@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}EcoPatch — Home{% endblock %}
+{% block content %}
+<div class="p-5 mb-4 bg-success bg-opacity-10 rounded-3">
+    <h1 class="display-6">Small Spaces, Greener Living</h1>
+    <p class="lead">EcoPatch membantu kamu mengubah balkon, teras, atau rooftop jadi kebun kota yang produktif.</p>
+    {% if not user.is_authenticated %}
+        <a href="{% url 'main:register' %}" class="btn btn-success">Mulai Sekarang</a>
+        <a href="{% url 'main:login' %}" class="btn btn-outline-success">Login</a>
+    {% else %}
+        <a href="{% url 'smart_care:list' %}" class="btn btn-success">Lihat Smart Care</a>
+    {% endif %}
+</div>
+{% endblock %}
