@@ -7,9 +7,7 @@
         <div class="collapse navbar-collapse" id="navbarMain">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" href="{% url 'main:home' %}">Home</a></li>
-                {% if user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'smart_care:list' %}">Smart Care</a></li>
-                {% endif %}
+                {# TODO: tambahkan link modul di sini begitu masing-masing app punya urls.py #}
             </ul>
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
