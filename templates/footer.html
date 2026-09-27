@@ -1,5 +1,84 @@
-<footer class="bg-light border-top py-3 mt-auto">
-    <div class="container text-center text-muted small">
-        &copy; {% now "Y" %} EcoPatch — Small Spaces, Greener Living.
+<footer class="site-footer mt-auto">
+    <div class="footer-wave" aria-hidden="true">
+        <svg class="footer-wave-svg" viewBox="0 0 1440 250" preserveAspectRatio="none">
+            <path class="footer-wave-1" d="M0,90 C120,100 180,118 260,116 C420,112 560,95 720,100 C880,105 1000,50 1150,50 C1280,50 1380,70 1440,80 L1440,250 L0,250 Z" />
+            <path class="footer-wave-2" d="M0,125 C200,125 420,170 720,172 C980,174 1200,140 1440,135 L1440,250 L0,250 Z" />
+            <path class="footer-wave-3" d="M0,150 C260,150 480,200 740,198 C1000,196 1240,165 1440,160 L1440,250 L0,250 Z" />
+        </svg>
+        {# Curves are shaped so each leaf lands on a contrasting layer; each layer's highest point stays at 20% / 50% / 60% #}
+        <svg class="footer-leaf footer-leaf-a" viewBox="0 0 24 24">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+        </svg>
+        <svg class="footer-leaf footer-leaf-b" viewBox="0 0 24 24">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+        </svg>
+        <svg class="footer-leaf footer-leaf-c" viewBox="0 0 24 24">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+        </svg>
+        <svg class="footer-leaf footer-leaf-d" viewBox="0 0 24 24">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+        </svg>
+    </div>
+
+    <div class="footer-body">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div>
+                    <a class="footer-brand" href="{% url 'main:home' %}">
+                        <svg class="footer-brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                        </svg>
+                        EcoPatch
+                    </a>
+                    <p class="footer-tagline">Membantu kamu mengubah balkon, teras, dan rooftop jadi kebun kota yang produktif - ruang kecil, dampak besar.</p>
+                    <div class="footer-socials">
+                        <a class="footer-social" href="#" aria-label="LinkedIn">IN</a>
+                        <a class="footer-social" href="#" aria-label="Twitter">TW</a>
+                        <a class="footer-social" href="#" aria-label="Instagram">IG</a>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="footer-heading">Platform</h3>
+                    {# TODO: ganti href="#" jadi {% url '<app>:list' %} begitu urls.py tiap modul tersedia #}
+                    <ul class="footer-links">
+                        <li><a href="#">Plant Library</a></li>
+                        <li><a href="#">My EcoPatch</a></li>
+                        <li><a href="#">Smart Care</a></li>
+                        <li><a href="#">Garden Journal</a></li>
+                        <li><a href="#">Seed Exchange</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="footer-heading">Bantuan</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Tentang Kami</a></li>
+                        <li><a href="#">Panduan Memulai</a></li>
+                        <li><a href="#">Pusat Bantuan</a></li>
+                        <li><a href="#">Hubungi Kami</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    <svg class="footer-copyright-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                    </svg>
+                    <span>&copy; {% now "Y" %} EcoPatch - Small Spaces, Greener Living.</span>
+                </div>
+                <div class="footer-bottom-links">
+                    <a href="#">Kebijakan Privasi</a>
+                    <a href="#">Syarat Layanan</a>
+                </div>
+            </div>
+        </div>
     </div>
 </footer>
