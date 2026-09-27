@@ -1,3 +1,86 @@
+/* Hero diorama + badges: parallax scene (see templates/main/home.html) */
+.hero-scene {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    aspect-ratio: 971 / 896;
+}
+
+.hero-diorama-wrap {
+    position: absolute;
+    inset: 0;
+}
+
+.hero-diorama {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.hero-badge-slot {
+    position: absolute;
+}
+
+.hero-badge-slot-healthy {
+    left: -1.75%;
+    top: 10.16%;
+    width: 19.46%;
+}
+
+.hero-badge-slot-weather {
+    left: 87.33%;
+    top: 22.21%;
+    width: 24.51%;
+}
+
+.hero-badge-slot-seed {
+    left: -13.39%;
+    top: 63.17%;
+    width: 18.43%;
+}
+
+.hero-badge {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+    animation: hero-float 3s ease-in-out infinite;
+}
+
+.hero-badge-slot-healthy .hero-badge {
+    animation-duration: 3s;
+    animation-delay: 0s;
+}
+
+.hero-badge-slot-weather .hero-badge {
+    animation-duration: 4s;
+    animation-delay: 0.4s;
+}
+
+.hero-badge-slot-seed .hero-badge {
+    animation-duration: 3.5s;
+    animation-delay: 0.8s;
+}
+
+@keyframes hero-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-11px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-badge {
+        animation: none;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .hero-badge {
+        animation: none;
+    }
+}
+
 /* Design tokens */
 :root {
     --surface-100: #fdedc9;
@@ -107,6 +190,8 @@ h1, h2, h3, .navbar-brand {
     }
 }
 
+/* ================= Landing page ================= */
+
 /* Buttons: brand hover states (Bootstrap's defaults are off-palette) and matching heights */
 .btn-success:hover,
 .btn-success:focus-visible,
@@ -126,6 +211,115 @@ h1, h2, h3, .navbar-brand {
     background: var(--surface-300);
     border-color: var(--border);
     color: var(--ink);
+}
+
+.ico {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Hero */
+.hero {
+    padding: 24px 0 40px;
+}
+
+.hero-title {
+    margin-bottom: 20px;
+    color: var(--ink);
+    font-size: clamp(2.6rem, 5.4vw, 4.4rem);
+    font-weight: 800;
+    line-height: 1.02;
+}
+
+.hero-highlight {
+    position: relative;
+    display: inline-block;
+    color: var(--brand-600);
+}
+
+.hero-swash {
+    position: absolute;
+    left: 0;
+    bottom: -0.12em;
+    width: 100%;
+    height: 0.28em;
+    overflow: visible;
+}
+
+.hero-swash path {
+    fill: none;
+    stroke: var(--accent-mango);
+    stroke-width: 6;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.hero-lead {
+    max-width: 480px;
+    margin-bottom: 28px;
+    color: var(--ink-muted);
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.hero-perks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--ink-muted);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.hero-perks li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hero-perks .ico {
+    width: 18px;
+    height: 18px;
+    color: var(--brand-600);
+}
+
+.hero-visual {
+    position: relative;
+}
+
+.hero-visual::before {
+    content: "";
+    position: absolute;
+    inset: -6% 0;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, var(--brand-300), transparent);
+    opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .hero-copy > * {
+        animation: rise-in 0.7s ease-out both;
+    }
+    .hero-copy > :nth-child(2) { animation-delay: 0.08s; }
+    .hero-copy > :nth-child(3) { animation-delay: 0.16s; }
+    .hero-copy > :nth-child(4) { animation-delay: 0.24s; }
+}
+
+@keyframes rise-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
 }
 
 /* Phones: tighter floating navbar; hero scene narrowed so the badges (negative offsets) stay on screen */
@@ -152,6 +346,12 @@ h1, h2, h3, .navbar-brand {
     .site-navbar .navbar-toggler {
         margin-left: 6px;
         padding: 4px 8px;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .hero-scene {
+        max-width: min(420px, 76%);
     }
 }
 

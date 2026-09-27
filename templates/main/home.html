@@ -1,12 +1,65 @@
 {% extends "base.html" %}
-{% block title %}EcoPatch — Home{% endblock %}
+{% load static %}
+{% block title %}EcoPatch - Home{% endblock %}
 {% block content %}
-<div class="p-5 mb-4 bg-success bg-opacity-10 rounded-3">
-    <h1 class="display-6">Small Spaces, Greener Living</h1>
-    <p class="lead">EcoPatch membantu kamu mengubah balkon, teras, atau rooftop jadi kebun kota yang produktif.</p>
-    {% if not user.is_authenticated %}
-        <a href="{% url 'main:register' %}" class="btn btn-success">Mulai Sekarang</a>
-        <a href="{% url 'main:login' %}" class="btn btn-outline-success">Login</a>
-    {% endif %}
-</div>
+
+{# ============ HERO ============ #}
+<section class="hero">
+    <div class="row align-items-center g-4 g-lg-5">
+        <div class="col-lg-6 hero-copy">
+            <h1 class="hero-title">
+                Small Spaces,<br>
+                <span class="hero-highlight">Greener Living
+                    <svg class="hero-swash" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true">
+                        <path d="M3,14 C60,4 140,4 297,10" />
+                    </svg>
+                </span>
+            </h1>
+            <p class="hero-lead">EcoPatch membantu kamu mengubah balkon, teras, atau rooftop jadi kebun kota yang produktif.</p>
+            <div class="hero-actions">
+                {% if user.is_authenticated %}
+                    {# TODO: ganti href="#" jadi {% url 'my_ecopatch:list' %} begitu urls.py my_ecopatch tersedia #}
+                    <a href="#" class="btn btn-success">Buka EcoPatch-ku</a>
+                    <a href="#fitur" class="btn btn-outline-success">Lihat Fitur</a>
+                {% else %}
+                    <a href="{% url 'main:register' %}" class="btn btn-success">Mulai Sekarang</a>
+                    <a href="#fitur" class="btn btn-outline-success">Lihat Fitur</a>
+                {% endif %}
+            </div>
+            <ul class="hero-perks">
+                <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Gratis untuk semua</li>
+                <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Cuaca kotamu real-time</li>
+                <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Ramah pemula</li>
+            </ul>
+        </div>
+        <div class="col-lg-6">
+            <div class="hero-visual">
+                <div class="hero-scene">
+                    <div class="hero-diorama-wrap" data-rellax-speed="-2">
+                        <img src="{% static 'img/hero/hero-diorama.png' %}" alt="Diorama kebun kota EcoPatch" class="hero-diorama">
+                    </div>
+                    <div class="hero-badge-slot hero-badge-slot-healthy" data-rellax-speed="4">
+                        <img src="{% static 'img/hero/badge-healthy.png' %}" alt="Badge tanaman sehat" class="hero-badge">
+                    </div>
+                    <div class="hero-badge-slot hero-badge-slot-weather" data-rellax-speed="5">
+                        <img src="{% static 'img/hero/badge-weather.png' %}" alt="Badge cuaca real-time" class="hero-badge">
+                    </div>
+                    <div class="hero-badge-slot hero-badge-slot-seed" data-rellax-speed="3">
+                        <img src="{% static 'img/hero/badge-seed.png' %}" alt="Badge tukar benih" class="hero-badge">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    (function () {
+        if (!window.matchMedia('(max-width: 767px)').matches) {
+            new Rellax('[data-rellax-speed]');
+        }
+    })();
+</script>
 {% endblock %}
