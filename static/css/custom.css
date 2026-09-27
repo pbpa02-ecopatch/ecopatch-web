@@ -1092,3 +1092,257 @@ h1, h2, h3, .navbar-brand {
 .landing-section {
     scroll-margin-top: 60px;
 }
+
+/* ================= Auth pages (login / register) ================= */
+.auth-shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 1040px;
+    margin: 8px auto 32px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 32px;
+    background: var(--surface-200);
+    box-shadow: 0 18px 40px rgba(34, 48, 31, 0.12);
+}
+
+.auth-panel {
+    padding: 40px 28px;
+}
+
+.auth-title {
+    margin: 0 0 10px;
+    color: var(--ink);
+    font-size: clamp(2rem, 4vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.auth-lead {
+    max-width: 420px;
+    margin-bottom: 28px;
+    color: var(--ink-muted);
+    font-size: 1.02rem;
+    line-height: 1.6;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.auth-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Django renders bare <input>s; style them here instead of adding widget classes in the view */
+.auth-form input:not([type="hidden"]) {
+    width: 100%;
+    padding: 13px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface-100);
+    color: var(--ink);
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.auth-form input::placeholder {
+    color: var(--ink-muted);
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: var(--brand-500);
+    background: var(--surface-200);
+    box-shadow: 0 0 0 4px var(--brand-300);
+}
+
+.auth-field.has-error input {
+    border-color: var(--danger);
+}
+
+.auth-field.has-error input:focus {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 22%, transparent);
+}
+
+.auth-password {
+    position: relative;
+}
+
+.auth-password input:not([type="hidden"]) {
+    padding-right: 52px;
+}
+
+.auth-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-muted);
+    transform: translateY(-50%);
+}
+
+.auth-toggle:hover,
+.auth-toggle[aria-pressed="true"] {
+    background: var(--brand-300);
+    color: var(--brand-600);
+}
+
+.auth-toggle:focus-visible {
+    outline: 3px solid var(--brand-300);
+}
+
+.auth-toggle .ico {
+    width: 18px;
+    height: 18px;
+}
+
+.auth-error {
+    margin-top: 6px;
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.auth-help {
+    margin-top: 6px;
+    color: var(--ink-muted);
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+.auth-help ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.auth-alert {
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--danger) 12%, var(--surface-200));
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.auth-submit {
+    width: 100%;
+    margin-top: 6px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    font-size: 16px;
+}
+
+.auth-switch {
+    margin: 24px 0 0;
+    color: var(--ink-muted);
+    font-size: 15px;
+    text-align: center;
+}
+
+.auth-switch a {
+    color: var(--brand-600);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* Illustration panel: hidden on phones so the form stays above the fold */
+.auth-aside {
+    display: none;
+}
+
+@media (min-width: 992px) {
+    .auth-shell {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .auth-panel {
+        align-self: center;
+        padding: 56px 56px;
+    }
+
+    .auth-aside {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 48px 44px 40px;
+        background:
+            radial-gradient(circle at 80% 18%, color-mix(in srgb, var(--accent-mango) 22%, transparent), transparent 42%),
+            linear-gradient(160deg, var(--brand-300), color-mix(in srgb, var(--brand-500) 40%, var(--brand-300)));
+    }
+
+    .auth-aside-copy h2 {
+        margin: 0 0 8px;
+        color: color-mix(in srgb, var(--brand-600) 55%, var(--ink));
+        font-size: 2rem;
+        line-height: 1.1;
+    }
+
+    .auth-aside-copy p {
+        max-width: 340px;
+        margin: 0;
+        color: color-mix(in srgb, var(--brand-600) 35%, var(--ink));
+        line-height: 1.6;
+    }
+
+    .auth-scene {
+        position: relative;
+        width: 82%;
+        margin: 0 auto;
+    }
+
+    .auth-diorama {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .auth-badge {
+        position: absolute;
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+        animation: hero-float 3.5s ease-in-out infinite;
+    }
+
+    .auth-badge-healthy {
+        left: -8%;
+        top: 8%;
+        width: 22%;
+    }
+
+    .auth-badge-weather {
+        right: -10%;
+        top: 30%;
+        width: 26%;
+        animation-delay: 0.6s;
+    }
+
+    .auth-perks {
+        margin: 0;
+        color: color-mix(in srgb, var(--brand-600) 35%, var(--ink));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-badge {
+        animation: none;
+    }
+}

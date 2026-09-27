@@ -1,23 +1,30 @@
 {% extends "base.html" %}
-{% block title %}Register - EcoPatch{% endblock %}
+{% block title %}Daftar - EcoPatch{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <h2 class="mb-3">Register</h2>
-        <form method="post" novalidate>
+<div class="auth-shell">
+    <section class="auth-panel">
+        <span class="section-eyebrow">Mulai berkebun</span>
+        <h1 class="auth-title">Buat akun EcoPatch</h1>
+        <p class="auth-lead">Satu akun untuk semua alat berkebunmu, dari memilih bibit sampai panen pertama.</p>
+
+        <form method="post" class="auth-form" novalidate>
             {% csrf_token %}
-            {% for field in form %}
-                <div class="mb-3">
-                    <label class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <div class="text-danger small">{{ field.errors }}</div>
-                    {% endif %}
+            {% if form.non_field_errors %}
+                <div class="auth-alert" role="alert">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
                 </div>
+            {% endif %}
+            {% for field in form %}
+                {% include "main/_auth_field.html" with show_help=True %}
             {% endfor %}
-            <button type="submit" class="btn btn-success w-100">Create Account</button>
+            <button type="submit" class="btn btn-success auth-submit">Buat Akun</button>
         </form>
-        <p class="mt-3">Sudah punya akun? <a href="{% url 'main:login' %}">Login</a></p>
-    </div>
+
+        <p class="auth-switch">Sudah punya akun? <a href="{% url 'main:login' %}">Masuk</a></p>
+    </section>
+
+    {% include "main/_auth_aside.html" with aside_title="Balkon kecil, panen besar" aside_text="Gabung dan ubah sudut sempit rumahmu jadi kebun kota yang produktif." %}
 </div>
 {% endblock %}
+
+{% block extra_scripts %}{% include "main/_auth_script.html" %}{% endblock %}
