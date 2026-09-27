@@ -516,11 +516,11 @@ feature/seed-exchange
 ## Deployment
 
 **PWS Deployment:**
-`[Belum tersedia]`
+https://salwa-alifia-eco-patch.pws.cs.ui.ac.id/ 
 
 ---
 
 ## Figma
 
 **Design / Wireframe:**
-`[Belum tersedia]`
+https://www.figma.com/design/oIDtpZy29QWfdudwhSFNb5/Untitled?node-id=0-1&t=LuUIQFP3lihxES26-1 
