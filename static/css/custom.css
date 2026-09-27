@@ -481,6 +481,24 @@ h1, h2, h3, .navbar-brand {
     scroll-margin-top: 24px;
 }
 
+/* Extra breathing room between the hero and the first content section */
+.landing-section-problems {
+    padding-top: 88px;
+}
+
+.section-eyebrow {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: var(--brand-300);
+    color: var(--brand-600);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
 .section-head {
     max-width: 640px;
     margin: 0 auto 40px;
