@@ -1,0 +1,16 @@
+{% load static %}
+<aside class="auth-aside" aria-hidden="true">
+    <div class="auth-aside-copy">
+        <h2>{{ aside_title }}</h2>
+        <p>{{ aside_text }}</p>
+    </div>
+    <div class="auth-scene">
+        <img src="{% static 'img/hero/hero-diorama.png' %}" alt="" class="auth-diorama">
+        <img src="{% static 'img/hero/badge-healthy.png' %}" alt="" class="auth-badge auth-badge-healthy">
+        <img src="{% static 'img/hero/badge-weather.png' %}" alt="" class="auth-badge auth-badge-weather">
+    </div>
+    <ul class="hero-perks auth-perks">
+        <li><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Gratis untuk semua</li>
+        <li><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Ramah pemula</li>
+    </ul>
+</aside>
