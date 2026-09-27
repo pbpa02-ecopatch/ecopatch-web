@@ -45,7 +45,7 @@
                 <ul class="navbar-nav mx-auto gap-2">
                     <li class="nav-item"><a class="nav-link{% if active_app == 'plant_library' %} active{% endif %}" href="#">Plant Library</a></li>
                     <li class="nav-item"><a class="nav-link{% if active_app == 'my_ecopatch' %} active{% endif %}" href="#">My EcoPatch</a></li>
-                    <li class="nav-item"><a class="nav-link{% if active_app == 'smart_care' %} active{% endif %}" href="#">Smart Care</a></li>
+                    <li class="nav-item"><a class="nav-link{% if active_app == 'smart_care' %} active{% endif %}" href="{% url 'smart_care:list' %}">Smart Care</a></li>
                     <li class="nav-item"><a class="nav-link{% if active_app == 'garden_journal' %} active{% endif %}" href="#">Garden Journal</a></li>
                     <li class="nav-item"><a class="nav-link{% if active_app == 'seed_exchange' %} active{% endif %}" href="#">Seed Exchange</a></li>
                 </ul>

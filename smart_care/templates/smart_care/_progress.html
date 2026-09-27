@@ -1,0 +1,7 @@
+<div class="care-progress" id="care-progress"{% if oob %} hx-swap-oob="true"{% endif %}>
+    <span>{{ stats.today_completed }}/{{ stats.today_total }} selesai hari ini</span>
+    <div class="care-progress-track" role="progressbar" aria-label="Progres tugas hari ini"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ stats.today_percent }}">
+        <div class="care-progress-fill" style="width: {{ stats.today_percent }}%"></div>
+    </div>
+</div>

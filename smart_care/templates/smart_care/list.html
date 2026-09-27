@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Smart Care - EcoPatch{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'smart_care/css/smart_care.css' %}">
+{% endblock %}
+{% block content %}
+<div class="care-page" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <div class="care-main">
+        <h1 class="care-title">Today's Care</h1>
+
+        {# ---------- Weather ---------- #}
+        <section class="care-card care-weather" aria-label="Cuaca {{ city }}">
+            <div class="care-weather-top">
+                <div class="care-weather-city">
+                    <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span>{{ city }}</span>
+                    {% if weather.condition %}<span class="care-weather-condition">· {{ weather.condition }}</span>{% endif %}
+                </div>
+                {% if weather.available and weather.rain_probability is not None %}
+                    <span class="care-rain-badge tone-sky">Rain {{ weather.rain_probability }}%</span>
+                {% endif %}
+            </div>
+
+            {% if weather.available %}
+                <div class="care-weather-stats">
+                    <div>
+                        <strong>{% if weather.temperature is not None %}{{ weather.temperature|floatformat:0 }}°C{% else %}–{% endif %}</strong>
+                        <span>Temperature</span>
+                    </div>
+                    <div>
+                        <strong>{% if weather.humidity is not None %}{{ weather.humidity }}%{% else %}–{% endif %}</strong>
+                        <span>Humidity</span>
+                    </div>
+                    <div>
+                        <strong>{% if weather.rain_probability is not None %}{{ weather.rain_probability }}%{% else %}–{% endif %}</strong>
+                        <span>Rain Prob.</span>
+                    </div>
+                </div>
+                {% if recommendation %}
+                    <p class="care-recommendation tone-mango">{{ recommendation }}</p>
+                {% endif %}
+            {% else %}
+                <p class="care-weather-empty">Info cuaca sedang tidak tersedia. Coba muat ulang halaman beberapa saat lagi.</p>
+            {% endif %}
+        </section>
+
+        {# ---------- Tasks ---------- #}
+        <div class="care-tasks-head">
+            <h2 class="care-overline">
+                {% if selected_date %}Tugas {{ selected_date|date:"d M Y" }}{% else %}Tugas hari ini{% endif %}
+            </h2>
+            {% include "smart_care/_progress.html" %}
+        </div>
+
+        <form method="get" class="care-date-filter">
+            <input type="hidden" name="city" value="{{ city }}">
+            <label for="care-date">Lihat tanggal</label>
+            <input type="date" id="care-date" name="date" value="{{ selected_date|date:'Y-m-d' }}" onchange="this.form.requestSubmit()">
+            {% if selected_date %}
+                <a href="?city={{ city|urlencode }}">Tampilkan semua yang akan datang</a>
+            {% endif %}
+            <noscript><button type="submit" class="btn btn-outline-success btn-sm">Terapkan</button></noscript>
+        </form>
+
+        {% if tasks %}
+            <ul class="care-task-list">
+                {% for task in tasks %}
+                    {% include "smart_care/_task_row.html" %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="care-empty">
+                <p>{% if selected_date %}Tidak ada tugas di tanggal ini.{% else %}Belum ada tugas perawatan yang akan datang di {{ city }}.{% endif %}</p>
+                <a href="{% url 'smart_care:create' %}?city={{ city|urlencode }}" class="btn btn-success">+ Tambah Tugas</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {# ---------- Sidebar ---------- #}
+    <aside class="care-sidebar">
+        {# TODO(smart_care): ganti jadi pilihan EcoPatch milik user begitu my_ecopatch.EcoPatch tersedia #}
+        <section class="care-card">
+            <form method="get">
+                <label for="care-city" class="care-overline">Pilih kota</label>
+                {% if selected_date %}<input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">{% endif %}
+                <select id="care-city" name="city" class="care-select" onchange="this.form.requestSubmit()">
+                    {% for value, label in city_choices %}
+                        <option value="{{ value }}"{% if value == city %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <noscript><button type="submit" class="btn btn-outline-success btn-sm mt-2">Terapkan</button></noscript>
+            </form>
+        </section>
+
+        {% include "smart_care/_summary.html" %}
+
+        <a href="{% url 'smart_care:create' %}?city={{ city|urlencode }}" class="care-add-btn">+ Tambah Tugas</a>
+    </aside>
+</div>
+{% endblock %}

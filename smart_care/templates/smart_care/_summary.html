@@ -1,0 +1,11 @@
+<section class="care-card" id="care-summary"{% if oob %} hx-swap-oob="true"{% endif %}>
+    <h2 class="care-overline">Ringkasan minggu ini</h2>
+    <dl class="care-summary">
+        <div><dt>Tugas selesai</dt><dd>{{ stats.week_completed }}</dd></div>
+        <div><dt>Tugas tertunda</dt><dd>{{ stats.week_pending }}</dd></div>
+        <div>
+            <dt>Tugas terlambat</dt>
+            <dd>{% if stats.overdue %}<span class="care-overdue-badge">{{ stats.overdue }}</span>{% else %}0{% endif %}</dd>
+        </div>
+    </dl>
+</section>

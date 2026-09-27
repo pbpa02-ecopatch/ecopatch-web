@@ -1,0 +1,495 @@
+/* Smart Care: builds only on the tokens in static/css/custom.css (no new colors here) */
+
+.care-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 16px 0;
+}
+
+.care-main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.care-title {
+    margin: 0;
+    color: var(--ink);
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+}
+
+.care-card {
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    background: var(--surface-200);
+    box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
+}
+
+.care-overline {
+    display: block;
+    margin: 0;
+    color: var(--ink-muted);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Weather */
+.care-weather-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.care-weather-city {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.care-weather-city .ico {
+    width: 18px;
+    height: 18px;
+    color: var(--brand-600);
+}
+
+.care-weather-condition {
+    color: var(--ink-muted);
+    font-weight: 500;
+}
+
+.care-rain-badge {
+    flex-shrink: 0;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--tone-soft);
+    color: var(--tone-text);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.care-weather-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.care-weather-stats div {
+    display: flex;
+    flex-direction: column;
+}
+
+.care-weather-stats strong {
+    color: var(--ink);
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.2;
+}
+
+.care-weather-stats span {
+    color: var(--ink-muted);
+    font-size: 12px;
+}
+
+.care-recommendation {
+    margin: 20px 0 0;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: var(--tone-soft);
+    color: var(--tone-text);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.care-weather-empty {
+    margin: 16px 0 0;
+    color: var(--ink-muted);
+    font-size: 14px;
+}
+
+/* Task list header + progress */
+.care-tasks-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    margin-top: 4px;
+}
+
+.care-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.care-progress-track {
+    width: 96px;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--surface-300);
+}
+
+.care-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--brand-500);
+    transition: width 0.3s ease;
+}
+
+.care-date-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-top: -8px;
+    color: var(--ink-muted);
+    font-size: 13px;
+}
+
+.care-date-filter input[type="date"] {
+    padding: 6px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-200);
+    color: var(--ink);
+    font-size: 13px;
+}
+
+.care-date-filter a {
+    color: var(--brand-600);
+    font-weight: 600;
+}
+
+/* Task rows */
+.care-task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.care-task {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface-200);
+}
+
+.care-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    padding: 0;
+    border: 2px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-300);
+    color: transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.care-check .ico {
+    width: 14px;
+    height: 14px;
+    stroke-width: 3;
+}
+
+.care-check:hover {
+    border-color: var(--brand-500);
+}
+
+.care-check:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 2px;
+}
+
+.care-task.is-done .care-check {
+    border-color: var(--brand-500);
+    background: var(--brand-500);
+    color: var(--surface-200);
+}
+
+.htmx-request.care-check {
+    opacity: 0.6;
+}
+
+.care-task-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.care-task-label {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.care-task-notes {
+    overflow: hidden;
+    color: var(--ink-muted);
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.care-task.is-done .care-task-label {
+    color: var(--ink-muted);
+    text-decoration: line-through;
+}
+
+.care-task-date {
+    flex-shrink: 0;
+    color: var(--ink-muted);
+    font-size: 12px;
+}
+
+.care-task-actions {
+    display: flex;
+    gap: 2px;
+}
+
+.care-task-actions form {
+    margin: 0;
+}
+
+.care-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-muted);
+}
+
+.care-icon-btn .ico {
+    width: 16px;
+    height: 16px;
+}
+
+.care-icon-btn:hover {
+    background: var(--surface-300);
+    color: var(--ink);
+}
+
+.care-icon-btn-danger,
+.care-icon-btn-danger:hover {
+    color: var(--danger);
+}
+
+.care-empty {
+    padding: 28px;
+    border: 1.5px dashed var(--border);
+    border-radius: 18px;
+    color: var(--ink-muted);
+    text-align: center;
+}
+
+.care-empty p {
+    margin-bottom: 16px;
+}
+
+/* Sidebar */
+.care-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.care-select {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    background-color: var(--surface-300);
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.care-select:focus {
+    outline: none;
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 4px var(--brand-300);
+}
+
+.care-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 14px 0 0;
+}
+
+.care-summary div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.care-summary dt {
+    color: var(--ink-muted);
+    font-weight: 500;
+}
+
+.care-summary dd {
+    margin: 0;
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.care-overdue-badge {
+    display: inline-block;
+    min-width: 28px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--danger) 25%, var(--surface-200));
+    color: color-mix(in srgb, var(--danger) 55%, var(--ink));
+    text-align: center;
+}
+
+.care-add-btn {
+    display: block;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: var(--brand-300);
+    color: var(--brand-600);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.care-add-btn:hover {
+    background: color-mix(in srgb, var(--brand-500) 35%, var(--brand-300));
+    color: var(--brand-600);
+}
+
+/* Create / edit form */
+.care-form-wrap {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 16px 0 32px;
+}
+
+.care-back {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: var(--brand-600);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.care-form-card {
+    padding: 32px;
+}
+
+.care-form-card .care-title {
+    margin-bottom: 24px;
+}
+
+.care-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.care-field label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.care-field input,
+.care-field select,
+.care-field textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-100);
+    color: var(--ink);
+}
+
+.care-field input:focus,
+.care-field select:focus,
+.care-field textarea:focus {
+    outline: none;
+    border-color: var(--brand-500);
+    background: var(--surface-200);
+    box-shadow: 0 0 0 4px var(--brand-300);
+}
+
+.care-field.has-error input,
+.care-field.has-error select {
+    border-color: var(--danger);
+}
+
+.care-field-error,
+.care-form-alert {
+    margin-top: 6px;
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.care-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+/* Desktop: two columns; below 768px the sidebar stacks under the task list */
+@media (min-width: 768px) {
+    .care-page {
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 40px 64px;
+    }
+
+    .care-main {
+        flex: 2;
+    }
+
+    .care-sidebar {
+        flex: 1;
+        max-width: 320px;
+    }
+}
+
+/* Between tablet and small desktop the 64px side padding squeezes the task rows */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .care-page {
+        padding: 32px 0;
+    }
+}

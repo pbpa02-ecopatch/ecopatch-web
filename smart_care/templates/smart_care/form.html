@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{% if is_edit %}Edit Tugas{% else %}Tambah Tugas{% endif %} - Smart Care{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'smart_care/css/smart_care.css' %}">
+{% endblock %}
+{% block content %}
+<div class="care-form-wrap">
+    <a href="{% url 'smart_care:list' %}?city={{ form.city.value|urlencode }}" class="care-back">&larr; Kembali ke Smart Care</a>
+    <section class="care-card care-form-card">
+        <span class="section-eyebrow">Smart Care</span>
+        <h1 class="care-title">{% if is_edit %}Edit tugas perawatan{% else %}Tambah tugas perawatan{% endif %}</h1>
+
+        <form method="post" class="care-form" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="care-form-alert" role="alert">{{ form.non_field_errors|join:" " }}</div>
+            {% endif %}
+            {% for field in form %}
+                <div class="care-field{% if field.errors %} has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div class="care-field-error">{{ field.errors|join:" " }}</div>{% endif %}
+                </div>
+            {% endfor %}
+            <div class="care-form-actions">
+                <a href="{% url 'smart_care:list' %}?city={{ form.city.value|urlencode }}" class="btn btn-outline-success">Batal</a>
+                <button type="submit" class="btn btn-success">{% if is_edit %}Simpan Perubahan{% else %}Tambah Tugas{% endif %}</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

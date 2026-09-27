@@ -1,0 +1,29 @@
+<li class="care-task{% if task.is_completed %} is-done{% endif %}" id="task-{{ task.pk }}">
+    <button type="button" class="care-check"
+            hx-post="{% url 'smart_care:complete' task.pk %}"
+            hx-target="#task-{{ task.pk }}" hx-swap="outerHTML"
+            aria-pressed="{{ task.is_completed|yesno:'true,false' }}"
+            aria-label="Tandai {{ task.get_task_type_display }} {{ task.is_completed|yesno:'belum selesai,selesai' }}">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 12 4 4 8-8"/></svg>
+    </button>
+    <div class="care-task-body">
+        <span class="care-task-label">{{ task.get_task_type_display }}</span>
+        {% if task.notes %}<span class="care-task-notes">{{ task.notes|truncatechars:70 }}</span>{% endif %}
+    </div>
+    <span class="care-task-date">{{ task.due_date|date:"d M" }}</span>
+    <div class="care-task-actions">
+        <a href="{% url 'smart_care:update' task.pk %}" class="care-icon-btn" aria-label="Edit {{ task.get_task_type_display }}">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </a>
+        <form method="post" action="{% url 'smart_care:delete' task.pk %}" onsubmit="return confirm('Hapus tugas {{ task.get_task_type_display }} ini?');">
+            {% csrf_token %}
+            <button type="submit" class="care-icon-btn care-icon-btn-danger" aria-label="Hapus {{ task.get_task_type_display }}">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+            </button>
+        </form>
+    </div>
+</li>
+{% if oob %}
+    {% include "smart_care/_progress.html" %}
+    {% include "smart_care/_summary.html" %}
+{% endif %}
