@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md site-navbar">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'main:home' %}">🌱 EcoPatch</a>
+         <a class="navbar-brand" href="{% url 'main:home' %}">🌱 EcoPatch</a>
 
         {% if user.is_authenticated %}
             <div class="d-flex align-items-center order-md-3">
@@ -39,12 +39,11 @@
         </button>
 
         <div class="collapse navbar-collapse flex-grow-1 order-md-2" id="navbarMain">
-            {# TODO: ganti href="#" jadi {% url '<app>:list' %} begitu urls.py tiap modul tersedia (lihat ecopatch_project/urls.py) #}
             {% if user.is_authenticated %}
                 {% with active_app=request.resolver_match.app_name %}
-                <ul class="navbar-nav mx-auto gap-2">
+                <ul class="navbar-nav nav-auth mx-auto gap-2">
                     <li class="nav-item"><a class="nav-link{% if active_app == 'plant_library' %} active{% endif %}" href="#">Plant Library</a></li>
-                    <li class="nav-item"><a class="nav-link{% if active_app == 'my_ecopatch' %} active{% endif %}" href="#">My EcoPatch</a></li>
+                    <li class="nav-item"><a class="nav-link{% if active_app == 'my_ecopatch' %} active{% endif %}" href="{% url 'my_ecopatch:list' %}">My EcoPatch</a></li>
                     <li class="nav-item"><a class="nav-link{% if active_app == 'smart_care' %} active{% endif %}" href="#">Smart Care</a></li>
                     <li class="nav-item"><a class="nav-link{% if active_app == 'garden_journal' %} active{% endif %}" href="#">Garden Journal</a></li>
                     <li class="nav-item"><a class="nav-link{% if active_app == 'seed_exchange' %} active{% endif %}" href="#">Seed Exchange</a></li>
