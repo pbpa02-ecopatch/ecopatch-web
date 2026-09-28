@@ -1,27 +1,33 @@
 <nav class="navbar navbar-expand-md site-navbar">
     <div class="container">
-         <a class="navbar-brand" href="{% url 'main:home' %}">🌱 EcoPatch</a>
+        <a class="navbar-brand" href="{% url 'main:home' %}">🌱 EcoPatch</a>
 
         {% if user.is_authenticated %}
+            {% firstof user.get_full_name user.username as display_name %}
             <div class="d-flex align-items-center order-md-3">
                 <div class="dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="navbar-avatar">{{ user.username|first|upper }}</span>
+                    <a class="nav-link dropdown-toggle avatar-toggle d-flex align-items-center" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu profil">
+                        <span class="navbar-avatar" aria-hidden="true">{{ display_name|first|upper }}</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><h6 class="dropdown-header">{{ user.username }}</h6></li>
-                        <li><span class="dropdown-item-text text-muted small">{{ user.email }}</span></li>
-                        <li><hr class="dropdown-divider"></li>
+                    <ul class="dropdown-menu dropdown-menu-end profile-menu">
+                        <li class="profile-menu-head">
+                            <span class="profile-menu-avatar" aria-hidden="true">{{ display_name|first|upper }}</span>
+                            <div class="profile-menu-id">
+                                <p class="profile-menu-name">{{ display_name }}</p>
+                                {% if user.email %}<p class="profile-menu-email">{{ user.email }}</p>{% endif %}
+                            </div>
+                        </li>
+                        <li class="profile-menu-divider" role="separator"></li>
                         {# TODO: ganti href="#" jadi {% url 'main:profile' %} begitu halaman profil tersedia #}
-                        <li><a class="dropdown-item" href="#">Profil Saya</a></li>
+                        <li><a class="profile-menu-item profile-menu-item--primary" href="#">Profil Saya</a></li>
                         {# TODO: ganti href="#" jadi {% url 'main:settings' %} begitu halaman pengaturan tersedia #}
-                        <li><a class="dropdown-item" href="#">Pengaturan</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="profile-menu-item" href="#">Pengaturan</a></li>
+                        <li class="profile-menu-divider" role="separator"></li>
                         <li>
                             <form action="{% url 'main:logout' %}" method="post">
                                 {% csrf_token %}
-                                <button type="submit" class="dropdown-item dropdown-item-danger">Keluar</button>
+                                <button type="submit" class="profile-menu-item profile-menu-item--danger">Keluar</button>
                             </form>
                         </li>
                     </ul>
