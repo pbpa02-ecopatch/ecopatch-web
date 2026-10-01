@@ -13,7 +13,7 @@ urlpatterns = [
     # TODO: masing-masing PIC menambahkan include() untuk app-nya sendiri:
     # path('smart-care/', include('smart_care.urls')),
     # path('plants/', include('plant_library.urls')),
-    # path('my-ecopatch/', include('my_ecopatch.urls')),
+    path('my-ecopatch/', include('my_ecopatch.urls')),
     path('journal/', include('garden_journal.urls')),
-    # path('seed-exchange/', include('seed_exchange.urls')),
+    path('seed-exchange/', include('seed_exchange.urls')),
 ]

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == "update" %}Ubah Listing{% else %}Buat Listing{% endif %} - Seed Exchange{% endblock %}
+
+{% block extra_head %}
+<style>
+    .seed-form-card {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 32px;
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        background: var(--surface-200);
+        box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
+    }
+    .seed-form-title { margin: 0 0 6px; font-size: 1.8rem; }
+    .seed-form-lead { margin: 0 0 8px; color: var(--ink-muted); }
+    .seed-form-legend { margin: 0 0 24px; color: var(--ink-muted); font-size: 13.5px; }
+    .seed-field { margin-bottom: 18px; }
+    .seed-label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
+    .seed-required { color: var(--danger); font-weight: 700; }
+    .seed-optional-tag { color: var(--ink-muted); font-weight: 400; font-size: 12.5px; }
+    .seed-input { border-radius: 16px; }
+    .seed-select-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        background: var(--surface-200);
+        text-align: left;
+    }
+    .seed-placeholder { color: var(--ink-muted); font-weight: 400; }
+    .seed-menu {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface-200);
+        box-shadow: 0 12px 32px rgba(34, 48, 31, 0.18);
+    }
+    .seed-menu-item {
+        border-radius: 10px;
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 12px;
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        border: none;
+    }
+    .seed-menu-item:hover {
+        background: color-mix(in srgb, var(--brand-300) 45%, var(--surface-200));
+    }
+    .seed-menu-item.active {
+        background: var(--brand-300);
+        color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+        font-weight: 700;
+    }
+    .seed-error { margin-top: 6px; font-size: 13px; color: color-mix(in srgb, var(--danger) 75%, var(--ink)); }
+    .seed-form-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="seed-form-card">
+    <h1 class="seed-form-title">{% if mode == "update" %}Ubah Listing{% else %}Buat Listing{% endif %}</h1>
+    <p class="seed-form-lead">Bagikan atau tukar bibit, stek, biji, dan tanamanmu.</p>
+    <p class="seed-form-legend"><span class="seed-required">*</span> wajib diisi</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% for row in rows %}
+            {% with field=row.field %}
+            <div class="seed-field">
+                <label class="seed-label" for="id_{{ field.name }}">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="seed-required" aria-hidden="true">*</span>
+                    {% else %}<span class="seed-optional-tag">(opsional)</span>{% endif %}
+                </label>
+                {% if row.select %}
+                <div class="dropdown" data-seed-select>
+                    <input type="hidden" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ row.select.value }}">
+                    <button type="button" class="form-control seed-input seed-select-btn dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <span data-seed-label>{% if row.select.display %}{{ row.select.display }}{% else %}<span class="seed-placeholder">Pilih {{ field.label|lower }}…</span>{% endif %}</span>
+                    </button>
+                    <ul class="dropdown-menu seed-menu">
+                        {% for opt in row.select.options %}
+                        <li><button type="button" class="dropdown-item seed-menu-item{% if opt.selected %} active{% endif %}"
+                                    data-seed-option data-value="{{ opt.value }}">{{ opt.label }}</button></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% else %}
+                {{ field }}
+                {% endif %}
+                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
+            </div>
+            {% endwith %}
+        {% endfor %}
+        <div class="seed-form-actions">
+            <button type="submit" class="btn btn-success">{% if mode == "update" %}Simpan perubahan{% else %}Simpan listing{% endif %}</button>
+            <a class="btn btn-outline-success" href="{% if mode == "update" %}{% url 'seed_exchange:detail' listing.pk %}{% else %}{% url 'seed_exchange:list' %}{% endif %}">Batal</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.querySelectorAll('[data-seed-select]').forEach(function (root) {
+    var input = root.querySelector('input[type="hidden"]');
+    var label = root.querySelector('[data-seed-label]');
+    root.querySelectorAll('[data-seed-option]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            input.value = btn.getAttribute('data-value');
+            label.textContent = btn.textContent.trim();
+            root.querySelectorAll('[data-seed-option]').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+        });
+    });
+});
+</script>
+{% endblock %}
