@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+{% block title %}Seed Exchange - EcoPatch{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Scoped Seed Exchange — memakai token global di custom.css, tanpa ubah file lain */
+    .seed-page-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    .seed-page-title {
+        margin: 0 0 6px;
+        color: var(--ink);
+        font-size: clamp(1.9rem, 3vw, 2.4rem);
+        font-weight: 800;
+    }
+    .seed-page-lead {
+        margin: 0;
+        color: var(--ink-muted);
+    }
+    .seed-section-title {
+        margin: 28px 0 14px;
+        color: var(--ink);
+        font-size: 1.35rem;
+    }
+    .seed-section-title:first-of-type { margin-top: 0; }
+    .seed-filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+    .seed-filter {
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface-200);
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 16px;
+        max-width: 100%;
+    }
+    select.seed-filter { cursor: pointer; }
+    button.seed-filter { cursor: pointer; }
+    input.seed-filter { min-width: 160px; }
+    .seed-filter:focus {
+        outline: none;
+        border-color: var(--brand-500);
+        box-shadow: 0 0 0 4px var(--brand-300);
+    }
+    .seed-menu {
+        min-width: 190px;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface-200);
+        box-shadow: 0 12px 32px rgba(34, 48, 31, 0.18);
+    }
+    .seed-menu-item {
+        border-radius: 10px;
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 12px;
+    }
+    .seed-menu-item:hover,
+    .seed-menu-item:focus-visible {
+        background: color-mix(in srgb, var(--brand-300) 45%, var(--surface-200));
+        color: var(--ink);
+    }
+    .seed-menu-item.active {
+        background: var(--brand-300);
+        color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+        font-weight: 700;
+    }
+    .seed-filter-reset {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface-200);
+        padding: 8px 16px;
+        color: var(--ink-muted);
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .seed-filter-reset:hover {
+        background: var(--surface-300);
+        color: var(--ink);
+    }
+    .seed-count {
+        margin: 10px 0 16px;
+        color: var(--ink-muted);
+        font-size: 14px;
+    }
+    .seed-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    .seed-card {
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: var(--surface-200);
+        box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
+    }
+    .seed-card-title {
+        margin: 0 0 10px;
+        font-size: 1.15rem;
+        line-height: 1.3;
+    }
+    .seed-card-title a { color: var(--ink); text-decoration: none; }
+    .seed-card-title a:hover { color: var(--brand-600); }
+    .seed-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .seed-pill {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.4;
+        white-space: nowrap;
+    }
+    .seed-pill--giveaway {
+        background: var(--brand-300);
+        color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+    }
+    .seed-pill--swap {
+        background: color-mix(in srgb, var(--accent-mango) 22%, var(--surface-200));
+        color: color-mix(in srgb, var(--accent-mango) 50%, var(--ink));
+    }
+    .seed-pill--available {
+        background: color-mix(in srgb, var(--accent-sky) 16%, var(--surface-200));
+        color: color-mix(in srgb, var(--accent-sky) 48%, var(--ink));
+    }
+    .seed-pill--requested {
+        background: color-mix(in srgb, var(--accent-mango) 22%, var(--surface-200));
+        color: color-mix(in srgb, var(--accent-mango) 50%, var(--ink));
+    }
+    .seed-pill--reserved {
+        background: var(--brand-300);
+        color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+    }
+    .seed-pill--completed {
+        background: var(--surface-300);
+        color: color-mix(in srgb, var(--ink-muted) 60%, var(--ink));
+    }
+    .seed-card-city {
+        margin: 0 0 8px;
+        color: var(--ink-muted);
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .seed-card-desc {
+        margin: 0 0 12px;
+        color: var(--ink-muted);
+        font-size: 14.5px;
+        line-height: 1.6;
+    }
+    .seed-card-meta {
+        margin: 0 0 4px;
+        color: var(--ink-muted);
+        font-size: 13px;
+    }
+    .seed-card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: auto;
+        padding-top: 14px;
+        border-top: 1px dashed var(--border);
+    }
+    .seed-card-note {
+        color: var(--ink-muted);
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .seed-empty {
+        grid-column: 1 / -1;
+        padding: 32px;
+        border: 2px dashed var(--border);
+        border-radius: 20px;
+        text-align: center;
+        color: var(--ink-muted);
+        background: transparent;
+    }
+    .seed-empty .btn { margin-top: 12px; }
+    /* Kartu placeholder "Buat Listing Baru" ala My EcoPatch */
+    .seed-card-add {
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        min-height: 220px;
+        border: 2px dashed var(--brand-500);
+        background: color-mix(in srgb, var(--brand-300) 35%, transparent);
+        box-shadow: none;
+        color: var(--brand-600);
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .seed-card-add:hover,
+    .seed-card-add:focus-visible {
+        border-color: var(--brand-600);
+        background: color-mix(in srgb, var(--brand-300) 55%, transparent);
+        color: var(--brand-600);
+    }
+    .seed-card-add:focus-visible {
+        outline: 3px solid var(--brand-300);
+        outline-offset: 2px;
+    }
+    .seed-add-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: var(--surface-200);
+        color: var(--brand-600);
+        box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
+    }
+    .seed-add-icon .ico {
+        width: 24px;
+        height: 24px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .seed-login-hint { margin-top: 24px; color: var(--ink-muted); }
+    .seed-login-hint a { color: var(--brand-600); font-weight: 700; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="seed-page">
+    <header class="seed-page-head">
+        <div>
+            <h1 class="seed-page-title">Seed Exchange</h1>
+            <p class="seed-page-lead">Temukan bibit, stek, dan biji untuk ditukar atau dibagikan.</p>
+        </div>
+        {% if user.is_authenticated %}
+            <a href="{% url 'seed_exchange:create' %}" class="btn btn-success">+ Buat Listing</a>
+        {% else %}
+            <a href="{% url 'main:login' %}?next={% url 'seed_exchange:create' %}" class="btn btn-success">+ Buat Listing</a>
+        {% endif %}
+    </header>
+
+    {% if user.is_authenticated %}
+        <h2 class="seed-section-title">Listing Saya</h2>
+        {% if my_listings %}
+            {% include "seed_exchange/partials/cards.html" with listings=my_listings grid_id="seed-mine" show_add_card=True %}
+        {% else %}
+            <div class="seed-empty">
+                <p><strong>Kamu belum punya listing.</strong></p>
+                <p>Bagikan bibit atau tanaman berlebihmu ke komunitas.</p>
+                <a class="btn btn-success btn-sm" href="{% url 'seed_exchange:create' %}">+ Buat listing pertama</a>
+            </div>
+        {% endif %}
+
+        <h2 class="seed-section-title">Jelajahi Listing</h2>
+    {% endif %}
+
+    <form id="seed-filter-form" class="seed-filters" method="get" action="{% url 'seed_exchange:list' %}"
+          hx-get="{% url 'seed_exchange:list' %}" hx-target="#seed-grid" hx-swap="outerHTML"
+          hx-push-url="true" hx-trigger="submit">
+        {% for dd in dropdowns %}
+        <div class="dropdown">
+            <button type="button" class="seed-filter dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ dd.current_label }}
+            </button>
+            <ul class="dropdown-menu seed-menu">
+                {% for item in dd.items %}
+                <li><a class="dropdown-item seed-menu-item{% if item.selected %} active{% endif %}" href="{{ item.url }}">{{ item.label }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+
+        <input id="seed-q" class="seed-filter" type="search" name="q" value="{{ active.q }}"
+               placeholder="Tanaman" aria-label="Cari tanaman"
+               hx-get="{% url 'seed_exchange:list' %}" hx-target="#seed-grid" hx-swap="outerHTML"
+               hx-push-url="true" hx-trigger="keyup changed delay:400ms, search">
+
+        <a class="seed-filter-reset" href="{% url 'seed_exchange:list' %}" aria-label="Reset filter">
+            <span aria-hidden="true">&times;</span> Reset
+        </a>
+    </form>
+
+    <p class="seed-count">{{ listings|length }} listing ditemukan</p>
+    {% include "seed_exchange/partials/cards.html" with listings=listings grid_id="seed-grid" %}
+
+    {% if not user.is_authenticated %}
+        <p class="seed-login-hint"><a href="{% url 'main:login' %}?next={% url 'seed_exchange:list' %}">Masuk</a> untuk membuat listing atau me-reserve listing orang lain.</p>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.body.addEventListener('htmx:configRequest', function (event) {
+    event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+});
+</script>
+{% endblock %}

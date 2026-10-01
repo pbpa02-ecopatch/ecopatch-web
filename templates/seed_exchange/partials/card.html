@@ -1,0 +1,12 @@
+<article class="seed-card" id="seed-card-{{ listing.pk }}">
+    <h3 class="seed-card-title">
+        <a href="{% url 'seed_exchange:detail' listing.pk %}">{{ listing.title }}</a>
+    </h3>
+    <div class="seed-badges">
+        <span class="seed-pill seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
+        <span class="seed-pill seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
+    </div>
+    <p class="seed-card-city">{{ listing.city }}{% if listing.plant_name %} &middot; {{ listing.plant_name }}{% endif %}</p>
+    <p class="seed-card-desc">{{ listing.description|default:"Belum ada deskripsi."|truncatewords:20 }}</p>
+    <p class="seed-card-meta">oleh {{ listing.user.username }} &middot; {{ listing.get_item_type_display }}{% if user.is_authenticated and listing.reserved_by_id == user.id and listing.status == 'requested' %} &middot; <strong>menunggu konfirmasi</strong>{% elif user.is_authenticated and listing.reserved_by_id == user.id and listing.status == 'reserved' %} &middot; <strong>sudah diterima</strong>{% endif %}</p>
+</article>

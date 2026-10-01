@@ -1,0 +1,18 @@
+<div id="{{ grid_id|default:'seed-grid' }}" class="seed-grid">
+    {% for listing in listings %}
+        {% include "seed_exchange/partials/card.html" with listing=listing %}
+    {% empty %}
+        <div class="seed-empty">
+            <p><strong>Belum ada listing yang cocok.</strong></p>
+            <p>Coba ubah filter atau buat listing baru.</p>
+        </div>
+    {% endfor %}
+    {% if show_add_card %}
+        <a href="{% url 'seed_exchange:create' %}" class="seed-card seed-card-add">
+            <span class="seed-add-icon" aria-hidden="true">
+                <svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+            <span class="seed-add-label">Buat Listing Baru</span>
+        </a>
+    {% endif %}
+</div>
