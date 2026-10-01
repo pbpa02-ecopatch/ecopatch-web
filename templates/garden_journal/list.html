@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Garden Journal — EcoPatch{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="journal-page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+        <h1 class="journal-title mb-1">Garden Journal</h1>
+        <p class="journal-subtitle mb-0">Pilih tanaman untuk melihat riwayat jurnalnya.</p>
+    </div>
+    <div>
+        <a href="{% url 'garden_journal:create' %}" class="btn btn-success">
+            + Tulis Jurnal Baru
+        </a>
+    </div>
+</div>
+
+<!-- Filter Bar: Pill style matching the design -->
+<form id="filter-form" class="d-flex flex-wrap align-items-center gap-2 mb-4">
+    <!-- Filter EcoPatch -->
+    <div class="filter-pill-btn">
+        <label for="id_ecopatch" class="mb-0 text-muted small">🪴</label>
+        <select name="ecopatch_name" id="id_ecopatch" class="filter-pill-select"
+                hx-get="{% url 'garden_journal:filter_ajax' %}"
+                hx-target="#book-shelf-container"
+                hx-trigger="change"
+                hx-include="#filter-form">
+            <option value="">Semua EcoPatch</option>
+            {% for ep in ecopatch_names %}
+                <option value="{{ ep }}" {% if selected_ecopatch_name == ep %}selected{% endif %}>
+                    {{ ep }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Filter Kondisi Tanaman -->
+    <div class="filter-pill-btn">
+        <label for="id_condition" class="mb-0 text-muted small">🌿</label>
+        <select name="condition" id="id_condition" class="filter-pill-select"
+                hx-get="{% url 'garden_journal:filter_ajax' %}"
+                hx-target="#book-shelf-container"
+                hx-trigger="change"
+                hx-include="#filter-form">
+            <option value="">Semua Kondisi</option>
+            {% for val, label in conditions %}
+                <option value="{{ val }}" {% if selected_condition == val %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Live Search Tanaman -->
+    <div class="filter-pill-btn ms-auto">
+        <span class="text-muted small">🔍</span>
+        <input type="text" name="plant_name"
+               class="border-0 bg-transparent text-dark small"
+               style="outline: none; width: 140px;"
+               placeholder="Cari tanaman..."
+               value="{{ selected_plant_name }}"
+               hx-get="{% url 'garden_journal:filter_ajax' %}"
+               hx-target="#book-shelf-container"
+               hx-trigger="keyup changed delay:350ms"
+               hx-include="#filter-form">
+    </div>
+</form>
+
+<!-- Book Shelf Container (HTMX Target) -->
+<div id="book-shelf-container">
+    {% include "garden_journal/partials/book_grid.html" %}
+</div>
+
+{% endblock %}
