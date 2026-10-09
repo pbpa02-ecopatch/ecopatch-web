@@ -194,9 +194,19 @@
 
 {% block content %}
 <section class="plant-page">
-    <header class="plant-page-head">
-        <h1 class="plant-page-title">Plant Library</h1>
-        <p class="plant-page-lead">Katalog tanaman untuk inspirasi dan panduan berkebun di ruang terbatas Anda.</p>
+    <header class="plant-page-head d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1 class="plant-page-title">Plant Library</h1>
+            <p class="plant-page-lead">Katalog tanaman untuk inspirasi dan panduan berkebun di ruang terbatas Anda.</p>
+        </div>
+        {% if user.is_staff %}
+            <div>
+                <a href="{% url 'plant_library:plant_create' %}" class="btn btn-success d-inline-flex align-items-center gap-2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                    Tambah Tanaman
+                </a>
+            </div>
+        {% endif %}
     </header>
 
     <!-- Filter & Pencarian -->
@@ -329,10 +339,20 @@
                                 {{ plant.description|default:"Tidak ada deskripsi tambahan."|truncatewords:16 }}
                             </p>
 
-                            <div class="plant-card-footer">
+                            <div class="plant-card-footer d-flex flex-column gap-2">
                                 <a href="{% url 'plant_library:plant_detail' plant.pk %}" class="btn btn-outline-success w-100">
                                     Lihat Detail Tanaman
                                 </a>
+                                {% if user.is_staff %}
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'plant_library:plant_update' plant.pk %}" class="btn btn-sm btn-light border flex-grow-1 text-center" title="Ubah tanaman">
+                                            ✏️ Ubah
+                                        </a>
+                                        <a href="{% url 'plant_library:plant_delete' plant.pk %}" class="btn btn-sm btn-light border text-danger flex-grow-1 text-center" title="Hapus tanaman">
+                                            🗑️ Hapus
+                                        </a>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </article>
@@ -350,4 +370,3 @@
     {% endif %}
 </section>
 {% endblock %}
-

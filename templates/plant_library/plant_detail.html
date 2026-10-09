@@ -11,7 +11,6 @@
         color: var(--ink-muted);
         text-decoration: none;
         font-weight: 600;
-        margin-bottom: 20px;
         padding: 6px 14px;
         border-radius: 999px;
         background: var(--surface-200);
@@ -157,16 +156,38 @@
         color: var(--ink);
         margin-bottom: 24px;
     }
+    .btn-danger {
+        border-radius: 999px;
+        padding: 10px 24px;
+        font-weight: 700;
+    }
+    .btn-outline-danger {
+        border-radius: 999px;
+        font-weight: 600;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container py-2">
-    <!-- Tombol Kembali -->
-    <a href="{% url 'plant_library:plant_list' %}" class="plant-back-btn">
-        <span>←</span>
-        <span>Kembali ke Plant Library</span>
-    </a>
+    <!-- Top Action / Breadcrumb Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <a href="{% url 'plant_library:plant_list' %}" class="plant-back-btn">
+            <span>←</span>
+            <span>Kembali ke Plant Library</span>
+        </a>
+
+        {% if user.is_staff %}
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'plant_library:plant_update' plant.pk %}" class="btn btn-outline-success btn-sm px-3">
+                    ✏️ Ubah Tanaman
+                </a>
+                <a href="{% url 'plant_library:plant_delete' plant.pk %}" class="btn btn-outline-danger btn-sm px-3">
+                    🗑️ Hapus Tanaman
+                </a>
+            </div>
+        {% endif %}
+    </div>
 
     <article class="plant-detail-container">
         <!-- Header Info -->
@@ -269,13 +290,23 @@
                 {% endif %}
             </div>
 
-            <div class="d-flex gap-3 pt-2">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pt-2 border-top">
                 <a href="{% url 'plant_library:plant_list' %}" class="btn btn-outline-success">
                     Kembali ke Daftar Tanaman
                 </a>
+
+                {% if user.is_staff %}
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'plant_library:plant_update' plant.pk %}" class="btn btn-success">
+                            ✏️ Ubah Data
+                        </a>
+                        <a href="{% url 'plant_library:plant_delete' plant.pk %}" class="btn btn-danger">
+                            🗑️ Hapus Tanaman
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </article>
 </div>
 {% endblock %}
-

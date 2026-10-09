@@ -1,5 +1,30 @@
-from django.shortcuts import get_object_or_404, render
+from functools import wraps
+
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.views import redirect_to_login
+from django.db.models import ProtectedError
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import PlantForm
 from .models import Plant
+
+
+def staff_required(view_func):
+    """Decorator untuk membatasi akses view hanya bagi user staff/admin.
+
+    Jika belum login, diarahkan ke halaman login.
+    Jika login tapi bukan staff, dialihkan ke plant_list dengan notifikasi error.
+    """
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect_to_login(request.get_full_path(), login_url=settings.LOGIN_URL)
+        if not request.user.is_staff:
+            messages.error(request, 'Akses ditolak. Fitur ini hanya dapat diakses oleh Admin/Staff.')
+            return redirect('plant_library:plant_list')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
 
 
 def plant_list(request):
@@ -52,3 +77,63 @@ def plant_detail(request, pk):
     """Menampilkan rincian detail 1 tanaman."""
     plant = get_object_or_404(Plant, pk=pk)
     return render(request, 'plant_library/plant_detail.html', {'plant': plant})
+
+
+@staff_required
+def plant_create(request):
+    """Menambahkan data tanaman baru (khusus Admin/Staff)."""
+    if request.method == 'POST':
+        form = PlantForm(request.POST)
+        if form.is_valid():
+            plant = form.save()
+            messages.success(request, f'Tanaman "{plant.name}" berhasil ditambahkan ke katalog.')
+            return redirect('plant_library:plant_detail', pk=plant.pk)
+    else:
+        form = PlantForm()
+
+    context = {
+        'form': form,
+        'is_edit': False,
+    }
+    return render(request, 'plant_library/plant_form.html', context)
+
+
+@staff_required
+def plant_update(request, pk):
+    """Mengubah data tanaman yang sudah ada (khusus Admin/Staff)."""
+    plant = get_object_or_404(Plant, pk=pk)
+    if request.method == 'POST':
+        form = PlantForm(request.POST, instance=plant)
+        if form.is_valid():
+            plant = form.save()
+            messages.success(request, f'Data tanaman "{plant.name}" berhasil diperbarui.')
+            return redirect('plant_library:plant_detail', pk=plant.pk)
+    else:
+        form = PlantForm(instance=plant)
+
+    context = {
+        'form': form,
+        'plant': plant,
+        'is_edit': True,
+    }
+    return render(request, 'plant_library/plant_form.html', context)
+
+
+@staff_required
+def plant_delete(request, pk):
+    """Menghapus data tanaman dengan proteksi ProtectedError (khusus Admin/Staff)."""
+    plant = get_object_or_404(Plant, pk=pk)
+    if request.method == 'POST':
+        plant_name = plant.name
+        try:
+            plant.delete()
+            messages.success(request, f'Tanaman "{plant_name}" berhasil dihapus dari katalog.')
+            return redirect('plant_library:plant_list')
+        except ProtectedError:
+            messages.error(
+                request,
+                f'Tanaman "{plant_name}" tidak dapat dihapus karena masih digunakan pada EcoPatch pengguna atau modul lain.'
+            )
+            return redirect('plant_library:plant_detail', pk=plant.pk)
+
+    return render(request, 'plant_library/plant_confirm_delete.html', {'plant': plant})
