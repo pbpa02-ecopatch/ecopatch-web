@@ -1,0 +1,1083 @@
+[
+  {
+    "model": "plant_library.plant",
+    "pk": 1,
+    "fields": {
+      "name": "Bayam Hijau",
+      "scientific_name": "Amaranthus tricolor",
+      "category": "vegetables",
+      "sunlight": "full",
+      "watering": "high",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Bayam hijau sangat cepat dipanen dalam waktu 3–4 minggu setelah semai. Cocok ditanam di pot dangkal atau planter box di area balkon dengan sinar matahari melimpah. Siram secara rutin setiap pagi agar daun tetap segar dan tidak layu.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 2,
+    "fields": {
+      "name": "Kangkung",
+      "scientific_name": "Ipomoea aquatica",
+      "category": "vegetables",
+      "sunlight": "full",
+      "watering": "high",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Sayuran favorit Indonesia yang sangat mudah tumbuh baik di tanah maupun sistem hidroponik sederhana. Memerlukan air yang cukup dan paparan sinar matahari langsung minimal 6 jam sehari. Dapat dipanen berkali-kali dengan memotong pucuk batangnya.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 3,
+    "fields": {
+      "name": "Sawi Sendok (Pakcoy)",
+      "scientific_name": "Brassica rapa subsp. chinensis",
+      "category": "vegetables",
+      "sunlight": "partial",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Pakcoy memiliki batang renyah dan daun hijau segar yang ideal ditanam di pot berukuran sedang. Tumbuh subur di tempat yang mendapatkan cahaya matahari pagi namun terlindung dari terik siang hari. Siap dipanen sekitar 30–40 hari setelah pindah tanam.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 4,
+    "fields": {
+      "name": "Selada Keriting Hijau",
+      "scientific_name": "Lactuca sativa",
+      "category": "vegetables",
+      "sunlight": "partial",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Selada keriting sangat populer untuk kebun perkotaan karena bentuk daunnya yang estetik dan renyah. Hindari paparan panas terik langsung agar daun tidak terasa pahit. Jaga kelembapan media tanam tetap sejuk dan tidak tergenang.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 5,
+    "fields": {
+      "name": "Cabai Rawit Merah",
+      "scientific_name": "Capsicum frutescens",
+      "category": "vegetables",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Tanaman wajib bagi dapur rumah tangga yang sangat adaptif ditanam di dalam pot. Butuh sinar matahari penuh sepanjang hari untuk memicu pembungaan dan pembuahan yang lebat. Lakukan pemangkasan pucuk muda agar tanaman tumbuh rimbun ke samping.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 6,
+    "fields": {
+      "name": "Cabai Merah Keriting",
+      "scientific_name": "Capsicum annuum",
+      "category": "vegetables",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Menghasilkan buah cabai panjang bergelombang dengan rasa pedas sedang. Tumbuh baik di pot berdiameter minimal 25 cm dengan drainase air yang lancar. Pastikan tanaman terlindung dari kelembapan berlebih saat musim hujan agar tidak mudah terserang jamur.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 7,
+    "fields": {
+      "name": "Tomat Ceri",
+      "scientific_name": "Solanum lycopersicum var. cerasiforme",
+      "category": "vegetables",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Tomat berukuran mini yang manis dan sangat produktif di ruang terbatas. Memerlukan ajir atau tiang penyangga agar batangnya tidak rebah saat mulai berbuah lebat. Berikan pupuk berkala dan siram secara konsisten pada bagian tanah.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 8,
+    "fields": {
+      "name": "Terung Ungu Mini",
+      "scientific_name": "Solanum melongena",
+      "category": "vegetables",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Terung dengan varietas kerdil yang sangat pas dibudidayakan dalam pot atau planter bag. Menyukai sinar matahari penuh dan media tanam yang kaya bahan organik gembur. Siram secara teratur terutama saat bunga mulai bermunculan.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 9,
+    "fields": {
+      "name": "Daun Bawang",
+      "scientific_name": "Allium fistulosum",
+      "category": "vegetables",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Tanaman bumbu daun yang bisa ditanam kembali dari sisa potongan akar dapur. Sangat hemat tempat dan bisa diletakkan di ambang jendela atau pot sempit. Cukup siram 1–2 hari sekali ketika permukaan tanah mulai terasa kering.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 10,
+    "fields": {
+      "name": "Seledri",
+      "scientific_name": "Apium graveolens",
+      "category": "vegetables",
+      "sunlight": "partial",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Seledri beraroma khas yang menyukai lingkungan sejuk dengan sinar matahari tidak langsung. Media tanam harus selalu lembap namun memiliki saluran air yang baik agar akar tidak membusuk. Petik batang bagian luar saat memanen agar tunas tengah terus berkembang.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 11,
+    "fields": {
+      "name": "Buncis Tegak",
+      "scientific_name": "Phaseolus vulgaris",
+      "category": "vegetables",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Varietas buncis tipe semak yang tidak membutuhkan lanjaran tinggi sehingga sangat efisien untuk kebun teras. Menghasilkan polong renyah dalam waktu sekitar 45–50 hari. Pastikan mendapat sinar matahari penuh untuk hasil panen optimal.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 12,
+    "fields": {
+      "name": "Bayam Merah",
+      "scientific_name": "Amaranthus tricolor",
+      "category": "vegetables",
+      "sunlight": "full",
+      "watering": "high",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Bayam dengan warna daun merah keunguan yang kaya antioksidan dan mempercantik tampilan balkon. Memiliki siklus hidup singkat dan sangat cepat tumbuh dari biji. Siram secara rutin dan panen sebelum tanaman mulai berbunga.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 13,
+    "fields": {
+      "name": "Kale Keriting",
+      "scientific_name": "Brassica oleracea var. sabellica",
+      "category": "vegetables",
+      "sunlight": "partial",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Superfood berdaun keriting lebat yang tahan dipanen berulang kali sepanjang musim. Lebih menyukai cuaca sejuk atau tempat berkanopi dengan sinar matahari pagi. Jaga kelembapan tanah dan bersihkan daun dari ulat secara berkala.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 14,
+    "fields": {
+      "name": "Kailan",
+      "scientific_name": "Brassica oleracea var. alboglabra",
+      "category": "vegetables",
+      "sunlight": "partial",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Sayuran berdaun tebal dan batang renyah yang sering digunakan dalam masakan oriental. Tumbuh subur di dataran rendah maupun menengah asalkan media tanam berpori dan gembur. Panen dapat dilakukan saat batang masih muda dan empuk.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 15,
+    "fields": {
+      "name": "Mentimun Mini",
+      "scientific_name": "Cucumis sativus",
+      "category": "vegetables",
+      "sunlight": "full",
+      "watering": "high",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "rooftop",
+      "description": "Mentimun varietas mini yang cocok dirambatkan pada teralis dinding atau pagar balkon. Membutuhkan sinar matahari penuh dan pasokan air yang banyak selama proses pembentukan buah. Buahnya renyah dan nikmat dipetik segar sebagai lalapan.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 16,
+    "fields": {
+      "name": "Kemangi",
+      "scientific_name": "Ocimum basilicum",
+      "category": "herbs",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Herba khas Nusantara beraroma wangi segar yang sering dijadikan lalapan dan bumbu masakan. Sangat menyukai sinar matahari terik agar minyak aromatik pada daunnya keluar maksimal. Petik pucuk bunga secara rutin agar tanaman tidak cepat tua dan terus bertunas lebat.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 17,
+    "fields": {
+      "name": "Sweet Basil",
+      "scientific_name": "Ocimum basilicum",
+      "category": "herbs",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Daun beraroma manis lembut yang menjadi bahan utama saus pesto dan masakan pasta. Tumbuh sangat baik di pot teras dekat jendela yang mendapatkan cahaya terang. Siram di bagian pangkal media tanah dan hindari membasahi daun secara berlebihan.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 18,
+    "fields": {
+      "name": "Mint (Peppermint)",
+      "scientific_name": "Mentha x piperita",
+      "category": "herbs",
+      "sunlight": "partial",
+      "watering": "high",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Herba penyegar yang sangat cepat merambat dan memberikan sensasi dingin alami pada minuman teh. Lebih baik ditanam di dalam pot tersendiri agar akarnya tidak mendominasi tanaman lain. Suka tempat agak teduh dengan kelembapan tanah yang konsisten.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 19,
+    "fields": {
+      "name": "Spearmint",
+      "scientific_name": "Mentha spicata",
+      "category": "herbs",
+      "sunlight": "partial",
+      "watering": "high",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Varian mint dengan aroma lembut dan rasa manis yang cocok untuk campuran infused water atau salad buah. Memerlukan media tanam yang selalu lembap namun bebas genangan air. Pangkas batang secara teratur untuk merangsang tunas-tunas baru yang rimbun.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 20,
+    "fields": {
+      "name": "Oregano",
+      "scientific_name": "Origanum vulgare",
+      "category": "herbs",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Tanaman bumbu mediterania yang aromatik dan menjadi pelengkap hidangan piza maupun olahan daging. Sangat toleran terhadap kekeringan dan menyukai media berpasir dengan drainase sangat baik. Biarkan permukaan tanah mengering sebelum melakukan penyiraman berikutnya.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 21,
+    "fields": {
+      "name": "Rosemary",
+      "scientific_name": "Salvia rosmarinus",
+      "category": "herbs",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "hard",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "rooftop",
+      "description": "Herba berdaun jarum dengan aroma pinus yang kuat untuk panggangan steak dan masakan eropa. Sangat sensitif terhadap kelebihan air dan busuk akar, sehingga butuh sirkulasi udara kencang dan pot berdrainase prima. Letakkan di tempat terbuka yang tersorot matahari penuh sepanjang hari.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 22,
+    "fields": {
+      "name": "Thyme",
+      "scientific_name": "Thymus vulgaris",
+      "category": "herbs",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Tanaman semak kecil merayap dengan daun mungil beraroma gurih herbal yang intens. Tumbuh lambat namun kokoh, sangat cocok untuk pot mini di teras atau balkon kering. Siram hemat secukupnya hanya ketika media tanam sudah benar-benar kering.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 23,
+    "fields": {
+      "name": "Ketumbar (Cilantro)",
+      "scientific_name": "Coriandrum sativum",
+      "category": "herbs",
+      "sunlight": "partial",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Daun ketumbar memberikan aroma tajam segar pada sup, kari, dan masakan salsa. Tanaman ini mudah berbunga jika cuaca terlalu panas, sehingga sebaiknya ditempatkan di area teduh berangin. Siram secara teratur tanpa membuat tanah terlalu becek.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 24,
+    "fields": {
+      "name": "Peterseli (Parsley)",
+      "scientific_name": "Petroselinum crispum",
+      "category": "herbs",
+      "sunlight": "partial",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Herba hiasan dan penyedap yang kaya vitamin dengan daun keriting hijau cerah. Tumbuh subur di tempat dengan sinar matahari pagi yang lembut dan media tanam gembur. Petik batang bagian luar saat memasak agar pertumbuhan daun baru tetap berlanjut.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 25,
+    "fields": {
+      "name": "Tarragon",
+      "scientific_name": "Artemisia dracunculus",
+      "category": "herbs",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Herba aromatik khas Perancis dengan sentuhan rasa adas manis yang cocok untuk hidangan ayam dan telur. Menyukai kondisi hangat dan tanah yang tidak basah tergenang. Pangkas berkala untuk menjaga bentuk semak tetap rapi dan tidak rapuh.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 26,
+    "fields": {
+      "name": "Jeruk Nipis Pot",
+      "scientific_name": "Citrus aurantiifolia",
+      "category": "fruit_container",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Tanaman buah jeruk yang sangat populer ditanam di pot besar pada area teras rumah. Menghasilkan buah asam segar yang kaya vitamin C dan berkhasiat untuk minuman maupun bumbu dapur. Membutuhkan sinar matahari penuh dan pemupukan teratur agar rajin berbuah.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 27,
+    "fields": {
+      "name": "Jeruk Purut",
+      "scientific_name": "Citrus hystrix",
+      "category": "fruit_container",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Terkenal dengan daun berlekuk dua yang harum semerbak untuk bumbu sup dan tom yum. Sangat mudah dirawat dalam pot berukuran sedang dan tahan terhadap panas terik matahari. Siram secara berkala dan periksa daun dari ulat pengerat.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 28,
+    "fields": {
+      "name": "Jeruk Limau",
+      "scientific_name": "Citrus amblycarpa",
+      "category": "fruit_container",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Pohon jeruk mungil yang cepat berbuah dan menjadi pelengkap utama aneka sambal Nusantara. Sangat cocok ditaruh di balkon kos atau apartemen yang terkena paparan sinar matahari langsung. Gunakan media tanam berpori agar perakaran tidak busuk.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 29,
+    "fields": {
+      "name": "Stroberi Pot",
+      "scientific_name": "Fragaria x ananassa",
+      "category": "fruit_container",
+      "sunlight": "partial",
+      "watering": "moderate",
+      "difficulty": "hard",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Buah manis asam berwarna merah menggoda yang bisa ditanam di pot gantung atau talang vertikal. Memerlukan sinar matahari pagi yang sejuk dan sirkulasi udara yang lancar agar buah tidak berjamur. Siram di pangkal batang tanpa membasahi buah yang sedang ranum.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 30,
+    "fields": {
+      "name": "Belimbing Wuluh",
+      "scientific_name": "Averrhoa bilimbi",
+      "category": "fruit_container",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "small_yard",
+      "description": "Pohon berukuran sedang yang mampu berbuah lebat langsung pada batang utamanya meski di dalam pot. Buahnya yang sangat asam menjadi bumbu utama sayur asam dan garang asem. Pastikan pot memiliki lubang drainase besar dan letakkan di tempat yang terbuka.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 31,
+    "fields": {
+      "name": "Murbei (Mulberry)",
+      "scientific_name": "Morus alba",
+      "category": "fruit_container",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "rooftop",
+      "description": "Tanaman buah perdu yang sangat adaptif dipangkas dan rajin berbuah manis kehitaman setelah pemangkasan ranting. Sangat tahan panas dan sangat menyukai terik matahari di rooftop atau balkon atas. Siram 1–2 kali sehari saat musim kemarau.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 32,
+    "fields": {
+      "name": "Jambu Kerikil Mini",
+      "scientific_name": "Psidium guajava var. pygmaeum",
+      "category": "fruit_container",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Varietas jambu biji berpostur kerdil dengan buah seukuran kelereng besar yang bisa dimakan langsung. Menjadi pilihan favorit untuk tabulampot hias karena bentuk pohonnya menyerupai bonsai alami. Cukup berikan sinar matahari penuh dan pupuk kandang secara berkala.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 33,
+    "fields": {
+      "name": "Tin (Ara)",
+      "scientific_name": "Ficus carica",
+      "category": "fruit_container",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "rooftop",
+      "description": "Pohon buah eksotis berdaun menjari lebar yang sangat menyukai cuaca panas terik dan media porous kering. Buahnya manis lembut dan kaya serat, sangat nikmat disantap saat matang pohon. Hindari penyiraman terlalu sering agar akar tidak membusuk.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 34,
+    "fields": {
+      "name": "Bunga Telang",
+      "scientific_name": "Clitoria ternatea",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Tanaman rambat berbunga biru pekat yang dapat diseduh menjadi teh herbal kaya antioksidan dan pewarna alami. Sangat mudah merambat pada pagar balkon dan rajin berbunga setiap pagi. Butuh sinar matahari penuh dan penyiraman sedang secara berkala.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 35,
+    "fields": {
+      "name": "Bunga Kertas (Bougainvillea)",
+      "scientific_name": "Bougainvillea spectabilis",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "rooftop",
+      "description": "Tanaman hias berbunga lebat warna-warni yang tahan banting di bawah terik matahari ekstrem. Sangat toleran kekeringan, bahkan jarang disiram justru merangsang mekarnya kelopak bunga yang indah. Pilihan sempurna untuk area rooftop atau balkon panas.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 36,
+    "fields": {
+      "name": "Melati Putih",
+      "scientific_name": "Jasminum sambac",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Bunga nasional beraroma harum manis yang menenangkan suasana teras dan halaman rumah. Menyukai paparan sinar matahari langsung untuk memicu munculnya kuncup-kuncup bunga baru. Siram teratur dan pangkas ranting yang tua agar tanaman tetap rimbun.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 37,
+    "fields": {
+      "name": "Krokot Mawar (Portulaka)",
+      "scientific_name": "Portulaca grandiflora",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Tanaman penutup tanah sukulen berbunga cerah yang mekar indah saat terkena sinar matahari pagi. Sangat tahan kering dan tidak memerlukan perawatan khusus yang merepotkan. Sangat cantik ditanam pada pot gantung di pinggir balkon.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 38,
+    "fields": {
+      "name": "Kamboja Jepang (Adenium)",
+      "scientific_name": "Adenium obesum",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Tanaman berbatang bonggol eksotis mirip bonsai dengan bunga terompet merah muda yang menawan. Menyimpan cadangan air di batangnya sehingga hanya perlu disiram ketika tanah benar-benar kering. Wajib ditaruh di tempat yang terkena sinar matahari penuh.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 39,
+    "fields": {
+      "name": "Tapak Dara (Vinca)",
+      "scientific_name": "Catharanthus roseus",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Bunga tropis yang mekar tiada henti dengan aneka warna cerah dari putih, ungu, hingga merah jambu. Tahan terhadap cuaca panas perkotaan dan tidak mudah terserang hama penyakit. Siram secukupnya di bagian media tanpa membasahi kelopak bunga.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 40,
+    "fields": {
+      "name": "Bunga Marigold (Kenikir Hias)",
+      "scientific_name": "Tagetes erecta",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Bunga bulat mekar berwarna kuning oranye cerah yang juga berfungsi alami sebagai pengusir hama serangga di kebun. Sangat cocok ditanam berdampingan dengan tanaman sayur di balkon atau teras. Berikan sinar matahari penuh dan buang bunga layu agar tunas baru cepat mekar.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 41,
+    "fields": {
+      "name": "Zinnia (Kembang Kertas Mini)",
+      "scientific_name": "Zinnia elegans",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Bunga mungil berlapis kelopak cerah yang sangat memikat lebah dan kupu-kupu penyerbuk. Cepat tumbuh dari benih dan langsung berbunga dalam hitungan minggu setelah semai. Suka tanah berdrainase baik dan paparan cahaya hangat sepanjang hari.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 42,
+    "fields": {
+      "name": "Bunga Asoka Mini",
+      "scientific_name": "Ixora coccinea",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "terrace",
+      "description": "Semak berbunga rimbun menggerombol seperti payung merah oranye yang mengandung nektar manis. Cocok untuk pembatas pot di sudut teras atau pinggir balkon. Memerlukan sinar matahari teratur untuk mempertahankan intensitas warna bunganya.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 43,
+    "fields": {
+      "name": "Bunga Kenop (Gomphrena)",
+      "scientific_name": "Gomphrena globosa",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Bunga bulat keunguan berbentuk kancing yang tahan lama dan sering dijadikan bunga kering hias. Sangat tangguh menghadapi cuaca panas terik dan keterbatasan air. Cukup siram sesekali dan tempatkan di pot kecil terbuka.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 44,
+    "fields": {
+      "name": "Bunga Pentas",
+      "scientific_name": "Pentas lanceolata",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Memiliki gugusan bunga berbentuk bintang kecil beraneka warna yang selalu mekar sepanjang tahun. Sangat adaptif untuk pot balkon yang mendapat cahaya matahari langsung. Jaga media tanam tetap lembap namun tidak becek.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 45,
+    "fields": {
+      "name": "Bunga Matahari Mini",
+      "scientific_name": "Helianthus annuus",
+      "category": "flowers",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Versi kerdil dari bunga matahari yang tingginya hanya sekitar 40 cm, sangat serasi untuk pot balkon kos. Selalu menghadapkan mahkota kuning cerahnya ke arah datangnya sinar matahari pagi. Membutuhkan sinar matahari penuh minimal 6 jam sehari agar mekar sempurna.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 46,
+    "fields": {
+      "name": "Lidah Mertua (Sansevieria)",
+      "scientific_name": "Dracaena trifasciata",
+      "category": "indoor_low_light",
+      "sunlight": "shade",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "indoor",
+      "space_requirement": "indoor",
+      "description": "Tanaman pembersih udara nomor satu yang mampu bertahan di ruangan minim cahaya dan pendingin udara. Memiliki daun tegak kokoh dengan motif garis kuning hijau yang sangat modern dan elegan. Cukup disiram 1–2 minggu sekali saat tanah sudah kering total.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 47,
+    "fields": {
+      "name": "Sirih Gading (Golden Pothos)",
+      "scientific_name": "Epipremnum aureum",
+      "category": "indoor_low_light",
+      "sunlight": "partial",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "indoor",
+      "description": "Tanaman rambat merayap dengan daun berbentuk hati bercorak kuning emas yang sangat toleran terhadap kelalaian perawatan. Bisa tumbuh subur di media tanah maupun botol berisi air di meja kerja kamar kos. Hindari sinar matahari langsung agar daun tidak hangus terbakar.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 48,
+    "fields": {
+      "name": "ZZ Plant (Zamioculcas)",
+      "scientific_name": "Zamioculcas zamiifolia",
+      "category": "indoor_low_light",
+      "sunlight": "shade",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "indoor",
+      "space_requirement": "indoor",
+      "description": "Berdaun tebal mengilap seperti plastik dengan batang sukulen yang menyimpan cadangan air berlimpah. Sangat cocok untuk sudut ruangan gelap atau kamar apartemen yang jarang terkena sinar matahari. Siram secara hemat sebulan 2–3 kali agar umbinya tidak membusuk.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 49,
+    "fields": {
+      "name": "Peace Lily (Spathiphyllum)",
+      "scientific_name": "Spathiphyllum wallisii",
+      "category": "indoor_low_light",
+      "sunlight": "shade",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "indoor",
+      "space_requirement": "indoor",
+      "description": "Tanaman hias dalam ruangan yang anggun dengan daun hijau gelap dan seludang bunga putih bersih. Daunnya akan terkulai secara dramatis memberi tanda ketika haus dan butuh segera disiram air. Letakkan di tempat teduh dengan sirkulasi udara kamar yang baik.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 50,
+    "fields": {
+      "name": "Monstera Deliciosa",
+      "scientific_name": "Monstera deliciosa",
+      "category": "indoor_low_light",
+      "sunlight": "partial",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "both",
+      "space_requirement": "indoor",
+      "description": "Tanaman ikonik berdaun sobek-sobek artistik yang memberikan sentuhan hutan tropis di ruang tamu atau kamar tidur. Menyukai cahaya terang tidak langsung dan media porous yang lembap. Bersihkan permukaan daun dari debu secara rutin menggunakan kain basah.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 51,
+    "fields": {
+      "name": "Aglaonema (Sri Rejeki)",
+      "scientific_name": "Aglaonema commutatum",
+      "category": "indoor_low_light",
+      "sunlight": "shade",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "indoor",
+      "space_requirement": "indoor",
+      "description": "Tanaman pembawa hoki dengan corak daun bercorak merah, merah muda, dan hijau yang memanjakan mata. Mampu beradaptasi baik di ruangan ber-AC dengan intensitas cahaya lampu ruangan biasa. Siram secukupnya ketika lapisan atas media tanam mulai mengering.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 52,
+    "fields": {
+      "name": "Spider Plant (Lili Paris)",
+      "scientific_name": "Chlorophytum comosum",
+      "category": "indoor_low_light",
+      "sunlight": "partial",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "indoor",
+      "description": "Tanaman gantung berdaun pita belang putih hijau yang rajin menghasilkan anakan menjuntai seperti laba-laba kecil. Sangat efektif menyerap polutan udara di dalam kamar kos. Tumbuh subur di tempat terang berangin tanpa paparan sinar matahari terik.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 53,
+    "fields": {
+      "name": "Philodendron Heartleaf",
+      "scientific_name": "Philodendron hederaceum",
+      "category": "indoor_low_light",
+      "sunlight": "shade",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "indoor",
+      "space_requirement": "indoor",
+      "description": "Herba merambat berdaun hati lembut berwarna hijau tua mengilap yang sangat anggun diletakkan di rak buku. Tahan di sudut ruangan redup dan hanya membutuhkan sedikit penyiraman berkala. Pangkas ujung sulurnya sesekali agar batangnya tumbuh semakin padat rimbun.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 54,
+    "fields": {
+      "name": "Kuping Gajah Mini",
+      "scientific_name": "Anthurium clarinervium",
+      "category": "indoor_low_light",
+      "sunlight": "shade",
+      "watering": "moderate",
+      "difficulty": "medium",
+      "indoor_outdoor": "indoor",
+      "space_requirement": "indoor",
+      "description": "Tanaman koleksi eksklusif berdaun beludru gelap tebal dengan urat-urat daun putih keperakan yang tegas. Membutuhkan kelembapan udara ruangan yang cukup dan media tanam yang sangat porous. Jauhkan dari sinar matahari langsung agar daun tidak hangus melepuh.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 55,
+    "fields": {
+      "name": "Pilea Peperomioides",
+      "scientific_name": "Pilea peperomioides",
+      "category": "indoor_low_light",
+      "sunlight": "partial",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "indoor",
+      "space_requirement": "indoor",
+      "description": "Dikenal dengan daun bulat pipih menyerupai koin uang yang sangat estetik menghiasi meja belajar. Tumbuh condong ke arah sumber cahaya, sehingga pot perlu diputar berkala agar bentuk tajuknya simetris. Siram hanya saat tanah bagian atas sudah kering.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 56,
+    "fields": {
+      "name": "Serai Wangi",
+      "scientific_name": "Cymbopogon citratus",
+      "category": "aromatic_useful",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Rumpun rumput aromatik berbatang wangi segar yang menjadi bumbu dasar aneka hidangan gulai dan teh serai hangat. Aroma minyak sitronela alaminya sangat ampuh mengusir nyamuk dari area balkon dan teras. Cukup ditanam di pot sedang dengan sinar matahari terik dan tanah gembur.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 57,
+    "fields": {
+      "name": "Pandan Wangi",
+      "scientific_name": "Pandanus amaryllifolius",
+      "category": "aromatic_useful",
+      "sunlight": "partial",
+      "watering": "high",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Daun beraroma vanila alami khas Nusantara yang digunakan sebagai pewangi kue tradisional, kolak, dan penanak nasi. Sangat menyukai kelembapan tinggi dan pasokan air yang banyak di tempat agak terlindung. Potong daun bagian bawah untuk konsumsi agar pucuk tengah terus bertunas.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 58,
+    "fields": {
+      "name": "Lavender (Lokal)",
+      "scientific_name": "Lavandula multifida",
+      "category": "aromatic_useful",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "medium",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Varian lavender tropis berdaun pakis dengan bunga ungu wangi yang efektif mengusir nyamuk dan serangga malam. Butuh sinar matahari penuh dan media tanam berpasir yang tidak menahan kelebihan air. Siram sedikit saja di pagi hari saat tanah mulai mengering.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 59,
+    "fields": {
+      "name": "Lidah Buaya",
+      "scientific_name": "Aloe vera",
+      "category": "aromatic_useful",
+      "sunlight": "full",
+      "watering": "low",
+      "difficulty": "easy",
+      "indoor_outdoor": "both",
+      "space_requirement": "balcony",
+      "description": "Sukulen serbaguna bergel tebal yang berkhasiat menyuburkan rambut, menenangkan kulit terbakar, dan diolah jadi minuman segar. Sangat minim perawatan dan tahan terhadap panas matahari terik di pot balkon. Hindari penyiraman terlalu sering agar pelepah daun tidak busuk berair.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "plant_library.plant",
+    "pk": 60,
+    "fields": {
+      "name": "Jeruk Kasturi (Calamansi)",
+      "scientific_name": "Citrus microcarpa",
+      "category": "aromatic_useful",
+      "sunlight": "full",
+      "watering": "moderate",
+      "difficulty": "easy",
+      "indoor_outdoor": "outdoor",
+      "space_requirement": "balcony",
+      "description": "Pohon jeruk perdu mungil yang bunganya beraroma semerbak wangi dan buahnya sangat harum untuk sirup atau perasan teh es. Sangat rajin berbuah sepanjang tahun meski hanya ditanam di pot berdiameter 25 cm di balkon. Letakkan di tempat terbuka yang tersorot matahari penuh sepanjang hari.",
+      "image_url": "",
+      "created_at": "2026-10-14T00:00:00Z",
+      "updated_at": "2026-10-14T00:00:00Z"
+    }
+  }
+]
+
