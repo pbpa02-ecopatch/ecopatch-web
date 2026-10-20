@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models import ProtectedError
 from django.test import TestCase, override_settings
 from django.urls import include, path, reverse
+from my_ecopatch.models import EcoPatch
 from plant_library.forms import PlantForm
 from plant_library.models import Plant
 
@@ -163,6 +164,45 @@ class PlantCRUDTests(TestCase):
             self.assertContains(response, 'tidak dapat dihapus karena masih digunakan')
             # Pastikan plant masih ada
             self.assertTrue(Plant.objects.filter(pk=self.plant.pk).exists())
+
+    def test_recommend_requires_login(self):
+        url = reverse('plant_library:plant_recommend')
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('login', res.url)
+
+    def test_recommend_no_ecopatch(self):
+        self.client.login(username='regular_user', password='password123')
+        url = reverse('plant_library:plant_recommend')
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'belum memiliki EcoPatch')
+
+    def test_recommend_with_ecopatch(self):
+        patch = EcoPatch.objects.create(
+            owner=self.regular_user,
+            name='Balkon Kosan',
+            space_type=EcoPatch.SpaceType.BALCONY,
+            sunlight=EcoPatch.Sunlight.FULL,
+            city='Depok',
+        )
+        indoor_plant = Plant.objects.create(
+            name='Sansevieria Test',
+            category=Plant.Category.INDOOR_LOW_LIGHT,
+            sunlight=Plant.Sunlight.SHADE,
+            watering=Plant.Watering.LOW,
+            difficulty=Plant.Difficulty.EASY,
+            indoor_outdoor=Plant.Placement.INDOOR,
+            space_requirement=Plant.SpaceRequirement.INDOOR,
+        )
+
+        self.client.login(username='regular_user', password='password123')
+        url = reverse('plant_library:plant_recommend')
+        res = self.client.get(url, {'patch': patch.pk})
+
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Kemangi')
+        self.assertNotContains(res, 'Sansevieria Test')
 
 
 # Definisikan urlpatterns pada modul ini agar @override_settings(ROOT_URLCONF=__name__) bekerja

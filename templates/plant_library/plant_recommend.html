@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+{% block title %}Rekomendasi Tanaman - EcoPatch{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Scoped Rekomendasi Tanaman - Memakai token resmi EcoPatch */
+    .recommend-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ink-muted);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: var(--surface-200);
+        border: 1px solid var(--border);
+        transition: all 0.2s ease;
+    }
+    .recommend-back-btn:hover {
+        background: var(--surface-300);
+        color: var(--ink);
+    }
+    .recommend-page-head {
+        margin-bottom: 24px;
+    }
+    .recommend-page-title {
+        font-size: clamp(2rem, 3.5vw, 2.6rem);
+        color: var(--ink);
+        margin-bottom: 6px;
+        font-family: 'Baloo 2', sans-serif;
+    }
+    .recommend-page-lead {
+        color: var(--ink-muted);
+        font-size: 1.05rem;
+        margin-bottom: 0;
+    }
+    .recommend-selector-card {
+        background: var(--surface-200);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 6px 16px rgba(34, 48, 31, 0.08);
+        margin-bottom: 24px;
+    }
+    .recommend-select-control {
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface-200);
+        color: var(--ink);
+        font-size: 0.95rem;
+        padding: 10px 18px;
+        font-weight: 600;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .recommend-select-control:focus {
+        border-color: var(--brand-500);
+        box-shadow: 0 0 0 3px var(--brand-300);
+        outline: none;
+    }
+    .recommend-banner {
+        background: color-mix(in srgb, var(--brand-300) 30%, var(--surface-200));
+        border: 1px solid var(--brand-500);
+        border-radius: 20px;
+        padding: 18px 24px;
+        margin-bottom: 24px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+    .recommend-banner-info {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+    .recommend-banner-pill {
+        background: var(--surface-200);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 5px 14px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--ink);
+    }
+    .recommend-reason-text {
+        color: var(--ink);
+        font-size: 0.95rem;
+        margin-top: 6px;
+        margin-bottom: 0;
+    }
+    .recommend-count-info {
+        font-weight: 600;
+        color: var(--ink-muted);
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+    .plant-card {
+        background: var(--surface-200);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: 0 6px 16px rgba(34, 48, 31, 0.08);
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .plant-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(34, 48, 31, 0.14);
+    }
+    .plant-card-media {
+        width: 100%;
+        height: 190px;
+        background: linear-gradient(135deg, var(--surface-300) 0%, var(--surface-100) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+    .plant-card-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .plant-card-placeholder-icon {
+        font-size: 3.5rem;
+        user-select: none;
+    }
+    .plant-card-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    .plant-badge-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+    .plant-badge {
+        font-size: 0.76rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        letter-spacing: 0.2px;
+    }
+    .plant-badge--category {
+        background: var(--brand-300);
+        color: var(--brand-600);
+    }
+    .plant-badge--match {
+        background: #e6f4ea;
+        color: #137333;
+        border: 1px solid #ceead6;
+    }
+    .plant-badge--diff-easy {
+        background: #e6f4ea;
+        color: #137333;
+    }
+    .plant-badge--diff-medium {
+        background: #fef7e0;
+        color: #b06000;
+    }
+    .plant-badge--diff-hard {
+        background: #fce8e6;
+        color: #c5221f;
+    }
+    .plant-card-title {
+        font-size: 1.35rem;
+        color: var(--ink);
+        margin: 0 0 4px;
+        font-family: 'Baloo 2', sans-serif;
+    }
+    .plant-card-scientific {
+        color: var(--ink-muted);
+        font-style: italic;
+        font-size: 0.88rem;
+        margin-bottom: 14px;
+    }
+    .plant-specs-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        background: var(--surface-100);
+        padding: 10px 12px;
+        border-radius: 14px;
+        font-size: 0.82rem;
+        color: var(--ink);
+        margin-bottom: 14px;
+    }
+    .plant-specs-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .plant-desc-snippet {
+        font-size: 0.88rem;
+        color: var(--ink-muted);
+        line-height: 1.5;
+        margin-bottom: 18px;
+        flex-grow: 1;
+    }
+    .plant-card-footer {
+        margin-top: auto;
+    }
+    .plant-empty-card {
+        text-align: center;
+        padding: 60px 24px;
+        background: var(--surface-200);
+        border: 2px dashed var(--border);
+        border-radius: 28px;
+        max-width: 680px;
+        margin: 20px auto 40px;
+    }
+    .plant-empty-icon {
+        font-size: 4rem;
+        margin-bottom: 16px;
+        line-height: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="recommend-page">
+    <a href="{% url 'plant_library:plant_list' %}" class="recommend-back-btn">
+        <span>←</span>
+        <span>Kembali ke Plant Library</span>
+    </a>
+
+    <header class="recommend-page-head">
+        <h1 class="recommend-page-title">✨ Rekomendasi Tanaman</h1>
+        <p class="recommend-page-lead">
+            Temukan tanaman terbaik yang paling sesuai dengan kondisi kebun EcoPatch milikmu.
+        </p>
+    </header>
+
+    {% if not user_patches %}
+        <!-- Kondisi saat user belum memiliki EcoPatch -->
+        <div class="plant-empty-card">
+            <div class="plant-empty-icon" aria-hidden="true">🪴</div>
+            <h2 class="h3 mb-2" style="font-family: 'Baloo 2', sans-serif;">Kamu belum memiliki EcoPatch</h2>
+            <p class="text-muted mb-4">
+                Fitur ini mencocokkan jenis tanaman dengan luas ruang dan paparan sinar matahari di kebunmu. Buat kebun virtual pertamamu sekarang!
+            </p>
+            <a href="{% url 'my_ecopatch:list' %}" class="btn btn-success">
+                Buka Halaman My EcoPatch
+            </a>
+        </div>
+    {% else %}
+        <!-- Form Pemilihan EcoPatch -->
+        <div class="recommend-selector-card">
+            <form method="get" action="{% url 'plant_library:plant_recommend' %}" class="row g-3 align-items-center">
+                <div class="col-12 col-md-auto">
+                    <label for="patch-selector" class="fw-bold mb-0">
+                        🌿 Pilih EcoPatch Kamu:
+                    </label>
+                </div>
+                <div class="col-12 col-md">
+                    <select name="patch" id="patch-selector" class="form-select recommend-select-control" onchange="this.form.submit()">
+                        {% for patch in user_patches %}
+                            <option value="{{ patch.pk }}" {% if selected_patch.pk == patch.pk %}selected{% endif %}>
+                                {{ patch.name }} ({{ patch.get_space_type_display }}{% if patch.sunlight %}, {{ patch.get_sunlight_display }}{% endif %})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <button type="submit" class="btn btn-success rounded-pill px-4">
+                        Tampilkan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {% if selected_patch %}
+            <!-- Banner Ringkasan Kondisi Kebun Terpilih -->
+            <div class="recommend-banner">
+                <div>
+                    <div class="recommend-banner-info mb-1">
+                        <strong class="fs-5">{{ selected_patch.name }}</strong>
+                        <span class="recommend-banner-pill">🏡 {{ selected_patch.get_space_type_display }}</span>
+                        {% if selected_patch.sunlight %}
+                            <span class="recommend-banner-pill">☀️ {{ selected_patch.get_sunlight_display }}</span>
+                        {% else %}
+                            <span class="recommend-banner-pill">☀️ Segala Sinar</span>
+                        {% endif %}
+                        {% if selected_patch.city %}
+                            <span class="recommend-banner-pill">📍 {{ selected_patch.city }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="recommend-reason-text">
+                        <strong>🎯 Alasan Kecocokan:</strong> {{ match_reason }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Counter Hasil -->
+            <div class="recommend-count-info">
+                Menampilkan <strong>{{ recommended_plants|length }}</strong> tanaman yang cocok untuk kebun <strong>{{ selected_patch.name }}</strong>.
+            </div>
+
+            <!-- Grid Rekomendasi Tanaman -->
+            {% if recommended_plants %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for plant in recommended_plants %}
+                        <div class="col">
+                            <article class="plant-card">
+                                <div class="plant-card-media">
+                                    {% if plant.image_url %}
+                                        <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy">
+                                    {% else %}
+                                        <span class="plant-card-placeholder-icon" aria-hidden="true">🪴</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="plant-card-body">
+                                    <div class="plant-badge-list">
+                                        <span class="plant-badge plant-badge--category">{{ plant.get_category_display }}</span>
+                                        <span class="plant-badge plant-badge--match">✨ Cocok untuk {{ selected_patch.get_space_type_display }}</span>
+                                        {% if plant.difficulty == 'easy' %}
+                                            <span class="plant-badge plant-badge--diff-easy">Mudah</span>
+                                        {% elif plant.difficulty == 'medium' %}
+                                            <span class="plant-badge plant-badge--diff-medium">Sedang</span>
+                                        {% else %}
+                                            <span class="plant-badge plant-badge--diff-hard">Sulit</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <h2 class="plant-card-title">{{ plant.name }}</h2>
+                                    {% if plant.scientific_name %}
+                                        <p class="plant-card-scientific">{{ plant.scientific_name }}</p>
+                                    {% endif %}
+
+                                    <div class="plant-specs-grid">
+                                        <div class="plant-specs-item" title="Sinar Matahari">
+                                            <span>☀️</span> <span>{{ plant.get_sunlight_display }}</span>
+                                        </div>
+                                        <div class="plant-specs-item" title="Frekuensi Penyiraman">
+                                            <span>💧</span> <span>{{ plant.get_watering_display }}</span>
+                                        </div>
+                                        <div class="plant-specs-item" title="Penempatan">
+                                            <span>🏡</span> <span>{{ plant.get_indoor_outdoor_display }}</span>
+                                        </div>
+                                        <div class="plant-specs-item" title="Kebutuhan Ruang">
+                                            <span>📐</span> <span>{{ plant.get_space_requirement_display }}</span>
+                                        </div>
+                                    </div>
+
+                                    <p class="plant-desc-snippet">
+                                        {{ plant.description|default:"Tidak ada deskripsi tambahan."|truncatewords:16 }}
+                                    </p>
+
+                                    <div class="plant-card-footer">
+                                        <a href="{% url 'plant_library:plant_detail' plant.pk %}" class="btn btn-outline-success w-100">
+                                            Lihat Detail Tanaman
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="plant-empty-card">
+                    <div class="plant-empty-icon" aria-hidden="true">🌿</div>
+                    <h3 class="mb-2" style="font-family: 'Baloo 2', sans-serif;">Belum ada tanaman yang cocok</h3>
+                    <p class="text-muted mb-4">
+                        Tidak ada tanaman yang memenuhi seluruh kriteria ruang dan sinar matahari untuk kebun ini. Kamu bisa menjelajahi katalog lengkap tanaman.
+                    </p>
+                    <a href="{% url 'plant_library:plant_list' %}" class="btn btn-success">
+                        Lihat Seluruh Katalog Tanaman
+                    </a>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</section>
+{% endblock %}
+

@@ -2,10 +2,12 @@ from functools import wraps
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.db.models import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 
+from my_ecopatch.models import EcoPatch
 from .forms import PlantForm
 from .models import Plant
 
@@ -77,6 +79,61 @@ def plant_detail(request, pk):
     """Menampilkan rincian detail 1 tanaman."""
     plant = get_object_or_404(Plant, pk=pk)
     return render(request, 'plant_library/plant_detail.html', {'plant': plant})
+
+
+@login_required
+def plant_recommend(request):
+    """Memberikan rekomendasi tanaman berdasarkan kondisi EcoPatch milik user."""
+    user_patches = EcoPatch.objects.filter(owner=request.user)
+
+    if not user_patches.exists():
+        return render(request, 'plant_library/plant_recommend.html', {
+            'user_patches': user_patches,
+            'selected_patch': None,
+            'recommended_plants': [],
+            'match_reason': '',
+        })
+
+    patch_id = request.GET.get('patch')
+    selected_patch = None
+    if patch_id:
+        selected_patch = user_patches.filter(pk=patch_id).first()
+
+    if not selected_patch:
+        selected_patch = user_patches.first()
+
+    # Logika filter rekomendasi murni Django (tanpa ML/AI)
+    recommended_plants = Plant.objects.all()
+
+    # 1. Sinar matahari: plant.sunlight == patch.sunlight (jika patch.sunlight ada)
+    if selected_patch.sunlight:
+        recommended_plants = recommended_plants.filter(sunlight=selected_patch.sunlight)
+
+    # 2. Kebutuhan ruang: sama dengan patch.space_type atau 'any'
+    recommended_plants = recommended_plants.filter(
+        space_requirement__in=[selected_patch.space_type, 'any']
+    )
+
+    # 3. Penempatan (indoor/outdoor):
+    # jika patch.space_type == 'indoor' -> 'indoor' atau 'both'
+    # selain itu -> 'outdoor' atau 'both'
+    if selected_patch.space_type == 'indoor':
+        recommended_plants = recommended_plants.filter(indoor_outdoor__in=['indoor', 'both'])
+    else:
+        recommended_plants = recommended_plants.filter(indoor_outdoor__in=['outdoor', 'both'])
+
+    # Format alasan kecocokan
+    sunlight_label = selected_patch.get_sunlight_display() if selected_patch.sunlight else 'semua intensitas sinar'
+    space_label = selected_patch.get_space_type_display()
+    match_reason = f"Cocok untuk area {space_label.lower()} dengan kebutuhan sinar {sunlight_label.lower()}."
+
+    context = {
+        'user_patches': user_patches,
+        'selected_patch': selected_patch,
+        'recommended_plants': recommended_plants,
+        'match_reason': match_reason,
+    }
+    return render(request, 'plant_library/plant_recommend.html', context)
 
 
 @staff_required
