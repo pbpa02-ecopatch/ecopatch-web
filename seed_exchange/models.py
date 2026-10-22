@@ -3,12 +3,11 @@ from django.db import models
 
 
 class SeedExchange(models.Model):
-    """Listing berbagi/tukar bibit milik Rheina (modul Seed Exchange).
+    """Listing berbagi/tukar bibit (modul Seed Exchange).
 
-    Relasi inti: User -> SeedExchange (owner). Field `plant_name`
-    sengaja CharField dulu karena `plant_library.Plant` belum ada
-    modelnya; nanti bisa diganti FK tanpa ubah view/filter:
-    # plant = models.ForeignKey('plant_library.Plant', on_delete=models.PROTECT, related_name='seed_listings', null=True, blank=True)
+    Relasi: User -> SeedExchange (owner). Field `plant_name`
+    sengaja CharField karena `plant_library.Plant` belum ada modelnya;
+    nanti bisa diganti FK tanpa ubah view/filter.
     """
 
     class ItemType(models.TextChoices):
