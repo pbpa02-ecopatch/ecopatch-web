@@ -516,7 +516,7 @@ feature/seed-exchange
 ## Deployment
 
 **PWS Deployment:**
-https://salwa-alifia-eco-patch.pws.cs.ui.ac.id/ 
+[LINK]
 
 ---
 
