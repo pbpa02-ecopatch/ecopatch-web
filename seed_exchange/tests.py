@@ -263,7 +263,7 @@ class SeedExchangeFlowTests(TestCase):
 
     def test_reserve_unavailable_returns_400(self):
         self._request_booking()
-        third = make_user('ketiga', 'test123')
+        make_user('ketiga', 'test123')
         self.client.login(username='ketiga', password='test123')
         response = self.client.post(reverse('seed_exchange:reserve', args=[self.listing.pk]))
         self.assertEqual(response.status_code, 400)

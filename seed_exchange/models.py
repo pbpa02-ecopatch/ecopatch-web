@@ -39,7 +39,7 @@ class SeedExchange(models.Model):
         ('Malang', 'Malang'),
         ('Medan', 'Medan'),
         ('Makassar', 'Makassar'),
-    ]
+    ]  # noqa: RUF012
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -80,7 +80,7 @@ class SeedExchange(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-created_at']  # noqa: RUF012
 
     def __str__(self):
         return self.title
