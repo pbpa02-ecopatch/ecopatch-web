@@ -132,7 +132,7 @@ class SeedExchangeViewTests(TestCase):
         response = self.client.get(reverse('seed_exchange:list'))
         self.assertContains(response, 'seed-menu')
         self.assertContains(response, 'Semua kota')
-        # opsi kota mempertahankan filter lain di URL-nya
+        # City filter keeps other params in URL.
         response = self.client.get(reverse('seed_exchange:list') + '?transaction_type=swap')
         self.assertContains(response, 'transaction_type=swap')
 
@@ -163,7 +163,7 @@ class SeedExchangeFlowTests(TestCase):
         response = self.client.get(reverse('seed_exchange:list'))
         self.assertContains(response, 'Listing Saya')
         self.assertContains(response, 'Jelajahi Listing')
-        # listing sendiri tidak diduplikasi di bagian jelajah
+        # Own listing not duplicated in browse section.
         content = response.content.decode()
         self.assertEqual(content.count('Bibit Cabai Rawit'), 1)
 
@@ -301,10 +301,10 @@ class SeedExchangeFlowTests(TestCase):
         self.client.login(username='rheina', password='test123')
         response = self.client.get(reverse('seed_exchange:list'))
         content = response.content.decode()
-        # kartu dashed "Buat Listing Baru" di ujung grid Listing Saya
+        # Dashed "New Listing" card at end of My Listings grid.
         self.assertIn('seed-card-add', content)
         self.assertContains(response, 'Buat Listing Baru')
-        # kartu bersih: tanpa tombol aksi cepat, kelola via halaman detail
+        # Clean cards: no quick actions, manage via detail page.
         self.assertNotContains(response, 'Tandai selesai')
         self.assertNotContains(response, 'Buka kembali')
         self.assertNotContains(response, '>Reserve<')

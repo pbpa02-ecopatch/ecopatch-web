@@ -46,8 +46,7 @@ class SeedExchange(models.Model):
         on_delete=models.CASCADE,
         related_name='seed_listings',
     )
-    # Siapa yang me-reserve (null = belum ada yang reserve).
-    # Dipakai agar owner tahu siapa yang minat & reserver tahu cara hubungi owner.
+    # Who reserved (null = none). Owner sees requester; requester sees owner contact.
     reserved_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
