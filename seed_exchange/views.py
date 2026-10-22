@@ -66,7 +66,19 @@ def _filter_url(current, name, value):
 
 
 def _filter_dropdowns(active):
-    """Opsi tiap dropdown custom: label, url (pertahankan filter lain), selected."""
+    """Opsi tiap dropdown custom: label, url (pertahankan filter lain), selected.
+
+    Mengembalikan list of dict yang langsung dipakai template:
+    [
+        {'name': 'city', 'current_label': 'Depok', 'items': [
+            {'label': 'Semua kota', 'url': '...', 'selected': False},
+            {'label': 'Jakarta', 'url': '...', 'selected': False},
+            {'label': 'Depok', 'url': '...', 'selected': True},
+            ...
+        ]},
+        ...
+    ]
+    """
     config = [
         ('item_type', 'Semua jenis', list(SeedExchange.ItemType.choices)),
         ('city', 'Semua kota', list(SeedExchange.CITY_CHOICES)),
@@ -308,7 +320,19 @@ def listing_cancel_reserve(request, pk):
 
 
 def _form_rows(form):
-    """Baris field untuk form.html; select dirender jadi dropdown custom."""
+    """Baris field untuk form.html; select dirender jadi dropdown custom.
+
+    Mengembalikan list of dict:
+    [
+        {'field': <BoundField>, 'select': None},  # text/textarea
+        {'field': <BoundField>, 'select': {       # Select field
+            'value': 'giveaway',
+            'display': 'Give Away',
+            'options': [{'value': 'seed', 'label': 'Seed', 'selected': False}, ...],
+            'required': True,
+        }},
+    ]
+    """
     select_names = {'item_type', 'city', 'transaction_type', 'status'}
     rows = []
     for bound_field in form:

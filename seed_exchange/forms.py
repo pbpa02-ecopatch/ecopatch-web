@@ -4,6 +4,13 @@ from .models import SeedExchange
 
 
 class SeedExchangeForm(forms.ModelForm):
+    """Form create/update listing.
+
+    Field `status` ditampilkan tapi di-create selalu default 'available'.
+    Dropdown custom di-render via template (bukan widget Select bawaan),
+    jadi `attrs` di sini hanya buat class CSS.
+    """
+
     class Meta:
         model = SeedExchange
         fields = [
