@@ -66,6 +66,22 @@ class ProfileViewTests(TestCase):
         response = self.client.get(self.url)
         self.assertContains(response, 'Anggota sejak Oktober 2026')
 
+    def test_logged_in_pages_use_the_sidebar_layout(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, 'has-sidebar')
+        self.assertContains(response, 'site-navbar--side')
+        self.assertContains(response, 'class="sidebar-user')
+
+    def test_sidebar_has_collapse_toggle(self):
+        self.assertContains(self.client.get(self.url), 'id="sidebar-toggle"')
+
+    def test_guest_pages_keep_the_top_navbar(self):
+        self.client.logout()
+        response = self.client.get(reverse('main:home'))
+        self.assertNotContains(response, 'has-sidebar')
+        self.assertNotContains(response, 'site-navbar site-navbar--side')  # kelas pada <nav>, bukan selector JS
+        self.assertNotContains(response, 'id="sidebar-toggle"')
+
     def test_each_section_has_its_own_form(self):
         response = self.client.get(self.url)
         for action in ('profile', 'bio'):
