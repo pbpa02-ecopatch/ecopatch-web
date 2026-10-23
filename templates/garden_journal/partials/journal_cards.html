@@ -1,0 +1,54 @@
+{% if journals %}
+    <div class="row g-3">
+        {% for journal in journals %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-{{ journal.get_condition_display_badge }}-subtle
+                                         text-{{ journal.get_condition_display_badge }}
+                                         border border-{{ journal.get_condition_display_badge }}-subtle">
+                                {{ journal.get_plant_condition_display }}
+                            </span>
+                            <small class="text-muted">{{ journal.date }}</small>
+                        </div>
+                        <h6 class="card-title fw-bold mb-1">{{ journal.title }}</h6>
+                        {% if journal.ecopatch_name or journal.plant_name %}
+                            <p class="small text-muted mb-1">
+                                {% if journal.ecopatch_name %}🪴 {{ journal.ecopatch_name }}{% endif %}
+                                {% if journal.ecopatch_name and journal.plant_name %} &mdash; {% endif %}
+                                {% if journal.plant_name %}🌱 {{ journal.plant_name }}{% endif %}
+                            </p>
+                        {% endif %}
+                        <p class="card-text small text-secondary" style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">{{ journal.notes }}</p>
+                        {% if journal.plant_height %}
+                            <p class="small mb-1"><span class="text-muted">Tinggi:</span> {{ journal.plant_height }} cm</p>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'garden_journal:detail' journal.pk %}" class="btn btn-sm btn-outline-success flex-grow-1">
+                                Lihat Detail
+                            </a>
+                            <a href="{% url 'garden_journal:edit' journal.pk %}" class="btn btn-sm btn-outline-secondary">
+                                ✏️
+                            </a>
+                            <form method="post" action="{% url 'garden_journal:delete' journal.pk %}"
+                                  onsubmit="return confirm('Hapus catatan ini?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5 text-muted">
+        <div style="font-size: 3rem;">📖</div>
+        <p class="mt-2">Belum ada catatan jurnal.<br>
+            <a href="{% url 'garden_journal:create' %}">Mulai catat sekarang!</a>
+        </p>
+    </div>
+{% endif %}

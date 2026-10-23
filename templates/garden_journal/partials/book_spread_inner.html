@@ -1,0 +1,126 @@
+<div class="open-book">
+    <!-- HALAMAN KIRI (Profil Tanaman & Cover Hint) -->
+    <div class="book-page-left">
+        <div>
+            <div class="plant-left-icon">🌿</div>
+            <h2 class="plant-left-title">{{ plant_name }}</h2>
+            <span class="badge bg-{{ latest_badge }}-subtle text-{{ latest_badge }} border border-{{ latest_badge }}-subtle book-tag-pill">
+                {{ latest_condition_display }}
+            </span>
+
+            {% if current_entry and current_entry.ecopatch_name %}
+                <div class="mt-3">
+                    <span class="badge bg-white text-secondary border px-3 py-1">
+                        🪴 {{ current_entry.ecopatch_name }}
+                    </span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="book-bottom-footer">
+            <span class="text-muted fst-italic">Buku Jurnal Tanaman</span>
+            <span class="badge bg-white text-muted border small">{{ total_entries }} entri</span>
+        </div>
+    </div>
+
+    <!-- PUNGGUNG TENGAH BUKU (3D Center Spine) -->
+    <div class="book-spine-center"></div>
+
+    <!-- HALAMAN KANAN (Isi Catatan & Lembaran) -->
+    <div class="book-page-right">
+        {% if current_entry %}
+            <div>
+                <!-- Header Atas Lembar: Tanggal, Tinggi, Tombol Next/Prev -->
+                <div class="entry-right-header">
+                    <div class="entry-right-meta">
+                        <span>{{ current_entry.date|date:"d M Y" }}</span>
+                        {% if current_entry.plant_height %}
+                            <span class="mx-1">&middot;</span>
+                            <span>Tinggi {{ current_entry.plant_height }}cm</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Tombol Panah Balik Halaman -->
+                    <div class="d-flex align-items-center gap-2">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if selected_condition %}&condition={{ selected_condition }}{% endif %}"
+                               class="page-turn-btn"
+                               hx-get="{% url 'garden_journal:plant_history' plant_name %}?page={{ page_obj.previous_page_number }}{% if selected_condition %}&condition={{ selected_condition }}{% endif %}"
+                               hx-target="#book-spread-container"
+                               title="Halaman Sebelumnya">
+                                &lt;
+                            </a>
+                        {% else %}
+                            <span class="page-turn-btn disabled">&lt;</span>
+                        {% endif %}
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if selected_condition %}&condition={{ selected_condition }}{% endif %}"
+                               class="page-turn-btn"
+                               hx-get="{% url 'garden_journal:plant_history' plant_name %}?page={{ page_obj.next_page_number }}{% if selected_condition %}&condition={{ selected_condition }}{% endif %}"
+                               hx-target="#book-spread-container"
+                               title="Halaman Selanjutnya">
+                                &gt;
+                            </a>
+                        {% else %}
+                            <span class="page-turn-btn disabled">&gt;</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Judul & Catatan Jurnal -->
+                <h3 class="entry-right-title">{{ current_entry.title }}</h3>
+                <p class="entry-right-notes">{{ current_entry.notes }}</p>
+
+                <!-- Polaroid Photo Slot (Placeholder sesuai mockup) -->
+                <div class="photo-polaroid-slot">
+                    <span style="font-size: 1.5rem; line-height: 1;">+</span>
+                    <span class="mt-1 fw-semibold">+ Foto</span>
+                    <span class="text-muted" style="font-size: 0.7rem;">(segera hadir)</span>
+                </div>
+            </div>
+
+            <!-- Footer Bawah Lembaran: Hal. x/y dan Tombol Aksi -->
+            <div>
+                <div class="book-bottom-footer">
+                    <span>Hal. {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'garden_journal:edit' current_entry.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-2" title="Edit Catatan Ini">
+                            ✏️ Edit
+                        </a>
+                        <form method="post" action="{% url 'garden_journal:delete' current_entry.pk %}"
+                              onsubmit="return confirm('Hapus lembaran catatan ini?')" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Hapus">
+                                🗑️
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <!-- Buku Kosong -->
+            <div class="text-center py-5 my-auto">
+                <div style="font-size: 2.5rem;">📖</div>
+                <h5 class="fw-bold mt-2">Buku Masih Kosong</h5>
+                <p class="text-muted small">Belum ada catatan untuk filter ini.</p>
+                <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-sm btn-success">
+                    + Tulis Lembaran Pertama
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Indicator Dots di Bawah Buku -->
+{% if page_obj.paginator.num_pages > 1 %}
+    <div class="page-dots-indicator">
+        {% for p in page_obj.paginator.page_range %}
+            <a href="?page={{ p }}{% if selected_condition %}&condition={{ selected_condition }}{% endif %}"
+               hx-get="{% url 'garden_journal:plant_history' plant_name %}?page={{ p }}{% if selected_condition %}&condition={{ selected_condition }}{% endif %}"
+               hx-target="#book-spread-container"
+               class="page-dot {% if p == page_obj.number %}active{% endif %}">
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}

@@ -1,0 +1,40 @@
+{% if books %}
+    <div class="book-shelf-grid">
+        {% for book in books %}
+            <a href="{% url 'garden_journal:plant_history' book.plant_name %}" class="book-item" title="Buka buku {{ book.plant_name }}">
+                <div class="book-cover-wrap pattern-{{ book.cover_pattern }}">
+                    <div class="book-inner">
+                        <div class="book-title-plate">
+                            <h5 class="book-plant-name">{{ book.plant_name }}</h5>
+                            <div class="book-badge-row">
+                                <span class="badge bg-{{ book.condition_badge }}-subtle text-{{ book.condition_badge }} border border-{{ book.condition_badge }}-subtle book-condition-badge">
+                                    {{ book.condition_display }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="book-footer-info">
+                            <div>📖 {{ book.count }} catatan</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="book-label-area">
+                    <div class="book-label-title">{{ book.plant_name }}</div>
+                    <div class="book-label-meta">
+                        {{ book.count }} catatan &middot; {{ book.latest_date|date:"d M Y" }}
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5 my-4">
+        <div style="font-size: 3.5rem;">📚</div>
+        <h5 class="fw-bold mt-2">Belum ada Buku Jurnal Tanaman</h5>
+        <p class="text-muted">Mulai catat perkembangan tanamanmu untuk membuat buku pertamamu!</p>
+        <a href="{% url 'garden_journal:create' %}" class="btn btn-success mt-2">
+            + Tulis Jurnal Baru
+        </a>
+    </div>
+{% endif %}

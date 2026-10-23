@@ -1346,3 +1346,371 @@ h1, h2, h3, .navbar-brand {
         animation: none;
     }
 }
+
+.site-navbar .navbar-brand-auth {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.5rem;
+}
+
+.brand-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--brand-300);
+    color: var(--brand-600);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.brand-name {
+    line-height: 1;
+}
+
+.site-navbar .navbar-nav.nav-auth .nav-link {
+    padding: 8px 18px;
+    border-radius: 999px;
+    color: var(--ink-muted);
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.site-navbar .navbar-nav.nav-auth .nav-link:hover:not(.active),
+.site-navbar .navbar-nav.nav-auth .nav-link:focus-visible:not(.active) {
+    background: color-mix(in srgb, var(--brand-300) 45%, transparent);
+    color: var(--ink);
+}
+
+.site-navbar .navbar-nav.nav-auth .nav-link.active {
+    color: var(--brand-600);
+    font-weight: 600;
+}
+
+.site-navbar .navbar-avatar {
+    width: 44px;
+    height: 44px;
+}
+
+@media (max-width: 575.98px) {
+    .site-navbar .navbar-brand-auth {
+        font-size: 1.2rem;
+    }
+
+    .brand-mark,
+    .site-navbar .navbar-avatar {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* ================= My EcoPatch ================= */
+.patch-page-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.patch-page-title {
+    margin: 0 0 6px;
+    color: var(--ink);
+    font-size: clamp(1.9rem, 3vw, 2.4rem);
+    font-weight: 800;
+}
+
+.patch-page-lead {
+    margin: 0;
+    color: var(--ink-muted);
+}
+
+.patch-create-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.patch-create-btn .ico {
+    width: 18px;
+    height: 18px;
+}
+
+.patch-empty {
+    margin-bottom: 20px;
+    color: var(--ink-muted);
+}
+
+.patch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.patch-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    background: var(--surface-200);
+    box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
+}
+
+.patch-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.patch-card-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.35rem;
+    line-height: 1.2;
+}
+
+.patch-card-city {
+    margin: 0 0 14px;
+    color: var(--ink-muted);
+}
+
+.patch-card-count {
+    margin: 0 0 14px;
+    color: var(--ink);
+    font-weight: 500;
+}
+
+.patch-status-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.patch-pill {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--tone-soft);
+    color: var(--tone-text);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.patch-pill--space,
+.patch-pill--growing {
+    --tone-soft: var(--brand-300);
+    --tone-text: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+}
+
+.patch-pill--planned {
+    --tone-soft: color-mix(in srgb, var(--accent-mango) 25%, var(--surface-200));
+    --tone-text: color-mix(in srgb, var(--accent-mango) 45%, var(--ink));
+}
+
+.patch-pill--planted {
+    --tone-soft: color-mix(in srgb, var(--accent-sky) 18%, var(--surface-200));
+    --tone-text: color-mix(in srgb, var(--accent-sky) 45%, var(--ink));
+}
+
+.patch-pill--harvested,
+.patch-pill--removed {
+    --tone-soft: var(--surface-300);
+    --tone-text: color-mix(in srgb, var(--ink-muted) 60%, var(--ink));
+}
+
+/* "Buat EcoPatch Baru" placeholder card */
+.patch-card-add {
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    border: 2px dashed var(--border);
+    background: transparent;
+    box-shadow: none;
+    color: var(--ink-muted);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.patch-card-add:hover,
+.patch-card-add:focus-visible {
+    border-color: var(--brand-500);
+    background: color-mix(in srgb, var(--brand-300) 25%, transparent);
+    color: var(--brand-600);
+}
+
+.patch-card-add:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 2px;
+}
+
+.patch-add-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface-200);
+    color: var(--brand-600);
+}
+
+.patch-add-icon .ico {
+    width: 24px;
+    height: 24px;
+}
+
+.site-navbar .avatar-toggle {
+    padding: 0;
+}
+
+.site-navbar .avatar-toggle::after {
+    display: none;
+}
+
+.site-navbar .avatar-toggle:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 3px;
+    border-radius: 50%;
+}
+
+.site-navbar .profile-menu.dropdown-menu {
+    width: 240px;
+    max-width: calc(100vw - 32px);
+    margin-top: 10px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface-200);
+    box-shadow: 0 12px 32px rgba(34, 48, 31, 0.18);
+}
+
+.profile-menu > li + li {
+    margin-top: 8px;
+}
+
+.profile-menu-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-menu-avatar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--brand-300);
+    color: var(--brand-600);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.profile-menu-id {
+    min-width: 0;
+}
+
+.profile-menu-name {
+    margin: 0;
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.profile-menu-email {
+    margin: 2px 0 0;
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+}
+
+.profile-menu > .profile-menu-divider {
+    height: 0;
+    margin: 10px 0;
+    border-top: 1.5px solid var(--border);
+}
+
+.profile-menu-item {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.profile-menu-item:hover,
+.profile-menu-item:focus-visible {
+    background: color-mix(in srgb, var(--brand-300) 30%, var(--surface-200));
+    color: var(--ink);
+}
+
+.profile-menu-item:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 2px;
+}
+
+.profile-menu-item--primary {
+    border-color: transparent;
+    background: var(--brand-300);
+    color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+}
+
+.profile-menu-item--primary:hover,
+.profile-menu-item--primary:focus-visible {
+    background: color-mix(in srgb, var(--brand-500) 30%, var(--brand-300));
+    color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+}
+
+/* "Keluar" */
+.profile-menu-item--danger,
+.profile-menu-item--danger:hover,
+.profile-menu-item--danger:focus-visible {
+    color: color-mix(in srgb, var(--danger) 60%, var(--ink));
+}
+
+.profile-menu-item--danger:hover,
+.profile-menu-item--danger:focus-visible {
+    background: color-mix(in srgb, var(--danger) 12%, var(--surface-200));
+}
+
+@media (max-width: 575.98px) {
+    .site-navbar .dropdown {
+        position: static;
+    }
+
+    .site-navbar .profile-menu.dropdown-menu {
+        right: 0;
+        left: 0;
+        width: auto;
+        max-width: none;
+        padding: 16px;
+    }
+}

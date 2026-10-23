@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ action }} Catatan — Garden Journal{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none">Rak Buku Jurnal</a>
+                </li>
+                {% if journal %}
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'garden_journal:plant_history' journal.plant_name %}" class="text-success text-decoration-none">
+                            {{ journal.plant_name }}
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="breadcrumb-item active">{{ action }} Catatan</li>
+            </ol>
+        </nav>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-4">
+                    {% if action == "Tambah" %}📝 Tulis Jurnal Baru{% else %}✏️ Edit Catatan Jurnal{% endif %}
+                </h4>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Pilihan Sampul Buku Pattern Picker -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-1">
+                            Pilih Sampul Buku (Pattern Cover)
+                        </label>
+                        <p class="text-muted small mb-2">Pilih motif cover buku jurnal untuk tanaman ini:</p>
+
+                        <div class="cover-picker-group">
+                            <label class="cover-option-label">
+                                <input type="radio" name="cover_pattern" value="brushes" class="cover-option-input"
+                                       {% if form.cover_pattern.value == "brushes" %}checked{% endif %}>
+                                <div class="cover-option-preview pattern-brushes"></div>
+                                <span class="cover-option-title">Brushes</span>
+                            </label>
+
+                            <label class="cover-option-label">
+                                <input type="radio" name="cover_pattern" value="dots" class="cover-option-input"
+                                       {% if form.cover_pattern.value == "dots" %}checked{% endif %}>
+                                <div class="cover-option-preview pattern-dots"></div>
+                                <span class="cover-option-title">Dots</span>
+                            </label>
+
+                            <label class="cover-option-label">
+                                <input type="radio" name="cover_pattern" value="flowers" class="cover-option-input"
+                                       {% if form.cover_pattern.value == "flowers" or not form.cover_pattern.value %}checked{% endif %}>
+                                <div class="cover-option-preview pattern-flowers"></div>
+                                <span class="cover-option-title">Flowers</span>
+                            </label>
+
+                            <label class="cover-option-label">
+                                <input type="radio" name="cover_pattern" value="seeds" class="cover-option-input"
+                                       {% if form.cover_pattern.value == "seeds" %}checked{% endif %}>
+                                <div class="cover-option-preview pattern-seeds"></div>
+                                <span class="cover-option-title">Seeds</span>
+                            </label>
+
+                            <label class="cover-option-label">
+                                <input type="radio" name="cover_pattern" value="soft" class="cover-option-input"
+                                       {% if form.cover_pattern.value == "soft" %}checked{% endif %}>
+                                <div class="cover-option-preview pattern-soft"></div>
+                                <span class="cover-option-title">Soft</span>
+                            </label>
+
+                            <label class="cover-option-label">
+                                <input type="radio" name="cover_pattern" value="leaves" class="cover-option-input"
+                                       {% if form.cover_pattern.value == "leaves" %}checked{% endif %}>
+                                <div class="cover-option-preview pattern-leaves"></div>
+                                <span class="cover-option-title">Leaves</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Nama Tanaman -->
+                        <div class="col-12 col-md-6">
+                            <label for="{{ form.plant_name.id_for_label }}" class="form-label fw-semibold">
+                                Nama Tanaman <span class="text-danger">*</span>
+                            </label>
+                            {{ form.plant_name }}
+                            <div class="form-text small">Catatan akan masuk ke buku tanaman ini.</div>
+                            {% if form.plant_name.errors %}
+                                <div class="invalid-feedback d-block">{{ form.plant_name.errors.as_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Nama EcoPatch -->
+                        <div class="col-12 col-md-6">
+                            <label for="{{ form.ecopatch_name.id_for_label }}" class="form-label fw-semibold">
+                                Nama EcoPatch <span class="text-muted small">(opsional)</span>
+                            </label>
+                            {{ form.ecopatch_name }}
+                            <div class="form-text small">Contoh: Balkon Timur, Pot Gantung.</div>
+                            {% if form.ecopatch_name.errors %}
+                                <div class="invalid-feedback d-block">{{ form.ecopatch_name.errors.as_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Judul Catatan -->
+                        <div class="col-12">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+                                Judul Catatan <span class="text-danger">*</span>
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback d-block">{{ form.title.errors.as_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Tanggal -->
+                        <div class="col-12 col-md-4">
+                            <label for="{{ form.date.id_for_label }}" class="form-label fw-semibold">
+                                Tanggal <span class="text-danger">*</span>
+                            </label>
+                            {{ form.date }}
+                            {% if form.date.errors %}
+                                <div class="invalid-feedback d-block">{{ form.date.errors.as_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Kondisi Tanaman -->
+                        <div class="col-12 col-md-4">
+                            <label for="{{ form.plant_condition.id_for_label }}" class="form-label fw-semibold">
+                                Kondisi Tanaman <span class="text-danger">*</span>
+                            </label>
+                            {{ form.plant_condition }}
+                            {% if form.plant_condition.errors %}
+                                <div class="invalid-feedback d-block">{{ form.plant_condition.errors.as_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Tinggi Tanaman -->
+                        <div class="col-12 col-md-4">
+                            <label for="{{ form.plant_height.id_for_label }}" class="form-label fw-semibold">
+                                Tinggi Tanaman (cm) <span class="text-muted small">(opsional)</span>
+                            </label>
+                            {{ form.plant_height }}
+                            {% if form.plant_height.errors %}
+                                <div class="invalid-feedback d-block">{{ form.plant_height.errors.as_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Catatan -->
+                        <div class="col-12">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label fw-semibold">
+                                Catatan Jurnal <span class="text-danger">*</span>
+                            </label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                                <div class="invalid-feedback d-block">{{ form.notes.errors.as_text }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Tombol Aksi -->
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-success px-4">
+                            {% if action == "Tambah" %}💾 Simpan ke Buku{% else %}✅ Update Catatan{% endif %}
+                        </button>
+                        <a href="{% url 'garden_journal:list' %}" class="btn btn-outline-secondary">
+                            Batal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

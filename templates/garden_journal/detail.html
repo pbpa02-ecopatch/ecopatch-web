@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}{{ journal.title }} — Garden Journal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none">Rak Jurnal</a>
+                </li>
+                {% if journal.plant_name %}
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'garden_journal:plant_history' journal.plant_name %}" class="text-success text-decoration-none">{{ journal.plant_name }}</a>
+                    </li>
+                {% endif %}
+                <li class="breadcrumb-item active">{{ journal.title }}</li>
+            </ol>
+        </nav>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="badge bg-{{ journal.get_condition_display_badge }}-subtle
+                                 text-{{ journal.get_condition_display_badge }}
+                                 border border-{{ journal.get_condition_display_badge }}-subtle fs-6 px-3 py-2">
+                        {{ journal.get_plant_condition_display }}
+                    </span>
+                    <small class="text-muted">{{ journal.date }}</small>
+                </div>
+
+                <h3 class="fw-bold mb-3">{{ journal.title }}</h3>
+
+                <!-- Meta info -->
+                <div class="row g-2 mb-3">
+                    {% if journal.ecopatch_name %}
+                        <div class="col-auto">
+                            <span class="badge bg-light text-dark border">🪴 {{ journal.ecopatch_name }}</span>
+                        </div>
+                    {% endif %}
+                    {% if journal.plant_name %}
+                        <div class="col-auto">
+                            <span class="badge bg-light text-dark border">🌱 {{ journal.plant_name }}</span>
+                        </div>
+                    {% endif %}
+                    {% if journal.plant_height %}
+                        <div class="col-auto">
+                            <span class="badge bg-light text-dark border">📏 {{ journal.plant_height }} cm</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <hr>
+
+                <!-- Catatan -->
+                <div class="mb-4">
+                    <h6 class="text-muted fw-semibold small text-uppercase mb-2">Catatan</h6>
+                    <p class="text-body" style="white-space: pre-wrap;">{{ journal.notes }}</p>
+                </div>
+
+                <!-- Footer info -->
+                <div class="text-muted small">
+                    <span>Dibuat: {{ journal.created_at|date:"d M Y, H:i" }}</span>
+                    {% if journal.updated_at != journal.created_at %}
+                        &middot;
+                        <span>Diedit: {{ journal.updated_at|date:"d M Y, H:i" }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card-footer bg-transparent border-0 px-4 pb-4 d-flex gap-2">
+                <a href="{% url 'garden_journal:edit' journal.pk %}" class="btn btn-outline-secondary">
+                    ✏️ Edit
+                </a>
+                <form method="post" action="{% url 'garden_journal:delete' journal.pk %}"
+                      onsubmit="return confirm('Yakin ingin menghapus catatan ini?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger">🗑️ Hapus</button>
+                </form>
+                <a href="{% url 'garden_journal:list' %}" class="btn btn-link text-muted ms-auto">
+                    ← Kembali ke list
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

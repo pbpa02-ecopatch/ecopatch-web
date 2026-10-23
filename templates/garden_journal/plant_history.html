@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Buku Jurnal: {{ plant_name }} — EcoPatch{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=2.0">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none fw-semibold small">
+        ← Kembali ke Rak Buku Jurnal
+    </a>
+    <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-success">
+        + Tulis Jurnal Baru
+    </a>
+</div>
+
+<!-- Toggle View -->
+<div class="d-flex align-items-center gap-2 mb-3">
+    <button id="btn-view-book" onclick="switchView('book')" class="view-toggle-btn active">📖 Buku</button>
+    <button id="btn-view-list" onclick="switchView('list')" class="view-toggle-btn">📋 Riwayat</button>
+    <span class="text-muted small ms-2">
+        <span id="total-count">{{ total_entries }}</span> catatan untuk <strong>{{ plant_name }}</strong>
+    </span>
+</div>
+
+<!-- Filter Pills -->
+<form id="book-filter-form" class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <div class="filter-pill-btn">
+        <select name="condition" id="filter-condition" class="filter-pill-select">
+            <option value="">Semua Kondisi</option>
+            {% for val, label in conditions %}
+                <option value="{{ val }}" {% if selected_condition == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-pill-btn">
+        <span class="text-muted small">📅</span>
+        <input type="date" id="filter-date" name="date" class="border-0 bg-transparent text-dark small"
+               style="outline: none;" value="{{ selected_date }}">
+    </div>
+</form>
+
+<!-- ===================== VIEW BOOK ===================== -->
+<div id="view-book" class="view-panel">
+    <div class="open-book-wrapper">
+        <div class="open-book" id="open-book-el">
+
+            <!-- HALAMAN KIRI -->
+            <div class="book-page-left">
+                <div>
+                    <div class="plant-left-icon">🌿</div>
+                    <h2 class="plant-left-title">{{ plant_name }}</h2>
+                    <span id="left-condition-badge" class="badge bg-{{ latest_badge }}-subtle text-{{ latest_badge }} border border-{{ latest_badge }}-subtle book-tag-pill">
+                        {{ latest_condition_display }}
+                    </span>
+                    <div id="left-ecopatch" class="mt-3" style="display:none;">
+                        <span class="badge bg-white text-secondary border px-3 py-1" id="left-ecopatch-text"></span>
+                    </div>
+                </div>
+                <div class="book-bottom-footer">
+                    <span class="text-muted fst-italic">Buku Jurnal Tanaman</span>
+                    <span class="badge bg-white text-muted border small" id="left-total">{{ total_entries }} entri</span>
+                </div>
+            </div>
+
+            <!-- PUNGGUNG TENGAH -->
+            <div class="book-spine-center"></div>
+
+            <!-- HALAMAN KANAN: Page Flip Container -->
+            <div class="book-page-right" style="overflow:hidden; position:relative;">
+                <!-- Halaman yang "terbang" saat flip -->
+                <div id="flip-overlay" class="flip-overlay" aria-hidden="true"></div>
+
+                <!-- Konten Aktual Halaman -->
+                <div id="page-content">
+                    <!-- diisi oleh JS -->
+                    <div class="text-center py-5 text-muted" id="empty-state" style="display:none;">
+                        <div style="font-size:2.5rem;">📖</div>
+                        <h5 class="fw-bold mt-2">Buku Masih Kosong</h5>
+                        <p class="small">Belum ada catatan untuk filter ini.</p>
+                        <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-sm btn-success">+ Tulis Lembaran Pertama</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dots Indicator -->
+        <div class="page-dots-indicator" id="page-dots"></div>
+    </div>
+</div>
+
+<!-- ===================== VIEW LIST ===================== -->
+<div id="view-list" class="view-panel" style="display:none;">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+            {% if journals %}
+                <div class="d-flex flex-column gap-3">
+                    {% for journal in journals %}
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge bg-{{ journal.get_condition_display_badge }}-subtle text-{{ journal.get_condition_display_badge }} border border-{{ journal.get_condition_display_badge }}-subtle">
+                                            {{ journal.get_plant_condition_display }}
+                                        </span>
+                                        {% if journal.ecopatch_name %}
+                                            <span class="badge bg-light text-secondary border">🪴 {{ journal.ecopatch_name }}</span>
+                                        {% endif %}
+                                        {% if journal.plant_height %}
+                                            <span class="badge bg-light text-secondary border">📏 {{ journal.plant_height }} cm</span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="text-muted small fw-semibold">📅 {{ journal.date|date:"d M Y" }}</span>
+                                </div>
+                                <h5 class="fw-bold mb-2">{{ journal.title }}</h5>
+                                <p class="text-secondary mb-3" style="white-space:pre-wrap;font-size:0.95rem;">{{ journal.notes }}</p>
+                                <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                                    <small class="text-muted fst-italic">Dicatat {{ journal.created_at|date:"d M Y, H:i" }}</small>
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'garden_journal:edit' journal.pk %}" class="btn btn-sm btn-outline-secondary">✏️ Edit</a>
+                                        <form method="post" action="{% url 'garden_journal:delete' journal.pk %}" onsubmit="return confirm('Hapus catatan ini?')">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">🗑️</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <div style="font-size:3rem;">📖</div>
+                    <p class="mt-2">Belum ada catatan untuk filter ini.</p>
+                    <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-success">+ Tulis Catatan Pertama</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- CSRF token for delete forms in JS -->
+{% csrf_token %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+/* ===============================================================
+   ALL JOURNAL ENTRIES (pre-loaded, no HTMX round-trip needed)
+   =============================================================== */
+const ALL_ENTRIES   = {{ all_entries_json|safe }};
+const PLANT_NAME    = "{{ plant_name|escapejs }}";
+const CREATE_URL    = "{% url 'garden_journal:create' %}?plant_name={{ plant_name }}";
+const CSRF_INPUT    = document.querySelector('[name=csrfmiddlewaretoken]');
+const CSRF_TOKEN    = CSRF_INPUT ? CSRF_INPUT.value : '';
+
+let currentIdx = {{ initial_page|default:0 }};
+let filteredEntries = [...ALL_ENTRIES];
+
+/* -------- View Toggle (Buku ↔ Riwayat) -------- */
+function switchView(mode) {
+    const bookPanel = document.getElementById('view-book');
+    const listPanel = document.getElementById('view-list');
+    const btnBook   = document.getElementById('btn-view-book');
+    const btnList   = document.getElementById('btn-view-list');
+    if (mode === 'book') {
+        if (bookPanel) bookPanel.style.display = '';
+        if (listPanel) listPanel.style.display = 'none';
+        if (btnBook) btnBook.classList.add('active');
+        if (btnList) btnList.classList.remove('active');
+    } else {
+        if (bookPanel) bookPanel.style.display = 'none';
+        if (listPanel) listPanel.style.display = '';
+        if (btnBook) btnBook.classList.remove('active');
+        if (btnList) btnList.classList.add('active');
+    }
+    try {
+        localStorage.setItem('journalView', mode);
+    } catch (e) {}
+}
+
+/* -------- Page Content Rendering -------- */
+function escHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function renderPage(idx) {
+    const el = document.getElementById('page-content');
+    const emptyEl = document.getElementById('empty-state');
+
+    if (!filteredEntries || filteredEntries.length === 0) {
+        if (el) el.innerHTML = '';
+        if (emptyEl) emptyEl.style.display = '';
+        renderDots(-1);
+        return;
+    }
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    // Bounds safety
+    if (idx < 0) idx = 0;
+    if (idx >= filteredEntries.length) idx = filteredEntries.length - 1;
+    currentIdx = idx;
+
+    const e = filteredEntries[idx];
+    if (!e) return;
+
+    // Update left page metadata
+    const epWrap = document.getElementById('left-ecopatch');
+    const epText = document.getElementById('left-ecopatch-text');
+    if (epWrap && epText) {
+        if (e.ecopatch_name) {
+            epText.textContent = '🪴 ' + e.ecopatch_name;
+            epWrap.style.display = '';
+        } else {
+            epWrap.style.display = 'none';
+        }
+    }
+
+    const condBadge = document.getElementById('left-condition-badge');
+    if (condBadge && e.condition_display) {
+        condBadge.className = `badge bg-${e.badge}-subtle text-${e.badge} border border-${e.badge}-subtle book-tag-pill`;
+        condBadge.textContent = e.condition_display;
+    }
+
+    const isFirst = (idx === 0);
+    const isLast  = (idx === filteredEntries.length - 1);
+    const metaExtras = e.plant_height
+        ? `<span class="mx-1">&middot;</span><span>Tinggi ${e.plant_height}cm</span>`
+        : '';
+
+    if (el) {
+        el.innerHTML = `
+            <div class="d-flex flex-column justify-content-between h-100" style="min-height: 380px;">
+                <div>
+                    <div class="entry-right-header">
+                        <div class="entry-right-meta">
+                            <span>📅 ${e.date}</span>${metaExtras}
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="page-turn-btn ${isFirst ? 'disabled' : ''}"
+                                    onclick="turnPage('prev')" ${isFirst ? 'disabled' : ''}
+                                    title="Halaman Sebelumnya (&larr;)">
+                                &lt;
+                            </button>
+                            <button type="button" class="page-turn-btn ${isLast ? 'disabled' : ''}"
+                                    onclick="turnPage('next')" ${isLast ? 'disabled' : ''}
+                                    title="Halaman Berikutnya (&rarr;)">
+                                &gt;
+                            </button>
+                        </div>
+                    </div>
+
+                    <h3 class="entry-right-title mt-2 mb-2">${escHtml(e.title)}</h3>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge bg-${e.badge}-subtle text-${e.badge} border border-${e.badge}-subtle">
+                            ${escHtml(e.condition_display)}
+                        </span>
+                        ${e.plant_height ? `<span class="badge bg-white text-secondary border">📏 ${e.plant_height} cm</span>` : ''}
+                        ${e.ecopatch_name ? `<span class="badge bg-white text-secondary border">🪴 ${escHtml(e.ecopatch_name)}</span>` : ''}
+                    </div>
+                    <p class="entry-right-notes" style="white-space: pre-wrap;">${escHtml(e.notes)}</p>
+
+                    <div class="photo-polaroid-slot mt-3">
+                        <span style="font-size:1.4rem;line-height:1;">📷</span>
+                        <span class="mt-1 fw-semibold small text-muted">+ Foto Tanaman</span>
+                        <span class="text-muted" style="font-size:0.7rem;">(segera hadir)</span>
+                    </div>
+                </div>
+
+                <div class="book-bottom-footer mt-4">
+                    <span class="fw-semibold text-muted">Hal. ${idx + 1} / ${filteredEntries.length}</span>
+                    <div class="d-flex gap-2">
+                        <a href="${e.edit_url}" class="btn btn-sm btn-outline-secondary py-0 px-2">✏️ Edit</a>
+                        <form method="post" action="${e.delete_url}"
+                              onsubmit="return confirm('Hapus lembaran catatan ini?')" style="display:inline;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${CSRF_TOKEN}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderDots(idx);
+}
+
+/* -------- Dots Indicator -------- */
+function renderDots(activeIdx) {
+    const container = document.getElementById('page-dots');
+    if (!container) return;
+    container.innerHTML = '';
+    if (filteredEntries.length <= 1) return;
+    filteredEntries.forEach((_, i) => {
+        const dot = document.createElement('span');
+        dot.className = 'page-dot' + (i === activeIdx ? ' active' : '');
+        dot.title = `Buka Halaman ${i + 1}`;
+        dot.onclick = () => jumpTo(i);
+        container.appendChild(dot);
+    });
+}
+
+/* -------- Page Turning & 3D Animation -------- */
+function turnPage(dir) {
+    if (dir === 'next' && currentIdx >= filteredEntries.length - 1) return;
+    if (dir === 'prev' && currentIdx <= 0) return;
+
+    const targetIdx = currentIdx + (dir === 'next' ? 1 : -1);
+    goToPage(targetIdx, dir);
+}
+
+function jumpTo(idx) {
+    if (idx === currentIdx || idx < 0 || idx >= filteredEntries.length) return;
+    const dir = idx > currentIdx ? 'next' : 'prev';
+    goToPage(idx, dir);
+}
+
+function goToPage(targetIdx, dir) {
+    // 1. Play visual animation
+    playFlip(dir);
+
+    // 2. Immediately render the destination page so it never gets stuck
+    currentIdx = targetIdx;
+    renderPage(currentIdx);
+}
+
+function playFlip(dir) {
+    const overlay = document.getElementById('flip-overlay');
+    const pageEl = document.getElementById('page-content');
+
+    if (overlay) {
+        overlay.className = 'flip-overlay';
+        void overlay.offsetWidth; // Force CSS reflow
+        overlay.classList.add(dir === 'next' ? 'flip-forward' : 'flip-backward');
+
+        const clearOverlay = () => {
+            overlay.className = 'flip-overlay';
+        };
+        overlay.addEventListener('animationend', clearOverlay, { once: true });
+        setTimeout(clearOverlay, 480);
+    }
+
+    if (pageEl) {
+        pageEl.classList.remove('page-flip-in-right', 'page-flip-in-left');
+        void pageEl.offsetWidth; // Force CSS reflow
+        pageEl.classList.add(dir === 'next' ? 'page-flip-in-right' : 'page-flip-in-left');
+
+        const clearPage = () => {
+            pageEl.classList.remove('page-flip-in-right', 'page-flip-in-left');
+        };
+        pageEl.addEventListener('animationend', clearPage, { once: true });
+        setTimeout(clearPage, 320);
+    }
+}
+
+/* -------- Keyboard Navigation (← and →) -------- */
+document.addEventListener('keydown', function(e) {
+    const bookPanel = document.getElementById('view-book');
+    const isBookActive = bookPanel && bookPanel.style.display !== 'none';
+    if (!isBookActive) return;
+
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        turnPage('next');
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        turnPage('prev');
+    }
+});
+
+/* -------- Filtering -------- */
+function applyFilters() {
+    const cond = document.getElementById('filter-condition')?.value || '';
+    const dateVal = document.getElementById('filter-date')?.value || '';
+
+    filteredEntries = ALL_ENTRIES.filter(e => {
+        const condOk = !cond || e.plant_condition === cond;
+        let dateOk = true;
+        if (dateVal) {
+            const [year, month, day] = dateVal.split('-');
+            dateOk = e.date.includes(parseInt(day, 10).toString().padStart(2, '0'));
+        }
+        return condOk && dateOk;
+    });
+
+    const countEl = document.getElementById('total-count');
+    if (countEl) countEl.textContent = filteredEntries.length;
+
+    currentIdx = 0;
+    renderPage(currentIdx);
+}
+
+/* -------- Initialization -------- */
+document.addEventListener('DOMContentLoaded', function () {
+    renderPage(currentIdx);
+
+    const fCond = document.getElementById('filter-condition');
+    if (fCond) fCond.addEventListener('change', applyFilters);
+
+    const fDate = document.getElementById('filter-date');
+    if (fDate) fDate.addEventListener('change', applyFilters);
+
+    try {
+        const saved = localStorage.getItem('journalView');
+        if (saved === 'list') switchView('list');
+    } catch (e) {}
+});
+</script>
+{% endblock %}

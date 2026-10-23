@@ -1,0 +1,698 @@
+/* =========================================================
+   GARDEN JOURNAL - 3D BOOK STYLING & PATTERNS
+   ========================================================= */
+
+.journal-page-header {
+    margin-bottom: 2rem;
+}
+
+.journal-title {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    color: #22301f;
+    letter-spacing: -0.5px;
+}
+
+.journal-subtitle {
+    color: #59684f;
+    font-size: 0.95rem;
+}
+
+/* Filter pills inspired by design */
+.filter-pill-btn {
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1px solid #e6cf95;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #22301f;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(34, 48, 31, 0.05);
+}
+
+.filter-pill-select {
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    color: #22301f;
+    outline: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+/* Book Container Grid */
+.book-shelf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 2.5rem 2rem;
+    padding: 1rem 0;
+}
+
+/* 3D Realistic Book Item */
+.book-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    perspective: 1000px;
+}
+
+.book-item:hover {
+    transform: translateY(-8px) scale(1.02);
+    text-decoration: none;
+    color: inherit;
+}
+
+.book-cover-wrap {
+    position: relative;
+    width: 170px;
+    height: 235px;
+    border-radius: 6px 14px 14px 6px;
+    box-shadow:
+        -5px 0 0 -2px #ffffff,
+        -7px 0 0 -3px #dedede,
+        -10px 0 18px rgba(0, 0, 0, 0.18),
+        8px 12px 24px rgba(34, 48, 31, 0.15);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
+}
+
+.book-item:hover .book-cover-wrap {
+    box-shadow:
+        -5px 0 0 -2px #ffffff,
+        -7px 0 0 -3px #dedede,
+        -12px 0 22px rgba(0, 0, 0, 0.22),
+        12px 18px 30px rgba(34, 48, 31, 0.22);
+}
+
+/* Book Spine shadow simulation */
+.book-cover-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 14px;
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.25) 0%,
+        rgba(0, 0, 0, 0.08) 50%,
+        rgba(255, 255, 255, 0.3) 70%,
+        rgba(0, 0, 0, 0.12) 100%
+    );
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Book Page Edges (Right side white paper layers) */
+.book-cover-wrap::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: 0;
+    bottom: 3px;
+    width: 4px;
+    background: repeating-linear-gradient(
+        to bottom,
+        #fbfbfb,
+        #fbfbfb 2px,
+        #e5e5e5 2px,
+        #e5e5e5 3px
+    );
+    box-shadow: -1px 0 2px rgba(0, 0, 0, 0.15);
+    z-index: 9;
+}
+
+/* Inner Book Texture & Header Plate */
+.book-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.2rem 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.book-title-plate {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(4px);
+    border-radius: 10px;
+    padding: 8px 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    text-align: center;
+}
+
+.book-title-plate .book-plant-name {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #22301f;
+    margin: 0;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.book-badge-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.book-condition-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: capitalize;
+}
+
+.book-footer-info {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 8px;
+    padding: 4px 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #435338;
+}
+
+/* PATTERN 1: BRUSHES (Artistic brush strokes) */
+.pattern-brushes {
+    background: #f7eed9;
+    background-image: 
+        radial-gradient(circle at 20% 30%, #f6c85f 0%, #f6c85f 24%, transparent 26%),
+        radial-gradient(circle at 85% 65%, #7ea8be 0%, #7ea8be 32%, transparent 35%),
+        radial-gradient(circle at 40% 85%, #f2a6a6 0%, #f2a6a6 20%, transparent 23%),
+        radial-gradient(circle at 80% 20%, #9cbfa7 0%, #9cbfa7 18%, transparent 21%);
+    background-size: 100% 100%;
+}
+
+/* PATTERN 2: DOTS (Playful colorful confetti dots) */
+.pattern-dots {
+    background-color: #f1f2ec;
+    background-image:
+        radial-gradient(#ffffff 22%, transparent 23%),
+        radial-gradient(#7ea8be 10%, transparent 12%),
+        radial-gradient(#e07a5f 8%, transparent 10%),
+        radial-gradient(#81b29a 11%, transparent 13%),
+        radial-gradient(#f4a261 9%, transparent 11%);
+    background-position: 0 0, 30px 40px, 70px 20px, 45px 80px, 90px 100px;
+    background-size: 120px 120px;
+}
+
+/* PATTERN 3: FLOWERS (Botanical floral garden vibe) */
+.pattern-flowers {
+    background-color: #eaf4ed;
+    background-image:
+        radial-gradient(circle at 50% 50%, #f6c85f 14%, transparent 16%),
+        radial-gradient(circle at 20% 20%, #ff7b90 12%, transparent 14%),
+        radial-gradient(circle at 80% 80%, #52b788 12%, transparent 14%),
+        radial-gradient(circle at 80% 25%, #64b5f6 10%, transparent 12%),
+        radial-gradient(circle at 25% 75%, #ffb703 10%, transparent 12%);
+    background-size: 80px 80px;
+}
+
+/* PATTERN 4: SEEDS (Raindrop / seed teardrop patterns) */
+.pattern-seeds {
+    background-color: #d8ece0;
+    background-image:
+        radial-gradient(ellipse at 50% 40%, #ffffff 28%, #c5e3d0 32%, transparent 36%),
+        radial-gradient(ellipse at 50% 40%, #c99351 10%, transparent 14%);
+    background-position: 0 0, 25px 35px;
+    background-size: 50px 65px;
+}
+
+/* PATTERN 5: SOFT (Minimal pastel stripes & gentle border motifs) */
+.pattern-soft {
+    background-color: #faf8f3;
+    background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(230, 207, 149, 0.4) 18px, rgba(230, 207, 149, 0.4) 20px),
+        repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(230, 207, 149, 0.2) 18px, rgba(230, 207, 149, 0.2) 20px);
+}
+
+/* PATTERN 6: LEAVES (Lush botanical emerald & sage foliage) */
+.pattern-leaves {
+    background-color: #e5f5eb;
+    background-image:
+        radial-gradient(ellipse 26px 14px at 30% 25%, #2d6a4f 0%, #2d6a4f 85%, transparent 88%),
+        radial-gradient(ellipse 22px 12px at 75% 70%, #40916c 0%, #40916c 85%, transparent 88%),
+        radial-gradient(ellipse 18px 10px at 80% 25%, #52b788 0%, #52b788 85%, transparent 88%),
+        radial-gradient(ellipse 20px 11px at 25% 75%, #74c69d 0%, #74c69d 85%, transparent 88%),
+        radial-gradient(circle 6px at 50% 50%, #95d5b2 0%, #95d5b2 85%, transparent 88%);
+    background-size: 80px 80px;
+}
+
+/* Book Below Title Labels */
+.book-label-area {
+    margin-top: 14px;
+    text-align: center;
+}
+
+.book-label-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #22301f;
+    margin-bottom: 2px;
+}
+
+.book-label-meta {
+    font-size: 0.8rem;
+    color: #59684f;
+}
+
+/* COVER PICKER in Form */
+.cover-picker-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.cover-option-label {
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+}
+
+.cover-option-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.cover-option-preview {
+    width: 65px;
+    height: 90px;
+    border-radius: 4px 10px 10px 4px;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.cover-option-preview::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.cover-option-input:checked + .cover-option-preview {
+    border-color: #1f9142;
+    transform: scale(1.08);
+    box-shadow: 0 6px 16px rgba(31, 145, 66, 0.35);
+}
+
+.cover-option-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #435338;
+    margin-top: 6px;
+    display: block;
+}
+
+/* =========================================================
+   OPEN BOOK DETAIL SPREAD (DUA HALAMAN BUKU TERBUKA)
+   ========================================================= */
+
+.open-book-wrapper {
+    max-width: 1060px;
+    margin: 1.5rem auto 3rem auto;
+    perspective: 1500px;
+}
+
+.open-book {
+    display: flex;
+    background: #fbf6ec;
+    border-radius: 20px;
+    box-shadow:
+        0 15px 35px rgba(34, 48, 31, 0.12),
+        0 3px 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    min-height: 520px;
+    border: 1px solid #ebd9b5;
+}
+
+/* Left Page (Halaman Kiri) */
+.book-page-left {
+    flex: 1;
+    background: #faf5ea;
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    box-shadow: inset -15px 0 25px -15px rgba(0, 0, 0, 0.1);
+    border-right: 1px solid #e8dbbe;
+}
+
+/* Center Book Spine (Punggung Tengah Buku) */
+.book-spine-center {
+    width: 24px;
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.08) 0%,
+        rgba(0, 0, 0, 0.22) 30%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(0, 0, 0, 0.22) 70%,
+        rgba(0, 0, 0, 0.08) 100%
+    );
+    box-shadow: 
+        inset 1px 0 3px rgba(0,0,0,0.15),
+        inset -1px 0 3px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 5;
+}
+
+/* Right Page (Halaman Kanan) */
+.book-page-right {
+    flex: 1.15;
+    background: #fffdf9;
+    padding: 2.8rem 2.8rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    box-shadow: inset 15px 0 25px -15px rgba(0, 0, 0, 0.1);
+}
+
+/* Plant Profile on Left Page */
+.plant-left-icon {
+    font-size: 3.2rem;
+    line-height: 1;
+    margin-bottom: 1.2rem;
+}
+
+.plant-left-title {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    color: #22301f;
+    margin-bottom: 0.8rem;
+    line-height: 1.15;
+}
+
+.book-tag-pill {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* Entry Content on Right Page */
+.entry-right-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+
+.entry-right-meta {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #59684f;
+}
+
+.entry-right-title {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: 1.65rem;
+    color: #22301f;
+    margin-bottom: 0.8rem;
+    line-height: 1.25;
+}
+
+.entry-right-notes {
+    font-size: 1.02rem;
+    color: #3b4737;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+}
+
+/* Polaroid Photo Slot */
+.photo-polaroid-slot {
+    width: 140px;
+    height: 140px;
+    margin: 1.2rem auto;
+    border: 2px dashed #d5c39c;
+    border-radius: 16px;
+    background: #faf4e6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #8c7b5a;
+    font-size: 0.8rem;
+    cursor: default;
+    transition: all 0.2s ease;
+}
+
+/* Page Turn Navigation Buttons */
+.page-turn-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1.5px solid #dfcfab;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #22301f;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.page-turn-btn:hover:not(:disabled):not(.disabled) {
+    background: #1f9142;
+    color: #ffffff;
+    border-color: #1f9142;
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(31, 145, 66, 0.3);
+}
+
+.page-turn-btn:disabled,
+.page-turn-btn.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    cursor: not-allowed;
+    border-color: #e5dac2;
+    background: #f7f3ea;
+}
+
+/* Dots Page Indicator */
+.page-dots-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 1.5rem;
+}
+
+.page-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #dfcfab;
+    display: inline-block;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.page-dot:hover {
+    background: #1f9142;
+    transform: scale(1.25);
+}
+
+.page-dot.active {
+    background: #1f9142;
+    transform: scale(1.35);
+    box-shadow: 0 2px 6px rgba(31, 145, 66, 0.4);
+}
+
+.book-bottom-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid #efe4cb;
+    font-size: 0.8rem;
+    color: #8c7b5a;
+}
+
+/* =========================================================
+   TOGGLE VIEW BUTTONS (Buku ↔ Riwayat)
+   ========================================================= */
+
+.view-toggle-btn {
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1.5px solid #e6cf95;
+    padding: 6px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #59684f;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    box-shadow: 0 2px 6px rgba(34, 48, 31, 0.05);
+}
+
+.view-toggle-btn:hover {
+    background: #f5edd8;
+    border-color: #c8a84b;
+    color: #22301f;
+}
+
+.view-toggle-btn.active {
+    background: #1f9142;
+    border-color: #1f9142;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(31, 145, 66, 0.3);
+}
+
+.view-panel {
+    transition: opacity 0.2s ease;
+}
+
+/* =========================================================
+   3D PAGE FLIP ANIMATION
+   ========================================================= */
+
+/* The overlay sits on top of the right page and "flips" */
+.flip-overlay {
+    position: absolute;
+    inset: 0;
+    background: #fffdf9;
+    z-index: 20;
+    transform-origin: left center;
+    pointer-events: none;
+    opacity: 0;
+    border-radius: 0 0 0 0;
+
+    /* Subtle paper texture */
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 28px,
+            rgba(230, 207, 149, 0.18) 28px,
+            rgba(230, 207, 149, 0.18) 29px
+        );
+}
+
+/* Forward flip: next page (right → fold left → disappear) */
+@keyframes flipForward {
+    0% {
+        opacity: 1;
+        transform: perspective(1400px) rotateY(0deg);
+        box-shadow: -8px 0 20px rgba(0,0,0,0.12);
+        background-color: #fffff8;
+    }
+    40% {
+        opacity: 1;
+        transform: perspective(1400px) rotateY(-35deg);
+        box-shadow: -20px 0 40px rgba(0,0,0,0.18);
+        background-color: #f4ebd2;
+    }
+    80% {
+        opacity: 0.4;
+        transform: perspective(1400px) rotateY(-82deg);
+        box-shadow: -4px 0 8px rgba(0,0,0,0.06);
+    }
+    100% {
+        opacity: 0;
+        transform: perspective(1400px) rotateY(-90deg);
+        box-shadow: none;
+    }
+}
+
+/* Backward flip: prev page (fold in from left → fully visible → fade) */
+@keyframes flipBackward {
+    0% {
+        opacity: 0;
+        transform: perspective(1400px) rotateY(-90deg);
+        background-color: #f4ebd2;
+    }
+    30% {
+        opacity: 0.5;
+        transform: perspective(1400px) rotateY(-60deg);
+    }
+    70% {
+        opacity: 1;
+        transform: perspective(1400px) rotateY(-20deg);
+        background-color: #faf7ef;
+        box-shadow: -16px 0 32px rgba(0,0,0,0.14);
+    }
+    100% {
+        opacity: 0;
+        transform: perspective(1400px) rotateY(0deg);
+        box-shadow: none;
+    }
+}
+
+.flip-overlay.flip-forward {
+    animation: flipForward 0.48s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.flip-overlay.flip-backward {
+    animation: flipBackward 0.48s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Page Turn Content Transitions */
+@keyframes pageFlipInRight {
+    0% {
+        opacity: 0.4;
+        transform: translateX(8px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pageFlipInLeft {
+    0% {
+        opacity: 0.4;
+        transform: translateX(-8px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.page-flip-in-right {
+    animation: pageFlipInRight 0.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+
+.page-flip-in-left {
+    animation: pageFlipInLeft 0.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}My EcoPatch - EcoPatch{% endblock %}
+
+{% block content %}
+<section class="patch-page">
+    <header class="patch-page-head">
+        <div>
+            <h1 class="patch-page-title">My EcoPatch</h1>
+            <p class="patch-page-lead">Kelola semua kebun dan tanamanmu dalam satu tempat.</p>
+        </div>
+        {# TODO: ganti href="#" jadi {% url 'my_ecopatch:create' %} begitu halaman buat EcoPatch tersedia #}
+        <a href="#" class="btn btn-success patch-create-btn">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Buat EcoPatch Baru
+        </a>
+    </header>
+
+    {% if not patches %}
+        <p class="patch-empty">Kamu belum punya EcoPatch. Mulai dengan membuat kebun pertamamu.</p>
+    {% endif %}
+
+    <div class="patch-grid">
+        {% for patch in patches %}
+            {# TODO: bungkus judul dengan link ke {% url 'my_ecopatch:detail' patch.pk %} begitu halaman detail tersedia #}
+            <article class="patch-card">
+                <div class="patch-card-top">
+                    <h2 class="patch-card-title">{{ patch.name }}</h2>
+                    <span class="patch-pill patch-pill--space">{{ patch.get_space_type_display }}</span>
+                </div>
+                <p class="patch-card-city">{{ patch.city }}</p>
+                <p class="patch-card-count">{{ patch.plant_total }} tanaman ditanam</p>
+                {% if patch.status_summary %}
+                    <ul class="patch-status-list">
+                        {% for item in patch.status_summary %}
+                            <li class="patch-pill patch-pill--{{ item.key }}">{{ item.count }} {{ item.label }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </article>
+        {% endfor %}
+
+        <a href="#" class="patch-card patch-card-add">
+            <span class="patch-add-icon" aria-hidden="true">
+                <svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+            <span class="patch-add-label">Buat EcoPatch Baru</span>
+        </a>
+    </div>
+</section>
+{% endblock %}
