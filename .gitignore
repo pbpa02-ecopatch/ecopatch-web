@@ -12,3 +12,6 @@ staticfiles/
 # Ignore all markdown docs except README
 *.md
 !README.md
+
+# User uploads
+media/
