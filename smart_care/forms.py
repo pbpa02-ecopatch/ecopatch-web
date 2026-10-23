@@ -20,3 +20,8 @@ class CareTaskForm(forms.ModelForm):
             "due_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
             "notes": forms.Textarea(attrs={"rows": 3, "placeholder": "Opsional, misalnya: pakai pupuk kompos cair"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Placeholder yang jelas menggantikan "---------" bawaan Django
+        self.fields["task_type"].choices = [("", "Pilih jenis tugas"), *CareTask.TASK_CHOICES]

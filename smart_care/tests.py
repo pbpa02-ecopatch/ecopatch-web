@@ -221,3 +221,57 @@ class CareTaskViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.task.refresh_from_db()
         self.assertTrue(self.task.is_completed)
+
+
+@patch("smart_care.views.get_weather", return_value=WEATHER_OK)
+@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
+class CareTaskPopupTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user("alice", password="pass12345")
+        self.client.login(username="alice", password="pass12345")
+        self.hx = {"HTTP_HX_REQUEST": "true"}
+
+    def test_list_has_popup_and_add_buttons_open_it(self, _weather):
+        response = self.client.get(reverse("smart_care:list"))
+        self.assertContains(response, 'id="care-modal-content"')
+        self.assertContains(response, 'data-bs-target="#care-modal"')
+        self.assertContains(response, 'hx-get="%s?city=Depok"' % reverse("smart_care:create"))
+
+    def test_htmx_get_returns_only_the_popup_content(self, _weather):
+        response = self.client.get(reverse("smart_care:create"), **self.hx)
+        self.assertContains(response, "modal-header")
+        self.assertNotContains(response, "<html")
+
+    def test_plain_get_still_returns_the_full_page(self, _weather):
+        response = self.client.get(reverse("smart_care:create"))
+        self.assertContains(response, "<html")
+
+    def test_htmx_valid_post_creates_and_redirects_via_header(self, _weather):
+        response = self.client.post(reverse("smart_care:create"), {
+            "task_type": "watering", "city": "Depok", "due_date": timezone.localdate().isoformat(), "notes": "",
+        }, **self.hx)
+        self.assertEqual(response.status_code, 204)
+        self.assertIn("city=Depok", response["HX-Redirect"])
+        self.assertEqual(CareTask.objects.filter(user=self.user).count(), 1)
+
+    def test_htmx_invalid_post_redisplays_the_popup_with_errors(self, _weather):
+        response = self.client.post(reverse("smart_care:create"), {"task_type": "", "city": "Depok", "due_date": ""}, **self.hx)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "care-field-error")
+        self.assertNotContains(response, "<html")
+        self.assertEqual(CareTask.objects.count(), 0)
+
+    def test_edit_popup_and_save(self, _weather):
+        task = make_task(self.user)
+        self.assertContains(self.client.get(reverse("smart_care:update", args=[task.pk]), **self.hx), "Edit tugas perawatan")
+        response = self.client.post(reverse("smart_care:update", args=[task.pk]), {
+            "task_type": "pruning", "city": "Depok", "due_date": task.due_date.isoformat(), "notes": "",
+        }, **self.hx)
+        self.assertEqual(response.status_code, 204)
+        task.refresh_from_db()
+        self.assertEqual(task.task_type, "pruning")
+
+    def test_task_type_placeholder_is_readable(self, _weather):
+        response = self.client.get(reverse("smart_care:create"), **self.hx)
+        self.assertContains(response, "Pilih jenis tugas")
+        self.assertNotContains(response, "---------")

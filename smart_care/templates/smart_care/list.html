@@ -72,7 +72,9 @@
         {% else %}
             <div class="care-empty">
                 <p>{% if selected_date %}Tidak ada tugas di tanggal ini.{% else %}Belum ada tugas perawatan yang akan datang di {{ city }}.{% endif %}</p>
-                <a href="{% url 'smart_care:create' %}?city={{ city|urlencode }}" class="btn btn-success">+ Tambah Tugas</a>
+                <a href="{% url 'smart_care:create' %}?city={{ city|urlencode }}" class="btn btn-success"
+                   hx-get="{% url 'smart_care:create' %}?city={{ city|urlencode }}" hx-target="#care-modal-content"
+                   data-bs-toggle="modal" data-bs-target="#care-modal">+ Tambah Tugas</a>
             </div>
         {% endif %}
     </div>
@@ -95,7 +97,27 @@
 
         {% include "smart_care/_summary.html" %}
 
-        <a href="{% url 'smart_care:create' %}?city={{ city|urlencode }}" class="care-add-btn">+ Tambah Tugas</a>
+        <a href="{% url 'smart_care:create' %}?city={{ city|urlencode }}" class="care-add-btn"
+           hx-get="{% url 'smart_care:create' %}?city={{ city|urlencode }}" hx-target="#care-modal-content"
+           data-bs-toggle="modal" data-bs-target="#care-modal">+ Tambah Tugas</a>
     </aside>
+
+    {# ---------- Popup tambah / edit tugas (isinya dimuat lewat HTMX) ---------- #}
+    <div class="modal fade care-modal" id="care-modal" tabindex="-1" aria-labelledby="care-modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" id="care-modal-content">
+                <div class="modal-body care-modal-loading">Memuat...</div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Kosongkan isi popup saat ditutup supaya pembukaan berikutnya selalu form yang baru
+    document.getElementById('care-modal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('care-modal-content').innerHTML = '<div class="modal-body care-modal-loading">Memuat...</div>';
+    });
+</script>
 {% endblock %}

@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -53,6 +54,19 @@ def _list_url(city):
     return f"{reverse('smart_care:list')}?{urlencode({'city': city})}"
 
 
+def _form_response(request, form, **extra):
+    """Popup (HTMX) gets only the modal content; a normal request gets the full page."""
+    template = "smart_care/_task_form.html" if request.headers.get("HX-Request") else "smart_care/form.html"
+    return render(request, template, {"form": form, **extra})
+
+
+def _saved_response(request, city):
+    """After a successful save: HTMX reloads the list (messages show as toasts), others redirect."""
+    if request.headers.get("HX-Request"):
+        return HttpResponse(status=204, headers={"HX-Redirect": _list_url(city)})
+    return redirect(_list_url(city))
+
+
 @login_required
 def care_task_list(request):
     city = _selected_city(request)
@@ -86,11 +100,11 @@ def care_task_create(request):
             task.user = request.user
             task.save()
             messages.success(request, "Tugas perawatan ditambahkan.")
-            return redirect(_list_url(task.city))
+            return _saved_response(request, task.city)
     else:
         initial = {"due_date": timezone.localdate(), "city": _selected_city(request)}
         form = CareTaskForm(initial=initial)
-    return render(request, "smart_care/form.html", {"form": form, "is_edit": False})
+    return _form_response(request, form, is_edit=False)
 
 
 @login_required
@@ -102,10 +116,10 @@ def care_task_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Tugas perawatan diperbarui.")
-            return redirect(_list_url(task.city))
+            return _saved_response(request, task.city)
     else:
         form = CareTaskForm(instance=task)
-    return render(request, "smart_care/form.html", {"form": form, "is_edit": True, "task": task})
+    return _form_response(request, form, is_edit=True, task=task)
 
 
 @login_required

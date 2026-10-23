@@ -493,3 +493,34 @@
         padding: 32px 0;
     }
 }
+
+/* Popup tambah / edit tugas */
+.care-modal .modal-content {
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    background: var(--surface-200);
+}
+
+.care-modal .modal-header,
+.care-modal .modal-footer {
+    border-color: var(--border);
+}
+
+.care-modal .modal-title {
+    font-size: 1.5rem;
+}
+
+.care-modal .care-form {
+    gap: 0;
+}
+
+.care-modal .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.care-modal-loading {
+    color: var(--ink-muted);
+    text-align: center;
+}
