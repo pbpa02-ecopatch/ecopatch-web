@@ -1,0 +1,9 @@
+<div class="profile-field{% if field.errors %} has-error{% endif %}">
+    <label class="auth-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.errors %}
+        <div class="auth-error">{{ field.errors|join:" " }}</div>
+    {% elif show_help and field.help_text %}
+        <div class="auth-help">{{ field.help_text }}</div>
+    {% endif %}
+</div>
