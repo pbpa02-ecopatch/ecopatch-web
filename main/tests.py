@@ -72,6 +72,9 @@ class ProfileViewTests(TestCase):
         self.assertContains(response, 'site-navbar--side')
         self.assertContains(response, 'class="sidebar-user')
 
+    def test_sidebar_user_row_has_tooltip(self):
+        self.assertContains(self.client.get(self.url), 'title="tanam - lama@example.com"')
+
     def test_sidebar_has_collapse_toggle(self):
         self.assertContains(self.client.get(self.url), 'id="sidebar-toggle"')
 

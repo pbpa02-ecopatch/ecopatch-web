@@ -71,7 +71,7 @@
 
         {% if user.is_authenticated %}
             <div class="sidebar-user">
-                <a href="{% url 'main:profile' %}" class="sidebar-user-link{% if request.resolver_match.url_name == 'profile' %} active{% endif %}">
+                <a href="{% url 'main:profile' %}" title="{{ display_name }}{% if user.email %} - {{ user.email }}{% endif %}" class="sidebar-user-link{% if request.resolver_match.url_name == 'profile' %} active{% endif %}">
                     <span class="navbar-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ display_name|first|upper }}{% endif %}</span>
                     <span class="sidebar-user-id">
                         <span class="sidebar-user-name">{{ display_name }}</span>
