@@ -60,6 +60,12 @@ class ProfileViewTests(TestCase):
         self.assertContains(response, 'class="profile-logout"')
         self.assertEqual(response.context['stats'], {'patches': 0, 'journals': 0, 'listings': 0})
 
+    def test_member_since_uses_indonesian_month(self):
+        self.user.date_joined = self.user.date_joined.replace(year=2026, month=10, day=5)
+        self.user.save()
+        response = self.client.get(self.url)
+        self.assertContains(response, 'Anggota sejak Oktober 2026')
+
     def test_each_section_has_its_own_form(self):
         response = self.client.get(self.url)
         for action in ('profile', 'bio'):

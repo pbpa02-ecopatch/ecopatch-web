@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}Profil Saya - EcoPatch{% endblock %}
 {% block content %}
 {% firstof user.get_full_name user.username as display_name %}
@@ -17,7 +18,7 @@
                 <h1 class="profile-name">{% firstof user.get_full_name user.username %}</h1>
                 <p class="profile-handle">@{{ user.username }}</p>
                 {% if profile.city %}<p class="profile-city">{{ profile.get_city_display }}</p>{% endif %}
-                <span class="profile-badge">Anggota sejak {{ user.date_joined|date:"F Y" }}</span>
+                <span class="profile-badge">Anggota sejak {% language 'id' %}{{ user.date_joined|date:"F Y" }}{% endlanguage %}</span>
                 {% if profile.bio %}
                     <p class="profile-bio">{{ profile.bio|linebreaksbr }}</p>
                 {% else %}
