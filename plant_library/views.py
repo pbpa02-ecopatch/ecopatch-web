@@ -1,15 +1,70 @@
 from functools import wraps
+import re
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
-from django.db.models import ProtectedError
+from django.db.models import ProtectedError, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from my_ecopatch.models import EcoPatch
 from .forms import PlantForm
 from .models import Plant
+
+
+# ---------------------------------------------------------------------------
+# Keyword mapping untuk pencarian natural language (tanpa AI/ML)
+# Urutan dari frasa terpanjang ke terpendek agar tidak salah potong.
+# ---------------------------------------------------------------------------
+_KEYWORD_MAP = [
+    # difficulty
+    ("mudah dirawat",    "difficulty", "easy"),
+    ("perawatan mudah",  "difficulty", "easy"),
+    ("perawatan sedang", "difficulty", "medium"),
+    # sunlight
+    ("cahaya penuh",     "sunlight",   "full"),
+    ("matahari penuh",   "sunlight",   "full"),
+    # indoor / outdoor
+    ("dalam ruangan",    "indoor_outdoor", "indoor"),
+    ("luar ruangan",     "indoor_outdoor", "outdoor"),
+    # shorter single-word phrases — must come after longer ones
+    ("mudah",            "difficulty", "easy"),
+    ("sedang",           "difficulty", "medium"),
+    ("teduh",            "sunlight",   "shade"),
+    ("indoor",           "indoor_outdoor", "indoor"),
+    ("outdoor",          "indoor_outdoor", "outdoor"),
+]
+
+# Kata sambung / stop-word yang dibuang setelah frasa dipetakan
+_STOP_WORDS = {"yang", "dan", "tanaman", "untuk", "dirawat"}
+
+
+def parse_query_keywords(raw_query):
+    """Petakan kata kunci natural ke filter Django, kembalikan sisa teks.
+
+    Returns:
+        (filters_dict, remaining_text)
+        - filters_dict: dict {field: value} yang berhasil dipetakan
+        - remaining_text: teks yang tersisa setelah frasa & stop-word dibuang
+    """
+    text = raw_query.lower().strip()
+    filters = {}
+
+    # Deteksi setiap frasa dari yang terpanjang; hapus dari teks setelah cocok
+    for phrase, field, value in _KEYWORD_MAP:
+        if phrase in text:
+            # Satu kelompok hanya satu nilai: jangan timpa yang sudah ada
+            if field not in filters:
+                filters[field] = value
+            text = text.replace(phrase, " ")
+
+    # Buang stop-word
+    words = text.split()
+    remaining_words = [w for w in words if w not in _STOP_WORDS and w]
+    remaining_text = " ".join(remaining_words).strip()
+
+    return filters, remaining_text
 
 
 def staff_required(view_func):
@@ -40,8 +95,25 @@ def plant_list(request):
     indoor_outdoor = request.GET.get('indoor_outdoor', '').strip()
     space_requirement = request.GET.get('space_requirement', '').strip()
 
+    # Natural-language keyword parsing dari query teks
     if query:
-        plants = plants.filter(name__icontains=query)
+        kw_filters, remaining_text = parse_query_keywords(query)
+
+        # Terapkan filter dari kata kunci (jangan timpa filter eksplisit dari chip/select)
+        if not sunlight and 'sunlight' in kw_filters:
+            sunlight = kw_filters['sunlight']
+        if not difficulty and 'difficulty' in kw_filters:
+            difficulty = kw_filters['difficulty']
+        if not indoor_outdoor and 'indoor_outdoor' in kw_filters:
+            indoor_outdoor = kw_filters['indoor_outdoor']
+
+        # Cari lewat nama/scientific_name hanya kalau masih ada sisa teks
+        if remaining_text:
+            plants = plants.filter(
+                Q(name__icontains=remaining_text) |
+                Q(scientific_name__icontains=remaining_text)
+            )
+
     if category:
         plants = plants.filter(category=category)
     if sunlight:

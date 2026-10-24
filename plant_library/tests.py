@@ -7,6 +7,7 @@ from django.urls import include, path, reverse
 from my_ecopatch.models import EcoPatch
 from plant_library.forms import PlantForm
 from plant_library.models import Plant
+from plant_library.views import parse_query_keywords
 
 # URL configuration lengkap untuk testing agar seluruh navigasi di header.html berhasil di-reverse
 test_urlpatterns = [
@@ -207,3 +208,105 @@ class PlantCRUDTests(TestCase):
 
 # Definisikan urlpatterns pada modul ini agar @override_settings(ROOT_URLCONF=__name__) bekerja
 urlpatterns = test_urlpatterns
+
+
+# =============================================================================
+# Tes fungsi parse_query_keywords (logika pemetaan kata kunci)
+# =============================================================================
+class ParseQueryKeywordsTests(TestCase):
+    """Unit test untuk fungsi parse_query_keywords di views.py."""
+
+    def test_keyword_natural_sentence_easy_shade(self):
+        """'tanaman yang mudah dirawat dan teduh' → difficulty=easy, sunlight=shade, tidak ada sisa teks."""
+        filters, remaining = parse_query_keywords("tanaman yang mudah dirawat dan teduh")
+        self.assertEqual(filters.get("difficulty"), "easy")
+        self.assertEqual(filters.get("sunlight"), "shade")
+        self.assertEqual(remaining, "")
+
+    def test_keyword_plain_name(self):
+        """'bayam' tidak dipetakan ke filter, sisa teks = 'bayam'."""
+        filters, remaining = parse_query_keywords("bayam")
+        self.assertEqual(filters, {})
+        self.assertEqual(remaining, "bayam")
+
+    def test_keyword_mixed_filter_and_name(self):
+        """'mudah bayam' → difficulty=easy, sisa teks = 'bayam'."""
+        filters, remaining = parse_query_keywords("mudah bayam")
+        self.assertEqual(filters.get("difficulty"), "easy")
+        self.assertEqual(remaining, "bayam")
+
+    def test_keyword_single_shade(self):
+        """'teduh' → sunlight=shade."""
+        filters, remaining = parse_query_keywords("teduh")
+        self.assertEqual(filters.get("sunlight"), "shade")
+        self.assertEqual(remaining, "")
+
+    def test_keyword_indoor(self):
+        """'indoor' → indoor_outdoor=indoor."""
+        filters, remaining = parse_query_keywords("indoor")
+        self.assertEqual(filters.get("indoor_outdoor"), "indoor")
+
+    def test_keyword_cahaya_penuh(self):
+        """'cahaya penuh' → sunlight=full."""
+        filters, remaining = parse_query_keywords("cahaya penuh")
+        self.assertEqual(filters.get("sunlight"), "full")
+        self.assertEqual(remaining, "")
+
+    def test_keyword_no_double_group(self):
+        """Satu kelompok tidak boleh diklaim dua kali: frasa terpanjang menang."""
+        # "mudah dirawat" harus diprioritaskan atas "mudah"
+        filters, remaining = parse_query_keywords("mudah dirawat")
+        self.assertEqual(filters.get("difficulty"), "easy")
+        self.assertEqual(remaining, "")
+
+
+@override_settings(ROOT_URLCONF=__name__)
+class KeywordSearchIntegrationTests(TestCase):
+    """Tes integrasi: keyword search menghasilkan queryset yang tepat lewat view."""
+
+    def setUp(self):
+        self.easy_shade = Plant.objects.create(
+            name="Pakis Haji",
+            category=Plant.Category.INDOOR_LOW_LIGHT,
+            sunlight=Plant.Sunlight.SHADE,
+            watering=Plant.Watering.LOW,
+            difficulty=Plant.Difficulty.EASY,
+            indoor_outdoor=Plant.Placement.INDOOR,
+            space_requirement=Plant.SpaceRequirement.INDOOR,
+        )
+        self.hard_full = Plant.objects.create(
+            name="Bayam Merah",
+            category=Plant.Category.VEGETABLES,
+            sunlight=Plant.Sunlight.FULL,
+            watering=Plant.Watering.HIGH,
+            difficulty=Plant.Difficulty.HARD,
+            indoor_outdoor=Plant.Placement.OUTDOOR,
+            space_requirement=Plant.SpaceRequirement.BALCONY,
+        )
+
+    def test_view_natural_sentence_easy_shade(self):
+        """'tanaman yang mudah dirawat dan teduh' harus muncul Pakis Haji, bukan Bayam Merah."""
+        url = reverse("plant_library:plant_list") + "?q=tanaman+yang+mudah+dirawat+dan+teduh"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertNotContains(res, "Bayam Merah")
+
+    def test_view_plain_name_search(self):
+        """'bayam' harus menemukan Bayam Merah lewat name__icontains."""
+        url = reverse("plant_library:plant_list") + "?q=bayam"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Bayam Merah")
+        self.assertNotContains(res, "Pakis Haji")
+
+    def test_view_mixed_easy_bayam(self):
+        """'mudah bayam' → filter difficulty=easy DAN nama mengandung 'bayam'.
+        Bayam Merah adalah hard, jadi tidak muncul; Pakis Haji ada nama 'bayam'? Tidak.
+        Hasil: 0 tanaman (benar, keduanya tidak lolos kedua filter)."""
+        url = reverse("plant_library:plant_list") + "?q=mudah+bayam"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        # Pakis Haji lolos easy tapi namanya tidak mengandung 'bayam',
+        # Bayam Merah mengandung 'bayam' tapi difficulty=hard → 0 hasil
+        self.assertContains(res, "Tidak ada tanaman ditemukan")
