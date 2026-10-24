@@ -4,6 +4,13 @@ from .models import SeedExchange
 
 
 class SeedExchangeForm(forms.ModelForm):
+    """Form create/update listing.
+
+    Field `status` ditampilkan tapi di-create selalu default 'available'.
+    Dropdown custom di-render via template (bukan widget Select bawaan),
+    jadi `attrs` di sini hanya buat class CSS.
+    """
+
     class Meta:
         model = SeedExchange
         fields = [
@@ -15,7 +22,7 @@ class SeedExchangeForm(forms.ModelForm):
             'transaction_type',
             'status',
             'description',
-        ]
+        ]  # noqa: RUF012
         labels = {
             'title': 'Judul listing',
             'item_type': 'Jenis item',
@@ -25,7 +32,7 @@ class SeedExchangeForm(forms.ModelForm):
             'transaction_type': 'Jenis transaksi',
             'status': 'Status',
             'description': 'Deskripsi',
-        }
+        }  # noqa: RUF012
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control seed-input',
@@ -48,4 +55,4 @@ class SeedExchangeForm(forms.ModelForm):
                 'rows': 4,
                 'placeholder': 'Ceritakan kondisi bibit/tanaman, jumlah, cara ambil/tukar...',
             }),
-        }
+        }  # noqa: RUF012

@@ -3,12 +3,11 @@ from django.db import models
 
 
 class SeedExchange(models.Model):
-    """Listing berbagi/tukar bibit milik Rheina (modul Seed Exchange).
+    """Listing berbagi/tukar bibit (modul Seed Exchange).
 
-    Relasi inti: User -> SeedExchange (owner). Field `plant_name`
-    sengaja CharField dulu karena `plant_library.Plant` belum ada
-    modelnya; nanti bisa diganti FK tanpa ubah view/filter:
-    # plant = models.ForeignKey('plant_library.Plant', on_delete=models.PROTECT, related_name='seed_listings', null=True, blank=True)
+    Relasi: User -> SeedExchange (owner). Field `plant_name`
+    sengaja CharField karena `plant_library.Plant` belum ada modelnya;
+    nanti bisa diganti FK tanpa ubah view/filter.
     """
 
     class ItemType(models.TextChoices):
@@ -40,15 +39,14 @@ class SeedExchange(models.Model):
         ('Malang', 'Malang'),
         ('Medan', 'Medan'),
         ('Makassar', 'Makassar'),
-    ]
+    ]  # noqa: RUF012
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='seed_listings',
     )
-    # Siapa yang me-reserve (null = belum ada yang reserve).
-    # Dipakai agar owner tahu siapa yang minat & reserver tahu cara hubungi owner.
+    # Who reserved (null = none). Owner sees requester; requester sees owner contact.
     reserved_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -81,7 +79,7 @@ class SeedExchange(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-created_at']  # noqa: RUF012
 
     def __str__(self):
         return self.title

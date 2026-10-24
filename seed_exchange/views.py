@@ -1,17 +1,17 @@
+from urllib.parse import urlencode
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from urllib.parse import urlencode
-
 from .forms import SeedExchangeForm
 from .models import SeedExchange
 
 
 def _filtered_queryset(request):
-    """Queryset dengan filter jenis item / tanaman / kota / transaksi / status."""
+    """Filtered queryset for list view (item type, plant name, city, transaction, status)."""
     qs = SeedExchange.objects.select_related('user').order_by('-created_at')
 
     item_type = request.GET.get('item_type', '').strip()
@@ -29,8 +29,7 @@ def _filtered_queryset(request):
         qs = qs.filter(item_type=item_type)
     if q:
         qs = qs.filter(title__icontains=q) | qs.filter(plant_name__icontains=q)
-        # NOTE: `|` di atas menggabungkan dua filter; tidak perlu distinct
-        # karena satu tabel, tapi aman bila nanti ada join M2M.
+        # `|` merges two filters; distinct() safe for future M2M joins.
         qs = qs.distinct()
     if city in valid_cities:
         qs = qs.filter(city=city)
@@ -54,7 +53,7 @@ def _is_htmx(request):
 
 
 def _filter_url(current, name, value):
-    """URL filter yang mempertahankan param lain (dipakai dropdown custom)."""
+    """Build filter URL preserving other params (for custom dropdowns)."""
     params = dict(current)
     if value:
         params[name] = value
@@ -66,7 +65,7 @@ def _filter_url(current, name, value):
 
 
 def _filter_dropdowns(active):
-    """Opsi tiap dropdown custom: label, url (pertahankan filter lain), selected."""
+    """Build dropdown options for template: [{name, current_label, items: [{label, url, selected}]}]."""
     config = [
         ('item_type', 'Semua jenis', list(SeedExchange.ItemType.choices)),
         ('city', 'Semua kota', list(SeedExchange.CITY_CHOICES)),
@@ -97,11 +96,7 @@ def _filter_dropdowns(active):
 
 
 def listing_list(request):
-    """List read-only untuk guest; filter dinamis via HTMX (partial tanpa reload).
-
-    Kalau login: "Listing Saya" (milik sendiri, bisa diedit) tampil terpisah,
-    bagian jelajah hanya berisi listing milik orang lain (bisa di-reserve).
-    """
+    """List view: guest read-only + HTMX filter; logged-in gets 'My Listings' + 'Browse' sections."""
     qs, active = _filtered_queryset(request)
     if request.user.is_authenticated:
         my_listings = list(
@@ -212,11 +207,7 @@ def _render_card(request, listing):
 
 @login_required
 def listing_reserve(request, pk):
-    """User login (bukan owner) booking listing yang masih Available.
-
-    Booking = minta, status jadi "Menunggu konfirmasi". Serah terima
-    terjadi setelah pemilik menekan Terima (tidak ada pembayaran/chat di v1).
-    """
+    """Booking: user requests listing (status -> Menunggu konfirmasi)."""
     listing = get_object_or_404(SeedExchange, pk=pk)
     if listing.user_id == request.user.id:
         return HttpResponseForbidden('Tidak bisa memesan listing sendiri.')
@@ -235,7 +226,7 @@ def listing_reserve(request, pk):
 
 @login_required
 def listing_accept(request, pk):
-    """Owner menerima booking (Menunggu konfirmasi -> Reserved)."""
+    """Owner accepts booking (Menunggu konfirmasi -> Reserved)."""
     listing = get_object_or_404(
         SeedExchange, pk=pk, user=request.user,
         status=SeedExchange.Status.REQUESTED,
@@ -252,7 +243,7 @@ def listing_accept(request, pk):
 
 @login_required
 def listing_complete(request, pk):
-    """Owner menandai listing Selesai (sudah diserahterimakan)."""
+    """Owner marks listing done (Reserved -> Completed)."""
     listing = get_object_or_404(SeedExchange, pk=pk, user=request.user)
     if request.method != 'POST':
         return redirect('seed_exchange:detail', pk=pk)
@@ -268,7 +259,7 @@ def listing_complete(request, pk):
 
 @login_required
 def listing_reopen(request, pk):
-    """Owner membuka kembali listing (Reserved/Completed -> Available)."""
+    """Owner reopens listing (Reserved/Completed -> Available)."""
     listing = get_object_or_404(SeedExchange, pk=pk, user=request.user)
     if request.method != 'POST':
         return redirect('seed_exchange:detail', pk=pk)
@@ -285,11 +276,7 @@ def listing_reopen(request, pk):
 
 @login_required
 def listing_cancel_reserve(request, pk):
-    """Yang booking membatalkan minatnya sendiri.
-
-    Hanya bisa selama masih "Menunggu konfirmasi". Kalau sudah diterima
-    pemilik, pembatalan harus lewat pemilik langsung.
-    """
+    """Requester cancels booking (only while Menunggu konfirmasi)."""
     listing = get_object_or_404(
         SeedExchange,
         pk=pk,
@@ -308,7 +295,7 @@ def listing_cancel_reserve(request, pk):
 
 
 def _form_rows(form):
-    """Baris field untuk form.html; select dirender jadi dropdown custom."""
+    """Form rows for template: [{field, select: {value, display, options, required}}]."""
     select_names = {'item_type', 'city', 'transaction_type', 'status'}
     rows = []
     for bound_field in form:
@@ -316,8 +303,7 @@ def _form_rows(form):
         if bound_field.name in select_names:
             value = bound_field.value()
             value = '' if value is None else str(value)
-            # Abaikan opsi kosong bawaan Django ("---------"); placeholder
-            # "Pilih ..." yang tampil kalau belum ada nilai.
+            # Skip Django's empty choice ("---------"); placeholder shows instead.
             options = [
                 (str(v), label)
                 for v, label in bound_field.field.choices if str(v) != ''
