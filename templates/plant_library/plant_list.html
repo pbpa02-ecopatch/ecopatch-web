@@ -4,18 +4,26 @@
 {% block extra_head %}
 <style>
     /* ================================================================
-       PLANT LIBRARY – Scoped styles (existing cards preserved)
+       PLANT LIBRARY – Scoped styles
+       Background: warm cream #FFF9EA, search bar putih dengan divider
        ================================================================ */
+
+    /* Wrap seluruh section dalam background cream */
+    .plant-page {
+        background: #FFF0CC;
+        border-radius: 24px;
+        padding: 0 0 32px;
+        min-height: 60vh;
+    }
 
     /* ---------- Hero Section ---------- */
     .pl-hero {
-        background: #f5f0e8;
-        border-radius: 28px;
-        padding: 48px 40px 36px;
+        background: #FFF0CC;
+        border-radius: 28px 28px 0 0;
+        padding: 48px 40px 32px;
         text-align: center;
         margin-bottom: 0;
         position: relative;
-        overflow: hidden;
     }
     .pl-hero-label {
         display: inline-flex;
@@ -23,89 +31,110 @@
         gap: 6px;
         font-size: 0.78rem;
         font-weight: 700;
-        letter-spacing: 1.2px;
+        letter-spacing: 1.4px;
         text-transform: uppercase;
-        color: var(--brand-600, #3a7c3b);
-        margin-bottom: 14px;
+        color: #2d7d32;
+        margin-bottom: 16px;
     }
     .pl-hero-label svg { flex-shrink: 0; }
     .pl-hero-title {
         font-family: 'Baloo 2', sans-serif;
-        font-size: clamp(2rem, 4.5vw, 2.9rem);
+        font-size: clamp(1.9rem, 4.5vw, 2.8rem);
         font-weight: 800;
         color: #1a2b1a;
-        line-height: 1.2;
-        margin-bottom: 28px;
+        line-height: 1.22;
+        margin-bottom: 32px;
     }
     .pl-hero-title .accent-green {
         color: #2d7d32;
         text-decoration: underline;
         text-decoration-color: #f5a623;
-        text-underline-offset: 4px;
+        text-underline-offset: 5px;
         text-decoration-thickness: 3px;
     }
 
-    /* ---------- Search Box ---------- */
+    /* ---------- Search Container ---------- */
     .pl-search-wrap {
-        background: #fff;
-        border-radius: 999px;
-        box-shadow: 0 4px 20px rgba(34, 48, 31, 0.12);
-        padding: 8px 12px 8px 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        max-width: 680px;
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 8px 32px rgba(34, 48, 31, 0.10), 0 1px 4px rgba(34, 48, 31, 0.06);
+        padding: 0;
+        max-width: 900px;
         margin: 0 auto;
+        overflow: hidden;
+        position: relative;
     }
+
+    /* Top row: search icon + input */
     .pl-search-row {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        padding: 16px 20px 14px 22px;
     }
     .pl-search-input {
         flex: 1;
         border: none;
         outline: none;
         background: transparent;
-        font-size: 1.05rem;
+        font-size: 1rem;
         color: #1a2b1a;
-        padding: 8px 0;
+        padding: 0;
+        min-width: 0;
     }
-    .pl-search-input::placeholder { color: #8fa38f; }
+    .pl-search-input::placeholder { color: #9aab9a; font-size: 0.97rem; }
     .pl-search-icon {
-        color: #8fa38f;
+        color: #9aab9a;
         flex-shrink: 0;
-        margin-right: 4px;
     }
 
-    /* Chips row inside search box */
+    /* Divider between input and chips */
+    .pl-search-divider {
+        height: 1px;
+        background: #eeeeee;
+        margin: 0 20px;
+    }
+
+    /* Bottom row: chips + submit button */
+    .pl-search-bottom {
+        display: flex;
+        align-items: center;
+        padding: 10px 14px 14px 20px;
+        gap: 8px;
+    }
+
+    /* Chips row */
     .pl-chip-row {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        padding: 4px 0 6px;
         align-items: center;
+        flex: 1;
+        min-width: 0;
     }
     .pl-chip {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        padding: 5px 13px;
+        gap: 4px;
+        padding: 5px 12px;
         border-radius: 999px;
-        border: 1.5px solid #d4ddd4;
+        border: 1.5px solid #dde8dd;
         background: #fff;
-        color: #3a5c3a;
-        font-size: 0.82rem;
+        color: #3d5c3d;
+        font-size: 0.8rem;
         font-weight: 600;
         text-decoration: none;
         white-space: nowrap;
-        transition: border-color 0.18s, background 0.18s, color 0.18s;
+        line-height: 1;
+        transition: border-color 0.15s, background 0.15s, color 0.15s;
         cursor: pointer;
     }
     .pl-chip:hover {
         border-color: #2d7d32;
-        background: #f0f8f0;
+        background: #f2faf2;
         color: #2d7d32;
+        text-decoration: none;
     }
     .pl-chip.active {
         background: #2d7d32;
@@ -118,10 +147,10 @@
         color: #fff;
     }
 
-    /* Submit button — round green arrow */
+    /* Submit button – round green, bottom-right */
     .pl-submit-btn {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         background: #2d7d32;
         border: none;
@@ -131,29 +160,32 @@
         justify-content: center;
         flex-shrink: 0;
         cursor: pointer;
-        transition: background 0.18s;
-        align-self: flex-end;
-        margin-bottom: 2px;
+        transition: background 0.15s, transform 0.15s;
+        margin-left: auto;
     }
-    .pl-submit-btn:hover { background: #245e27; }
+    .pl-submit-btn:hover {
+        background: #245e27;
+        transform: scale(1.06);
+    }
 
     /* ---------- Action buttons below hero ---------- */
     .pl-hero-actions {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 18px;
+        gap: 12px;
+        margin: 24px auto 0;
+        width: 100%;
     }
 
     /* ---------- Filter lainnya (details) ---------- */
     .pl-filter-extra {
         max-width: 680px;
-        margin: 12px auto 0;
+        margin: 10px auto 0;
     }
     .pl-filter-extra summary {
         cursor: pointer;
-        font-size: 0.88rem;
+        font-size: 0.85rem;
         font-weight: 600;
         color: #5a7c5a;
         list-style: none;
@@ -168,10 +200,10 @@
     .pl-filter-extra[open] summary .arrow { transform: rotate(90deg); }
     .pl-filter-extra-body {
         background: #fff;
-        border: 1px solid #d4ddd4;
+        border: 1px solid #dde8dd;
         border-radius: 18px;
-        padding: 16px 20px;
-        margin-top: 10px;
+        padding: 14px 18px;
+        margin-top: 8px;
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
@@ -195,30 +227,31 @@
     .pl-reset-btn {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         padding: 7px 16px;
         border-radius: 999px;
         border: 1.5px dashed #b8ccb8;
         background: transparent;
         color: #5a7c5a;
-        font-size: 0.85rem;
+        font-size: 0.84rem;
         font-weight: 600;
         text-decoration: none;
-        transition: all 0.18s;
+        transition: all 0.15s;
         white-space: nowrap;
     }
-    .pl-reset-btn:hover { background: #f0f8f0; border-color: #2d7d32; color: #2d7d32; }
+    .pl-reset-btn:hover { background: #f2faf2; border-color: #2d7d32; color: #2d7d32; }
 
     /* ---------- Count info ---------- */
     .plant-count-info {
         font-weight: 600;
-        color: var(--ink-muted, #5a7c5a);
+        color: #5a7c5a;
         font-size: 0.95rem;
         margin-bottom: 18px;
+        padding: 0 8px;
     }
 
     /* ================================================================
-       PLANT CARDS – unchanged from original
+       PLANT CARDS – tidak berubah dari sebelumnya
        ================================================================ */
     .plant-card {
         background: var(--surface-200);
@@ -245,27 +278,15 @@
         overflow: hidden;
         position: relative;
     }
-    .plant-card-media img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .plant-card-placeholder-icon {
-        font-size: 3.5rem;
-        user-select: none;
-    }
+    .plant-card-media img { width: 100%; height: 100%; object-fit: cover; }
+    .plant-card-placeholder-icon { font-size: 3.5rem; user-select: none; }
     .plant-card-body {
         padding: 20px;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
     }
-    .plant-badge-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 12px;
-    }
+    .plant-badge-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
     .plant-badge {
         font-size: 0.76rem;
         font-weight: 700;
@@ -277,18 +298,8 @@
     .plant-badge--diff-easy { background: #e6f4ea; color: #137333; }
     .plant-badge--diff-medium { background: #fef7e0; color: #b06000; }
     .plant-badge--diff-hard { background: #fce8e6; color: #c5221f; }
-    .plant-card-title {
-        font-size: 1.35rem;
-        color: var(--ink);
-        margin: 0 0 4px;
-        font-family: 'Baloo 2', sans-serif;
-    }
-    .plant-card-scientific {
-        color: var(--ink-muted);
-        font-style: italic;
-        font-size: 0.88rem;
-        margin-bottom: 14px;
-    }
+    .plant-card-title { font-size: 1.35rem; color: var(--ink); margin: 0 0 4px; font-family: 'Baloo 2', sans-serif; }
+    .plant-card-scientific { color: var(--ink-muted); font-style: italic; font-size: 0.88rem; margin-bottom: 14px; }
     .plant-specs-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -301,38 +312,37 @@
         margin-bottom: 14px;
     }
     .plant-specs-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        display: flex; align-items: center; gap: 6px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .plant-desc-snippet {
-        font-size: 0.88rem;
-        color: var(--ink-muted);
-        line-height: 1.5;
-        margin-bottom: 18px;
-        flex-grow: 1;
+        font-size: 0.88rem; color: var(--ink-muted); line-height: 1.5;
+        margin-bottom: 18px; flex-grow: 1;
     }
     .plant-card-footer { margin-top: auto; }
     .plant-empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        background: var(--surface-200);
-        border: 2px dashed var(--border);
-        border-radius: 28px;
+        text-align: center; padding: 60px 20px;
+        background: var(--surface-200); border: 2px dashed var(--border); border-radius: 28px;
     }
     .plant-empty-icon { font-size: 3.5rem; margin-bottom: 12px; }
 
     /* ---------- Responsive ---------- */
-    @media (max-width: 600px) {
-        .pl-hero { padding: 32px 18px 24px; }
-        .pl-search-wrap { border-radius: 20px; padding: 8px 10px 8px 14px; }
-        .pl-chip-row { gap: 5px; }
-        .pl-chip { font-size: 0.77rem; padding: 4px 10px; }
-        .pl-submit-btn { width: 42px; height: 42px; }
+    @media (max-width: 768px) {
+        .pl-hero { padding: 36px 20px 24px; }
+        .pl-search-wrap { border-radius: 20px; }
+        .pl-search-row { padding: 14px 14px 12px 16px; }
+        .pl-search-bottom { padding: 8px 10px 12px 14px; gap: 6px; }
+        .pl-search-divider { margin: 0 14px; }
+        .pl-chip { font-size: 0.75rem; padding: 4px 10px; }
+        .pl-submit-btn { width: 40px; height: 40px; }
         .pl-hero-actions .btn { font-size: 0.88rem; padding: 8px 14px; }
+    }
+    @media (max-width: 480px) {
+        .pl-hero { padding: 28px 12px 20px; }
+        .pl-search-row { padding: 12px 12px 10px 14px; }
+        .pl-search-bottom { padding: 8px 10px 10px 12px; flex-wrap: wrap; }
+        .pl-submit-btn { margin-left: auto; }
+        .pl-chip-row { gap: 5px; }
     }
 </style>
 {% endblock %}
@@ -380,16 +390,11 @@
                            class="pl-search-input"
                            placeholder='Coba "tanaman yang mudah dirawat dan teduh"'
                            autocomplete="off">
-                    <button type="submit" class="pl-submit-btn" aria-label="Cari">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12 5 19 12 12 19"/>
-                        </svg>
-                    </button>
                 </div>
 
-                
+                <div class="pl-search-divider"></div>
+
+                <div class="pl-search-bottom">
                 <div class="pl-chip-row">
                     
                     
@@ -472,7 +477,9 @@
                         </a>
                     {% endif %}
                 </div>
+                </div>
             </div>
+        </div>
         </form>
 
         
