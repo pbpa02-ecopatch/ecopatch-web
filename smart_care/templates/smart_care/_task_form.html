@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h2 class="modal-title" id="care-modal-title">{% if is_edit %}Edit tugas perawatan{% else %}Tambah tugas perawatan{% endif %}</h2>
+    <h2 class="modal-title" id="care-modal-title">{% if is_edit %}Edit Care Task{% else %}Tambah Care Task{% endif %}</h2>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
 </div>
 <form method="post" class="care-form"
@@ -7,19 +7,10 @@
       hx-target="#care-modal-content" hx-swap="innerHTML" novalidate>
     <div class="modal-body">
         {% csrf_token %}
-        {% if form.non_field_errors %}
-            <div class="care-form-alert" role="alert">{{ form.non_field_errors|join:" " }}</div>
-        {% endif %}
-        {% for field in form %}
-            <div class="care-field{% if field.errors %} has-error{% endif %}">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}<div class="care-field-error">{{ field.errors|join:" " }}</div>{% endif %}
-            </div>
-        {% endfor %}
+        {% include "smart_care/_task_fields.html" %}
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn btn-success">{% if is_edit %}Simpan Perubahan{% else %}Tambah Tugas{% endif %}</button>
+        <button type="submit" class="btn btn-success">{% if is_edit %}Simpan Perubahan{% else %}Tambah Task{% endif %}</button>
     </div>
 </form>

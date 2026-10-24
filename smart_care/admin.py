@@ -5,7 +5,8 @@ from .models import CareTask
 
 @admin.register(CareTask)
 class CareTaskAdmin(admin.ModelAdmin):
-    list_display = ("task_type", "user", "city", "due_date", "is_completed")
-    list_filter = ("task_type", "is_completed", "city")
-    search_fields = ("user__username", "notes")
+    list_display = ("plant_name", "task_type", "user", "due_date", "status", "source")
+    list_filter = ("task_type", "status", "source", "is_outdoor")
+    search_fields = ("plant_name", "user__username", "notes")
     date_hierarchy = "due_date"
+    readonly_fields = ("completed_at", "created_at")

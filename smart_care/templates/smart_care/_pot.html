@@ -1,0 +1,22 @@
+<li class="care-pot{% if pot.watering_due %} is-due{% endif %}{% if pot.never_recorded %} is-empty{% endif %}" data-key="{{ pot.key }}" style="--water: {{ pot.water }}">
+    <button type="button" class="care-pot-btn" aria-label="{{ pot.plant_name }}: {{ pot.label }}. Lihat tugasnya">
+        <svg class="care-pot-svg" viewBox="0 0 64 76" aria-hidden="true">
+            <defs>
+                <clipPath id="pot-clip-{{ forloop.counter }}"><path d="M12 24h40l-3.5 42a5 5 0 0 1-5 4.6H20.5a5 5 0 0 1-5-4.6z"/></clipPath>
+            </defs>
+            <g clip-path="url(#pot-clip-{{ forloop.counter }})">
+                <g class="pot-water"><path class="pot-wave" d="M-16 24q8-5 16 0t16 0t16 0t16 0t16 0t16 0V72H-16z"/></g>
+            </g>
+            <path class="pot-body" d="M12 24h40l-3.5 42a5 5 0 0 1-5 4.6H20.5a5 5 0 0 1-5-4.6z"/>
+            <rect class="pot-rim" x="8" y="18" width="48" height="8" rx="3"/>
+        </svg>
+        <span class="care-pot-name">{{ pot.plant_name }}</span>
+        <span class="care-pot-label">{{ pot.label }}</span>
+        <span class="care-pot-dots">
+            <span class="care-pot-dot{% if pot.fertilizing_ok %} is-on{% endif %}" data-dot="fertilizing"
+                  title="{% if pot.fertilizing_ok %}Pupuk masih aman{% else %}Waktunya pupuk{% endif %}"><i></i>Pupuk</span>
+            <span class="care-pot-dot{% if pot.inspection_ok %} is-on{% endif %}" data-dot="inspection"
+                  title="{% if pot.inspection_ok %}Pemeriksaan masih aman{% else %}Waktunya periksa{% endif %}"><i></i>Cek</span>
+        </span>
+    </button>
+</li>

@@ -3,23 +3,61 @@
 .care-page {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 16px 0;
+    gap: 22px;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 8px 0 32px;
 }
 
-.care-main {
+.care-head {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .care-title {
     margin: 0;
     color: var(--ink);
     font-family: 'Baloo 2', sans-serif;
+    font-size: 30px;
     font-weight: 700;
-    font-size: 26px;
+    line-height: 1.1;
+}
+
+.care-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--ink);
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.care-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.care-add .ico {
+    width: 18px;
+    height: 18px;
+}
+
+.care-badge {
+    min-width: 24px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--brand-300);
+    color: var(--brand-600);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
 }
 
 .care-card {
@@ -30,158 +68,457 @@
     box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
 }
 
-.care-overline {
-    display: block;
-    margin: 0;
-    color: var(--ink-muted);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+/* ---------------------------------------------------------------- Weather ribbon */
+.care-ribbon {
+    position: relative;
+    overflow: hidden;
+    border-radius: 40px;
+    background: var(--surface-200);
+    color: var(--ink);
 }
 
-/* Weather */
-.care-weather-top {
+/* Three tinted layers cross-fade with the weather: rain = sky, heat = mango, otherwise brand */
+.care-ribbon-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+}
+
+.bg-ok {
+    background: linear-gradient(120deg, color-mix(in srgb, var(--brand-300) 85%, var(--surface-100)), color-mix(in srgb, var(--brand-300) 30%, var(--surface-200)));
+}
+
+.bg-rain {
+    background: linear-gradient(120deg, color-mix(in srgb, var(--accent-sky) 30%, var(--surface-100)), color-mix(in srgb, var(--accent-sky) 8%, var(--surface-200)));
+}
+
+.bg-heat {
+    background: linear-gradient(120deg, color-mix(in srgb, var(--accent-mango) 34%, var(--surface-100)), color-mix(in srgb, var(--accent-mango) 9%, var(--surface-200)));
+}
+
+.care-ribbon[data-ambient="cloud"] .bg-ok,
+.care-ribbon[data-ambient="rain"] .bg-rain,
+.care-ribbon[data-ambient="sun"] .bg-heat {
+    opacity: 1;
+}
+
+.care-ribbon-body {
+    position: relative;
+    z-index: 1;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 6px;
+    padding: 24px 32px 26px;
+    transition: opacity 0.2s ease;
+}
+
+.care-ribbon.is-loading .care-ribbon-body {
+    opacity: 0.6;
+}
+
+.care-city-select {
+    padding: 0 18px 2px 0;
+    border: 0;
+    border-bottom: 1.5px dashed color-mix(in srgb, var(--ink) 35%, transparent);
+    border-radius: 0;
+    appearance: none;
+    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='m1 1 4 4 4-4' fill='none' stroke='%2359684f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 2px center / 9px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.care-city-select:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--ink) 25%, transparent);
+    outline-offset: 3px;
+}
+
+.care-now {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+}
+
+.care-temp {
+    display: inline-flex;
+    align-items: baseline;
+    color: var(--ink);
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.care-temp strong {
+    font-size: 72px;
+    font-weight: 800;
+    letter-spacing: -2px;
+}
+
+/* The degree ring is an SVG: the font's own degree sign is too small to read at this size */
+.care-deg {
+    display: inline-block;
+    width: 0.24em;
+    height: 0.24em;
+    margin: 0.26em 0 0 0.05em;
+    vertical-align: top;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+}
+
+.care-condition {
+    color: color-mix(in srgb, var(--ink) 75%, transparent);
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.care-advice {
+    max-width: 52ch;
+    margin: 0;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.care-meta {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 13px;
+}
+
+.care-weather-error {
+    margin: 0;
+    color: color-mix(in srgb, var(--danger) 70%, var(--ink));
+    font-weight: 600;
+}
+
+.care-weather-error[hidden] {
+    display: none;
+}
+
+.care-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--brand-600);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Ambient effect: one at a time, always clipped inside the ribbon */
+.care-ambient {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.amb {
+    display: none;
+}
+
+.care-ribbon[data-ambient="cloud"] .amb-cloud,
+.care-ribbon[data-ambient="rain"] .amb-rain,
+.care-ribbon[data-ambient="sun"] .amb-sun {
+    display: block;
+}
+
+.amb-cloud .cloud {
+    position: absolute;
+    fill: color-mix(in srgb, var(--surface-200) 70%, transparent);
+    animation: care-drift 26s ease-in-out infinite alternate;
+}
+
+.cloud-a {
+    top: -6px;
+    right: 6%;
+    width: 280px;
+}
+
+.cloud-b {
+    bottom: -20px;
+    right: 34%;
+    width: 200px;
+    opacity: 0.7;
+    animation-duration: 38s;
+    animation-direction: alternate-reverse;
+}
+
+.amb-rain span {
+    position: absolute;
+    top: -70px;
+    left: calc(var(--i) * 13% - 4%);
+    width: 3px;
+    height: 56px;
+    border-radius: 3px;
+    background: linear-gradient(transparent, color-mix(in srgb, var(--accent-sky) 45%, transparent));
+    opacity: 0.55;
+    transform: rotate(8deg);
+    animation: care-fall 2.1s linear infinite;
+    animation-delay: calc(var(--i) * -0.43s);
+}
+
+.amb-rain span:nth-child(2n) {
+    animation-duration: 2.8s;
+    opacity: 0.4;
+}
+
+.amb-rain span:nth-child(3n) {
+    animation-duration: 1.7s;
+    height: 40px;
+}
+
+.amb-sun svg {
+    position: absolute;
+    top: -70px;
+    right: -50px;
+    width: 280px;
+    height: 280px;
+    fill: color-mix(in srgb, var(--accent-mango) 30%, transparent);
+    stroke: color-mix(in srgb, var(--accent-mango) 38%, transparent);
+    stroke-width: 6;
+    stroke-linecap: round;
+    animation: care-spin 60s linear infinite;
+}
+
+@keyframes care-drift {
+    from { transform: translateX(-24px); }
+    to { transform: translateX(30px); }
+}
+
+@keyframes care-fall {
+    from { transform: translateY(0) rotate(8deg); }
+    to { transform: translateY(330px) rotate(8deg); }
+}
+
+@keyframes care-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ---------------------------------------------------------------- Date strip */
+.care-dates {
+    display: flex;
+    flex-direction: column;
     gap: 12px;
 }
 
-.care-weather-city {
-    display: flex;
-    align-items: center;
+.care-strip {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     gap: 6px;
-    color: var(--ink);
-    font-weight: 700;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-.care-weather-city .ico {
-    width: 18px;
-    height: 18px;
+.care-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 2px;
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface-200);
+    color: var(--ink);
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.care-day:hover {
+    background: var(--surface-100);
+    color: var(--ink);
+    transform: translateY(-2px);
+}
+
+.care-day.is-selected {
+    border-color: var(--brand-500);
+    background: var(--brand-300);
+}
+
+.care-day-name {
+    color: var(--ink-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.care-day.is-today .care-day-name {
     color: var(--brand-600);
 }
 
-.care-weather-condition {
+.care-day-num {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.care-day.is-today .care-day-num {
+    color: var(--brand-600);
+}
+
+.care-day-count {
+    min-width: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--accent-mango);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.care-day-count.is-zero {
+    background: transparent;
     color: var(--ink-muted);
     font-weight: 500;
 }
 
-.care-rain-badge {
-    flex-shrink: 0;
-    padding: 4px 12px;
-    border-radius: 999px;
-    background: var(--tone-soft);
-    color: var(--tone-text);
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.care-weather-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.care-weather-stats div {
-    display: flex;
-    flex-direction: column;
-}
-
-.care-weather-stats strong {
-    color: var(--ink);
-    font-family: 'Baloo 2', sans-serif;
-    font-weight: 700;
-    font-size: 22px;
-    line-height: 1.2;
-}
-
-.care-weather-stats span {
-    color: var(--ink-muted);
-    font-size: 12px;
-}
-
-.care-recommendation {
-    margin: 20px 0 0;
-    padding: 14px 16px;
-    border-radius: 18px;
-    background: var(--tone-soft);
-    color: var(--tone-text);
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.care-weather-empty {
-    margin: 16px 0 0;
-    color: var(--ink-muted);
-    font-size: 14px;
-}
-
-/* Task list header + progress */
-.care-tasks-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px 16px;
-    margin-top: 4px;
-}
-
+/* ---------------------------------------------------------------- Progress + plant */
 .care-progress {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: var(--ink-muted);
-    font-size: 12px;
-    font-weight: 600;
+    gap: 20px;
+    padding: 18px 24px;
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    background: var(--surface-200);
+    box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
 }
 
-.care-progress-track {
-    width: 96px;
-    height: 6px;
+.care-progress-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.care-progress-text p {
+    margin: 2px 0 10px;
+    color: var(--ink-muted);
+    font-size: 14px;
+}
+
+.care-bar {
+    height: 10px;
     overflow: hidden;
     border-radius: 999px;
     background: var(--surface-300);
 }
 
-.care-progress-fill {
+.care-bar-fill {
     height: 100%;
-    border-radius: 999px;
+    border-radius: inherit;
     background: var(--brand-500);
-    transition: width 0.3s ease;
+    transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.care-date-filter {
+.care-plant {
+    flex: 0 0 auto;
+    width: 92px;
+    height: 92px;
+    overflow: visible;
+}
+
+.pl-pot {
+    fill: color-mix(in srgb, var(--accent-mango) 55%, var(--ink));
+}
+
+.pl-rim {
+    fill: color-mix(in srgb, var(--accent-mango) 70%, var(--ink));
+}
+
+.pl-seed-fill {
+    fill: color-mix(in srgb, var(--accent-mango) 40%, var(--ink));
+}
+
+.pl-stem {
+    fill: none;
+    stroke: var(--brand-600);
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+.pl-leaf {
+    fill: var(--brand-500);
+}
+
+.pl-petal {
+    fill: var(--accent-mango);
+}
+
+.pl-core {
+    fill: color-mix(in srgb, var(--accent-mango) 40%, var(--ink));
+}
+
+/* Only the group of the current stage is visible; the others shrink back into the pot */
+.pl-stage {
+    opacity: 0;
+    transform: scale(0.6);
+    transform-origin: 48px 56px;
+    transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.care-plant[data-stage="0"] .pl-seed,
+.care-plant[data-stage="1"] .pl-sprout,
+.care-plant[data-stage="2"] .pl-leaves,
+.care-plant[data-stage="3"] .pl-flower {
+    opacity: 1;
+    transform: none;
+}
+
+.care-burst circle {
+    fill: var(--accent-mango);
+    opacity: 0;
+    transform-origin: 48px 24px;
+}
+
+.care-burst.is-active circle {
+    animation: care-burst 0.8s ease-out 1;
+}
+
+.care-burst.is-active circle:nth-child(odd) {
+    fill: var(--brand-500);
+}
+
+@keyframes care-burst {
+    0% { opacity: 1; transform: rotate(var(--a)) translateY(0) scale(1); }
+    100% { opacity: 0; transform: rotate(var(--a)) translateY(-30px) scale(0.4); }
+}
+
+/* ---------------------------------------------------------------- Tasks */
+.care-tasks {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 12px;
-    margin-top: -8px;
-    color: var(--ink-muted);
-    font-size: 13px;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.care-date-filter input[type="date"] {
-    padding: 6px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 999px;
-    background: var(--surface-200);
-    color: var(--ink);
-    font-size: 13px;
-}
-
-.care-date-filter a {
-    color: var(--brand-600);
-    font-weight: 600;
-}
-
-/* Task rows */
-.care-task-list {
+.care-group {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.care-group[hidden],
+.care-empty[hidden],
+.care-allclear[hidden] {
+    display: none;
+}
+
+.care-group-overdue .care-badge {
+    background: color-mix(in srgb, var(--danger) 16%, var(--surface-200));
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+}
+
+.care-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -189,37 +526,33 @@
 
 .care-task {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
     border: 1px solid var(--border);
-    border-radius: 18px;
+    border-radius: 20px;
     background: var(--surface-200);
 }
 
+.care-task.is-done .care-task-name {
+    color: var(--ink-muted);
+    text-decoration: line-through;
+}
+
+.care-task.is-done {
+    background: color-mix(in srgb, var(--surface-200) 60%, var(--surface-100));
+}
+
 .care-check {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    flex-shrink: 0;
+    position: relative;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    margin-top: 1px;
     padding: 0;
-    border: 2px solid var(--border);
-    border-radius: 999px;
-    background: var(--surface-300);
-    color: transparent;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.care-check .ico {
-    width: 14px;
-    height: 14px;
-    stroke-width: 3;
-}
-
-.care-check:hover {
-    border-color: var(--brand-500);
+    border: none;
+    border-radius: 50%;
+    background: transparent;
 }
 
 .care-check:focus-visible {
@@ -227,172 +560,166 @@
     outline-offset: 2px;
 }
 
-.care-task.is-done .care-check {
-    border-color: var(--brand-500);
-    background: var(--brand-500);
-    color: var(--surface-200);
+.care-check-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
 }
 
-.htmx-request.care-check {
-    opacity: 0.6;
+/* Ring + tick are drawn with stroke-dashoffset when the task is completed */
+.care-check-ring {
+    fill: transparent;
+    stroke: var(--border);
+    stroke-width: 2.5;
+    transition: fill 0.25s ease 0.35s, stroke 0.25s ease;
+}
+
+.care-check-mark {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 20;
+    stroke-dashoffset: 20;
+    transition: stroke-dashoffset 0.3s ease 0.2s;
+}
+
+.care-task.is-done .care-check-ring {
+    fill: var(--brand-500);
+    stroke: var(--brand-500);
+}
+
+.care-task.is-done .care-check-mark {
+    stroke-dashoffset: 0;
+}
+
+.care-check:hover .care-check-ring {
+    stroke: var(--brand-500);
 }
 
 .care-task-body {
     display: flex;
-    flex-direction: column;
     flex: 1;
+    flex-direction: column;
+    gap: 2px;
     min-width: 0;
 }
 
-.care-task-label {
+.care-task-name {
     color: var(--ink);
-    font-weight: 600;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.care-task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    color: var(--ink-muted);
+    font-size: 13px;
+}
+
+.care-task-meta span + span::before {
+    content: "";
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background: currentColor;
+    vertical-align: middle;
 }
 
 .care-task-notes {
-    overflow: hidden;
     color: var(--ink-muted);
-    font-size: 12px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    font-size: 13px;
 }
 
-.care-task.is-done .care-task-label {
-    color: var(--ink-muted);
-    text-decoration: line-through;
+.care-task-hint {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--accent-mango) 20%, var(--surface-200));
+    color: color-mix(in srgb, var(--accent-mango) 40%, var(--ink));
+    font-size: 12.5px;
+    font-weight: 600;
 }
 
-.care-task-date {
-    flex-shrink: 0;
-    color: var(--ink-muted);
-    font-size: 12px;
+.care-task-hint[hidden] {
+    display: none;
 }
 
 .care-task-actions {
     display: flex;
+    flex: 0 0 auto;
+    align-items: center;
     gap: 2px;
-}
-
-.care-task-actions form {
-    margin: 0;
 }
 
 .care-icon-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     border: none;
     border-radius: 999px;
     background: transparent;
     color: var(--ink-muted);
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.care-icon-btn .ico {
-    width: 16px;
-    height: 16px;
-}
-
-.care-icon-btn:hover {
+.care-icon-btn:hover,
+.care-icon-btn:focus-visible {
     background: var(--surface-300);
     color: var(--ink);
 }
 
-.care-icon-btn-danger,
-.care-icon-btn-danger:hover {
+.care-icon-btn-danger:hover,
+.care-icon-btn-danger:focus-visible {
+    background: color-mix(in srgb, var(--danger) 12%, var(--surface-200));
     color: var(--danger);
 }
 
+.care-icon-btn .ico {
+    width: 18px;
+    height: 18px;
+}
+
 .care-empty {
-    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 28px 20px;
     border: 1.5px dashed var(--border);
-    border-radius: 18px;
+    border-radius: 24px;
     color: var(--ink-muted);
     text-align: center;
 }
 
-.care-empty p {
-    margin-bottom: 16px;
+.care-empty .ico {
+    width: 40px;
+    height: 40px;
+    color: var(--brand-500);
 }
 
-/* Sidebar */
-.care-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.care-empty p,
+.care-allclear {
+    margin: 0;
+    color: var(--ink-muted);
 }
 
-.care-select {
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    background-color: var(--surface-300);
-    color: var(--ink);
+.care-allclear {
+    padding: 4px 4px 0;
     font-weight: 600;
 }
 
-.care-select:focus {
-    outline: none;
-    border-color: var(--brand-500);
-    box-shadow: 0 0 0 4px var(--brand-300);
-}
-
-.care-summary {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin: 14px 0 0;
-}
-
-.care-summary div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.care-summary dt {
-    color: var(--ink-muted);
-    font-weight: 500;
-}
-
-.care-summary dd {
-    margin: 0;
-    color: var(--ink);
-    font-weight: 700;
-}
-
-.care-overdue-badge {
-    display: inline-block;
-    min-width: 28px;
-    padding: 2px 10px;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--danger) 25%, var(--surface-200));
-    color: color-mix(in srgb, var(--danger) 55%, var(--ink));
-    text-align: center;
-}
-
-.care-add-btn {
-    display: block;
-    padding: 12px 20px;
-    border-radius: 999px;
-    background: var(--brand-300);
-    color: var(--brand-600);
-    font-weight: 700;
-    text-align: center;
-    text-decoration: none;
-    transition: background-color 0.2s ease;
-}
-
-.care-add-btn:hover {
-    background: color-mix(in srgb, var(--brand-500) 35%, var(--brand-300));
-    color: var(--brand-600);
-}
-
-/* Create / edit form */
+/* ---------------------------------------------------------------- Forms (popup + fallback page) */
 .care-form-wrap {
     max-width: 560px;
     margin: 0 auto;
@@ -407,12 +734,8 @@
     text-decoration: none;
 }
 
-.care-form-card {
-    padding: 32px;
-}
-
 .care-form-card .care-title {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .care-form {
@@ -429,7 +752,7 @@
     font-weight: 600;
 }
 
-.care-field input,
+.care-field input:not([type="checkbox"]),
 .care-field select,
 .care-field textarea {
     width: 100%;
@@ -454,6 +777,26 @@
     border-color: var(--danger);
 }
 
+.care-field-check label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 2px;
+}
+
+.care-field-check input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--brand-500);
+}
+
+.care-help {
+    display: block;
+    margin-top: 4px;
+    color: var(--ink-muted);
+    font-size: 12.5px;
+}
+
 .care-field-error,
 .care-form-alert {
     margin-top: 6px;
@@ -462,39 +805,18 @@
     font-weight: 500;
 }
 
+.care-form-alert {
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--danger) 12%, var(--surface-200));
+}
+
 .care-form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    margin-top: 8px;
+    gap: 10px;
 }
 
-/* Desktop: two columns; below 768px the sidebar stacks under the task list */
-@media (min-width: 768px) {
-    .care-page {
-        flex-direction: row;
-        align-items: flex-start;
-        padding: 40px 64px;
-    }
-
-    .care-main {
-        flex: 2;
-    }
-
-    .care-sidebar {
-        flex: 1;
-        max-width: 320px;
-    }
-}
-
-/* Between tablet and small desktop the 64px side padding squeezes the task rows */
-@media (min-width: 768px) and (max-width: 991.98px) {
-    .care-page {
-        padding: 32px 0;
-    }
-}
-
-/* Popup tambah / edit tugas */
 .care-modal .modal-content {
     border: 1px solid var(--border);
     border-radius: 28px;
@@ -517,10 +839,545 @@
 .care-modal .modal-body {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
 }
 
 .care-modal-loading {
     color: var(--ink-muted);
     text-align: center;
+}
+
+/* ---------------------------------------------------------------- Responsive */
+@media (max-width: 640px) {
+    .care-weather {
+        padding: 18px;
+    }
+
+    .care-temp strong {
+        font-size: 38px;
+    }
+
+    .care-progress {
+        gap: 14px;
+        padding: 16px;
+    }
+
+    .care-plant {
+        width: 72px;
+        height: 72px;
+    }
+}
+
+@media (max-width: 440px) {
+    .care-title {
+        font-size: 26px;
+    }
+
+    .care-strip {
+        gap: 4px;
+    }
+
+    .care-day {
+        padding: 8px 0;
+        border-radius: 14px;
+    }
+
+    .care-day-num {
+        font-size: 17px;
+    }
+
+    .care-task {
+        padding: 10px 12px;
+    }
+}
+
+/* ---------------------------------------------------------------- Date navigation: labelled buttons + picker */
+.care-dates-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+}
+
+.care-dates-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.care-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-200);
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.care-nav-btn:hover,
+.care-nav-btn:focus-visible {
+    border-color: var(--brand-500);
+    background: var(--brand-300);
+    color: var(--ink);
+}
+
+.care-nav-btn.is-current {
+    border-color: var(--brand-500);
+    background: var(--brand-500);
+    color: #fff;
+    pointer-events: none;
+}
+
+.care-nav-btn .ico {
+    width: 16px;
+    height: 16px;
+}
+
+.care-jump {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.care-jump input {
+    padding: 7px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-200);
+    color: var(--ink);
+}
+
+.care-jump input:focus {
+    outline: none;
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 4px var(--brand-300);
+}
+
+/* ---------------------------------------------------------------- Suggestions */
+.care-tag {
+    padding: 0 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent-sky) 18%, var(--surface-200));
+    color: color-mix(in srgb, var(--accent-sky) 55%, var(--ink));
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.care-task-meta .care-tag::before {
+    display: none;
+}
+
+.care-task.is-suggestion {
+    border-style: dashed;
+}
+
+.care-task-reason {
+    color: var(--ink-muted);
+    font-size: 13px;
+    font-style: italic;
+}
+
+.care-skip,
+.care-restore {
+    white-space: nowrap;
+    padding: 4px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-muted);
+    font-size: 13px;
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.care-skip:hover,
+.care-skip:focus-visible,
+.care-restore:hover,
+.care-restore:focus-visible {
+    background: var(--surface-300);
+    color: var(--ink);
+}
+
+.care-skipped {
+    padding: 4px 4px 0;
+}
+
+.care-skipped[hidden] {
+    display: none;
+}
+
+.care-skipped summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-muted);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.care-skipped-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.care-skipped-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--surface-200) 60%, var(--surface-100));
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.care-skipped-list small {
+    color: var(--ink-muted);
+    font-weight: 400;
+}
+
+@media (max-width: 440px) {
+    .care-nav-btn {
+        padding: 7px 11px;
+        font-size: 13px;
+    }
+
+    .care-task-actions {
+        align-self: center;
+    }
+}
+
+/* ---------------------------------------------------------------- Date strip: forecast per day */
+.care-day {
+    position: relative;
+}
+
+.care-day-rain {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    min-height: 16px;
+    color: color-mix(in srgb, var(--accent-sky) 60%, var(--ink));
+    font-size: 11.5px;
+    font-weight: 700;
+    visibility: hidden;
+}
+
+.care-day-rain.has-data {
+    visibility: visible;
+}
+
+.care-day-rain svg {
+    width: 9px;
+    height: 12px;
+    fill: var(--accent-sky);
+}
+
+.care-day-rain b {
+    font-weight: 700;
+}
+
+.care-day.is-rainy {
+    background: color-mix(in srgb, var(--accent-sky) 14%, var(--surface-200));
+    border-color: color-mix(in srgb, var(--accent-sky) 40%, var(--border));
+}
+
+.care-day.is-selected {
+    background: var(--brand-300);
+    border-color: var(--brand-500);
+}
+
+/* Today: a clear ring and a dot, independent of which day is selected */
+.care-day.is-today {
+    box-shadow: 0 0 0 2px var(--brand-500);
+}
+
+.care-day.is-today::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--brand-500);
+}
+
+/* ---------------------------------------------------------------- Pots: one per plant */
+.care-pots {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.care-pots-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+}
+
+.care-note {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 12.5px;
+}
+
+.care-pot-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.care-pot-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    padding: 12px 8px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 24px;
+    background: var(--surface-200);
+    color: var(--ink);
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.care-pot-btn:hover,
+.care-pot-btn:focus-visible {
+    border-color: var(--brand-500);
+    transform: translateY(-2px);
+}
+
+.care-pot-btn:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 2px;
+}
+
+.care-pot-svg {
+    width: 64px;
+    height: 76px;
+}
+
+.pot-body {
+    fill: color-mix(in srgb, var(--accent-sky) 8%, transparent);
+    stroke: color-mix(in srgb, var(--ink) 50%, transparent);
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.pot-rim {
+    fill: color-mix(in srgb, var(--accent-mango) 55%, var(--ink));
+}
+
+.pot-wave {
+    fill: color-mix(in srgb, var(--accent-sky) 80%, var(--surface-200));
+}
+
+/* The water is one shape slid up and down: --water is 1 right after watering and 0 when it is time */
+.pot-water {
+    transform: translateY(calc((1 - var(--water, 0)) * 46px));
+    transition: transform 0.6s cubic-bezier(0.34, 1.2, 0.5, 1);
+}
+
+.care-pot.is-filling .pot-wave {
+    animation: care-wave 0.55s linear 2;
+}
+
+@keyframes care-wave {
+    to { transform: translateX(-32px); }
+}
+
+.care-pot.is-empty .pot-body {
+    stroke-dasharray: 4 3;
+}
+
+.care-pot-name {
+    max-width: 100%;
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.care-pot-label {
+    color: var(--ink-muted);
+    font-size: 12.5px;
+}
+
+.care-pot.is-due .care-pot-btn {
+    border-color: var(--accent-mango);
+    background: color-mix(in srgb, var(--accent-mango) 14%, var(--surface-200));
+    animation: care-pulse 1.8s ease-out 1;
+}
+
+.care-pot.is-due .pot-body {
+    stroke: var(--accent-mango);
+}
+
+.care-pot.is-due .care-pot-label {
+    color: color-mix(in srgb, var(--accent-mango) 45%, var(--ink));
+    font-weight: 700;
+}
+
+@keyframes care-pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-mango) 55%, transparent); }
+    70% { box-shadow: 0 0 0 12px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.care-pot-dots {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.care-pot-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--ink-muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.care-pot-dot i {
+    width: 8px;
+    height: 8px;
+    border: 1.5px solid var(--ink-muted);
+    border-radius: 50%;
+}
+
+.care-pot-dot.is-on i {
+    border-color: var(--brand-500);
+    background: var(--brand-500);
+}
+
+/* A task row found through its pot */
+.care-task.is-highlight {
+    animation: care-highlight 1.6s ease-out 1;
+}
+
+@keyframes care-highlight {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-500) 60%, transparent); }
+    30% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand-500) 35%, transparent); }
+    100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+/* ---------------------------------------------------------------- Progress: a flat row, the plant is small */
+.care-progress {
+    gap: 14px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+}
+
+.care-progress .care-plant {
+    width: 56px;
+    height: 56px;
+}
+
+.care-progress-text p {
+    margin: 0 0 8px;
+}
+
+@media (max-width: 640px) {
+    .care-ribbon {
+        border-radius: 32px;
+    }
+
+    .care-ribbon-body {
+        padding: 20px 22px 22px;
+    }
+
+    .care-temp strong {
+        font-size: 60px;
+    }
+
+    .care-progress .care-plant {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+@media (max-width: 440px) {
+    /* three small pots per row so seven plants do not take a whole screen */
+    .care-pot-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .care-pot-btn {
+        padding: 10px 4px 8px;
+        border-radius: 20px;
+    }
+
+    .care-pot-svg {
+        width: 46px;
+        height: 55px;
+    }
+
+    .care-pot-name {
+        font-size: 13px;
+    }
+
+    .care-pot-label {
+        font-size: 11px;
+        text-align: center;
+    }
+
+    .care-pot-dots {
+        gap: 6px;
+    }
+
+    .care-pot-dot {
+        gap: 3px;
+        font-size: 10px;
+    }
+
+    .care-pot-dot i {
+        width: 7px;
+        height: 7px;
+    }
+}
+
+/* ---------------------------------------------------------------- Reduced motion: no animation anywhere */
+@media (prefers-reduced-motion: reduce) {
+    .care-page *,
+    .care-page *::before,
+    .care-page *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .care-ambient {
+        display: none;
+    }
+
+    .care-day:hover {
+        transform: none;
+    }
 }

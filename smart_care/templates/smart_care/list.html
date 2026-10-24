@@ -1,112 +1,232 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 {% block title %}Smart Care - EcoPatch{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'smart_care/css/smart_care.css' %}">
 {% endblock %}
 {% block content %}
-<div class="care-page" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <div class="care-main">
-        <h1 class="care-title">Today's Care</h1>
+<div class="care-page" id="care-page" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+     data-weather-url="{% url 'smart_care:weather' %}" data-csrf="{{ csrf_token }}"
+     data-accept-url="{% url 'smart_care:suggestion_accept' %}" data-skip-url="{% url 'smart_care:suggestion_skip' %}"
+     data-restore-url="{% url 'smart_care:suggestion_restore' %}">
 
-        {# ---------- Weather ---------- #}
-        <section class="care-card care-weather" aria-label="Cuaca {{ city }}">
-            <div class="care-weather-top">
-                <div class="care-weather-city">
-                    <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                    <span>{{ city }}</span>
-                    {% if weather.condition %}<span class="care-weather-condition">· {{ weather.condition }}</span>{% endif %}
-                </div>
-                {% if weather.available and weather.rain_probability is not None %}
-                    <span class="care-rain-badge tone-sky">Rain {{ weather.rain_probability }}%</span>
-                {% endif %}
-            </div>
-
-            {% if weather.available %}
-                <div class="care-weather-stats">
-                    <div>
-                        <strong>{% if weather.temperature is not None %}{{ weather.temperature|floatformat:0 }}°C{% else %}–{% endif %}</strong>
-                        <span>Temperature</span>
-                    </div>
-                    <div>
-                        <strong>{% if weather.humidity is not None %}{{ weather.humidity }}%{% else %}–{% endif %}</strong>
-                        <span>Humidity</span>
-                    </div>
-                    <div>
-                        <strong>{% if weather.rain_probability is not None %}{{ weather.rain_probability }}%{% else %}–{% endif %}</strong>
-                        <span>Rain Prob.</span>
-                    </div>
-                </div>
-                {% if recommendation %}
-                    <p class="care-recommendation tone-mango">{{ recommendation }}</p>
-                {% endif %}
-            {% else %}
-                <p class="care-weather-empty">Info cuaca sedang tidak tersedia. Coba muat ulang halaman beberapa saat lagi.</p>
-            {% endif %}
-        </section>
-
-        {# ---------- Tasks ---------- #}
-        <div class="care-tasks-head">
-            <h2 class="care-overline">
-                {% if selected_date %}Tugas {{ selected_date|date:"d M Y" }}{% else %}Tugas hari ini{% endif %}
-            </h2>
-            {% include "smart_care/_progress.html" %}
-        </div>
-
-        <form method="get" class="care-date-filter">
-            <input type="hidden" name="city" value="{{ city }}">
-            <label for="care-date">Lihat tanggal</label>
-            <input type="date" id="care-date" name="date" value="{{ selected_date|date:'Y-m-d' }}" onchange="this.form.requestSubmit()">
-            {% if selected_date %}
-                <a href="?city={{ city|urlencode }}">Tampilkan semua yang akan datang</a>
-            {% endif %}
-            <noscript><button type="submit" class="btn btn-outline-success btn-sm">Terapkan</button></noscript>
-        </form>
-
-        {% if tasks %}
-            <ul class="care-task-list">
-                {% for task in tasks %}
-                    {% include "smart_care/_task_row.html" %}
-                {% endfor %}
-            </ul>
-        {% else %}
-            <div class="care-empty">
-                <p>{% if selected_date %}Tidak ada tugas di tanggal ini.{% else %}Belum ada tugas perawatan yang akan datang di {{ city }}.{% endif %}</p>
-                <a href="{% url 'smart_care:create' %}?city={{ city|urlencode }}" class="btn btn-success"
-                   hx-get="{% url 'smart_care:create' %}?city={{ city|urlencode }}" hx-target="#care-modal-content"
-                   data-bs-toggle="modal" data-bs-target="#care-modal">+ Tambah Tugas</a>
-            </div>
-        {% endif %}
+    <div class="care-head">
+        <h1 class="care-title">Smart Care</h1>
+        <a href="{% url 'smart_care:create' %}?date={{ selected_date|date:'Y-m-d' }}" class="btn btn-success care-add"
+           hx-get="{% url 'smart_care:create' %}?date={{ selected_date|date:'Y-m-d' }}" hx-target="#care-modal-content"
+           data-bs-toggle="modal" data-bs-target="#care-modal">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Tambah Care Task
+        </a>
     </div>
 
-    {# ---------- Sidebar ---------- #}
-    <aside class="care-sidebar">
-        {# TODO(smart_care): ganti jadi pilihan EcoPatch milik user begitu my_ecopatch.EcoPatch tersedia #}
-        <section class="care-card">
-            <form method="get">
-                <label for="care-city" class="care-overline">Pilih kota</label>
-                {% if selected_date %}<input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">{% endif %}
-                <select id="care-city" name="city" class="care-select" onchange="this.form.requestSubmit()">
-                    {% for value, label in city_choices %}
-                        <option value="{{ value }}"{% if value == city %} selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
+    {# ---------- Weather ribbon ---------- #}
+    <section class="care-ribbon" id="care-weather" data-ambient="cloud" aria-label="Cuaca">
+        <div class="care-ribbon-bg bg-ok"></div>
+        <div class="care-ribbon-bg bg-rain"></div>
+        <div class="care-ribbon-bg bg-heat"></div>
+        <div class="care-ambient" aria-hidden="true">
+            <div class="amb amb-cloud">
+                <svg class="cloud cloud-a" viewBox="0 0 120 60"><path d="M30 52a18 18 0 0 1-2-35.9A24 24 0 0 1 74 14a20 20 0 0 1 24 20 14 14 0 0 1-2 18z"/></svg>
+                <svg class="cloud cloud-b" viewBox="0 0 120 60"><path d="M30 52a18 18 0 0 1-2-35.9A24 24 0 0 1 74 14a20 20 0 0 1 24 20 14 14 0 0 1-2 18z"/></svg>
+            </div>
+            <div class="amb amb-rain">
+                {% for i in "1234567" %}<span style="--i: {{ forloop.counter }}"></span>{% endfor %}
+            </div>
+            <div class="amb amb-sun">
+                <svg viewBox="0 0 160 160"><circle cx="80" cy="80" r="30"/><path d="M80 14v22M80 124v22M14 80h22M124 80h22M33 33l16 16M111 111l16 16M33 127l16-16M111 49l16-16"/></svg>
+            </div>
+        </div>
+
+        <div class="care-ribbon-body">
+            <div class="care-where">
+                <label for="care-city" class="visually-hidden">Kota</label>
+                <select id="care-city" class="care-city-select">
+                    {% for name in cities %}<option value="{{ name }}"{% if name == city %} selected{% endif %}>{{ name }}</option>{% endfor %}
                 </select>
-                <noscript><button type="submit" class="btn btn-outline-success btn-sm mt-2">Terapkan</button></noscript>
+            </div>
+            <div class="care-now">
+                <span class="care-temp"><strong><span id="care-temp">--</span><svg class="care-deg" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="3.2"/></svg><span class="visually-hidden">derajat Celsius</span></strong></span>
+                <span class="care-condition" id="care-condition">Memuat cuaca</span>
+            </div>
+            <p class="care-advice" id="care-advice" aria-live="polite">Mengambil data cuaca</p>
+            <p class="care-meta" id="care-meta"></p>
+            <p class="care-weather-error" id="care-weather-error" hidden>
+                Cuaca belum bisa dimuat. <button type="button" class="care-link" id="care-retry">Coba lagi</button>
+            </p>
+        </div>
+    </section>
+
+    {# ---------- Date strip ---------- #}
+    <section class="care-dates" aria-label="Pilih tanggal">
+        {% language 'id' %}
+        <h2 class="care-section-title">{{ selected_date|date:"l, j F Y" }}</h2>
+        <div class="care-dates-bar">
+            <div class="care-dates-nav" role="group" aria-label="Pindah tanggal">
+                <a href="{{ prev_week_url }}" class="care-nav-btn">
+                    <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                    Minggu lalu
+                </a>
+                <a href="{{ today_url }}" class="care-nav-btn{% if is_today %} is-current{% endif %}"{% if is_today %} aria-current="date"{% endif %}>Hari ini</a>
+                <a href="{{ next_week_url }}" class="care-nav-btn">
+                    Minggu depan
+                    <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                </a>
+            </div>
+            <form method="get" class="care-jump">
+                <label for="care-jump-date">Pilih tanggal</label>
+                <input type="date" id="care-jump-date" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+                <noscript><button type="submit" class="care-nav-btn">Buka</button></noscript>
             </form>
-        </section>
+        </div>
+        <ul class="care-strip">
+            {% for day in strip %}
+                <li>
+                    <a href="{{ day.url }}" class="care-day{% if day.is_selected %} is-selected{% endif %}{% if day.is_today %} is-today{% endif %}"
+                       data-day="{{ day.date|date:'Y-m-d' }}"{% if day.is_selected %} aria-current="date"{% endif %}
+                       aria-label="{{ day.date|date:'l, j F' }}">
+                        <span class="care-day-name">{{ day.date|date:"D" }}</span>
+                        <span class="care-day-num">{{ day.date|date:"j" }}</span>
+                        <span class="care-day-rain" data-rain aria-hidden="true"><svg viewBox="0 0 12 16"><path d="M6 1s4.5 5 4.5 8.2A4.5 4.5 0 0 1 1.5 9.2C1.5 6 6 1 6 1z"/></svg><b></b></span>
+                        <span class="care-day-count{% if not day.pending %} is-zero{% endif %}" data-count>{{ day.pending }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% endlanguage %}
+    </section>
 
-        {% include "smart_care/_summary.html" %}
+    {# ---------- One pot per plant ---------- #}
+    {% if pots %}
+    <section class="care-pots" aria-labelledby="care-pots-title">
+        <div class="care-pots-head">
+            <h2 class="care-section-title" id="care-pots-title">Tanamanmu</h2>
+            <p class="care-note">Ini perkiraan dari jadwal, bukan sensor</p>
+        </div>
+        <ul class="care-pot-row" id="care-pot-row">
+            {% for pot in pots %}{% include "smart_care/_pot.html" %}{% endfor %}
+        </ul>
+    </section>
+    {% endif %}
 
-        <a href="{% url 'smart_care:create' %}?city={{ city|urlencode }}" class="care-add-btn"
-           hx-get="{% url 'smart_care:create' %}?city={{ city|urlencode }}" hx-target="#care-modal-content"
-           data-bs-toggle="modal" data-bs-target="#care-modal">+ Tambah Tugas</a>
-    </aside>
+    {# ---------- Progress + daily plant ---------- #}
+    <section class="care-progress" aria-label="Progres">
+        <svg class="care-plant" id="care-plant" viewBox="0 0 96 96" data-stage="{{ progress.stage }}" role="img" aria-label="Tanaman yang tumbuh sesuai tugas selesai">
+            <path class="pl-pot" d="M31 62h34l-3.5 23a4 4 0 0 1-4 3.4h-19a4 4 0 0 1-4-3.4z"/>
+            <rect class="pl-rim" x="27" y="56" width="42" height="9" rx="3"/>
+            <g class="pl-stage pl-seed"><ellipse class="pl-seed-fill" cx="48" cy="55" rx="5.5" ry="3.6"/></g>
+            <g class="pl-stage pl-sprout">
+                <path class="pl-stem" d="M48 56V42"/>
+                <path class="pl-leaf" d="M48 48c-7 0-11-4-11-9 6 0 11 3 11 9z"/>
+                <path class="pl-leaf" d="M48 44c6 0 10-4 10-8-6 0-10 3-10 8z"/>
+            </g>
+            <g class="pl-stage pl-leaves">
+                <path class="pl-stem" d="M48 56V28"/>
+                <path class="pl-leaf" d="M48 50c-9 0-14-5-14-11 7 0 14 4 14 11z"/>
+                <path class="pl-leaf" d="M48 42c9 0 14-5 14-11-7 0-14 4-14 11z"/>
+                <path class="pl-leaf" d="M48 34c-8 0-12-4-12-10 7 0 12 3 12 10z"/>
+                <path class="pl-leaf" d="M48 28c6 0 10-3 10-8-6 0-10 2-10 8z"/>
+            </g>
+            <g class="pl-stage pl-flower">
+                <path class="pl-stem" d="M48 56V26"/>
+                <path class="pl-leaf" d="M48 50c-9 0-14-5-14-11 7 0 14 4 14 11z"/>
+                <path class="pl-leaf" d="M48 42c9 0 14-5 14-11-7 0-14 4-14 11z"/>
+                <circle class="pl-petal" cx="48" cy="13" r="6"/><circle class="pl-petal" cx="56.6" cy="19.2" r="6"/>
+                <circle class="pl-petal" cx="53.3" cy="29.3" r="6"/><circle class="pl-petal" cx="42.7" cy="29.3" r="6"/>
+                <circle class="pl-petal" cx="39.4" cy="19.2" r="6"/><circle class="pl-core" cx="48" cy="22" r="5"/>
+            </g>
+            <g class="care-burst" id="care-burst">
+                <circle style="--a: 0deg" cx="48" cy="24" r="2.6"/><circle style="--a: 45deg" cx="48" cy="24" r="2.6"/>
+                <circle style="--a: 90deg" cx="48" cy="24" r="2.6"/><circle style="--a: 135deg" cx="48" cy="24" r="2.6"/>
+                <circle style="--a: 180deg" cx="48" cy="24" r="2.6"/><circle style="--a: 225deg" cx="48" cy="24" r="2.6"/>
+                <circle style="--a: 270deg" cx="48" cy="24" r="2.6"/><circle style="--a: 315deg" cx="48" cy="24" r="2.6"/>
+            </g>
+        </svg>
+        <div class="care-progress-text">
+            <h2 class="care-section-title">{% if is_today %}Progres hari ini{% else %}Progres tanggal ini{% endif %}</h2>
+            <p id="care-progress-label" aria-live="polite">{{ progress.done }} dari {{ progress.total }} tugas selesai</p>
+            <div class="care-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress.percent }}" id="care-bar">
+                <div class="care-bar-fill" id="care-bar-fill" style="width: {{ progress.percent }}%"></div>
+            </div>
+        </div>
+    </section>
 
-    {# ---------- Popup tambah / edit tugas (isinya dimuat lewat HTMX) ---------- #}
+    {# ---------- Tasks ---------- #}
+    <section class="care-tasks" id="care-tasks">
+        <div class="care-group care-group-overdue" id="care-overdue"{% if not overdue_tasks %} hidden{% endif %}>
+            <h2 class="care-section-title">Terlewat <span class="care-badge" id="care-overdue-count">{{ overdue_tasks|length }}</span></h2>
+            <ul class="care-list" id="care-overdue-list">
+                {% for task in overdue_tasks %}{% include "smart_care/_task_item.html" with overdue=True %}{% endfor %}
+            </ul>
+        </div>
+
+        <div class="care-group">
+            <h2 class="care-section-title">Tugas <span class="care-badge" id="care-pending-count">{{ progress.pending }}</span></h2>
+            <ul class="care-list" id="care-pending-list">
+                {% for task in pending_tasks %}{% include "smart_care/_task_item.html" %}{% endfor %}
+                {% for suggestion in suggestions %}{% include "smart_care/_suggestion_item.html" %}{% endfor %}
+            </ul>
+            <div class="care-empty" id="care-empty"{% if progress.total %} hidden{% endif %} data-default="Belum ada tugas di tanggal ini" data-skipped="Semua saran hari ini dilewati">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22V12"/><path d="M12 12c0-4 3-7 8-7 0 5-3 7-8 7Z"/><path d="M12 15c0-3-2-5-6-5 0 4 2 5 6 5Z"/></svg>
+                {% if is_today and not has_plants %}
+                    <p>Tambahkan satu tugas untuk tanamanmu, setelah itu saran muncul otomatis</p>
+                {% elif skipped_suggestions %}
+                    <p>Semua saran hari ini dilewati</p>
+                {% else %}
+                    <p>Belum ada tugas di tanggal ini</p>
+                {% endif %}
+                <a href="{% url 'smart_care:create' %}?date={{ selected_date|date:'Y-m-d' }}" class="btn btn-success btn-sm"
+                   hx-get="{% url 'smart_care:create' %}?date={{ selected_date|date:'Y-m-d' }}" hx-target="#care-modal-content"
+                   data-bs-toggle="modal" data-bs-target="#care-modal">Tambah Care Task</a>
+            </div>
+            <p class="care-allclear" id="care-allclear"{% if progress.pending or not progress.total %} hidden{% endif %}>Semua tugas di tanggal ini sudah selesai</p>
+        </div>
+
+        <details class="care-skipped" id="care-skipped"{% if not skipped_suggestions %} hidden{% endif %}>
+            <summary>Dilewati hari ini <span class="care-badge" id="care-skipped-count">{{ skipped_suggestions|length }}</span></summary>
+            <ul class="care-skipped-list" id="care-skipped-list">
+                {% for task in skipped_suggestions %}
+                    <li><span>{{ task.plant_name }} <small>{{ task.get_task_type_display }}</small></span>
+                        <button type="button" class="care-restore" data-plant="{{ task.plant_name }}" data-type="{{ task.task_type }}">Batalkan</button></li>
+                {% endfor %}
+            </ul>
+        </details>
+
+        <div class="care-group" id="care-done-group"{% if not done_tasks %} hidden{% endif %}>
+            <h2 class="care-section-title">Selesai <span class="care-badge" id="care-done-count">{{ progress.done }}</span></h2>
+            <ul class="care-list" id="care-done-list">
+                {% for task in done_tasks %}{% include "smart_care/_task_item.html" %}{% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    {# ---------- Popup tambah / edit (isinya dimuat lewat HTMX) ---------- #}
     <div class="modal fade care-modal" id="care-modal" tabindex="-1" aria-labelledby="care-modal-title" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" id="care-modal-content">
-                <div class="modal-body care-modal-loading">Memuat...</div>
+                <div class="modal-body care-modal-loading">Memuat</div>
+            </div>
+        </div>
+    </div>
+
+    {# ---------- Popup hapus ---------- #}
+    <div class="modal fade care-modal" id="care-delete-modal" tabindex="-1" aria-labelledby="care-delete-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="care-delete-title">Hapus tugas</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <form method="post" id="care-delete-form">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <p class="mb-0">Tugas <strong id="care-delete-name"></strong> akan dihapus dan tidak bisa dikembalikan.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-danger">Hapus</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -114,10 +234,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-    // Kosongkan isi popup saat ditutup supaya pembukaan berikutnya selalu form yang baru
-    document.getElementById('care-modal').addEventListener('hidden.bs.modal', function () {
-        document.getElementById('care-modal-content').innerHTML = '<div class="modal-body care-modal-loading">Memuat...</div>';
-    });
-</script>
+<script src="{% static 'smart_care/js/smart_care.js' %}" defer></script>
 {% endblock %}
