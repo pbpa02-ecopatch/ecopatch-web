@@ -35,8 +35,8 @@
             </div>
         {% else %}
             <div class="d-flex align-items-center gap-2 order-md-3">
-                <a href="{% url 'main:login' %}" class="btn btn-outline-success">Masuk</a>
-                <a href="{% url 'main:register' %}" class="btn btn-success">Daftar</a>
+                <a href="{% url 'main:login' %}{% if request.resolver_match.app_name == 'plant_library' %}?next={{ request.get_full_path|urlencode }}{% endif %}" class="btn btn-outline-success">Masuk</a>
+                <a href="{% url 'main:register' %}{% if request.resolver_match.app_name == 'plant_library' %}?next={{ request.get_full_path|urlencode }}{% endif %}" class="btn btn-success">Daftar</a>
             </div>
         {% endif %}
 

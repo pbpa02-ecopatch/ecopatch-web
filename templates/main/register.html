@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Daftar - EcoPatch{% endblock %}
+{% block extra_head %}{% if google_auth_enabled %}<link rel="stylesheet" href="{% static 'css/auth_google.css' %}">{% endif %}{% endblock %}
 {% block content %}
 <div class="auth-shell">
     <section class="auth-panel">
@@ -20,7 +22,9 @@
             <button type="submit" class="btn btn-success auth-submit">Buat Akun</button>
         </form>
 
-        <p class="auth-switch">Sudah punya akun? <a href="{% url 'main:login' %}">Masuk</a></p>
+        {% if google_auth_enabled %}{% include "main/_auth_google.html" with google_label="Daftar dengan Google" %}{% endif %}
+
+        <p class="auth-switch">Sudah punya akun? <a href="{% url 'main:login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}">Masuk</a></p>
     </section>
 
     {% include "main/_auth_aside.html" with aside_title="Balkon kecil, panen besar" aside_text="Gabung dan ubah sudut sempit rumahmu jadi kebun kota yang produktif." %}
