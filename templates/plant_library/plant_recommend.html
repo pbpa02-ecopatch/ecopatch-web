@@ -317,7 +317,8 @@
                             <article class="plant-card">
                                 <div class="plant-card-media">
                                     {% if plant.image_url %}
-                                        <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy">
+                                        <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <span class="plant-card-placeholder-icon" style="display: none;" aria-hidden="true">🪴</span>
                                     {% else %}
                                         <span class="plant-card-placeholder-icon" aria-hidden="true">🪴</span>
                                     {% endif %}

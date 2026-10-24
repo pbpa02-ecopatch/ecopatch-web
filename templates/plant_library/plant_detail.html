@@ -214,7 +214,8 @@
             <div class="col-12 col-lg-6">
                 <div class="plant-detail-image-box">
                     {% if plant.image_url %}
-                        <img src="{{ plant.image_url }}" alt="{{ plant.name }}">
+                        <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="placeholder-large" style="display: none;" aria-hidden="true">🪴</div>
                     {% else %}
                         <div class="placeholder-large" aria-hidden="true">🪴</div>
                     {% endif %}
