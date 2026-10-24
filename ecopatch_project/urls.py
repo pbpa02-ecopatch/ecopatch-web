@@ -10,6 +10,7 @@ from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
+    path('accounts/', include('allauth.urls')),
     # TODO: masing-masing PIC menambahkan include() untuk app-nya sendiri:
     # path('smart-care/', include('smart_care.urls')),
     # path('plants/', include('plant_library.urls')),
