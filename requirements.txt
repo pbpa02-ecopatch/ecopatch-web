@@ -3,3 +3,5 @@ gunicorn
 psycopg2-binary
 python-dotenv
 whitenoise
+Pillow
+django-allauth[socialaccount]~=65.20

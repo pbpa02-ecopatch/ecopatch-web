@@ -1,0 +1,20 @@
+{% load static %}<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% block title %}{% endblock %} · EcoPatch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'auth/login.css' %}">
+</head><body>
+<main class="stage">
+  <section class="card" aria-labelledby="h">
+    <div class="form-side">
+      <div class="backrow"><a class="back" href="{% url 'main:login' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Kembali ke halaman masuk</a></div>
+      <a class="brand brand-m" href="{% url 'main:home' %}" aria-label="EcoPatch, ke beranda">{% include "main/_logo.html" %}<span>EcoPatch</span></a>
+      <div class="hello">{% include "main/_auth_mascot.html" %}
+        <div><h1 id="h">{% block heading %}{% endblock %}</h1><p class="sub">{% block lead %}{% endblock %}</p></div></div>
+      {% block content %}{% endblock %}
+    </div>
+    {% include "main/_auth_panel.html" %}
+  </section>
+</main>
+{% block scripts %}{% endblock %}
+</body></html>
