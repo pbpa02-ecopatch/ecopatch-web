@@ -198,6 +198,45 @@ class SiteNameTests(TestCase):
         self.assertEqual(Site.objects.get(pk=1).name, 'EcoPatch')
 
 
+class AssetVersionTests(TestCase):
+    """{% static_v %} puts a content hash in the URL so a browser never reuses a stale copy."""
+
+    def render(self, path):
+        from django.template import Context, Template
+        return Template('{% load asset_version %}{% static_v path %}').render(Context({'path': path}))
+
+    def test_url_carries_a_hash_of_the_file(self):
+        url = self.render('css/custom.css')
+        self.assertRegex(url, r'^/static/css/custom\.css\?v=[0-9a-f]{10}$')
+        self.assertEqual(url, self.render('css/custom.css'))
+
+    def test_hash_changes_when_the_file_changes(self):
+        folder = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, folder, ignore_errors=True)
+        target = os.path.join(folder, 'probe.css')
+        with open(target, 'w') as f:
+            f.write('a { color: red; }')
+        with override_settings(STATICFILES_DIRS=[folder]):
+            before = self.render('probe.css')
+            with open(target, 'w') as f:
+                f.write('a { color: blue; }')
+            after = self.render('probe.css')
+        self.assertNotEqual(before, after)
+        self.assertTrue(before.startswith('/static/probe.css?v='))
+
+    def test_unknown_file_falls_back_to_the_plain_url(self):
+        self.assertEqual(self.render('css/does-not-exist.css'), '/static/css/does-not-exist.css')
+
+    def test_pages_link_their_assets_with_a_version(self):
+        for name in ('main:home', 'main:login', 'main:register'):
+            html = self.client.get(reverse(name)).content.decode()
+            self.assertRegex(html, r'\.css\?v=[0-9a-f]{10}', name)
+        user = get_user_model().objects.create_user('asset_user', password='pw-12345-xx')
+        self.client.force_login(user)
+        html = self.client.get(reverse('my_ecopatch:list')).content.decode()
+        self.assertRegex(html, r'css/custom\.css\?v=[0-9a-f]{10}')
+
+
 class AfterLoginTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user('petak', password='pw12345678')

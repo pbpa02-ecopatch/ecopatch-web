@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% load static i18n %}
+{% load static asset_version i18n %}
 {% block title %}Smart Care - EcoPatch{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'smart_care/css/smart_care.css' %}">
+<link rel="stylesheet" href="{% static_v 'smart_care/css/smart_care.css' %}">
 {% endblock %}
 {% block content %}
 <div class="care-page" id="care-page" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
@@ -234,5 +234,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'smart_care/js/smart_care.js' %}" defer></script>
+<script src="{% static_v 'smart_care/js/smart_care.js' %}" defer></script>
 {% endblock %}
