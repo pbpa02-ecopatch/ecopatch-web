@@ -36,8 +36,15 @@ class LandingPageTests(TestCase):
         self.client.force_login(user)
         self.assertRedirects(self.client.get(reverse('main:home')), reverse('my_ecopatch:list'), fetch_redirect_response=False)
 
-    def test_plant_library_url_is_blank_until_that_route_exists(self):
+    def test_landing_links_to_the_plant_library_when_it_exists(self):
         response = self.client.get(reverse('main:home'))
+        self.assertEqual(response.context['plant_library_url'], reverse('plant_library:plant_list'))
+        self.assertContains(response, 'data-plant-library-url="/plants/"')
+
+    def test_landing_falls_back_to_its_own_anchor_without_the_plant_library_route(self):
+        from django.urls import NoReverseMatch
+        with mock.patch('main.views.reverse', side_effect=NoReverseMatch()):
+            response = self.client.get(reverse('main:home'))
         self.assertEqual(response.context['plant_library_url'], '')
         self.assertContains(response, 'data-plant-library-url=""')
 
