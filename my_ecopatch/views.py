@@ -10,7 +10,6 @@ from django.views.decorators.http import require_http_methods, require_POST
 from .forms import EcoPatchForm, PatchPlantForm
 from .models import EcoPatch, PatchPlant
 
-# Urutan chip status pada kartu, mengikuti wireframe (Growing, Harvested, Planned, ...).
 STATUS_ORDER = [
     PatchPlant.Status.GROWING,
     PatchPlant.Status.HARVESTED,
@@ -57,12 +56,12 @@ def _is_htmx(request):
     return request.headers.get('HX-Request') == 'true'
 
 
-def _detail_context(patch, plant_form=None):
+def _detail_context(patch, plant_form=None, initial=None):
     _attach_status_summary([patch])
     return {
         'patch': patch,
-        'plants': patch.plants.all(),
-        'plant_form': PatchPlantForm() if plant_form is None else plant_form,
+        'plants': patch.plants.select_related('plant'),
+        'plant_form': PatchPlantForm(initial=initial) if plant_form is None else plant_form,
         'status_choices': PatchPlant.Status.choices,
     }
 
@@ -88,7 +87,10 @@ def ecopatch_list(request):
 @login_required
 def ecopatch_detail(request, pk):
     patch = _get_patch(request, pk)
-    return render(request, 'my_ecopatch/ecopatch_detail.html', _detail_context(patch))
+    # ?plant=<id> memilih tanaman di form tambah, supaya Plant Library bisa menautkan "Tambah ke EcoPatch".
+    plant_id = request.GET.get('plant', '')
+    initial = {'plant': plant_id} if plant_id.isdigit() else None
+    return render(request, 'my_ecopatch/ecopatch_detail.html', _detail_context(patch, initial=initial))
 
 
 @login_required
@@ -145,7 +147,7 @@ def patchplant_add(request, pk):
         plant.patch = patch
         plant.save()
         if not _is_htmx(request):
-            messages.success(request, f'{plant.plant_name} ditambahkan ke {patch.name}.')
+            messages.success(request, f'{plant.plant.name} ditambahkan ke {patch.name}.')
             return redirect('my_ecopatch:detail', pk=patch.pk)
         form = None  # form kosong baru untuk panel yang di-refresh
     return _plants_response(request, patch, form)
