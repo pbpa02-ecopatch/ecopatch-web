@@ -11,6 +11,7 @@
             <p class="patch-page-lead">{{ patch.city }}</p>
         </div>
         <div class="patch-head-actions">
+            <a href="{% url 'plant_library:plant_recommend' %}?patch={{ patch.pk }}" class="btn btn-success">Rekomendasi tanaman</a>
             <a href="{% url 'my_ecopatch:update' patch.pk %}" class="btn btn-outline-success">Ubah</a>
             <a href="{% url 'my_ecopatch:delete' patch.pk %}" class="btn btn-outline-success patch-btn-danger">Hapus</a>
         </div>
@@ -25,4 +26,8 @@
 
     {% include "my_ecopatch/_plants_panel.html" %}
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+{% include "my_ecopatch/_select_script.html" %}
 {% endblock %}

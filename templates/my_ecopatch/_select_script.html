@@ -1,0 +1,24 @@
+{# Satu listener untuk semua dropdown kustom (event delegation), jadi tetap jalan setelah panel di-swap htmx. #}
+<script>
+document.addEventListener('click', function (event) {
+    var option = event.target.closest('[data-patch-option]');
+    if (!option) return;
+    var root = option.closest('[data-patch-select]');
+    if (!root) return;
+    var input = root.querySelector('input[type="hidden"]');
+    var label = root.querySelector('[data-patch-label]');
+    var value = option.getAttribute('data-value');
+
+    input.value = value;
+    root.querySelectorAll('[data-patch-option]').forEach(function (btn) {
+        btn.classList.toggle('active', btn === option);
+    });
+    if (value === '') {
+        label.textContent = root.getAttribute('data-placeholder');
+        label.classList.add('patch-placeholder');
+    } else {
+        label.textContent = option.textContent.trim();
+        label.classList.remove('patch-placeholder');
+    }
+});
+</script>
