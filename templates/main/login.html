@@ -1,31 +1,40 @@
-{% extends "base.html" %}
-{% block title %}Masuk - EcoPatch{% endblock %}
-{% block content %}
-<div class="auth-shell">
-    <section class="auth-panel">
-        <span class="section-eyebrow">Selamat datang kembali</span>
-        <h1 class="auth-title">Masuk ke EcoPatch</h1>
-        <p class="auth-lead">Lanjutkan merawat kebun kotamu dari tempat terakhir kamu berhenti.</p>
-
-        <form method="post" class="auth-form" novalidate>
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ next }}">
-            {% if form.non_field_errors %}
-                <div class="auth-alert" role="alert">
-                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-                </div>
-            {% endif %}
-            {% for field in form %}
-                {% include "main/_auth_field.html" %}
-            {% endfor %}
-            <button type="submit" class="btn btn-success auth-submit">Masuk</button>
-        </form>
-
-        <p class="auth-switch">Belum punya akun? <a href="{% url 'main:register' %}">Daftar gratis</a></p>
-    </section>
-
-    {% include "main/_auth_aside.html" with aside_title="Kebunmu menunggu" aside_text="Cek jadwal siram, cuaca kotamu, dan catatan tanamanmu hari ini." %}
-</div>
-{% endblock %}
-
-{% block extra_scripts %}{% include "main/_auth_script.html" %}{% endblock %}
+{% load static socialaccount %}<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Masuk · EcoPatch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'auth/login.css' %}">
+</head><body>
+<main class="stage">
+  <section class="card" aria-labelledby="h">
+    <div class="form-side">
+      <div class="backrow"><a class="back" href="{% url 'main:home' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Kembali</a></div>
+      <a class="brand brand-m" href="{% url 'main:home' %}" aria-label="EcoPatch, ke beranda">{% include "main/_logo.html" %}<span>EcoPatch</span></a>
+      <div class="hello">        {% include "main/_auth_mascot.html" %}
+        <div><h1 id="h">Halo lagi!</h1><p class="sub">Masuk untuk melanjutkan merawat kebunmu.</p></div></div>
+      {% for message in messages %}<div class="alert{% if message.tags == 'success' or message.tags == 'info' %} ok{% endif %}" role="status"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/></svg><span>{{ message }}</span></div>{% endfor %}
+      <div class="alert" id="alert" role="alert"{% if form.errors %} data-server="1"{% else %} hidden{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/></svg><span id="alerttxt">{% if form.errors %}Username atau password salah. Coba lagi.{% endif %}</span></div>
+      <form id="f" novalidate method="post" action="">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="field"><label for="u">Username</label><input id="u" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" value="{{ form.username.value|default:'' }}"{% if form.errors %} aria-invalid="true"{% endif %} required></div>
+        <div class="field"><label for="p">Password</label>
+          <div class="pw"><input id="p" name="password" type="password" autocomplete="current-password"{% if form.errors %} aria-invalid="true"{% endif %} required>
+            <button type="button" class="eye" id="eye" aria-label="Tampilkan password" aria-pressed="false"><svg class="e1" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="e2" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A9.6 9.6 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.4 6.5C3.8 8.3 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 4.2-.9M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></div></div>
+        <div class="row"><p class="caps" id="caps" hidden>Caps Lock sedang aktif</p><a class="link" href="{% url 'main:password_reset' %}" style="margin-left:auto">Lupa password?</a></div>
+        <button class="btn btn-primary" id="go" type="submit"><span class="t">Masuk</span><i class="spin" aria-hidden="true"></i></button>
+      </form>
+      {% if google_auth_enabled %}
+      <div class="or"><span>atau</span></div>
+      <form method="post" action="{% provider_login_url 'google' process='login' %}">
+        {% csrf_token %}
+        {% firstof next request.GET.next as next_url %}
+        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+        <button type="submit" class="btn btn-google"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9h12.4c-.5 2.9-2.2 5.4-4.7 7l7.3 5.7c4.3-4 6.8-9.9 6.8-17.1z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.3-5.7c-2 1.4-4.7 2.3-8.6 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>Masuk dengan Google</button>
+      </form>
+      {% endif %}
+      <p class="swap">Belum punya akun? <a href="{% url 'main:register' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Daftar gratis</a></p>
+    </div>
+    {% include "main/_auth_panel.html" %}
+  </section>
+</main>
+<script src="{% static 'auth/login.js' %}"></script></body></html>

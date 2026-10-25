@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}{% if is_edit %}Ubah {{ plant.name }}{% else %}Tambah Tanaman Baru{% endif %} - Plant Library{% endblock %}
+
+{% block extra_head %}
+<style>
+    .plant-form-container {
+        max-width: 860px;
+        margin: 0 auto 40px;
+    }
+    .plant-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ink-muted);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: var(--surface-200);
+        border: 1px solid var(--border);
+        transition: all 0.2s ease;
+    }
+    .plant-back-btn:hover {
+        background: var(--surface-300);
+        color: var(--ink);
+    }
+    .plant-form-card {
+        background: var(--surface-200);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        padding: 36px;
+        box-shadow: 0 8px 24px rgba(34, 48, 31, 0.08);
+    }
+    .plant-form-title {
+        font-size: clamp(1.8rem, 3vw, 2.3rem);
+        color: var(--ink);
+        font-family: 'Baloo 2', sans-serif;
+        margin-bottom: 6px;
+    }
+    .plant-form-subtitle {
+        color: var(--ink-muted);
+        margin-bottom: 28px;
+        font-size: 0.98rem;
+    }
+    .plant-field-label {
+        font-weight: 700;
+        font-size: 0.92rem;
+        color: var(--ink);
+        margin-bottom: 6px;
+    }
+    .form-control, .form-select {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 14px;
+        color: var(--ink);
+        background: var(--surface-200);
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--brand-500);
+        box-shadow: 0 0 0 3px var(--brand-300);
+    }
+    .plant-form-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 32px;
+        padding-top: 20px;
+        border-top: 1px dashed var(--border);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="plant-form-container">
+    <a href="{% if is_edit %}{% url 'plant_library:plant_detail' plant.pk %}{% else %}{% url 'plant_library:plant_list' %}{% endif %}" class="plant-back-btn">
+        <span>←</span>
+        <span>Kembali</span>
+    </a>
+
+    <div class="plant-form-card">
+        <h1 class="plant-form-title">
+            {% if is_edit %}✏️ Ubah Tanaman: {{ plant.name }}{% else %}🌱 Tambah Tanaman Baru{% endif %}
+        </h1>
+        <p class="plant-form-subtitle">
+            Lengkapi data spesifikasi dan perawatan tanaman untuk katalog Plant Library.
+        </p>
+
+        {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                <strong>Mohon periksa kesalahan input berikut:</strong>
+                <ul class="mb-0 mt-2">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field|capfirst }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="row g-3">
+                <!-- Nama Tanaman -->
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.name.id_for_label }}" class="plant-field-label">
+                        Nama Tanaman <span class="text-danger">*</span>
+                    </label>
+                    {{ form.name }}
+                </div>
+
+                <!-- Nama Ilmiah -->
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.scientific_name.id_for_label }}" class="plant-field-label">
+                        Nama Ilmiah (Latin)
+                    </label>
+                    {{ form.scientific_name }}
+                </div>
+
+                <!-- Kategori -->
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.category.id_for_label }}" class="plant-field-label">
+                        Kategori Tanaman <span class="text-danger">*</span>
+                    </label>
+                    {{ form.category }}
+                </div>
+
+                <!-- Tingkat Kesulitan -->
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.difficulty.id_for_label }}" class="plant-field-label">
+                        Tingkat Kesulitan <span class="text-danger">*</span>
+                    </label>
+                    {{ form.difficulty }}
+                </div>
+
+                <!-- Kebutuhan Sinar Matahari -->
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.sunlight.id_for_label }}" class="plant-field-label">
+                        Kebutuhan Sinar Matahari <span class="text-danger">*</span>
+                    </label>
+                    {{ form.sunlight }}
+                </div>
+
+                <!-- Frekuensi Penyiraman -->
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.watering.id_for_label }}" class="plant-field-label">
+                        Frekuensi Penyiraman <span class="text-danger">*</span>
+                    </label>
+                    {{ form.watering }}
+                </div>
+
+                <!-- Penempatan -->
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.indoor_outdoor.id_for_label }}" class="plant-field-label">
+                        Penempatan Ruang <span class="text-danger">*</span>
+                    </label>
+                    {{ form.indoor_outdoor }}
+                </div>
+
+                <!-- Kebutuhan Ruang -->
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.space_requirement.id_for_label }}" class="plant-field-label">
+                        Kebutuhan Ruang / Wadah <span class="text-danger">*</span>
+                    </label>
+                    {{ form.space_requirement }}
+                </div>
+
+                <!-- URL Gambar -->
+                <div class="col-12">
+                    <label for="{{ form.image_url.id_for_label }}" class="plant-field-label">
+                        URL Gambar Tanaman (Opsional)
+                    </label>
+                    {{ form.image_url }}
+                    <small class="text-muted">Masukkan tautan URL langsung ke gambar tanaman (JPG, PNG, WebP).</small>
+                </div>
+
+                <!-- Deskripsi & Panduan -->
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="plant-field-label">
+                        Deskripsi & Panduan Perawatan
+                    </label>
+                    {{ form.description }}
+                </div>
+            </div>
+
+            <div class="plant-form-actions">
+                <button type="submit" class="btn btn-success">
+                    {% if is_edit %}Simpan Perubahan{% else %}Tambah Tanaman{% endif %}
+                </button>
+                <a href="{% if is_edit %}{% url 'plant_library:plant_detail' plant.pk %}{% else %}{% url 'plant_library:plant_list' %}{% endif %}" class="btn btn-outline-success">
+                    Batal
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

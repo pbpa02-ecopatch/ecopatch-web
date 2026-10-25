@@ -103,6 +103,8 @@ def journal_filter_ajax(request):
 def plant_journal_history(request, plant_name):
     """Membuka lembaran buku dua sisi (open book spread) untuk satu tanaman."""
     import json
+    from datetime import timedelta
+
     journals_query = GardenJournal.objects.filter(
         user=request.user, plant_name=plant_name
     ).order_by("-date", "-created_at")
@@ -140,6 +142,7 @@ def plant_journal_history(request, plant_name):
             "title": j.title,
             "notes": j.notes,
             "date": j.date.strftime("%d %b %Y"),
+            "date_iso": j.date.isoformat(),
             "plant_height": j.plant_height,
             "ecopatch_name": j.ecopatch_name,
             "plant_condition": j.plant_condition,
@@ -147,12 +150,40 @@ def plant_journal_history(request, plant_name):
             "badge": badge_map.get(j.plant_condition, "secondary"),
             "edit_url": f"/journal/{j.pk}/edit/",
             "delete_url": f"/journal/{j.pk}/delete/",
+            "image_url": j.image.url if j.image else None,
+            "created_at": j.created_at.strftime("%d %b %Y, %H:%M"),
         }
         for j in journals_query
     ])
 
     first_all = GardenJournal.objects.filter(user=request.user, plant_name=plant_name).order_by("-date").first()
     cover_pattern = first_all.cover_pattern if first_all else "flowers"
+
+    # --- Stats for Riwayat dashboard ---
+    all_unfiltered = GardenJournal.objects.filter(
+        user=request.user, plant_name=plant_name
+    ).order_by("date")
+
+    # Latest and oldest height for growth calc
+    entries_with_height = all_unfiltered.exclude(plant_height__isnull=True)
+    latest_height = None
+    growth = None
+    if entries_with_height.exists():
+        latest_h = entries_with_height.order_by("-date").first()
+        oldest_h = entries_with_height.order_by("date").first()
+        latest_height = latest_h.plant_height
+        if latest_h != oldest_h:
+            growth = round(latest_h.plant_height - oldest_h.plant_height, 1)
+
+    # Chart data: height over time (ascending by date)
+    chart_data = json.dumps([
+        {
+            "date": j.date.strftime("%d %b %Y"),
+            "date_iso": j.date.isoformat(),
+            "height": j.plant_height,
+        }
+        for j in entries_with_height.order_by("date")
+    ])
 
     context = {
         "plant_name": plant_name,
@@ -168,7 +199,11 @@ def plant_journal_history(request, plant_name):
         "latest_badge": first_all.get_condition_display_badge if first_all else "success",
         "latest_condition_display": first_all.get_plant_condition_display() if first_all else "Healthy",
         "all_entries_json": all_entries_json,
-        "initial_page": int(page_obj.number) - 1,  # 0-indexed for JS
+        "initial_page": 0,  # Selalu buka lembar catatan terkini (index 0)
+        # stats
+        "latest_height": latest_height,
+        "growth": growth,
+        "chart_data": chart_data,
     }
 
     # Jika request AJAX / HTMX untuk membalik lembar halaman buku
@@ -190,7 +225,7 @@ def journal_create(request):
     """Menambah catatan jurnal baru."""
     initial_plant = request.GET.get("plant_name", "")
     if request.method == "POST":
-        form = GardenJournalForm(request.POST)
+        form = GardenJournalForm(request.POST, request.FILES)
         if form.is_valid():
             journal = form.save(commit=False)
             journal.user = request.user
@@ -224,7 +259,7 @@ def journal_edit(request, pk):
     journal = get_object_or_404(GardenJournal, pk=pk, user=request.user)
 
     if request.method == "POST":
-        form = GardenJournalForm(request.POST, instance=journal)
+        form = GardenJournalForm(request.POST, request.FILES, instance=journal)
         if form.is_valid():
             form.save()
             messages.success(request, f"Catatan '{journal.title}' berhasil diperbarui.")
