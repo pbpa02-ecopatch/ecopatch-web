@@ -39,8 +39,8 @@
             </div>
         {% else %}
             <div class="d-flex align-items-center gap-2 order-md-3">
-                <a href="{% url 'main:login' %}" class="btn btn-outline-success">Masuk</a>
-                <a href="{% url 'main:register' %}" class="btn btn-success">Daftar</a>
+                <a href="{% url 'main:login' %}{% if request.resolver_match.app_name == 'plant_library' %}?next={{ request.get_full_path|urlencode }}{% endif %}" class="btn btn-outline-success">Masuk</a>
+                <a href="{% url 'main:register' %}{% if request.resolver_match.app_name == 'plant_library' %}?next={{ request.get_full_path|urlencode }}{% endif %}" class="btn btn-success">Daftar</a>
             </div>
         {% endif %}
 
@@ -52,7 +52,7 @@
             {% if user.is_authenticated %}
                 {% with active_app=request.resolver_match.app_name %}
                 <ul class="navbar-nav nav-auth mx-auto gap-2">
-                    <li class="nav-item"><a class="nav-link{% if active_app == 'plant_library' %} active{% endif %}" href="#">Plant Library</a></li>
+                    <li class="nav-item"><a class="nav-link{% if active_app == 'plant_library' %} active{% endif %}" href="{% url 'plant_library:plant_list' %}">Plant Library</a></li>
                     <li class="nav-item"><a class="nav-link{% if active_app == 'my_ecopatch' %} active{% endif %}" href="{% url 'my_ecopatch:list' %}">My EcoPatch</a></li>
                     <li class="nav-item"><a class="nav-link{% if active_app == 'smart_care' %} active{% endif %}" href="#">Smart Care</a></li>
                     <li class="nav-item"><a class="nav-link{% if active_app == 'garden_journal' %} active{% endif %}" href="{% url 'garden_journal:list' %}">Garden Journal</a></li>
@@ -64,7 +64,7 @@
                 <ul class="navbar-nav mx-auto gap-2">
                     <li class="nav-item"><a class="nav-link" href="{% url 'main:home' %}#fitur">Fitur</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'main:home' %}#faq">FAQ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Plant Library</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'plant_library:plant_list' %}">Plant Library</a></li>
                 </ul>
             {% endif %}
         </div>

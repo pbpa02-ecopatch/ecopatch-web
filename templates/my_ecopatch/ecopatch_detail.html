@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ patch.name }} - EcoPatch{% endblock %}
+
+{% block content %}
+<section class="patch-page">
+    <a class="patch-back" href="{% url 'my_ecopatch:list' %}">&larr; Semua EcoPatch</a>
+
+    <header class="patch-page-head">
+        <div>
+            <h1 class="patch-page-title">{{ patch.name }}</h1>
+            <p class="patch-page-lead">{{ patch.city }}</p>
+        </div>
+        <div class="patch-head-actions">
+            <a href="{% url 'my_ecopatch:update' patch.pk %}" class="btn btn-outline-success">Ubah</a>
+            <a href="{% url 'my_ecopatch:delete' patch.pk %}" class="btn btn-outline-success patch-btn-danger">Hapus</a>
+        </div>
+    </header>
+
+    <dl class="patch-info">
+        <div><dt>Tipe ruang</dt><dd>{{ patch.get_space_type_display }}</dd></div>
+        <div><dt>Ukuran</dt><dd>{% if patch.size_m2 %}{{ patch.size_m2 }} m²{% else %}-{% endif %}</dd></div>
+        <div><dt>Sinar matahari</dt><dd>{% if patch.sunlight %}{{ patch.get_sunlight_display }}{% else %}-{% endif %}</dd></div>
+        <div class="patch-info-wide"><dt>Tujuan berkebun</dt><dd>{% if patch.goal %}{{ patch.goal }}{% else %}-{% endif %}</dd></div>
+    </dl>
+
+    {% include "my_ecopatch/_plants_panel.html" %}
+</section>
+{% endblock %}

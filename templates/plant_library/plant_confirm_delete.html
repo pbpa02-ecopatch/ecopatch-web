@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Hapus {{ plant.name }} - Plant Library{% endblock %}
+
+{% block extra_head %}
+<style>
+    .plant-delete-container {
+        max-width: 600px;
+        margin: 40px auto 60px;
+    }
+    .plant-delete-card {
+        background: var(--surface-200);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        padding: 36px;
+        box-shadow: 0 12px 32px rgba(34, 48, 31, 0.12);
+        text-align: center;
+    }
+    .plant-delete-icon {
+        font-size: 3.5rem;
+        margin-bottom: 16px;
+        line-height: 1;
+    }
+    .plant-delete-title {
+        font-size: 1.8rem;
+        color: var(--ink);
+        font-family: 'Baloo 2', sans-serif;
+        margin-bottom: 12px;
+    }
+    .plant-delete-lead {
+        color: var(--ink);
+        font-size: 1.05rem;
+        margin-bottom: 8px;
+    }
+    .plant-delete-warning {
+        background: #fce8e6;
+        color: #c5221f;
+        padding: 12px 18px;
+        border-radius: 14px;
+        font-size: 0.9rem;
+        margin-bottom: 24px;
+    }
+    .plant-delete-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+    }
+    .btn-danger {
+        border-radius: 999px;
+        padding: 10px 24px;
+        font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="plant-delete-container">
+    <div class="plant-delete-card">
+        <div class="plant-delete-icon" aria-hidden="true">⚠️</div>
+        <h1 class="plant-delete-title">Konfirmasi Hapus Tanaman</h1>
+        <p class="plant-delete-lead">
+            Apakah Anda yakin ingin menghapus tanaman <strong>"{{ plant.name }}"</strong> dari katalog?
+        </p>
+
+        <div class="plant-delete-warning">
+            Tindakan ini permanen. Jika tanaman ini sudah ditanam di EcoPatch pengguna atau modul lain, penghapusan akan dicegah secara otomatis oleh sistem.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="plant-delete-actions">
+                <a href="{% url 'plant_library:plant_detail' plant.pk %}" class="btn btn-outline-success">
+                    Batal
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    Ya, Hapus Tanaman
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

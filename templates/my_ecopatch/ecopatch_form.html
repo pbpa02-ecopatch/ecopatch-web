@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{% if patch %}Ubah EcoPatch{% else %}Buat EcoPatch Baru{% endif %} - EcoPatch{% endblock %}
+
+{% block content %}
+<section class="patch-form-shell">
+    <a class="patch-back" href="{% if patch %}{% url 'my_ecopatch:detail' patch.pk %}{% else %}{% url 'my_ecopatch:list' %}{% endif %}">&larr; Kembali</a>
+    <h1 class="patch-page-title">{% if patch %}Ubah EcoPatch{% else %}Buat EcoPatch Baru{% endif %}</h1>
+    <p class="patch-page-lead">Ceritakan sedikit tentang ruang berkebunmu supaya rekomendasi tanaman bisa lebih pas.</p>
+
+    <form method="post" class="patch-form" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="patch-alert" role="alert">{% for error in form.non_field_errors %}{{ error }}{% endfor %}</div>
+        {% endif %}
+        {% for field in form %}
+            {% include "my_ecopatch/_form_field.html" %}
+        {% endfor %}
+        <div class="patch-form-actions">
+            <button type="submit" class="btn btn-success">{% if patch %}Simpan perubahan{% else %}Buat EcoPatch{% endif %}</button>
+            <a class="btn btn-outline-success" href="{% if patch %}{% url 'my_ecopatch:detail' patch.pk %}{% else %}{% url 'my_ecopatch:list' %}{% endif %}">Batal</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -8,8 +8,7 @@
             <h1 class="patch-page-title">My EcoPatch</h1>
             <p class="patch-page-lead">Kelola semua kebun dan tanamanmu dalam satu tempat.</p>
         </div>
-        {# TODO: ganti href="#" jadi {% url 'my_ecopatch:create' %} begitu halaman buat EcoPatch tersedia #}
-        <a href="#" class="btn btn-success patch-create-btn">
+        <a href="{% url 'my_ecopatch:create' %}" class="btn btn-success patch-create-btn">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
             Buat EcoPatch Baru
         </a>
@@ -21,10 +20,11 @@
 
     <div class="patch-grid">
         {% for patch in patches %}
-            {# TODO: bungkus judul dengan link ke {% url 'my_ecopatch:detail' patch.pk %} begitu halaman detail tersedia #}
             <article class="patch-card">
                 <div class="patch-card-top">
-                    <h2 class="patch-card-title">{{ patch.name }}</h2>
+                    <h2 class="patch-card-title">
+                        <a href="{% url 'my_ecopatch:detail' patch.pk %}" class="patch-card-link stretched-link">{{ patch.name }}</a>
+                    </h2>
                     <span class="patch-pill patch-pill--space">{{ patch.get_space_type_display }}</span>
                 </div>
                 <p class="patch-card-city">{{ patch.city }}</p>
@@ -39,7 +39,7 @@
             </article>
         {% endfor %}
 
-        <a href="#" class="patch-card patch-card-add">
+        <a href="{% url 'my_ecopatch:create' %}" class="patch-card patch-card-add">
             <span class="patch-add-icon" aria-hidden="true">
                 <svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
             </span>
