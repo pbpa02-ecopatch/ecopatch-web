@@ -1,3 +1,4 @@
+{% load static %}
 {% if books %}
     <div class="book-shelf-grid">
         {% for book in books %}
@@ -30,7 +31,7 @@
     </div>
 {% else %}
     <div class="text-center py-5 my-4">
-        <div style="font-size: 3.5rem;">📚</div>
+        <img src="{% static 'img/mascot/petak-mencatat.png' %}" alt="Petak Mencatat" style="width: 140px; height: auto; max-width: 100%;" class="mb-3">
         <h5 class="fw-bold mt-2">Belum ada Buku Jurnal Tanaman</h5>
         <p class="text-muted">Mulai catat perkembangan tanamanmu untuk membuat buku pertamamu!</p>
         <a href="{% url 'garden_journal:create' %}" class="btn btn-success mt-2">
