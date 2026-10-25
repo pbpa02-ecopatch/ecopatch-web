@@ -1911,115 +1911,6 @@ h1, h2, h3, .navbar-brand {
 .profile-form textarea {
     width: 100%;
     padding: 13px 18px;
-
-/* my-ecopatch */
-.patch-card {
-    position: relative;
-}
-
-.patch-card-link {
-    color: inherit;
-    text-decoration: none;
-}
-
-.patch-card-link:hover,
-.patch-card-link:focus-visible {
-    color: var(--brand-600);
-}
-
-.patch-back {
-    display: inline-block;
-    margin-bottom: 16px;
-    color: var(--ink-muted);
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.patch-back:hover {
-    color: var(--brand-600);
-}
-
-.patch-head-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.btn-success.patch-btn-danger {
-    background: var(--danger);
-}
-
-.btn-success.patch-btn-danger:hover,
-.btn-success.patch-btn-danger:focus-visible {
-    background: color-mix(in srgb, var(--danger) 80%, var(--ink));
-}
-
-.btn-outline-success.patch-btn-danger {
-    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
-}
-
-.btn-outline-success.patch-btn-danger:hover,
-.btn-outline-success.patch-btn-danger:focus-visible {
-    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
-}
-
-.patch-form-shell {
-    max-width: 640px;
-    margin: 0 auto;
-}
-
-.patch-form-shell .patch-page-lead {
-    margin-bottom: 24px;
-}
-
-.patch-form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    padding: 28px;
-    border: 1px solid var(--border);
-    border-radius: 28px;
-    background: var(--surface-200);
-    box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
-}
-
-form.patch-form-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.patch-form-title {
-    margin: 0;
-    color: var(--ink);
-    font-size: 1.25rem;
-}
-
-.patch-form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-}
-
-.patch-form-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.patch-label {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--ink);
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.patch-form input:not([type="hidden"]),
-.patch-form select,
-.patch-form textarea {
-    width: 100%;
-    padding: 12px 16px;
     border: 1.5px solid var(--border);
     border-radius: 16px;
     background: var(--surface-100);
@@ -2047,14 +1938,6 @@ form.patch-form-actions {
 .profile-form input[type="password"]:focus,
 .profile-form select:focus,
 .profile-form textarea:focus {
-.patch-form input::placeholder,
-.patch-form textarea::placeholder {
-    color: var(--ink-muted);
-}
-
-.patch-form input:focus,
-.patch-form select:focus,
-.patch-form textarea:focus {
     outline: none;
     border-color: var(--brand-500);
     background: var(--surface-200);
@@ -2300,6 +2183,138 @@ form.patch-form-actions {
     margin: -6px 0 12px;
     color: var(--ink-muted);
     font-size: 13.5px;
+}
+
+
+
+/* my-ecopatch */
+.patch-card {
+    position: relative;
+}
+
+.patch-card-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.patch-card-link:hover,
+.patch-card-link:focus-visible {
+    color: var(--brand-600);
+}
+
+.patch-back {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: var(--ink-muted);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.patch-back:hover {
+    color: var(--brand-600);
+}
+
+.patch-head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn-success.patch-btn-danger {
+    background: var(--danger);
+}
+
+.btn-success.patch-btn-danger:hover,
+.btn-success.patch-btn-danger:focus-visible {
+    background: color-mix(in srgb, var(--danger) 80%, var(--ink));
+}
+
+.btn-outline-success.patch-btn-danger {
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+}
+
+.btn-outline-success.patch-btn-danger:hover,
+.btn-outline-success.patch-btn-danger:focus-visible {
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+}
+
+.patch-form-shell {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.patch-form-shell .patch-page-lead {
+    margin-bottom: 24px;
+}
+
+.patch-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    background: var(--surface-200);
+    box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
+}
+
+form.patch-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.patch-form-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.25rem;
+}
+
+.patch-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.patch-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.patch-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.patch-form input:not([type="hidden"]),
+.patch-form select,
+.patch-form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface-100);
+    color: var(--ink);
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.patch-form input::placeholder,
+.patch-form textarea::placeholder {
+    color: var(--ink-muted);
+}
+
+.patch-form input:focus,
+.patch-form select:focus,
+.patch-form textarea:focus {
+    outline: none;
+    border-color: var(--brand-500);
+    background: var(--surface-200);
+    box-shadow: 0 0 0 4px var(--brand-300);
 }
 
 .patch-field.has-error input,
