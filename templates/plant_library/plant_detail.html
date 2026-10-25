@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% block title %}{{ plant.name }} - Plant Library{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Scoped Detail Tanaman - Konsisten dengan tema dan token EcoPatch */
+    .plant-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ink-muted);
+        text-decoration: none;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: var(--surface-200);
+        border: 1px solid var(--border);
+        transition: all 0.2s ease;
+    }
+    .plant-back-btn:hover {
+        background: var(--surface-300);
+        color: var(--ink);
+    }
+    .plant-detail-container {
+        background: var(--surface-200);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        box-shadow: 0 8px 24px rgba(34, 48, 31, 0.08);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    .plant-detail-hero {
+        padding: 32px 32px 16px;
+    }
+    .plant-detail-title {
+        font-size: clamp(2.2rem, 4vw, 3rem);
+        color: var(--ink);
+        margin-bottom: 4px;
+        font-family: 'Baloo 2', sans-serif;
+    }
+    .plant-detail-scientific {
+        color: var(--ink-muted);
+        font-style: italic;
+        font-size: 1.15rem;
+        margin-bottom: 16px;
+    }
+    .plant-badge-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    .plant-badge {
+        font-size: 0.85rem;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 999px;
+    }
+    .plant-badge--category {
+        background: var(--brand-300);
+        color: var(--brand-600);
+    }
+    .plant-badge--diff-easy {
+        background: #e6f4ea;
+        color: #137333;
+    }
+    .plant-badge--diff-medium {
+        background: #fef7e0;
+        color: #b06000;
+    }
+    .plant-badge--diff-hard {
+        background: #fce8e6;
+        color: #c5221f;
+    }
+    .plant-detail-image-box {
+        width: 100%;
+        max-height: 420px;
+        min-height: 280px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, var(--surface-300) 0%, var(--surface-100) 100%);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+    .plant-detail-image-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .plant-detail-image-box .placeholder-large {
+        font-size: 6rem;
+        user-select: none;
+    }
+    .plant-specs-card {
+        background: var(--surface-100);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 24px;
+        height: 100%;
+    }
+    .plant-specs-title {
+        font-size: 1.25rem;
+        font-family: 'Baloo 2', sans-serif;
+        color: var(--ink);
+        margin-bottom: 18px;
+    }
+    .plant-spec-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px dashed rgba(230, 207, 149, 0.8);
+    }
+    .plant-spec-item:last-child {
+        border-bottom: none;
+    }
+    .plant-spec-icon {
+        font-size: 1.4rem;
+        line-height: 1;
+    }
+    .plant-spec-label {
+        font-size: 0.82rem;
+        color: var(--ink-muted);
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 2px;
+    }
+    .plant-spec-val {
+        font-size: 1rem;
+        color: var(--ink);
+        font-weight: 600;
+    }
+    .plant-desc-box {
+        padding: 0 32px 32px;
+    }
+    .plant-section-heading {
+        font-size: 1.4rem;
+        color: var(--ink);
+        font-family: 'Baloo 2', sans-serif;
+        margin-bottom: 12px;
+    }
+    .plant-desc-content {
+        color: var(--ink);
+        line-height: 1.7;
+        font-size: 1.02rem;
+        margin-bottom: 24px;
+    }
+    .plant-urban-tip {
+        background: color-mix(in srgb, var(--brand-300) 25%, var(--surface-200));
+        border-left: 4px solid var(--brand-500);
+        padding: 16px 20px;
+        border-radius: 12px;
+        color: var(--ink);
+        margin-bottom: 24px;
+    }
+    .btn-danger {
+        border-radius: 999px;
+        padding: 10px 24px;
+        font-weight: 700;
+    }
+    .btn-outline-danger {
+        border-radius: 999px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <!-- Top Action / Breadcrumb Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <a href="{% url 'plant_library:plant_list' %}" class="plant-back-btn">
+            <span>←</span>
+            <span>Kembali ke Plant Library</span>
+        </a>
+
+        {% if user.is_staff %}
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'plant_library:plant_update' plant.pk %}" class="btn btn-outline-success btn-sm px-3">
+                    ✏️ Ubah Tanaman
+                </a>
+                <a href="{% url 'plant_library:plant_delete' plant.pk %}" class="btn btn-outline-danger btn-sm px-3">
+                    🗑️ Hapus Tanaman
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <article class="plant-detail-container">
+        <!-- Header Info -->
+        <div class="plant-detail-hero">
+            <div class="plant-badge-list">
+                <span class="plant-badge plant-badge--category">{{ plant.get_category_display }}</span>
+                {% if plant.difficulty == 'easy' %}
+                    <span class="plant-badge plant-badge--diff-easy">Tingkat Kesulitan: Mudah</span>
+                {% elif plant.difficulty == 'medium' %}
+                    <span class="plant-badge plant-badge--diff-medium">Tingkat Kesulitan: Sedang</span>
+                {% else %}
+                    <span class="plant-badge plant-badge--diff-hard">Tingkat Kesulitan: Sulit</span>
+                {% endif %}
+            </div>
+
+            <h1 class="plant-detail-title">{{ plant.name }}</h1>
+            {% if plant.scientific_name %}
+                <p class="plant-detail-scientific">{{ plant.scientific_name }}</p>
+            {% endif %}
+        </div>
+
+        <div class="row g-4 px-4 pb-4">
+            <!-- Kolom Kiri: Gambar Tanaman -->
+            <div class="col-12 col-lg-6">
+                <div class="plant-detail-image-box">
+                    {% if plant.image_url %}
+                        <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="placeholder-large" style="display: none;" aria-hidden="true">🪴</div>
+                    {% else %}
+                        <div class="placeholder-large" aria-hidden="true">🪴</div>
+                    {% endif %}
+                </div>
+
+                <div class="plant-urban-tip">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <strong>🌱 Tips EcoPatch:</strong>
+                    </div>
+                    <p class="mb-0 small">
+                        Tanaman ini sangat cocok dimanfaatkan untuk konsep <em>urban gardening</em> di ruang seperti 
+                        <strong>{{ plant.get_space_requirement_display }}</strong>. Pastikan kebutuhan cahaya terpenuhi secara optimal!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Kolom Kanan: Spesifikasi Perawatan -->
+            <div class="col-12 col-lg-6">
+                <div class="plant-specs-card">
+                    <h2 class="plant-specs-title">Kebutuhan & Panduan Perawatan</h2>
+
+                    <div class="plant-spec-item">
+                        <span class="plant-spec-icon">☀️</span>
+                        <div>
+                            <div class="plant-spec-label">Kebutuhan Sinar Matahari</div>
+                            <div class="plant-spec-val">{{ plant.get_sunlight_display }}</div>
+                        </div>
+                    </div>
+
+                    <div class="plant-spec-item">
+                        <span class="plant-spec-icon">💧</span>
+                        <div>
+                            <div class="plant-spec-label">Frekuensi Penyiraman</div>
+                            <div class="plant-spec-val">{{ plant.get_watering_display }}</div>
+                        </div>
+                    </div>
+
+                    <div class="plant-spec-item">
+                        <span class="plant-spec-icon">🏡</span>
+                        <div>
+                            <div class="plant-spec-label">Penempatan Ruang</div>
+                            <div class="plant-spec-val">{{ plant.get_indoor_outdoor_display }}</div>
+                        </div>
+                    </div>
+
+                    <div class="plant-spec-item">
+                        <span class="plant-spec-icon">📐</span>
+                        <div>
+                            <div class="plant-spec-label">Kebutuhan Ruang / Wadah</div>
+                            <div class="plant-spec-val">{{ plant.get_space_requirement_display }}</div>
+                        </div>
+                    </div>
+
+                    <div class="plant-spec-item">
+                        <span class="plant-spec-icon">📊</span>
+                        <div>
+                            <div class="plant-spec-label">Tingkat Kesulitan</div>
+                            <div class="plant-spec-val">{{ plant.get_difficulty_display }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bagian Bawah: Deskripsi Lengkap -->
+        <div class="plant-desc-box">
+            <h2 class="plant-section-heading">Tentang Tanaman Ini</h2>
+            <div class="plant-desc-content">
+                {% if plant.description %}
+                    {{ plant.description|linebreaks }}
+                {% else %}
+                    <p class="text-muted fst-italic">Belum ada keterangan deskripsi atau panduan lengkap untuk tanaman ini.</p>
+                {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pt-2 border-top">
+                <a href="{% url 'plant_library:plant_list' %}" class="btn btn-outline-success">
+                    Kembali ke Daftar Tanaman
+                </a>
+
+                {% if user.is_staff %}
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'plant_library:plant_update' plant.pk %}" class="btn btn-success">
+                            ✏️ Ubah Data
+                        </a>
+                        <a href="{% url 'plant_library:plant_delete' plant.pk %}" class="btn btn-danger">
+                            🗑️ Hapus Tanaman
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+</div>
+{% endblock %}

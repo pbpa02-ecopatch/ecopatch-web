@@ -14,17 +14,20 @@ class GardenJournalForm(ModelForm):
             "title",
             "plant_condition",
             "plant_height",
+            "image",
             "cover_pattern",
             "notes",
         ]
         labels = {
             "plant_name": "Nama Tanaman",
             "ecopatch_name": "Nama EcoPatch",
+            "image": "Foto Tanaman (Opsional)",
             "cover_pattern": "Pilihan Sampul Buku (Cover Pattern)",
         }
         help_texts = {
             "plant_name": "Isi nama tanaman yang dicatat (misal: Monstera, Tomat Ceri, Cabai Rawit).",
             "ecopatch_name": "Isi nama kebunmu (contoh: Balkon Timur, Kebun Depan).",
+            "image": "Upload foto perkembangan tanaman hari ini (JPG/PNG).",
             "cover_pattern": "Pilih motif cover buku jurnal untuk tanaman ini.",
         }
         widgets = {
@@ -40,6 +43,7 @@ class GardenJournalForm(ModelForm):
             "plant_height": forms.NumberInput(
                 attrs={"class": "form-control", "step": "0.1", "min": "0", "placeholder": "cm"}
             ),
+            "image": forms.FileInput(attrs={"class": "form-control", "accept": "image/*"}),
             "cover_pattern": forms.RadioSelect(attrs={"class": "cover-radio-input"}),
             "notes": forms.Textarea(
                 attrs={"rows": 4, "class": "form-control", "placeholder": "Tulis perkembangan tanaman hari ini..."}

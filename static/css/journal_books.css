@@ -696,3 +696,240 @@
     animation: pageFlipInLeft 0.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
 }
 
+/* =========================================================
+   RIWAYAT (HISTORY) VIEW — Stat Cards, Chart, Grouped List
+   ========================================================= */
+
+/* ---- Stat Cards ---- */
+.stat-card {
+    background: #ffffff;
+    border: 1px solid #efe4cb;
+    border-radius: 14px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    height: 100%;
+}
+
+.stat-card-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #8c7b5a;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+}
+
+.stat-card-value {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #22301f;
+    line-height: 1.1;
+    font-family: 'Baloo 2', sans-serif;
+}
+
+.stat-card-unit {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #59684f;
+}
+
+/* ---- Chart Card ---- */
+.history-chart-card {
+    background: #ffffff;
+    border: 1px solid #efe4cb;
+    border-radius: 14px;
+    padding: 18px 20px 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.history-chart-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #59684f;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+}
+
+/* ---- Group Tab Toggle (Per minggu / Per bulan) ---- */
+.history-group-tabs {
+    display: inline-flex;
+    background: #f5edd8;
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+}
+
+.history-group-tab {
+    border: none;
+    background: transparent;
+    border-radius: 999px;
+    padding: 5px 18px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #59684f;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.history-group-tab.active {
+    background: #1f9142;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(31, 145, 66, 0.25);
+}
+
+.history-group-tab:hover:not(.active) {
+    background: rgba(31, 145, 66, 0.1);
+    color: #1f9142;
+}
+
+/* ---- Group Section Header ---- */
+.history-group {
+    border-radius: 0;
+    transition: all 0.2s ease;
+}
+
+.history-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 2px solid #e8dfc8;
+    margin-bottom: 12px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 8px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.history-group-header:hover {
+    background-color: rgba(31, 145, 66, 0.06);
+}
+
+.history-group-chevron {
+    display: inline-block;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+    font-size: 0.72rem;
+    color: #1f9142;
+    transform: rotate(0deg);
+}
+
+.history-group.collapsed .history-group-chevron {
+    transform: rotate(-90deg);
+}
+
+.history-group.collapsed .history-group-entries {
+    display: none !important;
+}
+
+.history-group.collapsed .history-group-header {
+    border-bottom: 1px dashed #d5c8ad;
+    opacity: 0.85;
+}
+
+.history-group.collapsed:hover .history-group-header {
+    opacity: 1;
+}
+
+.history-group-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #22301f;
+}
+
+.history-group-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #8c7b5a;
+    background: #f5edd8;
+    padding: 2px 10px;
+    border-radius: 999px;
+}
+
+/* ---- Entry Cards ---- */
+.history-entry-card {
+    display: flex;
+    gap: 0;
+    background: #ffffff;
+    border: 1px solid #efe4cb;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.history-entry-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.09);
+    transform: translateY(-1px);
+}
+
+.history-entry-left {
+    width: 5px;
+    flex-shrink: 0;
+}
+
+.history-entry-color-bar {
+    width: 100%;
+    height: 100%;
+    min-height: 60px;
+    border-radius: 0;
+    opacity: 0.75;
+}
+
+/* Bootstrap contextual colors for the bar */
+.history-entry-color-bar.bg-success { background-color: #198754 !important; }
+.history-entry-color-bar.bg-warning { background-color: #ffc107 !important; }
+.history-entry-color-bar.bg-danger  { background-color: #dc3545 !important; }
+.history-entry-color-bar.bg-info    { background-color: #0dcaf0 !important; }
+.history-entry-color-bar.bg-primary { background-color: #0d6efd !important; }
+.history-entry-color-bar.bg-secondary { background-color: #6c757d !important; }
+
+.history-entry-body {
+    flex: 1;
+    padding: 14px 16px 12px;
+}
+
+.history-entry-title {
+    font-weight: 700;
+    font-size: 0.98rem;
+    color: #22301f;
+    margin-bottom: 4px;
+}
+
+.history-entry-notes {
+    font-size: 0.88rem;
+    color: #59684f;
+    margin-bottom: 0;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ---- View Toggle Buttons (📖 Buku / 📋 Riwayat) ---- */
+.view-toggle-btn {
+    border: 1px solid #e6cf95;
+    background: #ffffff;
+    border-radius: 999px;
+    padding: 6px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #59684f;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.view-toggle-btn:hover:not(.active) {
+    background: #fdfaf3;
+    border-color: #1f9142;
+    color: #1f9142;
+}
+
+.view-toggle-btn.active {
+    background: #1f9142;
+    border-color: #1f9142;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(31, 145, 66, 0.25);
+}
