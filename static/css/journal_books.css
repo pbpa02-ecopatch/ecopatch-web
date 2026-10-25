@@ -191,71 +191,135 @@
     color: #435338;
 }
 
-/* PATTERN 1: BRUSHES (Artistic brush strokes) */
+/* PATTERN 1: BRUSHES — Brand color blobs on warm cream */
 .pattern-brushes {
-    background: #f7eed9;
-    background-image: 
-        radial-gradient(circle at 20% 30%, #f6c85f 0%, #f6c85f 24%, transparent 26%),
-        radial-gradient(circle at 85% 65%, #7ea8be 0%, #7ea8be 32%, transparent 35%),
-        radial-gradient(circle at 40% 85%, #f2a6a6 0%, #f2a6a6 20%, transparent 23%),
-        radial-gradient(circle at 80% 20%, #9cbfa7 0%, #9cbfa7 18%, transparent 21%);
+    background-color: #faf6ec;
+    background-image:
+        radial-gradient(circle at 20% 30%, #1f9142 0%, #1f9142 22%, transparent 25%),
+        radial-gradient(circle at 82% 62%, #ff9d2e 0%, #ff9d2e 26%, transparent 29%),
+        radial-gradient(circle at 40% 83%, #29b6d8 0%, #29b6d8 17%, transparent 20%),
+        radial-gradient(circle at 75% 18%, #93e0a8 0%, #93e0a8 15%, transparent 18%);
     background-size: 100% 100%;
 }
 
-/* PATTERN 2: DOTS (Playful colorful confetti dots) */
+/* PATTERN 2: DOTS — Earthy confetti on pale sage */
 .pattern-dots {
-    background-color: #f1f2ec;
+    background-color: #eef7f2;
     background-image:
-        radial-gradient(#ffffff 22%, transparent 23%),
-        radial-gradient(#7ea8be 10%, transparent 12%),
-        radial-gradient(#e07a5f 8%, transparent 10%),
-        radial-gradient(#81b29a 11%, transparent 13%),
-        radial-gradient(#f4a261 9%, transparent 11%);
+        radial-gradient(#fdedc9 22%, transparent 24%),
+        radial-gradient(#1f9142 10%, transparent 12%),
+        radial-gradient(#ff9d2e 8%, transparent 10%),
+        radial-gradient(#22301f 7%, transparent 9%),
+        radial-gradient(#4ecb72 9%, transparent 11%);
     background-position: 0 0, 30px 40px, 70px 20px, 45px 80px, 90px 100px;
     background-size: 120px 120px;
 }
 
-/* PATTERN 3: FLOWERS (Botanical floral garden vibe) */
+/* PATTERN 3: FLOWERS — Botanical dots in brand palette on pale mint */
 .pattern-flowers {
-    background-color: #eaf4ed;
+    background-color: #edf8f2;
     background-image:
-        radial-gradient(circle at 50% 50%, #f6c85f 14%, transparent 16%),
-        radial-gradient(circle at 20% 20%, #ff7b90 12%, transparent 14%),
-        radial-gradient(circle at 80% 80%, #52b788 12%, transparent 14%),
-        radial-gradient(circle at 80% 25%, #64b5f6 10%, transparent 12%),
-        radial-gradient(circle at 25% 75%, #ffb703 10%, transparent 12%);
+        radial-gradient(circle at 50% 50%, #ff9d2e 13%, transparent 15%),
+        radial-gradient(circle at 20% 20%, #1f9142 11%, transparent 13%),
+        radial-gradient(circle at 80% 80%, #22301f 10%, transparent 12%),
+        radial-gradient(circle at 80% 25%, #29b6d8 9%, transparent 11%),
+        radial-gradient(circle at 25% 75%, #d7f4e0 11%, transparent 13%);
     background-size: 80px 80px;
 }
 
-/* PATTERN 4: SEEDS (Raindrop / seed teardrop patterns) */
+/* PATTERN 4: SEEDS — Earthy teardrops on warm sage */
 .pattern-seeds {
-    background-color: #d8ece0;
+    background-color: #d0e8d8;
     background-image:
-        radial-gradient(ellipse at 50% 40%, #ffffff 28%, #c5e3d0 32%, transparent 36%),
-        radial-gradient(ellipse at 50% 40%, #c99351 10%, transparent 14%);
+        radial-gradient(ellipse at 50% 40%, #fdedc9 26%, #b8d8c0 30%, transparent 34%),
+        radial-gradient(ellipse at 50% 40%, #22301f 9%, transparent 12%);
     background-position: 0 0, 25px 35px;
     background-size: 50px 65px;
 }
 
-/* PATTERN 5: SOFT (Minimal pastel stripes & gentle border motifs) */
+/* PATTERN 5: SOFT — Vintage journal ruled lines on warm cream */
 .pattern-soft {
-    background-color: #faf8f3;
-    background-image: 
-        repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(230, 207, 149, 0.4) 18px, rgba(230, 207, 149, 0.4) 20px),
-        repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(230, 207, 149, 0.2) 18px, rgba(230, 207, 149, 0.2) 20px);
+    background-color: #faf8f2;
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            transparent, transparent 18px,
+            rgba(34, 48, 31, 0.11) 18px, rgba(34, 48, 31, 0.11) 20px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent, transparent 18px,
+            rgba(34, 48, 31, 0.05) 18px, rgba(34, 48, 31, 0.05) 20px
+        );
 }
 
-/* PATTERN 6: LEAVES (Lush botanical emerald & sage foliage) */
+/* PATTERN 6: LEAVES — Design system greens foliage */
 .pattern-leaves {
     background-color: #e5f5eb;
     background-image:
-        radial-gradient(ellipse 26px 14px at 30% 25%, #2d6a4f 0%, #2d6a4f 85%, transparent 88%),
-        radial-gradient(ellipse 22px 12px at 75% 70%, #40916c 0%, #40916c 85%, transparent 88%),
-        radial-gradient(ellipse 18px 10px at 80% 25%, #52b788 0%, #52b788 85%, transparent 88%),
-        radial-gradient(ellipse 20px 11px at 25% 75%, #74c69d 0%, #74c69d 85%, transparent 88%),
-        radial-gradient(circle 6px at 50% 50%, #95d5b2 0%, #95d5b2 85%, transparent 88%);
+        radial-gradient(ellipse 26px 14px at 30% 25%, #22301f 0%, #22301f 85%, transparent 88%),
+        radial-gradient(ellipse 22px 12px at 75% 70%, #1f9142 0%, #1f9142 85%, transparent 88%),
+        radial-gradient(ellipse 18px 10px at 80% 25%, #4ecb72 0%, #4ecb72 85%, transparent 88%),
+        radial-gradient(ellipse 20px 11px at 25% 75%, #93e0a8 0%, #93e0a8 85%, transparent 88%),
+        radial-gradient(circle 5px at 50% 50%, #ff9d2e 0%, #ff9d2e 85%, transparent 88%);
     background-size: 80px 80px;
 }
+
+
+/* PATTERN 7: BARK — Kayu coklat hangat, serat pohon */
+.pattern-bark {
+    background-color: #d4a96a;
+    background-image:
+        radial-gradient(ellipse at 25% 28%, #6b4226 0%, #6b4226 20%, transparent 23%),
+        radial-gradient(ellipse at 72% 68%, #8b5e3c 0%, #8b5e3c 24%, transparent 27%),
+        radial-gradient(ellipse at 78% 18%, #a0784c 0%, #a0784c 14%, transparent 17%),
+        radial-gradient(ellipse at 22% 78%, #c4956a 0%, #c4956a 18%, transparent 21%),
+        radial-gradient(circle at 50% 50%, rgba(107, 66, 38, 0.2) 0%, transparent 65%);
+    background-size: 100% 100%;
+}
+
+/* PATTERN 8: TERRA — Tanah liat terracotta hangat */
+.pattern-terra {
+    background-color: #e8c4a0;
+    background-image:
+        radial-gradient(circle at 50% 50%, #c17b5a 13%, transparent 15%),
+        radial-gradient(circle at 20% 20%, #8b3a2a 11%, transparent 13%),
+        radial-gradient(circle at 80% 80%, #d4835a 12%, transparent 14%),
+        radial-gradient(circle at 78% 22%, #fdedc9 10%, transparent 12%),
+        radial-gradient(circle at 22% 78%, #a0522d 10%, transparent 12%);
+    background-size: 75px 75px;
+}
+
+/* PATTERN 9: MOSS — Lumut hijau bumi muted */
+.pattern-moss {
+    background-color: #c8d8b8;
+    background-image:
+        radial-gradient(ellipse 24px 13px at 28% 28%, #3d5c35 0%, #3d5c35 85%, transparent 88%),
+        radial-gradient(ellipse 20px 10px at 72% 65%, #4a6741 0%, #4a6741 85%, transparent 88%),
+        radial-gradient(ellipse 16px 9px at 76% 22%, #6b8f5e 0%, #6b8f5e 85%, transparent 88%),
+        radial-gradient(ellipse 18px 10px at 24% 72%, #8aad7a 0%, #8aad7a 85%, transparent 88%),
+        radial-gradient(circle 5px at 50% 50%, #d4a96a 0%, #d4a96a 85%, transparent 88%);
+    background-size: 75px 75px;
+}
+
+/* PATTERN 10: CLAY — Tanah pasir keemasan earthy */
+.pattern-clay {
+    background-color: #f0dfc8;
+    background-image:
+        radial-gradient(#c17b5a 20%, transparent 22%),
+        radial-gradient(#8b5e3c 9%, transparent 11%),
+        radial-gradient(#d4a96a 7%, transparent 9%),
+        radial-gradient(#6b4226 7%, transparent 9%),
+        radial-gradient(#e8c4a0 9%, transparent 11%);
+    background-position: 0 0, 28px 38px, 65px 18px, 42px 76px, 88px 95px;
+    background-size: 110px 110px;
+}
+
+/* PATTERN 11: SOLID (Plain color — background-color set via JS from data-cover-color) */
+.pattern-solid {
+    background-color: #4ecb72; /* fallback, overridden by JS */
+}
+
 
 /* Book Below Title Labels */
 .book-label-area {
@@ -328,6 +392,96 @@
     color: #435338;
     margin-top: 6px;
     display: block;
+}
+
+/* TAB GROUP */
+.cover-tab-group {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid #e8dbbe;
+    padding-bottom: 0;
+}
+
+.cover-tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -2px;
+    padding: 8px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #59684f;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+
+.cover-tab-btn:hover {
+    color: #1f9142;
+    background: rgba(79, 203, 114, 0.07);
+}
+
+.cover-tab-btn.active {
+    color: #1f9142;
+    border-bottom-color: #1f9142;
+    background: rgba(79, 203, 114, 0.05);
+}
+
+.cover-tab-content {
+    padding-top: 1rem;
+    animation: fadeInTab 0.2s ease;
+}
+
+@keyframes fadeInTab {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* COLOR SWATCH GROUP */
+.color-swatch-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.color-swatch-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.13);
+    padding: 0;
+    outline: none;
+}
+
+.color-swatch-btn:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.color-swatch-btn.selected {
+    border-color: #1f9142;
+    transform: scale(1.18);
+    box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.28), 0 4px 12px rgba(0,0,0,0.18);
+}
+
+/* CUSTOM COLOR PICKER */
+.color-custom-picker {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    padding: 2px;
+    cursor: pointer;
+    background: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s;
+}
+
+.color-custom-picker:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
 /* =========================================================
@@ -933,3 +1087,370 @@
     color: #ffffff;
     box-shadow: 0 2px 8px rgba(31, 145, 66, 0.25);
 }
+
+/* =========================================================
+   SAMPUL BUKU PICKER MODAL & COMPACT CARD
+   ========================================================= */
+
+/* Compact Card on the Form */
+.cover-compact-card {
+    background: #ffffff;
+    border: 1px solid #e2e8e0;
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cover-compact-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(34, 48, 31, 0.05);
+}
+
+.book-mini-thumb {
+    width: 44px;
+    height: 60px;
+    border-radius: 3px 8px 8px 3px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow:
+        -2px 0 0 -1px #ffffff,
+        -4px 0 0 -2px #dedede,
+        2px 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.book-mini-thumb::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: rgba(0, 0, 0, 0.18);
+}
+
+.btn-ganti-sampul {
+    background: #e8f8ed;
+    color: #1f9142;
+    border: none;
+    border-radius: 999px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 8px 18px;
+    transition: background 0.18s, transform 0.18s;
+}
+
+.btn-ganti-sampul:hover {
+    background: #d4f3dd;
+    color: #157333;
+    transform: translateY(-1px);
+}
+
+/* Modal Book Preview */
+.modal-book-preview-wrap {
+    perspective: 800px;
+}
+
+.modal-book-preview {
+    width: 110px;
+    height: 152px;
+    border-radius: 4px 12px 12px 4px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        -4px 0 0 -1px #ffffff,
+        -7px 0 0 -2px #dedede,
+        -10px 0 16px rgba(0, 0, 0, 0.14),
+        6px 12px 24px rgba(34, 48, 31, 0.18);
+    transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.modal-book-preview::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(255,255,255,0.18) 25%, rgba(0,0,0,0.12) 100%);
+    z-index: 2;
+}
+
+.modal-book-title-tag {
+    position: absolute;
+    bottom: 18px;
+    left: 16px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #22301f;
+    letter-spacing: -0.2px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Modal Tabs */
+.modal-cover-tabs {
+    border-bottom: 1.5px solid #eaeaea;
+}
+
+.modal-cover-tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    padding: 10px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.18s, border-color 0.18s;
+}
+
+.modal-cover-tab-btn:hover {
+    color: #1f9142;
+}
+
+.modal-cover-tab-btn.active {
+    color: #1f9142;
+    border-bottom-color: #1f9142;
+    font-weight: 700;
+}
+
+/* 3-Column Pattern Grid */
+.modal-pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px 12px;
+    padding: 12px 2px;
+}
+
+.modal-pattern-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.modal-pattern-card {
+    width: 100%;
+    aspect-ratio: 3 / 4.2;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.modal-pattern-item:hover .modal-pattern-card {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+}
+
+.modal-pattern-item.selected .modal-pattern-card {
+    border-color: #1f9142;
+    box-shadow: 0 0 0 2px rgba(31, 145, 66, 0.2), 0 4px 12px rgba(31, 145, 66, 0.25);
+}
+
+.modal-check-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #1f9142;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+    z-index: 3;
+}
+
+.modal-pattern-item.selected .modal-check-badge {
+    display: flex;
+}
+
+.modal-pattern-label {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #435338;
+    text-align: center;
+}
+
+.modal-pattern-item.selected .modal-pattern-label {
+    font-weight: 700;
+    color: #1f9142;
+}
+
+/* Modal Color Swatch Groups */
+.modal-swatch-section-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #59684f;
+    margin-bottom: 8px;
+}
+
+.modal-swatch-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.modal-swatch-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.modal-swatch-circle:hover {
+    transform: scale(1.15);
+}
+
+.modal-swatch-circle.selected {
+    border-color: #1f9142;
+    transform: scale(1.18);
+    box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.3), 0 4px 10px rgba(0,0,0,0.18);
+}
+
+/* Rainbow Button */
+.modal-rainbow-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: conic-gradient(from 90deg, #ff2a2a, #ff9900, #ffee00, #33cc33, #00bfff, #3366ff, #9933ff, #ff3399, #ff2a2a);
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.modal-rainbow-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.modal-rainbow-btn.selected {
+    box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.35), 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn-apply-cover {
+    background: #22c55e;
+    color: #ffffff;
+    border: none;
+    font-weight: 700;
+    transition: background 0.18s, transform 0.18s;
+}
+
+.btn-apply-cover:hover {
+    background: #16a34a;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   KONDISI TANAMAN GRID CARDS & PHOTO UPLOAD BOX
+   ========================================================= */
+
+.condition-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 576px) {
+    .condition-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+}
+
+.condition-card {
+    background: #fcfdfc;
+    border: 1.5px solid #e8ede7;
+    border-radius: 14px;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+    text-align: center;
+}
+
+.condition-card:hover {
+    border-color: #93e0a8;
+    background: #f4fbf6;
+    transform: translateY(-1px);
+}
+
+.condition-card.active {
+    background: #eaf7ee;
+    border-color: #1f9142;
+    box-shadow: 0 0 0 1px #1f9142, 0 3px 8px rgba(31, 145, 66, 0.15);
+}
+
+.condition-card-icon {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.condition-card-label {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #435338;
+}
+
+.condition-card.active .condition-card-label {
+    color: #1f9142;
+    font-weight: 700;
+}
+
+/* Photo Upload Box */
+.photo-upload-box {
+    border: 2px dashed #cfdbcd;
+    background: #fafcfa;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.photo-upload-box:hover {
+    border-color: #1f9142;
+    background: #f2f9f4;
+}
+
+.photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.photo-preview-wrap {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.photo-preview-img {
+    max-height: 240px;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+

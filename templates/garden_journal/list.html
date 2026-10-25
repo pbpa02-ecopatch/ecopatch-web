@@ -77,3 +77,15 @@
 </div>
 
 {% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function applyBookCoverColors() {
+        document.querySelectorAll('[data-cover-color]').forEach(function(el) {
+            el.style.backgroundColor = el.dataset.coverColor;
+        });
+    }
+    applyBookCoverColors();
+    document.addEventListener('htmx:afterSwap', applyBookCoverColors);
+</script>
+{% endblock %}

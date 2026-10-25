@@ -59,6 +59,7 @@ def _get_plant_books(request):
                 "condition_badge": latest.get_condition_display_badge,
                 "condition_display": latest.get_plant_condition_display(),
                 "cover_pattern": cover_pattern,
+                "cover_color": latest.cover_color or "",
                 "ecopatch_name": latest.ecopatch_name,
                 "latest_entry": latest,
             })
@@ -158,6 +159,7 @@ def plant_journal_history(request, plant_name):
 
     first_all = GardenJournal.objects.filter(user=request.user, plant_name=plant_name).order_by("-date").first()
     cover_pattern = first_all.cover_pattern if first_all else "flowers"
+    cover_color = first_all.cover_color if first_all else ""
 
     # --- Stats for Riwayat dashboard ---
     all_unfiltered = GardenJournal.objects.filter(
@@ -192,6 +194,7 @@ def plant_journal_history(request, plant_name):
         "current_entry": current_entry,
         "page_obj": page_obj,
         "cover_pattern": cover_pattern,
+        "cover_color": cover_color,
         "conditions": GardenJournal.CONDITION_CHOICES,
         "selected_condition": condition_filter,
         "selected_date": date_filter,

@@ -19,6 +19,11 @@ class GardenJournal(models.Model):
         ("seeds", "Seeds"),
         ("soft", "Soft"),
         ("leaves", "Leaves"),
+        ("bark", "Bark"),
+        ("terra", "Terra"),
+        ("moss", "Moss"),
+        ("clay", "Clay"),
+        ("solid", "Solid Color"),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="garden_journals")
@@ -50,6 +55,12 @@ class GardenJournal(models.Model):
         choices=COVER_CHOICES,
         default="flowers",
         help_text="Sampul buku jurnal",
+    )
+    cover_color = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        help_text="Warna hex untuk sampul polos (misal: #1f9142)",
     )
     image = models.ImageField(
         upload_to="journal_photos/",
