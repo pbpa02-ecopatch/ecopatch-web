@@ -1,12 +1,7 @@
 <nav class="navbar navbar-expand-md site-navbar{% if user.is_authenticated %} site-navbar--side{% endif %}">
     <div class="container">
         <div class="sidebar-head">
-            <a class="navbar-brand" href="{% url 'main:home' %}">🌱 <span class="brand-text">EcoPatch</span></a>
-            {% if user.is_authenticated %}
-                <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Ciutkan menu" aria-pressed="false">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
-            {% endif %}
+            <a class="navbar-brand" href="{% url 'main:home' %}" aria-label="EcoPatch">{% if user.is_authenticated %}<span class="brand-emoji" aria-hidden="true">🌱</span><svg class="brand-sprout" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg>{% else %}🌱{% endif %} <span class="brand-text">EcoPatch</span></a>
         </div>
 
         {% if user.is_authenticated %}
@@ -71,17 +66,33 @@
 
         {% if user.is_authenticated %}
             <div class="sidebar-user">
-                <a href="{% url 'main:profile' %}" title="{{ display_name }}{% if user.email %} - {{ user.email }}{% endif %}" class="sidebar-user-link{% if request.resolver_match.url_name == 'profile' %} active{% endif %}">
+                <button type="button" id="sidebar-user-toggle" title="{{ display_name }}{% if user.email %} - {{ user.email }}{% endif %}" aria-haspopup="menu" aria-expanded="false" aria-controls="sidebar-user-menu" class="sidebar-user-link{% if request.resolver_match.url_name == 'profile' %} active{% endif %}">
                     <span class="navbar-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ display_name|first|upper }}{% endif %}</span>
                     <span class="sidebar-user-id">
                         <span class="sidebar-user-name">{{ display_name }}</span>
                         <span class="sidebar-user-sub">Profil Saya</span>
                     </span>
-                </a>
-                <form action="{% url 'main:logout' %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="sidebar-logout">Keluar</button>
-                </form>
+                    <svg class="sidebar-user-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+                </button>
+                <div class="sidebar-user-menu" id="sidebar-user-menu" role="menu" hidden>
+                    <a class="sidebar-menu-item" role="menuitem" href="{% url 'main:profile' %}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                        Profil Saya
+                    </a>
+                    <div class="sidebar-menu-divider" role="separator"></div>
+                    <form action="{% url 'main:logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="sidebar-menu-item sidebar-menu-item--danger" role="menuitem">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+                            Keluar
+                        </button>
+                    </form>
+                </div>
+                <div class="sidebar-foot">
+                    <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Ciutkan menu" title="Ciutkan menu" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 3v18"/><path d="m16 9-3 3 3 3"/></svg>
+                    </button>
+                </div>
             </div>
         {% endif %}
     </div>

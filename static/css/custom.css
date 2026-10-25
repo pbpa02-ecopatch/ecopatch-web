@@ -2240,28 +2240,65 @@ h1, h2, h3, .navbar-brand {
     font-size: 13.5px;
 }
 
-/* ================= Sidebar navigation (logged-in users, md and up) ================= */
-.sidebar-user {
+/* ================= Floating sidebar (logged-in users, md and up) =================
+   A rounded card that floats over the page with a gap on every side. Top: logo. Middle: the menu in groups.
+   Bottom: the profile row (opens a small menu with Profil Saya and Keluar), then the collapse button. Expanded it shows labels; collapsed
+   (html.sidebar-collapsed) it is a narrow pill of icons with short dividers between the groups.
+   The menu icons are CSS masks picked by the order of the <li>s in header.html (1 Plant Library, 2 My EcoPatch,
+   3 Smart Care, 4 Garden Journal, 5 Seed Exchange); if that order changes, update the nth-child rules below.
+   Small screens keep the top bar. */
+.sidebar-head {
+    display: contents;
+}
+
+.sidebar-user,
+.brand-sprout {
     display: none;
 }
 
 @media (min-width: 768px) {
-    body.has-sidebar {
-        padding-left: 248px;
+    html {
+        --side-gap: 16px;
+        --side-width: 248px;
     }
 
+    html.sidebar-collapsed {
+        --side-width: 72px;
+    }
+
+    body.has-sidebar {
+        padding-left: calc(var(--side-width) + var(--side-gap) * 2);
+        transition: padding-left 0.2s ease;
+    }
+
+    /* ---- the floating card ---- */
     .site-navbar.site-navbar--side {
+        --side-bg: color-mix(in srgb, var(--surface-200) 85%, var(--surface-100));
+        --side-line: color-mix(in srgb, var(--border) 75%, transparent);
+        --side-hover: color-mix(in srgb, var(--ink) 6%, transparent);
+        --side-active: #157a3c;
+        --side-active-edge: #0f5e2d;
         position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        width: 248px;
+        z-index: 1030;
+        top: var(--side-gap);
+        bottom: var(--side-gap);
+        left: var(--side-gap);
+        width: var(--side-width);
         margin: 0;
-        padding: 20px 14px;
+        padding: 18px 12px 14px;
+        overflow-x: hidden;
         overflow-y: auto;
-        border-right: 1px solid var(--border);
-        border-radius: 0;
-        box-shadow: none;
+        scrollbar-width: none;
+        border: 1px solid var(--side-line);
+        border-radius: 30px;
+        background: var(--side-bg);
+        color: var(--ink);
+        box-shadow: 0 14px 34px rgba(34, 48, 31, 0.16), 0 2px 6px rgba(34, 48, 31, 0.08);
+        transition: width 0.2s ease;
+    }
+
+    .site-navbar--side::-webkit-scrollbar {
+        display: none;
     }
 
     .site-navbar--side > .container {
@@ -2274,15 +2311,47 @@ h1, h2, h3, .navbar-brand {
         padding: 0;
     }
 
-    .site-navbar--side .navbar-brand {
-        margin: 0 8px 24px;
-        font-size: 1.5rem;
+    /* ---- top: logo, with a line under it ---- */
+    .sidebar-head {
+        display: flex;
+        align-items: center;
+        margin: 0 0 14px;
+        padding: 2px 8px 14px;
+        border-bottom: 1px solid var(--side-line);
     }
 
+    .site-navbar--side .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        font-size: 1.5rem;
+        white-space: nowrap;
+    }
+
+    .site-navbar--side .brand-emoji {
+        display: none;
+    }
+
+    .site-navbar--side .brand-sprout {
+        display: block;
+        flex: 0 0 auto;
+        width: 30px;
+        height: 30px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* ---- menu ---- */
     .site-navbar--side .navbar-collapse {
         flex-direction: column;
-        flex-grow: 1;
+        flex-grow: 0 !important;
         align-items: stretch;
+        border-bottom: 0;
     }
 
     .site-navbar.site-navbar--side .navbar-nav {
@@ -2291,53 +2360,137 @@ h1, h2, h3, .navbar-brand {
         margin: 0 !important;
     }
 
-    .site-navbar.site-navbar--side .navbar-nav .nav-link,
-    .site-navbar.site-navbar--side .navbar-nav .nav-link.active {
-        padding: 10px 14px;
-        border-radius: 14px;
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        border-radius: 16px;
+        color: var(--ink);
+        font-size: 15.5px;
+        font-weight: 600;
+        transition: background-color 0.15s ease, color 0.15s ease;
     }
 
-    /* Menu, lalu kartu profil, lalu ruang kosong; Keluar menempel di dasar sidebar */
-    /* Bootstrap memberi .navbar-collapse order-md-2 dan flex-grow-1 (!important); urutan akhir:
-       brand, menu (2), kartu profil (3), Keluar (4, menempel di dasar) */
-    .site-navbar--side .navbar-collapse {
-        flex-grow: 0 !important;
-        padding-bottom: 14px;
-        border-bottom: 1px dashed var(--border);
+    .site-navbar--side .navbar-nav.nav-auth .nav-link::before {
+        content: "";
+        flex: 0 0 auto;
+        width: 22px;
+        height: 22px;
+        background-color: currentColor;
+        -webkit-mask: var(--nav-icon) center / contain no-repeat;
+        mask: var(--nav-icon) center / contain no-repeat;
     }
 
-    .sidebar-user {
-        display: contents;
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link:hover:not(.active) {
+        background: var(--side-hover);
     }
 
-    .sidebar-user-link {
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link:focus-visible {
+        outline: 2px solid var(--brand-500);
+        outline-offset: 2px;
+    }
+
+    /* the page you are on: solid green with a darker lower edge */
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link.active {
+        background: var(--side-active);
+        color: #fff;
+        box-shadow: 0 3px 0 var(--side-active-edge), 0 8px 14px rgba(21, 122, 60, 0.28);
+    }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1) .nav-link {
+        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M2%204h6a4%204%200%200%201%204%204v13a3%203%200%200%200-3-3H2z%27/%3E%3Cpath%20d=%27M22%204h-6a4%204%200%200%200-4%204v13a3%203%200%200%201%203-3h7z%27/%3E%3C/svg%3E");
+    }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(2) .nav-link {
+        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Crect%20x=%273%27%20y=%273%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%2714%27%20y=%273%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%273%27%20y=%2714%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%2714%27%20y=%2714%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3C/svg%3E");
+    }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3) .nav-link {
+        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M12%203s6%206.2%206%2010.5A6%206%200%200%201%206%2013.5C6%209.2%2012%203%2012%203z%27/%3E%3C/svg%3E");
+    }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(4) .nav-link {
+        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M5%203h12a2%202%200%200%201%202%202v16H7a2%202%200%200%201-2-2z%27/%3E%3Cpath%20d=%27M9%203v18M12%208h4M12%2012h4%27/%3E%3C/svg%3E");
+    }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) .nav-link {
+        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M7%207h13l-3-3M17%2017H4l3%203%27/%3E%3C/svg%3E");
+    }
+
+    /* group headings (shown only while expanded) */
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1) { --nav-group: "Kebun"; }
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3) { --nav-group: "Perawatan"; }
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) { --nav-group: "Komunitas"; }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1)::before,
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3)::before,
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5)::before {
+        display: block;
+        content: var(--nav-group);
+        padding: 4px 14px 6px;
+        color: var(--ink-muted);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+    }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3),
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) {
+        margin-top: 10px;
+    }
+
+    /* ---- bottom: profile row, then collapse button and sign out ---- */
+    .site-navbar--side .sidebar-user {
+        display: flex;
+        flex-direction: column;
         order: 3;
-        margin-top: 14px;
-    }
-
-    .sidebar-user form {
-        order: 4;
+        gap: 4px;
         margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid var(--side-line);
     }
 
-    .sidebar-user-link {
+    .site-navbar--side .sidebar-user-link {
         display: flex;
         align-items: center;
         gap: 10px;
+        width: 100%;
+        min-width: 0;
         padding: 8px;
-        border-radius: 14px;
+        border: 0;
+        border-radius: 16px;
+        background: transparent;
         color: var(--ink);
+        font: inherit;
+        text-align: left;
         text-decoration: none;
+        cursor: pointer;
     }
 
-    .sidebar-user-link:hover,
-    .sidebar-user-link.active {
-        background: color-mix(in srgb, var(--brand-300) 45%, transparent);
+    .site-navbar--side .sidebar-user-link:hover,
+    .site-navbar--side .sidebar-user-link.active,
+    .site-navbar--side .sidebar-user-link[aria-expanded="true"] {
+        background: var(--side-hover);
         color: var(--ink);
+    }
+
+    .site-navbar--side .sidebar-user-link:focus-visible {
+        outline: 2px solid var(--brand-500);
+        outline-offset: 2px;
+    }
+
+    .site-navbar--side .navbar-avatar {
+        flex: 0 0 auto;
+        width: 38px;
+        height: 38px;
+        background: var(--brand-500);
+        color: #fff;
     }
 
     .sidebar-user-id {
         display: flex;
+        flex: 1 1 auto;
         flex-direction: column;
         min-width: 0;
         line-height: 1.25;
@@ -2356,364 +2509,198 @@ h1, h2, h3, .navbar-brand {
         font-size: 12.5px;
     }
 
-    .sidebar-logout {
-        width: 100%;
-        padding: 8px 14px;
-        border: 0;
-        border-radius: 14px;
-        background: transparent;
-        color: color-mix(in srgb, var(--danger) 75%, var(--ink));
-        font-weight: 600;
-        text-align: left;
+    .sidebar-user-chevron {
+        flex: 0 0 auto;
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: var(--ink-muted);
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
     }
 
-    .sidebar-logout:hover,
-    .sidebar-logout:focus-visible {
-        background: color-mix(in srgb, var(--danger) 12%, var(--surface-200));
-    }
-}
-
-/* Sidebar: ikon per menu (CSS mask, jadi markup link di header.html tidak perlu diubah)
-   Ikon dipetakan lewat urutan <li>; kalau urutan menu berubah, sesuaikan nth-child di bawah. */
-@media (min-width: 768px) {
-    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link {
+    .sidebar-foot {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 11px 14px;
-        border-radius: 14px;
-        color: var(--ink);
-        font-size: 15.5px;
-        font-weight: 500;
-    }
-
-    .site-navbar--side .navbar-nav.nav-auth .nav-link::before {
-        content: "";
-        flex: 0 0 auto;
-        width: 22px;
-        height: 22px;
-        background-color: currentColor;
-        -webkit-mask: var(--nav-icon) center / contain no-repeat;
-        mask: var(--nav-icon) center / contain no-repeat;
-    }
-
-    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link.active {
-        background: color-mix(in srgb, var(--brand-300) 50%, var(--surface-200));
-        color: var(--ink);
-        font-weight: 600;
-    }
-
-    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link.active::before {
-        color: var(--brand-600);
-    }
-
-    /* Plant Library */
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1) .nav-link {
-        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M2%204h6a4%204%200%200%201%204%204v13a3%203%200%200%200-3-3H2z%27/%3E%3Cpath%20d=%27M22%204h-6a4%204%200%200%200-4%204v13a3%203%200%200%201%203-3h7z%27/%3E%3C/svg%3E");
-    }
-
-    /* My EcoPatch */
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(2) .nav-link {
-        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Crect%20x=%273%27%20y=%273%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%2714%27%20y=%273%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%273%27%20y=%2714%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%2714%27%20y=%2714%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3C/svg%3E");
-    }
-
-    /* Smart Care */
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3) .nav-link {
-        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M12%203s6%206.2%206%2010.5A6%206%200%200%201%206%2013.5C6%209.2%2012%203%2012%203z%27/%3E%3C/svg%3E");
-    }
-
-    /* Garden Journal */
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(4) .nav-link {
-        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M5%203h12a2%202%200%200%201%202%202v16H7a2%202%200%200%201-2-2z%27/%3E%3Cpath%20d=%27M9%203v18M12%208h4M12%2012h4%27/%3E%3C/svg%3E");
-    }
-
-    /* Seed Exchange */
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) .nav-link {
-        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M7%207h13l-3-3M17%2017H4l3%203%27/%3E%3C/svg%3E");
-    }
-}
-
-/* ================= Collapsible sidebar ================= */
-.sidebar-head {
-    display: contents;
-}
-
-.sidebar-toggle {
-    display: none;
-}
-
-@media (min-width: 768px) {
-    body.has-sidebar,
-    .site-navbar.site-navbar--side {
-        transition: padding-left 0.2s ease, width 0.2s ease;
-    }
-
-    .sidebar-head {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 8px;
-    }
-
-    .sidebar-head .navbar-brand {
-        white-space: nowrap;
     }
 
     .sidebar-toggle {
         display: flex;
-        flex: 0 0 auto;
         align-items: center;
         justify-content: center;
-        width: 32px;
-        height: 32px;
-        margin-top: 2px;
+        width: 40px;
+        height: 40px;
         padding: 0;
-        border: 1px solid var(--border);
-        border-radius: 50%;
-        background: var(--surface-200);
+        border: 0;
+        border-radius: 14px;
+        background: transparent;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .sidebar-toggle {
         color: var(--ink-muted);
     }
 
     .sidebar-toggle:hover,
     .sidebar-toggle:focus-visible {
-        background: color-mix(in srgb, var(--brand-300) 45%, transparent);
+        background: var(--side-hover);
         color: var(--ink);
     }
 
     .sidebar-toggle svg {
-        width: 16px;
-        height: 16px;
+        width: 22px;
+        height: 22px;
         fill: none;
         stroke: currentColor;
-        stroke-width: 2.4;
+        stroke-width: 1.8;
         stroke-linecap: round;
         stroke-linejoin: round;
-        transition: transform 0.2s ease;
     }
 
-    /* ---- collapsed: icons only ---- */
-    html.sidebar-collapsed body.has-sidebar {
-        padding-left: 80px;
-    }
-
-    html.sidebar-collapsed .site-navbar.site-navbar--side {
-        width: 80px;
-        padding: 20px 12px;
-    }
-
-    html.sidebar-collapsed .site-navbar--side .sidebar-head {
+    /* ---- the profile menu: fixed, so the card's overflow cannot clip it (position is set in base.html) ---- */
+    .sidebar-user-menu {
+        position: fixed;
+        z-index: 1040;
+        display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
+        gap: 2px;
+        min-width: 200px;
+        padding: 8px;
+        border: 1px solid var(--side-line);
+        border-radius: 20px;
+        background: var(--side-bg);
+        box-shadow: 0 14px 34px rgba(34, 48, 31, 0.18), 0 2px 6px rgba(34, 48, 31, 0.08);
     }
 
-    html.sidebar-collapsed .site-navbar--side .navbar-brand {
-        margin: 0;
-        font-size: 1.7rem;
-    }
-
-    html.sidebar-collapsed .site-navbar--side .brand-text,
-    html.sidebar-collapsed .site-navbar--side .sidebar-user-id {
+    .sidebar-user-menu[hidden] {
         display: none;
     }
 
-    html.sidebar-collapsed .sidebar-toggle svg {
-        transform: rotate(180deg);
+    .sidebar-user-menu form {
+        margin: 0;
+    }
+
+    .sidebar-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 10px 12px;
+        border: 0;
+        border-radius: 12px;
+        background: transparent;
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 600;
+        text-align: left;
+        text-decoration: none;
+    }
+
+    .sidebar-menu-item svg {
+        flex: 0 0 auto;
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .sidebar-menu-item:hover,
+    .sidebar-menu-item:focus-visible {
+        background: var(--side-hover);
+        color: var(--ink);
+    }
+
+    .sidebar-menu-item--danger,
+    .sidebar-menu-item--danger:hover,
+    .sidebar-menu-item--danger:focus-visible {
+        color: color-mix(in srgb, var(--danger) 80%, var(--ink));
+    }
+
+    .sidebar-menu-item--danger:hover,
+    .sidebar-menu-item--danger:focus-visible {
+        background: color-mix(in srgb, var(--danger) 12%, transparent);
+    }
+
+    .sidebar-menu-divider {
+        height: 1px;
+        margin: 4px 6px;
+        background: var(--side-line);
+    }
+
+    /* ---- collapsed: a narrow pill of icons ---- */
+    html.sidebar-collapsed .site-navbar--side .sidebar-head {
+        justify-content: center;
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    html.sidebar-collapsed .site-navbar--side .brand-text,
+    html.sidebar-collapsed .site-navbar--side .sidebar-user-id,
+    html.sidebar-collapsed .site-navbar--side .sidebar-user-chevron,
+    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item::before {
+        display: none;
+    }
+
+    html.sidebar-collapsed .site-navbar.site-navbar--side .navbar-nav {
+        gap: 10px !important;
+    }
+
+    /* the group headings turn into short dividers */
+    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3),
+    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) {
+        margin-top: 0;
+    }
+
+    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3)::before,
+    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5)::before {
+        display: block;
+        content: "";
+        width: 28px;
+        height: 1px;
+        margin: 0 auto 10px;
+        padding: 0;
+        background: var(--side-line);
     }
 
     html.sidebar-collapsed .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link {
         justify-content: center;
         gap: 0;
-        padding: 12px 0;
-        font-size: 0;
-    }
-
-    html.sidebar-collapsed .sidebar-user-link {
-        justify-content: center;
-        padding: 6px 0;
-    }
-
-    html.sidebar-collapsed .sidebar-logout {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 10px 0;
-        font-size: 0;
-    }
-
-    html.sidebar-collapsed .sidebar-logout::before {
-        content: "";
-        width: 22px;
-        height: 22px;
-        background-color: currentColor;
-        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5M21 12H9'/%3E%3C/svg%3E") center / contain no-repeat;
-        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5M21 12H9'/%3E%3C/svg%3E") center / contain no-repeat;
-    }
-}
-
-/* ================= Sidebar colour: cream, one step darker than the page ================= */
-@media (min-width: 768px) {
-    .site-navbar.site-navbar--side {
-        --side-bg: var(--surface-300);
-        --side-text: var(--ink);
-        --side-muted: var(--ink-muted);
-        --side-hover: color-mix(in srgb, var(--ink) 7%, transparent);
-        --side-active: var(--surface-200);
-        --side-line: var(--border);
-        background: var(--side-bg);
-        color: var(--side-text);
-    }
-
-    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link {
-        color: var(--side-text);
-    }
-
-    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link:hover:not(.active),
-    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link:focus-visible:not(.active) {
-        background: var(--side-hover);
-    }
-
-    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link.active {
-        background: var(--side-active);
-        box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 12%, transparent);
-    }
-
-    .site-navbar--side .navbar-collapse {
-        border-bottom-color: var(--side-line);
-    }
-
-    .site-navbar--side .sidebar-user-link {
-        color: var(--side-text);
-    }
-
-    .site-navbar--side .sidebar-user-link:hover,
-    .site-navbar--side .sidebar-user-link.active {
-        background: var(--side-hover);
-        color: var(--side-text);
-    }
-
-    .site-navbar--side .sidebar-user-sub {
-        color: var(--side-muted);
-    }
-
-    .site-navbar--side .sidebar-logout:hover,
-    .site-navbar--side .sidebar-logout:focus-visible {
-        background: color-mix(in srgb, var(--danger) 14%, transparent);
-    }
-
-    .site-navbar--side .sidebar-toggle {
-        border-color: var(--side-line);
-        background: var(--surface-200);
-        color: var(--side-text);
-    }
-
-    .site-navbar--side .sidebar-toggle:hover,
-    .site-navbar--side .sidebar-toggle:focus-visible {
-        background: var(--brand-300);
-    }
-}
-
-/* ================= Sidebar v2: grouped menu + user row at the bottom ================= */
-@media (min-width: 768px) {
-    .site-navbar.site-navbar--side {
-        --logout-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5M21 12H9'/%3E%3C/svg%3E");
-    }
-
-    /* Menu dikelompokkan lewat CSS (berdasarkan urutan <li>), jadi markup link di header.html tidak berubah */
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1) { --nav-group: "Kebun"; }
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3) { --nav-group: "Perawatan"; }
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) { --nav-group: "Komunitas"; }
-
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1)::before,
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3)::before,
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5)::before {
-        display: block;
-        content: var(--nav-group);
-        padding: 4px 14px 6px;
-        color: var(--side-muted);
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 0.03em;
-    }
-
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3),
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) {
-        margin-top: 10px;
-        padding-top: 12px;
-        border-top: 1px solid var(--side-line);
-    }
-
-    .site-navbar.site-navbar--side .navbar-collapse {
-        border-bottom: 0;
-    }
-
-    /* Baris pengguna di dasar: avatar + nama di kiri, ikon keluar di kanan */
-    .site-navbar--side .sidebar-user {
-        display: flex;
-        order: 3;
-        align-items: center;
-        gap: 6px;
-        margin-top: auto;
-        padding-top: 12px;
-        border-top: 1px solid var(--side-line);
-    }
-
-    .site-navbar--side .sidebar-user-link {
-        order: 0;
-        flex: 1 1 auto;
-        min-width: 0;
-        margin-top: 0;
-    }
-
-    .site-navbar--side .sidebar-user form {
-        order: 0;
-        flex: 0 0 auto;
-        margin-top: 0;
-    }
-
-    .site-navbar--side .sidebar-user-sub {
-        display: none;
-    }
-
-    .site-navbar--side .sidebar-logout {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 38px;
+        width: 44px;
+        height: 44px;
+        margin: 0 auto;
         padding: 0;
-        border-radius: 10px;
         font-size: 0;
-    }
-
-    .site-navbar--side .sidebar-logout::before {
-        content: "";
-        width: 20px;
-        height: 20px;
-        background-color: currentColor;
-        -webkit-mask: var(--logout-icon) center / contain no-repeat;
-        mask: var(--logout-icon) center / contain no-repeat;
-    }
-
-    /* ---- collapsed rail: judul grup hilang, garis pemisah tetap; avatar lalu ikon keluar di bawah ---- */
-    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item::before {
-        display: none;
-    }
-
-    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3),
-    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) {
-        margin-top: 8px;
-        padding-top: 8px;
     }
 
     html.sidebar-collapsed .site-navbar--side .sidebar-user {
-        flex-direction: column;
-        gap: 4px;
+        align-items: center;
     }
 
     html.sidebar-collapsed .site-navbar--side .sidebar-user-link {
-        flex: 0 0 auto;
+        justify-content: center;
+        padding: 4px;
+    }
+
+    /* the expand button sits last, at the very bottom */
+    html.sidebar-collapsed .site-navbar--side .sidebar-foot {
+        justify-content: center;
+    }
+
+    html.sidebar-collapsed .sidebar-toggle svg {
+        transform: scaleX(-1);
+    }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+    body.has-sidebar,
+    .site-navbar.site-navbar--side,
+    .sidebar-user-link,
+    .sidebar-toggle {
+        transition: none;
     }
 }
 
