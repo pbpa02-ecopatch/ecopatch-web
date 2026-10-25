@@ -150,6 +150,7 @@ def plant_journal_history(request, plant_name):
             "badge": badge_map.get(j.plant_condition, "secondary"),
             "edit_url": f"/journal/{j.pk}/edit/",
             "delete_url": f"/journal/{j.pk}/delete/",
+            "image_url": j.image.url if j.image else None,
             "created_at": j.created_at.strftime("%d %b %Y, %H:%M"),
         }
         for j in journals_query
@@ -198,7 +199,7 @@ def plant_journal_history(request, plant_name):
         "latest_badge": first_all.get_condition_display_badge if first_all else "success",
         "latest_condition_display": first_all.get_plant_condition_display() if first_all else "Healthy",
         "all_entries_json": all_entries_json,
-        "initial_page": int(page_obj.number) - 1,  # 0-indexed for JS
+        "initial_page": 0,  # Selalu buka lembar catatan terkini (index 0)
         # stats
         "latest_height": latest_height,
         "growth": growth,
@@ -224,7 +225,7 @@ def journal_create(request):
     """Menambah catatan jurnal baru."""
     initial_plant = request.GET.get("plant_name", "")
     if request.method == "POST":
-        form = GardenJournalForm(request.POST)
+        form = GardenJournalForm(request.POST, request.FILES)
         if form.is_valid():
             journal = form.save(commit=False)
             journal.user = request.user
@@ -258,7 +259,7 @@ def journal_edit(request, pk):
     journal = get_object_or_404(GardenJournal, pk=pk, user=request.user)
 
     if request.method == "POST":
-        form = GardenJournalForm(request.POST, instance=journal)
+        form = GardenJournalForm(request.POST, request.FILES, instance=journal)
         if form.is_valid():
             form.save()
             messages.success(request, f"Catatan '{journal.title}' berhasil diperbarui.")
