@@ -1,5 +1,4 @@
-{% extends "base.html" %}
-{% block title %}Seed Exchange - EcoPatch{% endblock %}
+{% extends "base.html" %} {% block title %}Seed Exchange - EcoPatch{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -22,18 +21,63 @@
         margin: 0;
         color: var(--ink-muted);
     }
-    .seed-section-title {
-        margin: 28px 0 14px;
-        color: var(--ink);
-        font-size: 1.35rem;
+
+    /* --- Search Bar (terpisah dari filter) --- */
+    .seed-search-bar {
+        margin-bottom: 16px;
     }
-    .seed-section-title:first-of-type { margin-top: 0; }
+    .seed-search-bar form {
+        position: relative;
+        max-width: 100%;
+    }
+    .seed-search-input {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--surface-200);
+        color: var(--ink);
+        font-size: 15px;
+        padding: 14px 48px 14px 18px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .seed-search-input::placeholder { color: var(--ink-muted); }
+    .seed-search-input:focus {
+        outline: none;
+        border-color: var(--brand-500);
+        box-shadow: 0 0 0 4px var(--brand-300);
+    }
+    .seed-search-clear {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: var(--surface-300);
+        color: var(--ink-muted);
+        line-height: 1;
+        text-decoration: none;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .seed-search-clear:hover,
+    .seed-search-clear:focus-visible {
+        background: var(--brand-300);
+        color: var(--brand-600);
+        outline: none;
+    }
+    .seed-search-clear svg { width: 20px; height: 20px; }
+
+    /* --- Filter Dropdowns --- */
     .seed-filters {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 10px;
-        margin-bottom: 8px;
+        margin-bottom: 16px;
     }
     .seed-filter {
         border: 1px solid var(--border);
@@ -47,11 +91,24 @@
     }
     select.seed-filter { cursor: pointer; }
     button.seed-filter { cursor: pointer; }
-    input.seed-filter { min-width: 160px; }
     .seed-filter:focus {
         outline: none;
         border-color: var(--brand-500);
         box-shadow: 0 0 0 4px var(--brand-300);
+    }
+    .seed-filter--active {
+        border-color: var(--brand-500);
+        background: color-mix(in srgb, var(--brand-300) 40%, var(--surface-200));
+        color: var(--brand-600);
+    }
+    .seed-filter-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--brand-500);
+        margin-left: 6px;
+        flex-shrink: 0;
     }
     .seed-menu {
         min-width: 190px;
@@ -96,11 +153,100 @@
         background: var(--surface-300);
         color: var(--ink);
     }
+
+    /* --- Tab Navigation (shared pill style with filters) --- */
+    .seed-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    .seed-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface-200);
+        color: var(--ink-muted);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .seed-tab:hover {
+        background: var(--surface-300);
+        color: var(--ink);
+        border-color: var(--border);
+    }
+    .seed-tab:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--brand-300);
+    }
+    .seed-tab.active {
+        background: var(--brand-500);
+        color: #fff;
+        border-color: var(--brand-500);
+        box-shadow: 0 4px 12px rgba(34, 48, 31, 0.25);
+    }
+    .seed-tab-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        border-radius: 999px;
+        background: var(--surface-300);
+        color: var(--ink-muted);
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .seed-tab.active .seed-tab-count {
+        background: color-mix(in srgb, #fff 30%, transparent);
+        color: #fff;
+    }
+    .seed-tab-count--locked {
+        background: var(--surface-300);
+        color: var(--ink-muted);
+        font-size: 14px;
+        line-height: 1;
+    }
+    .seed-tab-count--locked svg {
+        width: 11px;
+        height: 11px;
+        display: block;
+    }
+    .seed-tab.active .seed-tab-count--locked {
+        background: color-mix(in srgb, #fff 30%, transparent);
+        color: #fff;
+    }
+
+    /* --- Tab Panels --- */
+    .seed-tab-panel { display: none; }
+    .seed-tab-panel.active { display: block; animation: seed-fade-in 0.15s ease; }
+    @keyframes seed-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .seed-section-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .seed-section-title {
+        margin: 0;
+        color: var(--ink);
+        font-size: 1.35rem;
+    }
     .seed-count {
-        margin: 10px 0 16px;
         color: var(--ink-muted);
         font-size: 14px;
     }
+
     .seed-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -132,47 +278,15 @@
         line-height: 1.4;
         white-space: nowrap;
     }
-    .seed-pill--giveaway {
-        background: var(--brand-300);
-        color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
-    }
-    .seed-pill--swap {
-        background: color-mix(in srgb, var(--accent-mango) 22%, var(--surface-200));
-        color: color-mix(in srgb, var(--accent-mango) 50%, var(--ink));
-    }
-    .seed-pill--available {
-        background: color-mix(in srgb, var(--accent-sky) 16%, var(--surface-200));
-        color: color-mix(in srgb, var(--accent-sky) 48%, var(--ink));
-    }
-    .seed-pill--requested {
-        background: color-mix(in srgb, var(--accent-mango) 22%, var(--surface-200));
-        color: color-mix(in srgb, var(--accent-mango) 50%, var(--ink));
-    }
-    .seed-pill--reserved {
-        background: var(--brand-300);
-        color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
-    }
-    .seed-pill--completed {
-        background: var(--surface-300);
-        color: color-mix(in srgb, var(--ink-muted) 60%, var(--ink));
-    }
-    .seed-card-city {
-        margin: 0 0 8px;
-        color: var(--ink-muted);
-        font-size: 14px;
-        font-weight: 600;
-    }
-    .seed-card-desc {
-        margin: 0 0 12px;
-        color: var(--ink-muted);
-        font-size: 14.5px;
-        line-height: 1.6;
-    }
-    .seed-card-meta {
-        margin: 0 0 4px;
-        color: var(--ink-muted);
-        font-size: 13px;
-    }
+    .seed-pill--giveaway { background: var(--brand-300); color: color-mix(in srgb, var(--brand-600) 65%, var(--ink)); }
+    .seed-pill--swap { background: color-mix(in srgb, var(--accent-mango) 22%, var(--surface-200)); color: color-mix(in srgb, var(--accent-mango) 50%, var(--ink)); }
+    .seed-pill--available { background: color-mix(in srgb, var(--accent-sky) 16%, var(--surface-200)); color: color-mix(in srgb, var(--accent-sky) 48%, var(--ink)); }
+    .seed-pill--requested { background: color-mix(in srgb, var(--accent-mango) 22%, var(--surface-200)); color: color-mix(in srgb, var(--accent-mango) 50%, var(--ink)); }
+    .seed-pill--reserved { background: var(--brand-300); color: color-mix(in srgb, var(--brand-600) 65%, var(--ink)); }
+    .seed-pill--completed { background: var(--surface-300); color: color-mix(in srgb, var(--ink-muted) 60%, var(--ink)); }
+    .seed-card-city { margin: 0 0 8px; color: var(--ink-muted); font-size: 14px; font-weight: 600; }
+    .seed-card-desc { margin: 0 0 12px; color: var(--ink-muted); font-size: 14.5px; line-height: 1.6; }
+    .seed-card-meta { margin: 0 0 4px; color: var(--ink-muted); font-size: 13px; }
     .seed-card-actions {
         display: flex;
         flex-wrap: wrap;
@@ -181,14 +295,12 @@
         padding-top: 14px;
         border-top: 1px dashed var(--border);
     }
-    .seed-card-note {
-        color: var(--ink-muted);
-        font-size: 13px;
-        font-weight: 600;
-    }
+    .seed-card-note { color: var(--ink-muted); font-size: 13px; font-weight: 600; }
+
+    /* --- Empty States --- */
     .seed-empty {
         grid-column: 1 / -1;
-        padding: 32px;
+        padding: 40px 24px;
         border: 2px dashed var(--border);
         border-radius: 20px;
         text-align: center;
@@ -196,7 +308,27 @@
         background: transparent;
     }
     .seed-empty .btn { margin-top: 12px; }
-    /* Kartu placeholder "Buat Listing Baru" ala My EcoPatch */
+    .seed-empty-mascot {
+        display: block;
+        width: 160px;
+        height: auto;
+        margin: -10px auto 2px;
+    }
+    .seed-empty-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        margin-bottom: 16px;
+        color: var(--ink-muted);
+    }
+    .seed-empty-icon svg { width: 28px; height: 28px; }
+    .seed-empty-title { margin: 0 0 8px; font-size: 1.1rem; color: var(--ink); }
+    .seed-empty-desc { margin: 0 0 16px; color: var(--ink-muted); }
+
+    /* Kartu placeholder "Buat Listing Baru" */
     .seed-card-add {
         align-items: center;
         justify-content: center;
@@ -216,10 +348,7 @@
         background: color-mix(in srgb, var(--brand-300) 55%, transparent);
         color: var(--brand-600);
     }
-    .seed-card-add:focus-visible {
-        outline: 3px solid var(--brand-300);
-        outline-offset: 2px;
-    }
+    .seed-card-add:focus-visible { outline: 3px solid var(--brand-300); outline-offset: 2px; }
     .seed-add-icon {
         display: flex;
         align-items: center;
@@ -231,17 +360,78 @@
         color: var(--brand-600);
         box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
     }
-    .seed-add-icon .ico {
-        width: 24px;
-        height: 24px;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
+    .seed-add-icon .ico { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* --- Consistent button styles --- */
+    .btn-seed-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 999px;
+        background: var(--brand-500);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
+    .btn-seed-primary:hover { background: var(--brand-600); }
+    .btn-seed-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-300); }
+
+    .btn-seed-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface-200);
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .btn-seed-secondary:hover { background: var(--surface-300); }
+    .btn-seed-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-300); }
+
+    .btn-seed-danger {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border: 1px solid color-mix(in srgb, var(--accent-mango) 40%, var(--border));
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--accent-mango) 12%, transparent);
+        color: var(--accent-mango);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .btn-seed-danger:hover { background: var(--accent-mango); color: #fff; border-color: var(--accent-mango); }
+    .btn-seed-danger:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-mango) 40%, transparent); }
+
+    .btn-seed-sm { padding: 6px 12px; font-size: 13px; }
+
     .seed-login-hint { margin-top: 24px; color: var(--ink-muted); }
     .seed-login-hint a { color: var(--brand-600); font-weight: 700; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+        .seed-tabs { gap: 6px; }
+        .seed-tab { padding: 8px 14px; font-size: 13px; }
+        .seed-tab-count { min-width: 18px; height: 18px; font-size: 11px; }
+        .seed-search-input { padding-right: 44px; }
+        .seed-filter { padding: 8px 12px; font-size: 13px; }
+        .seed-section-header { flex-direction: column; align-items: flex-start; }
+        .seed-filters { gap: 8px; }
+        .seed-empty-mascot { width: 128px; }
+    }
 </style>
 {% endblock %}
 
@@ -253,59 +443,34 @@
             <p class="seed-page-lead">Temukan bibit, stek, dan biji untuk ditukar atau dibagikan.</p>
         </div>
         {% if user.is_authenticated %}
-            <a href="{% url 'seed_exchange:create' %}" class="btn btn-success">+ Buat Listing</a>
+            <a href="{% url 'seed_exchange:create' %}" class="btn btn-success" aria-label="Buat listing baru">+ Buat Listing</a>
         {% else %}
-            <a href="{% url 'main:login' %}?next={% url 'seed_exchange:create' %}" class="btn btn-success">+ Buat Listing</a>
+            <a href="{% url 'main:login' %}?next={% url 'seed_exchange:create' %}" class="btn btn-success" aria-label="Buat listing baru">+ Buat Listing</a>
         {% endif %}
     </header>
 
-    {% if user.is_authenticated %}
-        <h2 class="seed-section-title">Listing Saya</h2>
-        {% if my_listings %}
-            {% include "seed_exchange/partials/cards.html" with listings=my_listings grid_id="seed-mine" show_add_card=True %}
-        {% else %}
-            <div class="seed-empty">
-                <p><strong>Kamu belum punya listing.</strong></p>
-                <p>Bagikan bibit atau tanaman berlebihmu ke komunitas.</p>
-                <a class="btn btn-success btn-sm" href="{% url 'seed_exchange:create' %}">+ Buat listing pertama</a>
-            </div>
-        {% endif %}
+    {# --- Search Bar (terpisah dari filter) --- #}
+    <div class="seed-search-bar">
+        <form method="get" action="{% url 'seed_exchange:list' %}"
+              hx-get="{% url 'seed_exchange:list' %}" hx-target="#seed-tabs-content" hx-swap="innerHTML"
+              hx-push-url="true" hx-trigger="submit" hx-include="#seed-active-params">
+            <input id="seed-q" class="seed-search-input" type="search" name="q" value="{{ active.q }}"
+                   placeholder="Cari tanaman, judul, atau deskripsi..." aria-label="Cari listing"
+                   hx-get="{% url 'seed_exchange:list' %}" hx-target="#seed-tabs-content" hx-swap="innerHTML"
+                   hx-push-url="true" hx-trigger="keyup changed delay:400ms, search"
+                   hx-include="#seed-active-params">
+            {% if active.q %}
+                <a class="seed-search-clear" href="{% url 'seed_exchange:list' %}?tab={{ active_tab }}{% if q_clear_qs %}&{{ q_clear_qs }}{% endif %}" aria-label="Hapus pencarian">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </a>
+            {% endif %}
+        </form>
+    </div>
 
-        <h2 class="seed-section-title">Jelajahi Listing</h2>
-    {% endif %}
-
-    <form id="seed-filter-form" class="seed-filters" method="get" action="{% url 'seed_exchange:list' %}"
-          hx-get="{% url 'seed_exchange:list' %}" hx-target="#seed-grid" hx-swap="outerHTML"
-          hx-push-url="true" hx-trigger="submit">
-        {% for dd in dropdowns %}
-        <div class="dropdown">
-            <button type="button" class="seed-filter dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                {{ dd.current_label }}
-            </button>
-            <ul class="dropdown-menu seed-menu">
-                {% for item in dd.items %}
-                <li><a class="dropdown-item seed-menu-item{% if item.selected %} active{% endif %}" href="{{ item.url }}">{{ item.label }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endfor %}
-
-        <input id="seed-q" class="seed-filter" type="search" name="q" value="{{ active.q }}"
-               placeholder="Tanaman" aria-label="Cari tanaman"
-               hx-get="{% url 'seed_exchange:list' %}" hx-target="#seed-grid" hx-swap="outerHTML"
-               hx-push-url="true" hx-trigger="keyup changed delay:400ms, search">
-
-        <a class="seed-filter-reset" href="{% url 'seed_exchange:list' %}" aria-label="Reset filter">
-            <span aria-hidden="true">&times;</span> Reset
-        </a>
-    </form>
-
-    <p class="seed-count">{{ listings|length }} listing ditemukan</p>
-    {% include "seed_exchange/partials/cards.html" with listings=listings grid_id="seed-grid" %}
-
-    {% if not user.is_authenticated %}
-        <p class="seed-login-hint"><a href="{% url 'main:login' %}?next={% url 'seed_exchange:list' %}">Masuk</a> untuk membuat listing atau me-reserve listing orang lain.</p>
-    {% endif %}
+    {# --- Sections (filters + tabs + panel, swapped together via HTMX) --- #}
+    <div id="seed-tabs-content">
+        {% include "seed_exchange/partials/tabs_content.html" %}
+    </div>
 </section>
 {% endblock %}
 
