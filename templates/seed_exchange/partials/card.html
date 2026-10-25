@@ -3,10 +3,17 @@
         <a href="{% url 'seed_exchange:detail' listing.pk %}">{{ listing.title }}</a>
     </h3>
     <div class="seed-badges">
+        <span class="seed-pill seed-pill--type">{{ listing.get_item_type_display }}</span>
         <span class="seed-pill seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
-        <span class="seed-pill seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
     </div>
-    <p class="seed-card-city">{{ listing.city }}{% if listing.plant_name %} &middot; {{ listing.plant_name }}{% endif %}</p>
+    <p class="seed-card-location">
+        {{ listing.city }}{% if listing.plant_name %}
+        <span aria-hidden="true">&middot;</span>
+        {{ listing.plant_name }}{% endif %}
+    </p>
     <p class="seed-card-desc">{{ listing.description|default:"Belum ada deskripsi."|truncatewords:20 }}</p>
-    <p class="seed-card-meta">oleh {{ listing.user.username }} &middot; {{ listing.get_item_type_display }}</p>
+    <p class="seed-card-meta">oleh {{ listing.user.username }}</p>
+    <div class="seed-card-status">
+        <span class="seed-status seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
+    </div>
 </article>

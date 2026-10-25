@@ -66,7 +66,15 @@
         background: var(--surface-200);
         box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
     }
-    .seed-detail-title { margin: 0 0 10px; font-size: clamp(1.6rem, 3vw, 2.1rem); }
+    .seed-detail-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .seed-detail-title { margin: 0; font-size: clamp(1.6rem, 3vw, 2.1rem); }
     .seed-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
     .seed-pill {
         display: inline-block;
@@ -75,11 +83,23 @@
         font-size: 12px;
         font-weight: 700;
     }
+    .seed-pill--type { background: var(--surface-300); color: color-mix(in srgb, var(--ink-muted) 70%, var(--ink)); }
+    .seed-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.4;
+        white-space: nowrap;
+    }
     .seed-pill--giveaway { background: var(--brand-300); color: color-mix(in srgb, var(--brand-600) 65%, var(--ink)); }
     .seed-pill--swap { background: color-mix(in srgb, var(--accent-mango) 22%, var(--surface-200)); color: color-mix(in srgb, var(--accent-mango) 50%, var(--ink)); }
-    .seed-pill--available { background: color-mix(in srgb, var(--accent-sky) 16%, var(--surface-200)); color: color-mix(in srgb, var(--accent-sky) 48%, var(--ink)); }
+    .seed-pill--available { background: color-mix(in srgb, var(--brand-300) 70%, var(--surface-200)); color: color-mix(in srgb, var(--brand-600) 70%, var(--ink)); }
     .seed-pill--requested { background: color-mix(in srgb, var(--accent-mango) 22%, var(--surface-200)); color: color-mix(in srgb, var(--accent-mango) 50%, var(--ink)); }
-    .seed-pill--reserved { background: var(--brand-300); color: color-mix(in srgb, var(--brand-600) 65%, var(--ink)); }
+    .seed-pill--reserved { background: color-mix(in srgb, var(--accent-sky) 16%, var(--surface-200)); color: color-mix(in srgb, var(--accent-sky) 48%, var(--ink)); }
     .seed-pill--completed { background: var(--surface-300); color: color-mix(in srgb, var(--ink-muted) 60%, var(--ink)); }
     .seed-meta-grid {
         display: grid;
@@ -97,6 +117,56 @@
     .seed-back:hover { color: var(--ink); }
     .seed-hint { margin-top: 16px; color: var(--ink-muted); font-size: 14px; }
     .seed-hint a { color: var(--brand-600); font-weight: 700; }
+
+    /* --- Guest callout (shared with the list page) --- */
+    .seed-login-hint {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 22px;
+        padding: 18px 20px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: linear-gradient(135deg, color-mix(in srgb, var(--brand-300) 45%, var(--surface-200)), var(--surface-200) 70%);
+        box-shadow: 0 6px 16px rgba(34, 48, 31, 0.08);
+    }
+    .seed-login-hint-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: var(--brand-300);
+        color: var(--brand-600);
+    }
+    .seed-login-hint-icon svg { width: 24px; height: 24px; }
+    .seed-login-hint-body { flex: 1 1 auto; min-width: 0; }
+    .seed-login-hint-title {
+        margin: 0 0 2px;
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 700;
+    }
+    .seed-login-hint-text {
+        margin: 0;
+        color: var(--ink-muted);
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    .seed-login-hint-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+    @media (max-width: 640px) {
+        .seed-login-hint { flex-wrap: wrap; padding: 16px; }
+        .seed-login-hint-body { flex-basis: calc(100% - 60px); }
+        .seed-login-hint-actions { width: 100%; }
+        .seed-login-hint-actions .btn-seed-primary,
+        .seed-login-hint-actions .btn-seed-secondary { flex: 1; justify-content: center; }
+    }
     .seed-owner-note {
         margin-top: 16px;
         padding: 12px 16px;
@@ -145,17 +215,16 @@
 <a class="seed-back" href="{% url 'seed_exchange:list' %}">&larr; Kembali ke Seed Exchange</a>
 
 <article class="seed-detail-card">
-    <h1 class="seed-detail-title">{{ listing.title }}</h1>
+    <div class="seed-detail-head">
+        <h1 class="seed-detail-title">{{ listing.title }}</h1>
+        <span class="seed-status seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
+    </div>
     <div class="seed-badges">
+        <span class="seed-pill seed-pill--type">{{ listing.get_item_type_display }}</span>
         <span class="seed-pill seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
-        <span class="seed-pill seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
     </div>
 
     <dl class="seed-meta-grid">
-        <div class="seed-meta">
-            <dt>Jenis item</dt>
-            <dd>{{ listing.get_item_type_display }}</dd>
-        </div>
         <div class="seed-meta">
             <dt>Tanaman</dt>
             <dd>{{ listing.plant_name|default:"-" }}</dd>
@@ -256,7 +325,8 @@
     {% elif user.is_authenticated and listing.status == 'completed' %}
         <p class="seed-hint">Listing ini sudah selesai.</p>
     {% else %}
-        <p class="seed-hint"><a href="{% url 'main:login' %}?next={% url 'seed_exchange:detail' listing.pk %}">Masuk</a> untuk booking atau membuat listing punyamu sendiri.</p>
+        {% url 'seed_exchange:detail' listing.pk as detail_url %}
+        {% include "seed_exchange/partials/login_callout.html" with title="Ingin booking bibit ini?" text="Masuk untuk booking listing atau membuat listing punyamu sendiri. Belum punya akun? Daftar gratis, kok." next_url=detail_url %}
     {% endif %}
 </article>
 {% endblock %}
