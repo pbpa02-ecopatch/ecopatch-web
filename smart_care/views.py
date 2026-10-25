@@ -18,7 +18,6 @@ from .plant_source import find_patch_plant, get_user_city, get_user_plants, is_o
 from .suggestions import INTERVALS, HistoryEntry, build_suggestions, normalize, plant_status
 from .weather import CITIES, DEFAULT_CITY, WeatherUnavailable, weather_payload
 
-CITY_SESSION_KEY = "care_city"
 STRIP_RADIUS = 3  # 3 days either side of the selected date = a 7 day strip
 Status = CareTask.Status
 
@@ -31,12 +30,9 @@ def _profile_city(user):
         return ""
 
 
-def _current_city(request):
-    """Session choice, else the city of the user's EcoPatch, else the profile city, else Depok."""
-    city = request.session.get(CITY_SESSION_KEY)
-    if city in CITIES:
-        return city
-    for city in (get_user_city(request.user), _profile_city(request.user)):
+def _current_city(user):
+    """The city of the user's EcoPatch, else the profile city, else Depok. The user does not pick it here."""
+    for city in (get_user_city(user), _profile_city(user)):
         if city in CITIES:
             return city
     return DEFAULT_CITY
@@ -153,8 +149,7 @@ def care_task_list(request):
         "prev_week_url": _list_url(selected - timedelta(days=7)),
         "next_week_url": _list_url(selected + timedelta(days=7)),
         "today_url": _list_url(),
-        "city": _current_city(request),
-        "cities": list(CITIES),
+        "city": _current_city(request.user),
     }
     return render(request, "smart_care/list.html", context)
 
@@ -162,13 +157,8 @@ def care_task_list(request):
 @login_required
 @require_GET
 def weather(request):
-    """Weather + advice as JSON. `?city=` also stores the choice in the session."""
-    requested = request.GET.get("city")
-    if requested:
-        if requested not in CITIES:
-            return JsonResponse({"available": False, "message": "Kota tidak didukung."}, status=400)
-        request.session[CITY_SESSION_KEY] = requested
-    city = _current_city(request)
+    """Weather + advice as JSON for the user's own city; the city cannot be chosen through the URL."""
+    city = _current_city(request.user)
     try:
         return JsonResponse(weather_payload(city))
     except WeatherUnavailable:
