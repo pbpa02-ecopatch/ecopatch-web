@@ -304,11 +304,21 @@ class ForgotPasswordTests(TestCase):
         self.request_link('tidak-ada@example.com')
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_a_google_only_account_gets_no_email(self):
+    def test_an_account_without_a_password_can_get_one_through_the_link(self):
         google_user = get_user_model().objects.create_user('lewat_google', email='g@example.com')
         google_user.set_unusable_password()
         google_user.save()
         self.request_link('g@example.com')
+        self.assertEqual(len(mail.outbox), 1)
+        link = self.link_from_email().replace('http://testserver', '')
+        form_url = self.client.get(link, follow=True).redirect_chain[-1][0]
+        self.client.post(form_url, {'new_password1': 'Baru-9876-rahasia', 'new_password2': 'Baru-9876-rahasia'})
+        self.assertTrue(self.client.login(username='lewat_google', password='Baru-9876-rahasia'))
+        self.assertTrue(EmailAddress.objects.filter(user=google_user, verified=True).exists())
+
+    def test_an_inactive_account_gets_no_email(self):
+        get_user_model().objects.filter(pk=self.user.pk).update(is_active=False)
+        self.request_link()
         self.assertEqual(len(mail.outbox), 0)
 
     def test_the_whole_flow_changes_the_password_and_verifies_the_email(self):

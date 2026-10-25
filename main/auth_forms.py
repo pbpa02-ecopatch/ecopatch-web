@@ -27,6 +27,11 @@ class RegisterForm(UserCreationForm):
 class EcoPasswordResetForm(PasswordResetForm):
     """Builds the reset link from the host the request came in on, not from django.contrib.sites ("example.com")."""
 
+    def get_users(self, email):
+        # Django skips users without a usable password. Here those are people who signed up with Google (or whose
+        # password was wiped when Google was linked), and the link in the email is how they get a password of their own.
+        return User._default_manager.filter(email__iexact=email, is_active=True)
+
     def save(self, *args, **kwargs):
         request = kwargs.get('request')
         if request is not None:
