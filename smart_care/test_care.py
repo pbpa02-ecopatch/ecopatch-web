@@ -594,6 +594,23 @@ class CareViewTests(CacheClearingTestCase):
         response = self.client.get(reverse("smart_care:list"), {"date": "bukan-tanggal"})
         self.assertEqual(response.context["selected_date"], timezone.localdate())
 
+    # ---- the weather card and the rain advice
+    def test_the_weather_card_labels_the_rain_figure(self):
+        response = self.client.get(reverse("smart_care:list"))
+        self.assertContains(response, 'id="care-meta-note"')
+        self.assertContains(response, "peluang tertinggi hari ini")
+
+    def test_rows_say_which_plants_are_outdoor_because_rain_advice_is_only_for_those(self):
+        indoor = make_patch_plant(self.user, "Lidah mertua", patch=make_patch(self.user, space_type="indoor"))
+        outdoor = make_patch_plant(self.user, "Cabai")
+        for plant in (indoor, outdoor):
+            task = make_task(self.user)
+            link_task(task, plant)
+            task.save()
+        response = self.client.get(reverse("smart_care:list"))
+        self.assertContains(response, 'data-plant="Lidah mertua" data-type="watering" data-outdoor="0"')
+        self.assertContains(response, 'data-plant="Cabai" data-type="watering" data-outdoor="1"')
+
     # ---- weather endpoint (fetch mocked, never the network)
     @patch("smart_care.views.weather_payload")
     def test_weather_endpoint_returns_json_for_the_users_city(self, mock_payload):
@@ -658,6 +675,7 @@ class CareViewTests(CacheClearingTestCase):
         self.assertEqual(len(data["daily"]), 7)
         self.assertEqual([day["rainy"] for day in data["daily"]], [True, False, False, False, True, False, False])
         self.assertEqual(data["daily"][0]["date"], "2026-10-24")
+        self.assertEqual((data["rain_mm"], data["daily"][0]["rain_mm"]), (12.4, 12.4))
         self.assertEqual(mock_urlopen.call_count, 1)
 
     def test_page_renders_without_calling_the_weather_api(self):

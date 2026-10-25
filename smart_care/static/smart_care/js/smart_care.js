@@ -45,6 +45,12 @@
     return typeof value === 'number' ? String(Math.round(value)) : '--';
   }
 
+  // "sekitar 5 mm"; under 1 mm the number would only say "0"
+  function rainAmount(mm) {
+    if (typeof mm !== 'number') return '';
+    return mm < 1 ? 'kurang dari 1 mm' : 'sekitar ' + Math.round(mm) + ' mm';
+  }
+
   function renderForecast(daily) {
     var byDate = {};
     daily.forEach(function (day) { byDate[day.date] = day; });
@@ -55,7 +61,7 @@
       if (day && typeof day.rain_probability === 'number') {
         $('b', rain).textContent = day.rain_probability + '%';
         rain.classList.add('has-data');
-        cell.title = 'Peluang hujan ' + day.rain_probability + '%';
+        cell.title = ['Peluang hujan tertinggi ' + day.rain_probability + '%', rainAmount(day.rain_mm)].filter(Boolean).join(', ');
       } else {
         rain.classList.remove('has-data');
         cell.removeAttribute('title');
@@ -71,8 +77,11 @@
     $('#care-advice').textContent = data.recommendation.message;
     var parts = [];
     if (typeof data.humidity === 'number') parts.push('Kelembapan ' + Math.round(data.humidity) + '%');
-    if (typeof data.rain_probability === 'number') parts.push('Hujan ' + Math.round(data.rain_probability) + '%');
+    var hasRain = typeof data.rain_probability === 'number';
+    if (hasRain) parts.push('Hujan ' + Math.round(data.rain_probability) + '%');
+    if (hasRain && rainAmount(data.rain_mm)) parts.push(rainAmount(data.rain_mm));
     $('#care-meta').textContent = parts.join(' \u00b7 ');
+    $('#care-meta-note').hidden = !hasRain;
     renderForecast(data.daily || []);
     currentHints = data.hints || {};
     applyHints();
@@ -83,6 +92,7 @@
     $('#care-temp').textContent = '--';
     $('#care-advice').textContent = 'Saran sesuai cuaca muncul setelah data berhasil dimuat';
     $('#care-meta').textContent = '';
+    $('#care-meta-note').hidden = true;
     renderForecast([]);
     currentHints = {};
     applyHints();
