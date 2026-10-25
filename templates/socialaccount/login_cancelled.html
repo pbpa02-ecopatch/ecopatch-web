@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Masuk dengan Google dibatalkan - EcoPatch{% endblock %}
+{% block content %}
+<div class="auth-shell">
+    <section class="auth-panel">
+        <h1 class="auth-title">Masuk dengan Google dibatalkan</h1>
+        <p class="auth-lead">Tidak apa-apa. Kamu bisa mencoba lagi kapan saja, atau masuk dengan username dan password.</p>
+        <p class="auth-switch"><a href="{% url 'main:login' %}">Kembali ke halaman masuk</a> &middot; <a href="{% url 'main:register' %}">Buat akun</a></p>
+    </section>
+</div>
+{% endblock %}

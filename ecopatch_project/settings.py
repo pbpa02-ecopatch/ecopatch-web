@@ -45,6 +45,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    # Third party (login with Google)
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
     # Local apps
     'main',
@@ -63,6 +70,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -78,6 +86,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'main.context_processors.google_auth',
             ],
         },
     },
@@ -147,5 +156,50 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Auth redirects
 LOGIN_URL = 'main:login'
-LOGIN_REDIRECT_URL = 'main:home'
+# After signing in people go to their gardens, unless they were sent to the login page from somewhere (?next=)
+LOGIN_REDIRECT_URL = 'my_ecopatch:list'
 LOGOUT_REDIRECT_URL = 'main:home'
+
+# Login with Google (django-allauth). The credentials come from the environment (.env), never from the code.
+# Without them the Google button is hidden and the rest of the app works as before.
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+GOOGLE_AUTH_ENABLED = bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
+
+SITE_ID = 1
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+# Sign-in and sign-up pages stay our own (main app); allauth only handles the Google round trip.
+ACCOUNT_LOGIN_METHODS = {'username'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http' if DEBUG else 'https'
+SOCIALACCOUNT_AUTO_SIGNUP = True
+# A Google account only joins an existing user when that user's email is verified (see main/adapters.py);
+# allauth's own email matching is left off because EcoPatch does not verify the emails people type at sign-up.
+SOCIALACCOUNT_ADAPTER = 'main.adapters.SocialAccountAdapter'
+SOCIALACCOUNT_LOGIN_ON_GET = False
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {'client_id': GOOGLE_CLIENT_ID, 'secret': GOOGLE_CLIENT_SECRET, 'key': ''},
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    },
+}
+
+# Password reset. Emails are printed in the terminal until an SMTP server is configured in .env
+# (for Gmail: EMAIL_HOST=smtp.gmail.com, EMAIL_HOST_USER=<address>, EMAIL_HOST_PASSWORD=<app password>).
+PASSWORD_RESET_TIMEOUT = 60 * 60  # the link works for one hour
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'  # port 465
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True' and not EMAIL_USE_SSL  # port 587
+EMAIL_TIMEOUT = 10  # seconds, so a blocked SMTP port cannot hang the page
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_BACKEND = (
+    'django.core.mail.backends.smtp.EmailBackend' if EMAIL_HOST else 'django.core.mail.backends.console.EmailBackend'
+)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'EcoPatch <noreply@ecopatch.local>')
