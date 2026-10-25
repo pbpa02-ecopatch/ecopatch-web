@@ -237,6 +237,51 @@ class AssetVersionTests(TestCase):
         self.assertRegex(html, r'css/custom\.css\?v=[0-9a-f]{10}')
 
 
+class SidebarMenuTests(TestCase):
+    """The profile row of the sidebar opens a small menu; there is no separate sign-out icon any more."""
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('menu_user', password='pw-12345-xx')
+
+    def page(self):
+        self.client.force_login(self.user)
+        return self.client.get(reverse('my_ecopatch:list')).content.decode()
+
+    def test_the_menu_holds_the_profile_link_and_the_sign_out_form(self):
+        html = self.page()
+        start = html.index('id="sidebar-user-menu"')
+        menu = html[start:html.index('class="sidebar-foot"', start)]
+        self.assertIn('role="menu" hidden', menu)  # closed until the profile row is clicked
+        self.assertIn(f'href="{reverse("main:profile")}"', menu)
+        self.assertIn(f'action="{reverse("main:logout")}"', menu)
+        self.assertIn('method="post"', menu)
+        self.assertIn('csrfmiddlewaretoken', menu)
+        self.assertIn('Keluar', menu)
+
+    def test_the_profile_row_is_the_button_that_opens_it(self):
+        html = self.page()
+        self.assertIn('id="sidebar-user-toggle"', html)
+        self.assertIn('aria-controls="sidebar-user-menu"', html)
+        self.assertIn('aria-expanded="false"', html)
+
+    def test_the_old_sign_out_icon_is_gone(self):
+        self.assertNotIn('sidebar-logout', self.page())
+
+    def test_the_collapse_button_is_at_the_bottom_not_next_to_the_logo(self):
+        html = self.page()
+        self.assertGreater(html.index('id="sidebar-toggle"'), html.index('id="sidebar-user-toggle"'))
+        self.assertLess(html.index('class="sidebar-head"'), html.index('id="sidebar-user-menu"'))
+        head = html[html.index('class="sidebar-head"'):html.index('class="navbar-toggler"')]
+        self.assertNotIn('sidebar-toggle', head)
+
+    def test_guests_get_no_sidebar_menu(self):
+        html = self.client.get(reverse('plant_library:plant_list')).content.decode()
+        # the shared script in base.html names these ids; what must be missing is the markup itself
+        self.assertNotIn('id="sidebar-user-menu"', html)
+        self.assertNotIn('id="sidebar-user-toggle"', html)
+        self.assertNotIn('id="sidebar-toggle"', html)
+
+
 class AfterLoginTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user('petak', password='pw12345678')

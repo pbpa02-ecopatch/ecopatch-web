@@ -61,8 +61,41 @@
                     localStorage.setItem('sidebar-collapsed', root.classList.contains('sidebar-collapsed') ? '1' : '0');
                 } catch (e) {}
                 sync();
+                closeUserMenu();
             });
             sync();
+
+            // Profile row opens a small menu (Profil Saya, Keluar). It is position: fixed so the card's
+            // overflow cannot clip it: above the row when expanded, to the right of the pill when collapsed.
+            var userButton = document.getElementById('sidebar-user-toggle');
+            var userMenu = document.getElementById('sidebar-user-menu');
+            function closeUserMenu(returnFocus) {
+                if (!userMenu || userMenu.hidden) return;
+                userMenu.hidden = true;
+                userButton.setAttribute('aria-expanded', 'false');
+                if (returnFocus) userButton.focus();
+            }
+            if (userButton && userMenu) {
+                userButton.addEventListener('click', function () {
+                    if (!userMenu.hidden) return closeUserMenu();
+                    var row = userButton.getBoundingClientRect();
+                    var card = userButton.closest('.site-navbar').getBoundingClientRect();
+                    var collapsed = root.classList.contains('sidebar-collapsed');
+                    userMenu.style.minWidth = collapsed ? '' : row.width + 'px';
+                    userMenu.style.left = (collapsed ? card.right + 10 : row.left) + 'px';
+                    userMenu.style.bottom = (window.innerHeight - (collapsed ? row.bottom : row.top - 8)) + 'px';
+                    userMenu.hidden = false;
+                    userButton.setAttribute('aria-expanded', 'true');
+                    userMenu.querySelector('[role="menuitem"]').focus();
+                });
+                document.addEventListener('click', function (event) {
+                    if (!userMenu.contains(event.target) && !userButton.contains(event.target)) closeUserMenu();
+                });
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') closeUserMenu(true);
+                });
+                window.addEventListener('resize', function () { closeUserMenu(); });
+            }
         })();
         document.querySelectorAll('.site-toast').forEach(function (el) {
             bootstrap.Toast.getOrCreateInstance(el).show();

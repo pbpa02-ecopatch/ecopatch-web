@@ -2242,7 +2242,7 @@ h1, h2, h3, .navbar-brand {
 
 /* ================= Floating sidebar (logged-in users, md and up) =================
    A rounded card that floats over the page with a gap on every side. Top: logo. Middle: the menu in groups.
-   Bottom: the profile row, then the collapse button and sign out. Expanded it shows labels; collapsed
+   Bottom: the profile row (opens a small menu with Profil Saya and Keluar), then the collapse button. Expanded it shows labels; collapsed
    (html.sidebar-collapsed) it is a narrow pill of icons with short dividers between the groups.
    The menu icons are CSS masks picked by the order of the <li>s in header.html (1 Plant Library, 2 My EcoPatch,
    3 Smart Care, 4 Garden Journal, 5 Seed Exchange); if that order changes, update the nth-child rules below.
@@ -2278,7 +2278,6 @@ h1, h2, h3, .navbar-brand {
         --side-hover: color-mix(in srgb, var(--ink) 6%, transparent);
         --side-active: #157a3c;
         --side-active-edge: #0f5e2d;
-        --logout-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5M21 12H9'/%3E%3C/svg%3E");
         position: fixed;
         z-index: 1030;
         top: var(--side-gap);
@@ -2456,15 +2455,22 @@ h1, h2, h3, .navbar-brand {
         display: flex;
         align-items: center;
         gap: 10px;
+        width: 100%;
         min-width: 0;
         padding: 8px;
+        border: 0;
         border-radius: 16px;
+        background: transparent;
         color: var(--ink);
+        font: inherit;
+        text-align: left;
         text-decoration: none;
+        cursor: pointer;
     }
 
     .site-navbar--side .sidebar-user-link:hover,
-    .site-navbar--side .sidebar-user-link.active {
+    .site-navbar--side .sidebar-user-link.active,
+    .site-navbar--side .sidebar-user-link[aria-expanded="true"] {
         background: var(--side-hover);
         color: var(--ink);
     }
@@ -2517,15 +2523,9 @@ h1, h2, h3, .navbar-brand {
     .sidebar-foot {
         display: flex;
         align-items: center;
-        justify-content: space-between;
     }
 
-    .sidebar-foot form {
-        margin: 0;
-    }
-
-    .sidebar-toggle,
-    .sidebar-logout {
+    .sidebar-toggle {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2558,23 +2558,77 @@ h1, h2, h3, .navbar-brand {
         stroke-linejoin: round;
     }
 
-    .sidebar-logout {
-        color: color-mix(in srgb, var(--danger) 75%, var(--ink));
-        font-size: 0;
+    /* ---- the profile menu: fixed, so the card's overflow cannot clip it (position is set in base.html) ---- */
+    .sidebar-user-menu {
+        position: fixed;
+        z-index: 1040;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 200px;
+        padding: 8px;
+        border: 1px solid var(--side-line);
+        border-radius: 20px;
+        background: var(--side-bg);
+        box-shadow: 0 14px 34px rgba(34, 48, 31, 0.18), 0 2px 6px rgba(34, 48, 31, 0.08);
     }
 
-    .sidebar-logout::before {
-        content: "";
+    .sidebar-user-menu[hidden] {
+        display: none;
+    }
+
+    .sidebar-user-menu form {
+        margin: 0;
+    }
+
+    .sidebar-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 10px 12px;
+        border: 0;
+        border-radius: 12px;
+        background: transparent;
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 600;
+        text-align: left;
+        text-decoration: none;
+    }
+
+    .sidebar-menu-item svg {
+        flex: 0 0 auto;
         width: 20px;
         height: 20px;
-        background-color: currentColor;
-        -webkit-mask: var(--logout-icon) center / contain no-repeat;
-        mask: var(--logout-icon) center / contain no-repeat;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
     }
 
-    .sidebar-logout:hover,
-    .sidebar-logout:focus-visible {
-        background: color-mix(in srgb, var(--danger) 14%, transparent);
+    .sidebar-menu-item:hover,
+    .sidebar-menu-item:focus-visible {
+        background: var(--side-hover);
+        color: var(--ink);
+    }
+
+    .sidebar-menu-item--danger,
+    .sidebar-menu-item--danger:hover,
+    .sidebar-menu-item--danger:focus-visible {
+        color: color-mix(in srgb, var(--danger) 80%, var(--ink));
+    }
+
+    .sidebar-menu-item--danger:hover,
+    .sidebar-menu-item--danger:focus-visible {
+        background: color-mix(in srgb, var(--danger) 12%, transparent);
+    }
+
+    .sidebar-menu-divider {
+        height: 1px;
+        margin: 4px 6px;
+        background: var(--side-line);
     }
 
     /* ---- collapsed: a narrow pill of icons ---- */
@@ -2631,10 +2685,9 @@ h1, h2, h3, .navbar-brand {
         padding: 4px;
     }
 
-    /* avatar, then sign out, with the expand button last, at the very bottom */
+    /* the expand button sits last, at the very bottom */
     html.sidebar-collapsed .site-navbar--side .sidebar-foot {
-        flex-direction: column-reverse;
-        gap: 4px;
+        justify-content: center;
     }
 
     html.sidebar-collapsed .sidebar-toggle svg {
@@ -2646,8 +2699,7 @@ h1, h2, h3, .navbar-brand {
     body.has-sidebar,
     .site-navbar.site-navbar--side,
     .sidebar-user-link,
-    .sidebar-toggle,
-    .sidebar-logout {
+    .sidebar-toggle {
         transition: none;
     }
 }
