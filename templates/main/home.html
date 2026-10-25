@@ -1,4 +1,4 @@
-{% load static %}<!DOCTYPE html>
+{% load static asset_version %}<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'landing/landing.css' %}">
+<link rel="stylesheet" href="{% static_v 'landing/landing.css' %}">
 </head>
 <body data-plant-library-url="{{ plant_library_url }}">
 
@@ -375,6 +375,6 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="{% static 'landing/landing.js' %}"></script>
+<script src="{% static_v 'landing/landing.js' %}"></script>
 </body>
 </html>
