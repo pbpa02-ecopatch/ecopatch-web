@@ -127,6 +127,7 @@ def _filter_dropdowns(active):
     return dropdowns
 
 
+@login_required
 def listing_list(request):
     """List view with 3 sections: Listing Saya, Booking Saya, Jelajahi."""
     qs, active = _filtered_queryset(request)
@@ -191,6 +192,7 @@ def listing_list(request):
     return render(request, 'seed_exchange/list.html', context)
 
 
+@login_required
 def listing_detail(request, pk):
     listing = get_object_or_404(SeedExchange.objects.select_related('user', 'reserved_by'), pk=pk)
     is_owner = request.user.is_authenticated and listing.user_id == request.user.id

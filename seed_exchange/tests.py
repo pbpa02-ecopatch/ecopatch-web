@@ -1,4 +1,5 @@
 import re
+from urllib.parse import quote
 
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -47,14 +48,23 @@ class SeedExchangeViewTests(TestCase):
         self.other = make_user('teman', 'test123')
         self.listing = make_listing(self.owner)
 
-    def test_guest_can_view_list(self):
-        response = self.client.get(reverse('seed_exchange:list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Bibit Cabai Rawit')
+    def test_guest_list_redirects_to_login(self):
+        url = reverse('seed_exchange:list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, f'/login/?next={quote(url)}')
 
-    def test_guest_can_view_detail(self):
-        response = self.client.get(reverse('seed_exchange:detail', args=[self.listing.pk]))
-        self.assertEqual(response.status_code, 200)
+    def test_guest_htmx_list_redirects_to_login(self):
+        url = reverse('seed_exchange:list')
+        response = self.client.get(url, HTTP_HX_REQUEST='true')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, f'/login/?next={quote(url)}')
+
+    def test_guest_detail_redirects_to_login(self):
+        url = reverse('seed_exchange:detail', args=[self.listing.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, f'/login/?next={quote(url)}')
 
     def test_guest_cannot_access_create(self):
         response = self.client.get(reverse('seed_exchange:create'))
@@ -124,6 +134,7 @@ class SeedExchangeViewTests(TestCase):
         self.assertFalse(SeedExchange.objects.filter(pk=self.listing.pk).exists())
 
     def test_filter_by_city_and_status(self):
+        self.client.login(username='teman', password='test123')
         make_listing(self.owner, title='Bibit Tomat Ceri', city='Bandung', status='available')
         url = reverse('seed_exchange:list') + '?city=Bandung&status=available'
         response = self.client.get(url)
@@ -131,6 +142,7 @@ class SeedExchangeViewTests(TestCase):
         self.assertNotContains(response, 'Bibit Cabai Rawit')
 
     def test_custom_dropdowns_render_with_labels(self):
+        self.client.login(username='rheina', password='test123')
         response = self.client.get(reverse('seed_exchange:list'))
         self.assertContains(response, 'seed-menu')
         self.assertContains(response, 'Semua kota')
@@ -139,6 +151,7 @@ class SeedExchangeViewTests(TestCase):
         self.assertContains(response, 'transaction_type=swap')
 
     def test_htmx_returns_partial(self):
+        self.client.login(username='teman', password='test123')
         response = self.client.get(
             reverse('seed_exchange:list'),
             HTTP_HX_REQUEST='true',
@@ -378,15 +391,14 @@ class SeedExchangeTabAndFilterTests(TestCase):
         self.assertContains(response, 'Stek Monstera')
         self.assertNotContains(response, 'Biji Kemangi')
 
-    def test_guest_sees_same_sections_with_login_gate(self):
+    def test_guest_cannot_view_sections_or_my_tab(self):
+        # The whole page (including HTMX swaps) is behind login now.
         response = self.client.get(reverse('seed_exchange:list'))
-        self.assertContains(response, 'Listing Saya')
-        self.assertContains(response, 'Booking Saya')
-        self.assertContains(response, 'Jelajahi')
-        # Guest can open a restricted section, but only sees a login prompt.
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response.url)
         guest_mine = self.client.get(reverse('seed_exchange:list') + '?tab=mine', HTTP_HX_REQUEST='true')
-        self.assertContains(guest_mine, 'Masuk untuk melihat listingmu.')
-        self.assertNotContains(guest_mine, 'seed-card-add')
+        self.assertEqual(guest_mine.status_code, 302)
+        self.assertIn('/login/', guest_mine.url)
 
     def test_booked_listing_not_in_browse(self):
         self.mine.status = SeedExchange.Status.REQUESTED
