@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -22,7 +23,11 @@ class EcoPatch(models.Model):
     )
     name = models.CharField(max_length=100)
     space_type = models.CharField(max_length=20, choices=SpaceType.choices)
-    size_m2 = models.PositiveIntegerField(null=True, blank=True, help_text='Ukuran ruang (m²)')
+    size_m2 = models.PositiveIntegerField(
+        null=True, blank=True,
+        validators=[MinValueValidator(1)],
+        help_text='Ukuran ruang (m²)',
+    )
     sunlight = models.CharField(max_length=20, choices=Sunlight.choices, blank=True)
     city = models.CharField(max_length=100)
     goal = models.TextField(blank=True, help_text='Tujuan berkebun')
@@ -44,11 +49,18 @@ class PatchPlant(models.Model):
         REMOVED = 'removed', 'Removed'
 
     patch = models.ForeignKey(EcoPatch, on_delete=models.CASCADE, related_name='plants')
-    # belum diintegrasi plant_library
+
+    # SEMENTARA: nama tanaman diketik manual karena model Plant di plant_library belum ada.
+    # Begitu Plant tersedia, ganti dengan ForeignKey (lihat catatan di jawaban):
     # plant = models.ForeignKey('plant_library.Plant', on_delete=models.PROTECT, related_name='patch_plants')
-    quantity = models.PositiveIntegerField(default=1)
+    plant_name = models.CharField(max_length=100, default='')
+
+    quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PLANNED)
     planted_at = models.DateField(null=True, blank=True)
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self):
-        return f'{self.patch} - {self.get_status_display()}'
+        return f'{self.plant_name} @ {self.patch}'

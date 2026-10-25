@@ -1,0 +1,71 @@
+{# Panel ini di-swap seluruhnya oleh htmx (hx-target="#patch-plants"), jadi id di bawah harus tetap ada. #}
+<div id="patch-plants" class="patch-plants">
+    <div class="patch-plants-head">
+        <h2 class="patch-section-title">Tanaman di EcoPatch ini</h2>
+        <p class="patch-card-count">{{ patch.plant_total }} tanaman</p>
+        {% if patch.status_summary %}
+            <ul class="patch-status-list">
+                {% for item in patch.status_summary %}
+                    <li class="patch-pill patch-pill--{{ item.key }}">{{ item.count }} {{ item.label }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    {% if plants %}
+        <ul class="plant-list">
+            {% for plant in plants %}
+                <li class="plant-row">
+                    <div class="plant-main">
+                        <strong class="plant-name">{{ plant.plant_name|default:"(tanpa nama)" }}</strong>
+                        <span class="plant-meta">{{ plant.quantity }} tanaman{% if plant.planted_at %} &middot; mulai tanam {{ plant.planted_at|date:"j M Y" }}{% endif %}</span>
+                    </div>
+
+                    <form method="post" class="plant-status-form"
+                          action="{% url 'my_ecopatch:plant_status' plant.pk %}"
+                          hx-post="{% url 'my_ecopatch:plant_status' plant.pk %}"
+                          hx-trigger="change" hx-target="#patch-plants" hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <label class="visually-hidden" for="status-{{ plant.pk }}">Status {{ plant.plant_name }}</label>
+                        <select name="status" id="status-{{ plant.pk }}" class="plant-status-select patch-pill--{{ plant.status }}">
+                            {% for value, label in status_choices %}
+                                <option value="{{ value }}"{% if value == plant.status %} selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <noscript><button type="submit" class="btn btn-outline-success btn-sm">Simpan</button></noscript>
+                    </form>
+
+                    <form method="post"
+                          action="{% url 'my_ecopatch:plant_delete' plant.pk %}"
+                          hx-post="{% url 'my_ecopatch:plant_delete' plant.pk %}"
+                          hx-confirm="Hapus {{ plant.plant_name }} dari EcoPatch ini?"
+                          hx-target="#patch-plants" hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <button type="submit" class="plant-remove">Hapus</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="patch-empty">Belum ada tanaman. Tambahkan tanaman pertamamu di bawah.</p>
+    {% endif %}
+
+    <form method="post" class="patch-form patch-plant-form" novalidate
+          action="{% url 'my_ecopatch:plant_add' patch.pk %}"
+          hx-post="{% url 'my_ecopatch:plant_add' patch.pk %}"
+          hx-target="#patch-plants" hx-swap="outerHTML">
+        {% csrf_token %}
+        <h3 class="patch-form-title">Tambah tanaman</h3>
+        {% if plant_form.non_field_errors %}
+            <div class="patch-alert" role="alert">{% for error in plant_form.non_field_errors %}{{ error }}{% endfor %}</div>
+        {% endif %}
+        <div class="patch-form-grid">
+            {% for field in plant_form %}
+                {% include "my_ecopatch/_form_field.html" %}
+            {% endfor %}
+        </div>
+        <div class="patch-form-actions">
+            <button type="submit" class="btn btn-success">Tambah tanaman</button>
+        </div>
+    </form>
+</div>
