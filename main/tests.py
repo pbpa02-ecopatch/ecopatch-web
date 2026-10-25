@@ -1,6 +1,12 @@
+import re
+import smtplib
+from io import StringIO
+from unittest import mock
 from urllib.parse import parse_qs, urlparse
 
 from allauth.account.middleware import AccountMiddleware
+from allauth.account.models import EmailAddress
+from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.helpers import complete_social_login
 from allauth.socialaccount.models import SocialAccount, SocialApp
 from allauth.socialaccount.providers.google.provider import GoogleProvider
@@ -9,6 +15,9 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages import get_messages
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.core import mail
+from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
@@ -127,33 +136,45 @@ class GoogleLoginEnabledTests(TestCase):
         self.assertEqual(get_user_model().objects.count(), 1)
         self.assertEqual(request.user, user)
 
-    def test_google_login_with_an_email_that_already_has_a_user_signs_in_to_that_user(self):
-        existing = get_user_model().objects.create_user('tesEcopatch', email='budi@example.com', password='pw12345678')
+    def _google_visit(self, email, uid):
+        request = RequestFactory().get('/accounts/google/login/callback/')
+        SessionMiddleware(lambda r: None).process_request(request)
+        MessageMiddleware(lambda r: None).process_request(request)
+        request.user = AnonymousUser()
+        out = {}
 
-        def visit():
-            request = RequestFactory().get('/accounts/google/login/callback/')
-            SessionMiddleware(lambda r: None).process_request(request)
-            MessageMiddleware(lambda r: None).process_request(request)
-            request.user = AnonymousUser()
-            out = {}
-
-            def finish_login(req):
-                provider = GoogleProvider(req, app=SocialApp(provider='google', client_id='x', secret='y'))
-                login = provider.sociallogin_from_response(req, {
-                    'sub': 'google-uid-999', 'email': 'budi@example.com', 'email_verified': True, 'name': 'Budi Santoso',
-                })
+        def finish_login(req):
+            provider = GoogleProvider(req, app=SocialApp(provider='google', client_id='x', secret='y'))
+            login = provider.sociallogin_from_response(req, {'sub': uid, 'email': email, 'email_verified': True, 'name': 'Budi Santoso'})
+            try:
                 out['response'] = complete_social_login(req, login)
-                return out['response']
+            except ImmediateHttpResponse as stop:
+                out['response'] = stop.response
+            return out['response']
 
-            AccountMiddleware(finish_login)(request)
-            return request, out['response']
+        AccountMiddleware(finish_login)(request)
+        return request, out['response']
 
-        request, response = visit()
+    def test_google_signs_in_to_an_existing_user_whose_email_is_verified(self):
+        existing = get_user_model().objects.create_user('tesEcopatch', email='budi@example.com', password='pw12345678')
+        EmailAddress.objects.create(user=existing, email='budi@example.com', verified=True, primary=True)
+
+        request, response = self._google_visit('budi@example.com', 'google-uid-999')
         self.assertEqual(response.status_code, 302)
         self.assertNotIn('/signup', response['Location'])
         self.assertEqual(request.user, existing)
         self.assertEqual(get_user_model().objects.count(), 1)
         self.assertEqual(SocialAccount.objects.filter(user=existing, provider='google', uid='google-uid-999').count(), 1)
+
+    def test_google_does_not_enter_an_account_whose_email_is_not_verified(self):
+        existing = get_user_model().objects.create_user('tesEcopatch', email='budi@example.com', password='pw12345678')
+
+        request, response = self._google_visit('budi@example.com', 'google-uid-999')
+        self.assertRedirects(response, reverse('main:login'), fetch_redirect_response=False)
+        self.assertFalse(request.user.is_authenticated)
+        self.assertEqual(get_user_model().objects.count(), 1)
+        self.assertFalse(SocialAccount.objects.filter(user=existing).exists())
+        self.assertIn('belum terverifikasi', ' '.join(str(m) for m in get_messages(request)))
 
 
 class SiteNameTests(TestCase):
@@ -185,13 +206,13 @@ class AfterLoginTests(TestCase):
         page = self.client.get(reverse('main:register') + '?next=' + target)
         self.assertContains(page, 'login/?next=')
         response = self.client.post(reverse('main:register') + '?next=' + target, {
-            'username': 'baru', 'password1': 'Sup3r-rahasia-99', 'password2': 'Sup3r-rahasia-99',
+            'username': 'baru', 'email': 'baru@example.com', 'password1': 'Sup3r-rahasia-99', 'password2': 'Sup3r-rahasia-99',
         })
         self.assertRedirects(response, reverse('main:login') + '?next=%2Fseed-exchange%2F', fetch_redirect_response=False)
 
     def test_register_ignores_a_destination_on_another_site(self):
         response = self.client.post(reverse('main:register') + '?next=https://evil.example/', {
-            'username': 'baru2', 'password1': 'Sup3r-rahasia-99', 'password2': 'Sup3r-rahasia-99',
+            'username': 'baru2', 'email': 'baru2@example.com', 'password1': 'Sup3r-rahasia-99', 'password2': 'Sup3r-rahasia-99',
         })
         self.assertRedirects(response, reverse('main:login'), fetch_redirect_response=False)
 
@@ -199,3 +220,165 @@ class AfterLoginTests(TestCase):
         with override_settings(GOOGLE_AUTH_ENABLED=True, SOCIALACCOUNT_PROVIDERS=FAKE_GOOGLE):
             page = self.client.get(reverse('main:register') + '?next=/seed-exchange/')
         self.assertContains(page, 'name="next" value="/seed-exchange/"')
+
+
+class AuthPagesTests(TestCase):
+    def test_wrong_password_shows_the_error_and_keeps_the_username(self):
+        response = self.client.post(reverse('main:login'), {'username': 'tidak_ada', 'password': 'salah'})
+        self.assertContains(response, 'Username atau password salah. Coba lagi.')
+        self.assertContains(response, 'data-server="1"')
+        self.assertContains(response, 'value="tidak_ada"')
+
+    def test_taken_username_is_reported_in_indonesian(self):
+        get_user_model().objects.create_user('petak', password='pw12345678')
+        response = self.client.post(reverse('main:register'), {
+            'username': 'petak', 'email': 'lain@example.com', 'password1': 'Sup3r-rahasia-99', 'password2': 'Sup3r-rahasia-99',
+        })
+        self.assertContains(response, 'sudah ada')
+        self.assertContains(response, 'aria-invalid="true"')
+
+    def test_weak_password_is_reported_in_indonesian(self):
+        response = self.client.post(reverse('main:register'), {'username': 'baru', 'email': 'baru@example.com', 'password1': '12345678', 'password2': '12345678'})
+        self.assertContains(response, 'class="err"')
+        self.assertNotContains(response, 'This password')
+
+    def test_account_created_message_shows_on_the_login_page(self):
+        response = self.client.post(reverse('main:register'), {
+            'username': 'baru3', 'email': 'baru3@example.com', 'password1': 'Sup3r-rahasia-99', 'password2': 'Sup3r-rahasia-99',
+        }, follow=True)
+        self.assertContains(response, 'Akun berhasil dibuat. Silakan masuk.')
+        self.assertTrue(get_user_model().objects.filter(username='baru3').exists())
+
+
+class RegisterEmailTests(TestCase):
+    def post(self, **extra):
+        data = {'username': 'baru', 'email': 'baru@example.com', 'password1': 'Sup3r-rahasia-99', 'password2': 'Sup3r-rahasia-99'}
+        data.update(extra)
+        return self.client.post(reverse('main:register'), data)
+
+    def test_the_email_is_saved(self):
+        self.post()
+        self.assertEqual(get_user_model().objects.get(username='baru').email, 'baru@example.com')
+
+    def test_an_email_is_required(self):
+        response = self.post(email='')
+        self.assertContains(response, 'Isi email kamu dulu ya.')
+        self.assertFalse(get_user_model().objects.filter(username='baru').exists())
+
+    def test_the_same_email_cannot_register_twice(self):
+        get_user_model().objects.create_user('lama', email='Baru@Example.com', password='pw12345678')
+        self.assertContains(self.post(), 'Email ini sudah terdaftar')
+        self.assertFalse(get_user_model().objects.filter(username='baru').exists())
+
+    def test_register_page_asks_for_the_email(self):
+        self.assertContains(self.client.get(reverse('main:register')), 'name="email"')
+
+
+class ForgotPasswordTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('petak', email='petak@example.com', password='lama-12345678')
+
+    def request_link(self, email='petak@example.com'):
+        response = self.client.post(reverse('main:password_reset'), {'email': email})
+        self.assertRedirects(response, reverse('main:password_reset_done'))
+        return response
+
+    def link_from_email(self):
+        match = re.search(r'https?://\S+', mail.outbox[0].body)
+        return match.group(0)
+
+    def test_login_page_links_to_forgot_password(self):
+        self.assertContains(self.client.get(reverse('main:login')), reverse('main:password_reset'))
+
+    def test_an_email_with_a_link_is_sent_in_indonesian_using_this_host(self):
+        self.request_link()
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0]
+        self.assertEqual(message.to, ['petak@example.com'])
+        self.assertEqual(message.subject, 'Atur ulang password EcoPatch kamu')
+        self.assertIn('Halo petak', message.body)
+        self.assertIn('http://testserver/lupa-password/', message.body)
+        self.assertNotIn('example.com/lupa', message.body)
+
+    def test_an_unknown_email_looks_exactly_the_same_and_sends_nothing(self):
+        self.request_link('tidak-ada@example.com')
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_a_google_only_account_gets_no_email(self):
+        google_user = get_user_model().objects.create_user('lewat_google', email='g@example.com')
+        google_user.set_unusable_password()
+        google_user.save()
+        self.request_link('g@example.com')
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_the_whole_flow_changes_the_password_and_verifies_the_email(self):
+        self.request_link()
+        link = self.link_from_email().replace('http://testserver', '')
+        page = self.client.get(link, follow=True)
+        self.assertContains(page, 'Buat password baru')
+        form_url = page.redirect_chain[-1][0]
+        done = self.client.post(form_url, {'new_password1': 'Baru-9876-rahasia', 'new_password2': 'Baru-9876-rahasia'})
+        self.assertRedirects(done, reverse('main:password_reset_complete'))
+
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('Baru-9876-rahasia'))
+        self.assertTrue(EmailAddress.objects.filter(user=self.user, email='petak@example.com', verified=True).exists())
+        self.assertTrue(self.client.login(username='petak', password='Baru-9876-rahasia'))
+
+    def test_a_link_works_only_once(self):
+        self.request_link()
+        link = self.link_from_email().replace('http://testserver', '')
+        page = self.client.get(link, follow=True)
+        form_url = page.redirect_chain[-1][0]
+        self.client.post(form_url, {'new_password1': 'Baru-9876-rahasia', 'new_password2': 'Baru-9876-rahasia'})
+        again = self.client.get(link, follow=True)
+        self.assertContains(again, 'Tautan tidak berlaku')
+
+    def test_a_weak_new_password_is_refused_in_indonesian(self):
+        self.request_link()
+        link = self.link_from_email().replace('http://testserver', '')
+        form_url = self.client.get(link, follow=True).redirect_chain[-1][0]
+        response = self.client.post(form_url, {'new_password1': '12345678', 'new_password2': '12345678'})
+        self.assertContains(response, 'class="err"')
+        self.assertNotContains(response, 'This password')
+
+    def test_a_made_up_link_is_refused(self):
+        self.assertContains(self.client.get('/lupa-password/abc/def/', follow=True), 'Tautan tidak berlaku')
+
+    def test_after_the_reset_google_may_enter_that_account(self):
+        self.request_link()
+        link = self.link_from_email().replace('http://testserver', '')
+        form_url = self.client.get(link, follow=True).redirect_chain[-1][0]
+        self.client.post(form_url, {'new_password1': 'Baru-9876-rahasia', 'new_password2': 'Baru-9876-rahasia'})
+        self.assertTrue(EmailAddress.objects.filter(user=self.user, verified=True).exists())
+
+
+class EmailSendingTests(TestCase):
+    def test_the_test_command_sends_one_email(self):
+        out = StringIO()
+        call_command('send_test_email', 'kamu@example.com', stdout=out)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['kamu@example.com'])
+        self.assertIn('Terkirim ke kamu@example.com', out.getvalue())
+
+    def test_the_test_command_explains_a_refused_login(self):
+        with mock.patch('main.management.commands.send_test_email.send_mail', side_effect=smtplib.SMTPAuthenticationError(535, b'bad')):
+            with self.assertRaisesMessage(CommandError, 'app password'):
+                call_command('send_test_email', 'kamu@example.com', stdout=StringIO())
+
+    def test_the_test_command_explains_a_login_that_closes_the_connection(self):
+        with mock.patch('main.management.commands.send_test_email.send_mail', side_effect=smtplib.SMTPServerDisconnected('Connection unexpectedly closed')):
+            with self.assertRaisesMessage(CommandError, 'app password'):
+                call_command('send_test_email', 'kamu@example.com', stdout=StringIO())
+
+    def test_the_test_command_explains_a_blocked_port(self):
+        with mock.patch('main.management.commands.send_test_email.send_mail', side_effect=TimeoutError()):
+            with self.assertRaisesMessage(CommandError, 'port 465'):
+                call_command('send_test_email', 'kamu@example.com', stdout=StringIO())
+
+    def test_a_broken_mail_server_does_not_break_forgot_password(self):
+        get_user_model().objects.create_user('petak', email='petak@example.com', password='lama-12345678')
+        with mock.patch('django.core.mail.message.EmailMultiAlternatives.send', side_effect=smtplib.SMTPServerDisconnected('down')):
+            with self.assertLogs('django.contrib.auth', level='ERROR'):  # Django logs the failure and carries on
+                response = self.client.post(reverse('main:password_reset'), {'email': 'petak@example.com'})
+        self.assertRedirects(response, reverse('main:password_reset_done'))
