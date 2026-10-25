@@ -1,12 +1,7 @@
 <nav class="navbar navbar-expand-md site-navbar{% if user.is_authenticated %} site-navbar--side{% endif %}">
     <div class="container">
         <div class="sidebar-head">
-            <a class="navbar-brand" href="{% url 'main:home' %}">🌱 <span class="brand-text">EcoPatch</span></a>
-            {% if user.is_authenticated %}
-                <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Ciutkan menu" aria-pressed="false">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
-            {% endif %}
+            <a class="navbar-brand" href="{% url 'main:home' %}" aria-label="EcoPatch">{% if user.is_authenticated %}<span class="brand-emoji" aria-hidden="true">🌱</span><svg class="brand-sprout" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg>{% else %}🌱{% endif %} <span class="brand-text">EcoPatch</span></a>
         </div>
 
         {% if user.is_authenticated %}
@@ -77,11 +72,17 @@
                         <span class="sidebar-user-name">{{ display_name }}</span>
                         <span class="sidebar-user-sub">Profil Saya</span>
                     </span>
+                    <svg class="sidebar-user-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
                 </a>
-                <form action="{% url 'main:logout' %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="sidebar-logout">Keluar</button>
-                </form>
+                <div class="sidebar-foot">
+                    <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Ciutkan menu" title="Ciutkan menu" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 3v18"/><path d="m16 9-3 3 3 3"/></svg>
+                    </button>
+                    <form action="{% url 'main:logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="sidebar-logout" title="Keluar">Keluar</button>
+                    </form>
+                </div>
             </div>
         {% endif %}
     </div>

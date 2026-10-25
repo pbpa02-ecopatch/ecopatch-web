@@ -53,6 +53,7 @@
                 var collapsed = root.classList.contains('sidebar-collapsed');
                 toggle.setAttribute('aria-pressed', collapsed);
                 toggle.setAttribute('aria-label', collapsed ? 'Lebarkan menu' : 'Ciutkan menu');
+                toggle.title = toggle.getAttribute('aria-label');
             }
             toggle.addEventListener('click', function () {
                 root.classList.toggle('sidebar-collapsed');
