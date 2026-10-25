@@ -2552,22 +2552,17 @@ h1, h2, h3, .navbar-brand {
     }
 }
 
-/* ================= Sidebar colour: deep green (same family as the footer) ================= */
+/* ================= Sidebar colour: cream, one step darker than the page ================= */
 @media (min-width: 768px) {
     .site-navbar.site-navbar--side {
-        --side-bg: #1B4332;
-        --side-text: #e6f4ea;
-        --side-muted: #95D5B2;
-        --side-hover: rgba(255, 255, 255, 0.09);
-        --side-active: rgba(255, 255, 255, 0.16);
-        --side-line: rgba(255, 255, 255, 0.16);
+        --side-bg: var(--surface-300);
+        --side-text: var(--ink);
+        --side-muted: var(--ink-muted);
+        --side-hover: color-mix(in srgb, var(--ink) 7%, transparent);
+        --side-active: var(--surface-200);
+        --side-line: var(--border);
         background: var(--side-bg);
-        border-right: 0;
         color: var(--side-text);
-    }
-
-    .site-navbar--side .navbar-brand {
-        color: #fff;
     }
 
     .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link {
@@ -2577,16 +2572,11 @@ h1, h2, h3, .navbar-brand {
     .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link:hover:not(.active),
     .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link:focus-visible:not(.active) {
         background: var(--side-hover);
-        color: #fff;
     }
 
     .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link.active {
         background: var(--side-active);
-        color: #fff;
-    }
-
-    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link.active::before {
-        color: #b7e4c7;
+        box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 12%, transparent);
     }
 
     .site-navbar--side .navbar-collapse {
@@ -2600,37 +2590,27 @@ h1, h2, h3, .navbar-brand {
     .site-navbar--side .sidebar-user-link:hover,
     .site-navbar--side .sidebar-user-link.active {
         background: var(--side-hover);
-        color: #fff;
-    }
-
-    .site-navbar--side .sidebar-user-name {
-        color: #fff;
+        color: var(--side-text);
     }
 
     .site-navbar--side .sidebar-user-sub {
         color: var(--side-muted);
     }
 
-    .site-navbar--side .sidebar-logout {
-        color: color-mix(in srgb, var(--danger) 40%, #fff);
-    }
-
     .site-navbar--side .sidebar-logout:hover,
     .site-navbar--side .sidebar-logout:focus-visible {
-        background: color-mix(in srgb, var(--danger) 25%, transparent);
-        color: #fff;
+        background: color-mix(in srgb, var(--danger) 14%, transparent);
     }
 
     .site-navbar--side .sidebar-toggle {
         border-color: var(--side-line);
-        background: var(--side-hover);
+        background: var(--surface-200);
         color: var(--side-text);
     }
 
     .site-navbar--side .sidebar-toggle:hover,
     .site-navbar--side .sidebar-toggle:focus-visible {
-        background: var(--side-active);
-        color: #fff;
+        background: var(--brand-300);
     }
 }
 
