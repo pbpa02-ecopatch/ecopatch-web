@@ -38,7 +38,6 @@
 
   /* ------------------------------------------------------------------ weather ribbon + forecast in the date strip */
   var weatherEl = $('#care-weather');
-  var citySelect = $('#care-city');
   var errorLine = $('#care-weather-error');
   var currentHints = {};
 
@@ -90,11 +89,10 @@
     errorLine.hidden = false;
   }
 
-  function loadWeather(city) {
+  function loadWeather() {
     weatherEl.classList.add('is-loading');
     errorLine.hidden = true;
-    var url = page.dataset.weatherUrl + (city ? '?city=' + encodeURIComponent(city) : '');
-    return fetch(url, { headers: { Accept: 'application/json' }, credentials: 'same-origin' })
+    return fetch(page.dataset.weatherUrl, { headers: { Accept: 'application/json' }, credentials: 'same-origin' })
       .then(function (response) {
         return response.json().then(function (data) { return { ok: response.ok, data: data }; });
       })
@@ -116,8 +114,7 @@
     });
   }
 
-  citySelect.addEventListener('change', function () { loadWeather(citySelect.value); });
-  $('#care-retry').addEventListener('click', function () { loadWeather(citySelect.value); });
+  $('#care-retry').addEventListener('click', function () { loadWeather(); });
   loadWeather();
 
   /* ------------------------------------------------------------------ pots (one per plant) */

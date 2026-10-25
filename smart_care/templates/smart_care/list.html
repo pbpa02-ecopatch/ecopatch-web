@@ -40,10 +40,7 @@
 
         <div class="care-ribbon-body">
             <div class="care-where">
-                <label for="care-city" class="visually-hidden">Kota</label>
-                <select id="care-city" class="care-city-select">
-                    {% for name in cities %}<option value="{{ name }}"{% if name == city %} selected{% endif %}>{{ name }}</option>{% endfor %}
-                </select>
+                <span class="care-city">{{ city }}</span>
             </div>
             <div class="care-now">
                 <span class="care-temp"><strong><span id="care-temp">--</span><svg class="care-deg" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="3.2"/></svg><span class="visually-hidden">derajat Celsius</span></strong></span>

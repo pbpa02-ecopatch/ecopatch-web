@@ -596,14 +596,12 @@ class CareViewTests(CacheClearingTestCase):
 
     # ---- weather endpoint (fetch mocked, never the network)
     @patch("smart_care.views.weather_payload")
-    def test_weather_endpoint_returns_json_and_remembers_city(self, mock_payload):
+    def test_weather_endpoint_returns_json_for_the_users_city(self, mock_payload):
+        make_patch_plant(self.user, patch=make_patch(self.user, city="Bandung"))
         mock_payload.return_value = {"available": True, "city": "Bandung"}
-        response = self.client.get(reverse("smart_care:weather"), {"city": "Bandung"})
+        response = self.client.get(reverse("smart_care:weather"))
         self.assertEqual(response.json()["city"], "Bandung")
         mock_payload.assert_called_with("Bandung")
-        self.assertEqual(self.client.session["care_city"], "Bandung")
-        self.client.get(reverse("smart_care:weather"))
-        mock_payload.assert_called_with("Bandung")  # remembered from the session
 
     @patch("smart_care.views.weather_payload", return_value={"available": True})
     def test_default_city_is_depok(self, mock_payload):
@@ -624,23 +622,29 @@ class CareViewTests(CacheClearingTestCase):
         mock_payload.assert_called_with("Bandung")
 
     @patch("smart_care.views.weather_payload", return_value={"available": True})
-    def test_the_city_picked_on_the_page_beats_the_ecopatch_city(self, mock_payload):
-        make_patch_plant(self.user, patch=make_patch(self.user, city="Bandung"))
-        self.client.get(reverse("smart_care:weather"), {"city": "Malang"})
-        mock_payload.assert_called_with("Malang")
-
-    @patch("smart_care.views.weather_payload", return_value={"available": True})
     def test_the_ecopatch_city_beats_the_profile_city(self, mock_payload):
         make_patch_plant(self.user, patch=make_patch(self.user, city="Bandung"))
         with patch.object(User, "profile", MagicMock(city="Medan"), create=True):
             self.client.get(reverse("smart_care:weather"))
         mock_payload.assert_called_with("Bandung")
 
-    @patch("smart_care.views.weather_payload")
-    def test_unknown_city_is_rejected(self, mock_payload):
-        response = self.client.get(reverse("smart_care:weather"), {"city": "Atlantis"})
-        self.assertEqual(response.status_code, 400)
-        mock_payload.assert_not_called()
+    @patch("smart_care.views.weather_payload", return_value={"available": True})
+    def test_a_city_in_the_url_is_ignored(self, mock_payload):
+        make_patch_plant(self.user, patch=make_patch(self.user, city="Bandung"))
+        for city in ("Malang", "Atlantis"):
+            response = self.client.get(reverse("smart_care:weather"), {"city": city})
+            self.assertEqual(response.status_code, 200)
+            mock_payload.assert_called_with("Bandung")
+        self.assertNotIn("care_city", self.client.session)
+
+    def test_the_weather_card_shows_the_city_without_a_picker(self):
+        make_patch_plant(self.user, patch=make_patch(self.user, city="Medan"))
+        response = self.client.get(reverse("smart_care:list"))
+        self.assertEqual(response.context["city"], "Medan")
+        self.assertContains(response, '<span class="care-city">Medan</span>')
+        self.assertNotContains(response, 'id="care-city"')
+        self.assertNotContains(response, "<select")
+        self.assertNotIn("cities", response.context)
 
     @patch("smart_care.views.weather_payload", side_effect=WeatherUnavailable("down"))
     def test_weather_failure_is_handled_gracefully(self, _mock):
