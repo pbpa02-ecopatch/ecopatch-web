@@ -3091,3 +3091,24 @@ form.patch-form-actions {
     width: auto;
     min-width: 170px;
 }
+
+.plant-name-link {
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.plant-name-link:hover,
+.plant-name-link:focus-visible {
+    color: var(--brand-600);
+    text-decoration: underline;
+}
+
+.patch-help-lead {
+    margin: -8px 0 0;
+}
+
+.patch-help-lead a {
+    color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+    font-weight: 600;
+}

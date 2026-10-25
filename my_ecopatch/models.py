@@ -67,10 +67,18 @@ class PatchPlant(models.Model):
 
     patch = models.ForeignKey(EcoPatch, on_delete=models.CASCADE, related_name='plants')
 
-    # SEMENTARA: nama tanaman diketik manual karena model Plant di plant_library belum ada.
-    # Begitu Plant tersedia, ganti dengan ForeignKey (lihat catatan di jawaban):
-    # plant = models.ForeignKey('plant_library.Plant', on_delete=models.PROTECT, related_name='patch_plants')
-    plant_name = models.CharField(max_length=100, default='')
+    # Tanaman diambil dari Plant Library. PROTECT: tanaman yang masih dipakai di EcoPatch tidak bisa
+    # dihapus dari katalog (plant_library.views.plant_delete sudah menangani ProtectedError ini).
+    # null=True HANYA untuk masa transisi dari plant_name; form tetap mewajibkan plant (blank=False).
+    plant = models.ForeignKey(
+        'plant_library.Plant',
+        on_delete=models.PROTECT,
+        related_name='patch_plants',
+        null=True,
+    )
+
+    # LEGACY: akan dihapus di tahap B2 setelah semua baris lama terhubung ke Plant.
+    plant_name = models.CharField(max_length=100, default='', blank=True)
 
     quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PLANNED)
@@ -80,4 +88,5 @@ class PatchPlant(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        return f'{self.plant_name} @ {self.patch}'
+        name = self.plant.name if self.plant_id else self.plant_name
+        return f'{name} @ {self.patch}'

@@ -17,7 +17,12 @@
             {% for plant in plants %}
                 <li class="plant-row">
                     <div class="plant-main">
-                        <strong class="plant-name">{{ plant.plant_name|default:"(tanpa nama)" }}</strong>
+                        {% if plant.plant %}
+                            <a class="plant-name plant-name-link" href="{% url 'plant_library:plant_detail' plant.plant.pk %}">{{ plant.plant.name }}</a>
+                        {% else %}
+                            {# Baris lama yang belum terhubung ke Plant Library #}
+                            <strong class="plant-name">{{ plant.plant_name|default:"(tanpa nama)" }}</strong>
+                        {% endif %}
                         <span class="plant-meta">{{ plant.quantity }} tanaman{% if plant.planted_at %} &middot; mulai tanam {{ plant.planted_at|date:"j M Y" }}{% endif %}</span>
                     </div>
 
@@ -30,7 +35,7 @@
                         <div class="dropdown">
                             <button type="button" class="plant-status-btn patch-pill--{{ plant.status }} dropdown-toggle"
                                     data-bs-toggle="dropdown" aria-expanded="false"
-                                    aria-label="Ubah status {{ plant.plant_name }}">{{ plant.get_status_display }}</button>
+                                    aria-label="Ubah status {% firstof plant.plant.name plant.plant_name %}">{{ plant.get_status_display }}</button>
                             <ul class="dropdown-menu dropdown-menu-end patch-menu">
                                 {% for value, label in status_choices %}
                                     <li><button type="submit" name="status" value="{{ value }}"
@@ -43,7 +48,7 @@
                     <form method="post"
                           action="{% url 'my_ecopatch:plant_delete' plant.pk %}"
                           hx-post="{% url 'my_ecopatch:plant_delete' plant.pk %}"
-                          hx-confirm="Hapus {{ plant.plant_name }} dari EcoPatch ini?"
+                          hx-confirm="Hapus {% firstof plant.plant.name plant.plant_name %} dari EcoPatch ini?"
                           hx-target="#patch-plants" hx-swap="outerHTML">
                         {% csrf_token %}
                         <button type="submit" class="plant-remove">Hapus</button>
@@ -61,6 +66,11 @@
           hx-target="#patch-plants" hx-swap="outerHTML">
         {% csrf_token %}
         <h3 class="patch-form-title">Tambah tanaman</h3>
+        <p class="patch-help patch-help-lead">
+            Belum tahu mau menanam apa?
+            <a href="{% url 'plant_library:plant_recommend' %}?patch={{ patch.pk }}">Lihat rekomendasi untuk EcoPatch ini</a>
+            atau <a href="{% url 'plant_library:plant_list' %}">jelajahi Plant Library</a>.
+        </p>
         {% if plant_form.non_field_errors %}
             <div class="patch-alert" role="alert">{% for error in plant_form.non_field_errors %}{{ error }}{% endfor %}</div>
         {% endif %}

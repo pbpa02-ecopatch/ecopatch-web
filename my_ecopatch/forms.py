@@ -1,5 +1,7 @@
 from django import forms
 
+from plant_library.models import Plant
+
 from .models import EcoPatch, PatchPlant
 
 
@@ -37,16 +39,20 @@ class EcoPatchForm(forms.ModelForm):
 class PatchPlantForm(forms.ModelForm):
     class Meta:
         model = PatchPlant
-        fields = ['plant_name', 'quantity', 'status', 'planted_at']
+        fields = ['plant', 'quantity', 'status', 'planted_at']
         labels = {
-            'plant_name': 'Nama tanaman',
+            'plant': 'Tanaman',
             'quantity': 'Jumlah',
             'status': 'Status',
             'planted_at': 'Tanggal mulai menanam',
         }
         help_texts = {'planted_at': 'Opsional.'}
         widgets = {
-            'plant_name': forms.TextInput(attrs={'placeholder': 'Contoh: Cabai rawit'}),
             'quantity': forms.NumberInput(attrs={'min': 1}),
             'planted_at': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['plant'].queryset = Plant.objects.order_by('name')
+        self.fields['plant'].empty_label = 'Pilih tanaman'
