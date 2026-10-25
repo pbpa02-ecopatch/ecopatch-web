@@ -1,0 +1,16 @@
+{% load patch_extras %}
+{% select_data field as sel %}
+{# Dropdown kustom (Bootstrap dropdown + input hidden), polanya sama dengan Seed Exchange. Logikanya ada di _select_script.html #}
+<div class="dropdown patch-select" data-patch-select data-placeholder="{{ sel.placeholder }}">
+    <input type="hidden" name="{{ field.html_name }}" id="{{ field.id_for_label }}" value="{{ sel.value }}">
+    <button type="button" class="patch-select-btn dropdown-toggle" id="{{ field.id_for_label }}_btn"
+            data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
+        <span data-patch-label{% if not sel.display %} class="patch-placeholder"{% endif %}>{% if sel.display %}{{ sel.display }}{% else %}{{ sel.placeholder }}{% endif %}</span>
+    </button>
+    <ul class="dropdown-menu patch-menu">
+        {% for opt in sel.options %}
+            <li><button type="button" class="dropdown-item patch-menu-item{% if opt.selected %} active{% endif %}"
+                        data-patch-option data-value="{{ opt.value }}">{{ opt.label }}</button></li>
+        {% endfor %}
+    </ul>
+</div>

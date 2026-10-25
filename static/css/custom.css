@@ -1991,3 +1991,100 @@ form.patch-form-actions {
 .htmx-request .plant-status-select {
     opacity: 0.6;
 }
+
+.patch-required {
+    color: var(--danger);
+    font-weight: 700;
+}
+
+.patch-select-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface-100);
+    color: var(--ink);
+    font-size: 15px;
+    text-align: left;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.patch-select-btn:focus-visible,
+.patch-select-btn.show {
+    outline: none;
+    border-color: var(--brand-500);
+    background: var(--surface-200);
+    box-shadow: 0 0 0 4px var(--brand-300);
+}
+
+.patch-field.has-error .patch-select-btn {
+    border-color: var(--danger);
+}
+
+.patch-placeholder {
+    color: var(--ink-muted);
+    font-weight: 400;
+}
+
+.patch-menu {
+    width: 100%;
+    max-height: 280px;
+    padding: 8px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface-200);
+    box-shadow: 0 12px 32px rgba(34, 48, 31, 0.18);
+}
+
+.patch-menu-item {
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+}
+
+.patch-menu-item:hover,
+.patch-menu-item:focus-visible {
+    background: color-mix(in srgb, var(--brand-300) 45%, var(--surface-200));
+    color: var(--ink);
+}
+
+.patch-menu-item.active {
+    background: var(--brand-300);
+    color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+    font-weight: 700;
+}
+
+/* Status tanaman di tiap baris: pill kecil + menu selebar isinya */
+.plant-status-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 999px;
+    background: var(--tone-soft);
+    color: var(--tone-text);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.plant-status-btn:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 2px;
+}
+
+.plant-row .patch-menu {
+    width: auto;
+    min-width: 170px;
+}
