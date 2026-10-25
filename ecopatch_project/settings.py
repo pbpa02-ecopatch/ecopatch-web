@@ -173,13 +173,9 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http' if DEBUG else 'https'
 SOCIALACCOUNT_AUTO_SIGNUP = True
-# A Google account whose (Google-verified) email matches an existing user signs in to that user instead of
-# being asked to sign up again. NOTE: EcoPatch does not verify the emails stored on its own users. Today the
-# register page does not collect an email, so nothing can be claimed this way; if a page ever lets people type
-# an email without verifying it, turn this off or verify emails first, otherwise someone could pre-register
-# another person's address and be connected to their Google login.
-SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
-SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+# A Google account only joins an existing user when that user's email is verified (see main/adapters.py);
+# allauth's own email matching is left off because EcoPatch does not verify the emails people type at sign-up.
+SOCIALACCOUNT_ADAPTER = 'main.adapters.SocialAccountAdapter'
 SOCIALACCOUNT_LOGIN_ON_GET = False
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -188,3 +184,18 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {'access_type': 'online'},
     },
 }
+
+# Password reset. Emails are printed in the terminal until an SMTP server is configured in .env
+# (for Gmail: EMAIL_HOST=smtp.gmail.com, EMAIL_HOST_USER=<address>, EMAIL_HOST_PASSWORD=<app password>).
+PASSWORD_RESET_TIMEOUT = 60 * 60  # the link works for one hour
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'  # port 465
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True' and not EMAIL_USE_SSL  # port 587
+EMAIL_TIMEOUT = 10  # seconds, so a blocked SMTP port cannot hang the page
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_BACKEND = (
+    'django.core.mail.backends.smtp.EmailBackend' if EMAIL_HOST else 'django.core.mail.backends.console.EmailBackend'
+)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'EcoPatch <noreply@ecopatch.local>')
