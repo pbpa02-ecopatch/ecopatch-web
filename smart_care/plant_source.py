@@ -1,21 +1,82 @@
-"""Where Smart Care learns which plants a user has.
+"""Where Smart Care learns which plants a user has: the plants in the user's My EcoPatch.
 
-TODO(smart_care): replace the body with a read of my_ecopatch.PatchPlant (status Planted or Growing)
-and take the care intervals from Plant Library. Keep the signature `get_user_plants(user)` returning
-a list of (plant_name, is_outdoor) so nothing else has to change.
+A plant takes part in care (task form, suggestions, pots) while its status in My EcoPatch is Planted or
+Growing. A task links to its plant, but copies the plant's name and the indoor/outdoor flag when it is linked,
+so the history still reads right after the plant is renamed or removed.
 """
-from .models import CareTask
+from django.db.models import Q
+
+from my_ecopatch.models import EcoPatch, PatchPlant
+
 from .suggestions import normalize
+
+CARE_STATUSES = (PatchPlant.Status.PLANTED, PatchPlant.Status.GROWING)
+NAME_MAX_LENGTH = 80  # CareTask.plant_name
+
+
+def patch_plant_name(patch_plant):
+    """The Plant Library name, or the old free-text name of a row not linked to the library yet."""
+    name = patch_plant.plant.name if patch_plant.plant_id else patch_plant.plant_name
+    return " ".join(name.split())[:NAME_MAX_LENGTH]
+
+
+def is_outdoor(patch_plant):
+    """Only an indoor EcoPatch keeps its plants out of the rain advice."""
+    return patch_plant.patch.space_type != EcoPatch.SpaceType.INDOOR
+
+
+def link_task(task, patch_plant):
+    """Point a task at a plant and snapshot the plant's name and indoor/outdoor flag onto it."""
+    task.patch_plant = patch_plant
+    task.plant_name = patch_plant_name(patch_plant)
+    task.is_outdoor = is_outdoor(patch_plant)
+
+
+def user_patch_plants(user, keep=None):
+    """The user's own plants that can have care tasks. `keep` is a plant that stays listed even when its
+    status no longer qualifies (the plant of a task being edited). Other users' plants never appear."""
+    wanted = Q(status__in=CARE_STATUSES)
+    if keep is not None:
+        wanted |= Q(pk=keep)
+    return (
+        PatchPlant.objects.filter(patch__owner=user)
+        .filter(wanted)
+        .select_related("plant", "patch")
+        .order_by("patch__name", "plant__name", "plant_name", "pk")
+    )
+
+
+def _one_per_name(user):
+    """One plant per name (ignoring case and extra spaces): the newest My EcoPatch row decides the spelling and
+    the indoor/outdoor flag, so a plant that sits in two patches is still one pot."""
+    chosen = {}
+    for patch_plant in user_patch_plants(user).order_by("-pk"):
+        name = patch_plant_name(patch_plant)
+        if name:
+            chosen.setdefault(normalize(name), patch_plant)
+    return sorted(chosen.values(), key=lambda patch_plant: normalize(patch_plant_name(patch_plant)))
 
 
 def get_user_plants(user):
-    """Version 1: a plant exists once the user has made one task for it.
+    """[(plant_name, is_outdoor)] sorted by name; this is what the suggestions and the pots are built from."""
+    return [(patch_plant_name(patch_plant), is_outdoor(patch_plant)) for patch_plant in _one_per_name(user)]
 
-    Names are compared ignoring case and extra spaces, and the newest task decides the spelling and
-    the indoor/outdoor flag, so one plant never shows up twice. Only the user's own tasks are read.
-    """
-    plants = {}
-    rows = CareTask.objects.filter(user=user).order_by("-created_at", "-pk").values_list("plant_name", "is_outdoor")
-    for plant_name, is_outdoor in rows:
-        plants.setdefault(normalize(plant_name), (" ".join(plant_name.split()), is_outdoor))
-    return sorted(plants.values(), key=lambda plant: normalize(plant[0]))
+
+def find_patch_plant(user, name):
+    """The user's plant behind a plant name posted by the suggestion buttons, or None."""
+    wanted = normalize(name)
+    for patch_plant in _one_per_name(user):
+        if normalize(patch_plant_name(patch_plant)) == wanted:
+            return patch_plant
+    return None
+
+
+def get_user_city(user):
+    """City of the user's newest EcoPatch that has a plant needing care, or '' when there is none."""
+    city = (
+        EcoPatch.objects.filter(owner=user, plants__status__in=CARE_STATUSES)
+        .order_by("-created_at", "-pk")
+        .values_list("city", flat=True)
+        .first()
+    )
+    return city or ""

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% load static i18n %}
+{% load static asset_version i18n %}
 {% block title %}Smart Care - EcoPatch{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'smart_care/css/smart_care.css' %}">
+<link rel="stylesheet" href="{% static_v 'smart_care/css/smart_care.css' %}">
 {% endblock %}
 {% block content %}
 <div class="care-page" id="care-page" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
@@ -169,7 +169,7 @@
             <div class="care-empty" id="care-empty"{% if progress.total %} hidden{% endif %} data-default="Belum ada tugas di tanggal ini" data-skipped="Semua saran hari ini dilewati">
                 <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22V12"/><path d="M12 12c0-4 3-7 8-7 0 5-3 7-8 7Z"/><path d="M12 15c0-3-2-5-6-5 0 4 2 5 6 5Z"/></svg>
                 {% if is_today and not has_plants %}
-                    <p>Tambahkan satu tugas untuk tanamanmu, setelah itu saran muncul otomatis</p>
+                    <p>Tambahkan tanamanmu di <a href="{% url 'my_ecopatch:list' %}">My EcoPatch</a> (status Planted atau Growing), lalu saran perawatan muncul otomatis</p>
                 {% elif skipped_suggestions %}
                     <p>Semua saran hari ini dilewati</p>
                 {% else %}
@@ -234,5 +234,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'smart_care/js/smart_care.js' %}" defer></script>
+<script src="{% static_v 'smart_care/js/smart_care.js' %}" defer></script>
 {% endblock %}

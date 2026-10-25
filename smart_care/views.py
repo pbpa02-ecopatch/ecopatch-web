@@ -14,7 +14,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from .forms import CareTaskForm
 from .models import CareTask
-from .plant_source import get_user_plants
+from .plant_source import find_patch_plant, get_user_city, get_user_plants, is_outdoor, patch_plant_name
 from .suggestions import INTERVALS, HistoryEntry, build_suggestions, normalize, plant_status
 from .weather import CITIES, DEFAULT_CITY, WeatherUnavailable, weather_payload
 
@@ -32,12 +32,14 @@ def _profile_city(user):
 
 
 def _current_city(request):
-    """Session choice, else the profile city, else Depok."""
+    """Session choice, else the city of the user's EcoPatch, else the profile city, else Depok."""
     city = request.session.get(CITY_SESSION_KEY)
     if city in CITIES:
         return city
-    city = _profile_city(request.user)
-    return city if city in CITIES else DEFAULT_CITY
+    for city in (get_user_city(request.user), _profile_city(request.user)):
+        if city in CITIES:
+            return city
+    return DEFAULT_CITY
 
 
 def _parse_date(value):
@@ -192,7 +194,7 @@ def _saved_response(request, day):
 @login_required
 def care_task_create(request):
     if request.method == "POST":
-        form = CareTaskForm(request.POST)
+        form = CareTaskForm(request.POST, user=request.user)
         if form.is_valid():
             task = form.save(commit=False)
             task.user = request.user
@@ -200,7 +202,7 @@ def care_task_create(request):
             messages.success(request, "Tugas perawatan ditambahkan.")
             return _saved_response(request, task.due_date)
     else:
-        form = CareTaskForm(initial={"due_date": _parse_date(request.GET.get("date")) or timezone.localdate()})
+        form = CareTaskForm(initial={"due_date": _parse_date(request.GET.get("date")) or timezone.localdate()}, user=request.user)
     return _form_response(request, form, is_edit=False)
 
 
@@ -209,13 +211,13 @@ def care_task_update(request, pk):
     # Filtering by user makes other users' tasks a 404 rather than exposing that they exist
     task = get_object_or_404(CareTask, pk=pk, user=request.user)
     if request.method == "POST":
-        form = CareTaskForm(request.POST, instance=task)
+        form = CareTaskForm(request.POST, instance=task, user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, "Tugas perawatan diperbarui.")
             return _saved_response(request, task.due_date)
     else:
-        form = CareTaskForm(instance=task)
+        form = CareTaskForm(instance=task, user=request.user)
     return _form_response(request, form, is_edit=True, task=task)
 
 
@@ -259,15 +261,12 @@ def care_task_complete(request, pk):
 
 
 def _valid_suggestion(request):
-    """(plant_name, is_outdoor, task_type) when the posted pair belongs to this user and can be suggested."""
+    """(patch_plant, task_type) when the posted pair belongs to this user and can be suggested."""
     task_type = request.POST.get("task_type", "")
-    wanted = normalize(request.POST.get("plant_name", ""))
-    if task_type not in INTERVALS or not wanted:
+    if task_type not in INTERVALS:
         return None
-    for plant_name, is_outdoor in get_user_plants(request.user):
-        if normalize(plant_name) == wanted:
-            return plant_name, is_outdoor, task_type
-    return None
+    patch_plant = find_patch_plant(request.user, request.POST.get("plant_name", ""))
+    return (patch_plant, task_type) if patch_plant else None
 
 
 def _suggestion_task(request, status):
@@ -276,7 +275,8 @@ def _suggestion_task(request, status):
     found = _valid_suggestion(request)
     if found is None:
         return None, False
-    plant_name, is_outdoor, task_type = found
+    patch_plant, task_type = found
+    plant_name = patch_plant_name(patch_plant)
     today = timezone.localdate()
     for existing in CareTask.objects.filter(user=request.user, due_date=today, task_type=task_type):
         if normalize(existing.plant_name) == normalize(plant_name):
@@ -289,7 +289,8 @@ def _suggestion_task(request, status):
         due_date=today,
         source=CareTask.Source.SUGGESTED,
         defaults={
-            "is_outdoor": is_outdoor,
+            "patch_plant": patch_plant,
+            "is_outdoor": is_outdoor(patch_plant),
             "status": status,
             "completed_at": timezone.now() if status == Status.COMPLETED else None,
         },
@@ -335,7 +336,8 @@ def suggestion_restore(request):
     found = _valid_suggestion(request)
     if found is None:
         return JsonResponse({"error": "Saran tidak dikenali."}, status=400)
-    plant_name, _, task_type = found
+    patch_plant, task_type = found
+    plant_name = patch_plant_name(patch_plant)
     skipped = [
         task for task in _skipped_suggestions(request.user, timezone.localdate()).filter(task_type=task_type)
         if normalize(task.plant_name) == normalize(plant_name)

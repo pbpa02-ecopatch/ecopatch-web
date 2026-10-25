@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static asset_version %}
 {% block title %}{% if is_edit %}Edit Care Task{% else %}Tambah Care Task{% endif %} - Smart Care{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'smart_care/css/smart_care.css' %}">
+<link rel="stylesheet" href="{% static_v 'smart_care/css/smart_care.css' %}">
 {% endblock %}
 {% block content %}
 <div class="care-form-wrap">

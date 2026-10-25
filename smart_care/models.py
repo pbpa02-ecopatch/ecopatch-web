@@ -22,12 +22,19 @@ class CareTask(models.Model):
         MANUAL = "manual", "Manual"
         SUGGESTED = "suggested", "Saran"
 
-    # TODO(smart_care): my_ecopatch belum punya model PatchPlant. Begitu modul itu selesai,
-    # ganti `plant_name` dengan ForeignKey ke my_ecopatch.PatchPlant; kepemilikan lalu dicek
-    # lewat patch_plant.ecopatch.user dan `is_outdoor` bisa diambil dari ecopatch.
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        related_name="care_tasks",
+    )
+    # The plant in My EcoPatch this task is for. SET_NULL: removing the plant must not erase the care history,
+    # which is why plant_name and is_outdoor are copied from it when the task is linked (see plant_source.link_task).
+    # A task without a link is one made before Smart Care read My EcoPatch and that could not be matched to a plant.
+    patch_plant = models.ForeignKey(
+        "my_ecopatch.PatchPlant",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="care_tasks",
     )
     plant_name = models.CharField(max_length=80)
