@@ -1,0 +1,23 @@
+<li class="care-task is-suggestion" data-suggestion data-plant="{{ suggestion.plant_name }}" data-type="{{ suggestion.task_type }}"
+    data-outdoor="{{ suggestion.is_outdoor|yesno:'1,0' }}">
+    <button type="button" class="care-check" aria-pressed="false"
+            aria-label="Tandai {{ suggestion.plant_name }} ({{ suggestion.label }}) selesai">
+        <svg class="care-check-svg" viewBox="0 0 28 28" aria-hidden="true">
+            <circle class="care-check-ring" cx="14" cy="14" r="11"/>
+            <path class="care-check-mark" d="m8.5 14.5 3.8 3.8 7.2-8"/>
+        </svg>
+    </button>
+    <div class="care-task-body">
+        <span class="care-task-name">{{ suggestion.plant_name }}</span>
+        <span class="care-task-meta">
+            <span>{{ suggestion.label }}</span>
+            <span class="care-tag">Saran</span>
+            {% if not suggestion.is_outdoor %}<span>Dalam ruangan</span>{% endif %}
+        </span>
+        <span class="care-task-reason">{{ suggestion.reason }}</span>
+        <span class="care-task-hint" hidden></span>
+    </div>
+    <div class="care-task-actions">
+        <button type="button" class="care-skip" aria-label="Lewati saran {{ suggestion.label }} untuk {{ suggestion.plant_name }}">Lewati</button>
+    </div>
+</li>

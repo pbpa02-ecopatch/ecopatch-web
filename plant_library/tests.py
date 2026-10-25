@@ -13,6 +13,7 @@ from plant_library.views import parse_query_keywords
 test_urlpatterns = [
     path('', include('main.urls')),
     path('plants/', include('plant_library.urls')),
+    path('smart-care/', include('smart_care.urls')),
     path('my-ecopatch/', include('my_ecopatch.urls')),
     path('journal/', include('garden_journal.urls')),
     path('seed-exchange/', include('seed_exchange.urls')),

@@ -14,7 +14,7 @@ urlpatterns = [
     path('', include('main.urls')),
     path('accounts/', include('allauth.urls')),
     # TODO: masing-masing PIC menambahkan include() untuk app-nya sendiri:
-    # path('smart-care/', include('smart_care.urls')),
+    path('smart-care/', include('smart_care.urls')),
     path('plants/', include('plant_library.urls')),
     path('my-ecopatch/', include('my_ecopatch.urls')),
     path('journal/', include('garden_journal.urls')),
