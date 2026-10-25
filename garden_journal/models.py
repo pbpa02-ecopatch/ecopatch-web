@@ -51,6 +51,12 @@ class GardenJournal(models.Model):
         default="flowers",
         help_text="Sampul buku jurnal",
     )
+    image = models.ImageField(
+        upload_to="journal_photos/",
+        blank=True,
+        null=True,
+        help_text="Foto tanaman (opsional)",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
