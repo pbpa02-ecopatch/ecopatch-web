@@ -13,5 +13,5 @@ staticfiles/
 *.md
 !README.md
 
-# User uploads
+# Media uploads
 media/

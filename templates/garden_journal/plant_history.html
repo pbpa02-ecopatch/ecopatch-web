@@ -4,7 +4,7 @@
 {% block title %}Buku Jurnal: {{ plant_name }} — EcoPatch{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=2.0">
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=3.2">
 {% endblock %}
 
 {% block content %}
@@ -51,13 +51,28 @@
             <!-- HALAMAN KIRI -->
             <div class="book-page-left">
                 <div>
-                    <div class="plant-left-icon">🌿</div>
+                    <div class="plant-left-mascot mb-2">
+                        <img id="left-mascot-img"
+                             src="{% if latest_condition == 'wilting' %}{% static 'img/mascot/petak-layu.png' %}{% elif latest_condition == 'flowering' %}{% static 'img/mascot/petak-semangat.png' %}{% elif latest_condition == 'fruiting' or latest_condition == 'ready_to_harvest' %}{% static 'img/mascot/petak-bangga.png' %}{% elif latest_condition == 'needs_attention' %}{% static 'img/mascot/petak-penasaran.png' %}{% else %}{% static 'img/mascot/petak-senang.png' %}{% endif %}"
+                             alt="Petak" style="width: 76px; height: auto; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);">
+                    </div>
                     <h2 class="plant-left-title">{{ plant_name }}</h2>
                     <span id="left-condition-badge" class="badge bg-{{ latest_badge }}-subtle text-{{ latest_badge }} border border-{{ latest_badge }}-subtle book-tag-pill">
                         {{ latest_condition_display }}
                     </span>
                     <div id="left-ecopatch" class="mt-3" style="display:none;">
                         <span class="badge bg-white text-secondary border px-3 py-1" id="left-ecopatch-text"></span>
+                    </div>
+
+                    <!-- Petunjuk Urutan Buku Dinamis -->
+                    <div class="book-reading-hint mt-3 p-2 rounded" style="background: rgba(31, 145, 66, 0.08); border: 1px dashed rgba(31, 145, 66, 0.3);">
+                        <div class="d-flex align-items-start gap-2">
+                            <span style="font-size:0.95rem;">💡</span>
+                            <div style="font-size: 0.74rem; color: #224c29; line-height: 1.4;">
+                                <strong id="left-hint-title">Buku Terbuka di Catatan Terkini</strong><br>
+                                <span id="left-hint-desc">Menampilkan kondisi paling baru. Balik lembar (&rarr;) untuk melihat riwayat hari-hari sebelumnya.</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="book-bottom-footer">
@@ -78,7 +93,7 @@
                 <div id="page-content">
                     <!-- diisi oleh JS -->
                     <div class="text-center py-5 text-muted" id="empty-state" style="display:none;">
-                        <div style="font-size:2.5rem;">📖</div>
+                        <img src="{% static 'img/mascot/petak-mencatat.png' %}" alt="Petak" style="width: 100px; height: auto;" class="mb-2">
                         <h5 class="fw-bold mt-2">Buku Masih Kosong</h5>
                         <p class="small">Belum ada catatan untuk filter ini.</p>
                         <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-sm btn-success">+ Tulis Lembaran Pertama</a>
@@ -87,59 +102,105 @@
             </div>
         </div>
 
-        <!-- Dots Indicator -->
-        <div class="page-dots-indicator" id="page-dots"></div>
+        <!-- Dots Indicator & Quick Navigation -->
+        <div class="d-flex flex-column align-items-center mt-3">
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-1 flex-wrap">
+                <button type="button" class="btn btn-sm btn-light border py-1 px-3 text-secondary fw-semibold"
+                        id="btn-jump-newest" onclick="jumpTo(0)" style="font-size: 0.76rem; border-radius: 999px;">
+                    ⏮️ Terkini (Terbaru)
+                </button>
+                <div class="page-dots-indicator my-0" id="page-dots"></div>
+                <button type="button" class="btn btn-sm btn-light border py-1 px-3 text-secondary fw-semibold"
+                        id="btn-jump-oldest" onclick="jumpTo(filteredEntries.length - 1)" style="font-size: 0.76rem; border-radius: 999px;">
+                    Hari Pertama (Awal) ⏭️
+                </button>
+            </div>
+            <div class="text-muted small fst-italic" style="font-size:0.75rem;">
+                Lembaran buku: <strong>Terbaru (Hal. 1)</strong> ◀ ··· ▶ <strong>Terlama (Hal. Akhir)</strong>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- ===================== VIEW LIST ===================== -->
 <div id="view-list" class="view-panel" style="display:none;">
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-9">
-            {% if journals %}
-                <div class="d-flex flex-column gap-3">
-                    {% for journal in journals %}
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body p-4">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <span class="badge bg-{{ journal.get_condition_display_badge }}-subtle text-{{ journal.get_condition_display_badge }} border border-{{ journal.get_condition_display_badge }}-subtle">
-                                            {{ journal.get_plant_condition_display }}
-                                        </span>
-                                        {% if journal.ecopatch_name %}
-                                            <span class="badge bg-light text-secondary border">🪴 {{ journal.ecopatch_name }}</span>
-                                        {% endif %}
-                                        {% if journal.plant_height %}
-                                            <span class="badge bg-light text-secondary border">📏 {{ journal.plant_height }} cm</span>
-                                        {% endif %}
-                                    </div>
-                                    <span class="text-muted small fw-semibold">📅 {{ journal.date|date:"d M Y" }}</span>
-                                </div>
-                                <h5 class="fw-bold mb-2">{{ journal.title }}</h5>
-                                <p class="text-secondary mb-3" style="white-space:pre-wrap;font-size:0.95rem;">{{ journal.notes }}</p>
-                                <div class="d-flex align-items-center justify-content-between pt-2 border-top">
-                                    <small class="text-muted fst-italic">Dicatat {{ journal.created_at|date:"d M Y, H:i" }}</small>
-                                    <div class="d-flex gap-2">
-                                        <a href="{% url 'garden_journal:edit' journal.pk %}" class="btn btn-sm btn-outline-secondary">✏️ Edit</a>
-                                        <form method="post" action="{% url 'garden_journal:delete' journal.pk %}" onsubmit="return confirm('Hapus catatan ini?')">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">🗑️</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
+
+    {% if journals %}
+    <!-- Stat Cards Row -->
+    <div class="row g-3 mb-4" id="stat-cards-row">
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-card-label">Total catatan</div>
+                <div class="stat-card-value">{{ total_entries }}</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-card-label">Tinggi terakhir</div>
+                <div class="stat-card-value">
+                    {% if latest_height %}{{ latest_height|floatformat:0 }} <span class="stat-card-unit">cm</span>{% else %}<span class="text-muted fs-6">—</span>{% endif %}
                 </div>
-            {% else %}
-                <div class="text-center py-5 text-muted">
-                    <div style="font-size:3rem;">📖</div>
-                    <p class="mt-2">Belum ada catatan untuk filter ini.</p>
-                    <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-success">+ Tulis Catatan Pertama</a>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-card-label">Pertumbuhan</div>
+                <div class="stat-card-value {% if growth and growth > 0 %}text-success{% elif growth and growth < 0 %}text-danger{% endif %}">
+                    {% if growth %}
+                        {% if growth > 0 %}+{% endif %}{{ growth|floatformat:1 }} <span class="stat-card-unit">cm</span>
+                    {% else %}
+                        <span class="text-muted fs-6">—</span>
+                    {% endif %}
                 </div>
-            {% endif %}
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-card-label">Kondisi terakhir</div>
+                <div class="stat-card-value">
+                    <span class="badge bg-{{ latest_badge }}-subtle text-{{ latest_badge }} border border-{{ latest_badge }}-subtle px-2 py-1" style="font-size:0.85rem;">
+                        {{ latest_condition_display }}
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Height Chart -->
+    <div class="history-chart-card mb-4" id="chart-section">
+        <div class="history-chart-title">Grafik tinggi tanaman (cm)</div>
+        <div style="position:relative; height: 160px;">
+            <canvas id="heightChart"></canvas>
+        </div>
+        <div id="chart-no-data" class="text-center text-muted small py-3" style="display:none;">
+            Belum ada data tinggi tanaman untuk ditampilkan.
+        </div>
+    </div>
+
+    <!-- Group Toggle Filter -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <div class="history-group-tabs" id="group-tabs">
+                <button class="history-group-tab active" id="tab-week" onclick="switchGrouping('week')">Per minggu</button>
+                <button class="history-group-tab" id="tab-month" onclick="switchGrouping('month')">Per bulan</button>
+                <button class="history-group-tab" id="tab-all" onclick="switchGrouping('all')">Semua</button>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary py-1 px-3" id="btn-toggle-all" onclick="toggleAllGroups()" style="font-size: 0.8rem; border-radius: 999px;">
+                📁 Sembunyikan Semua
+            </button>
+        </div>
+    </div>
+
+    <!-- Grouped Entries Container -->
+    <div id="grouped-entries-container"></div>
+
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <img src="{% static 'img/mascot/petak-mencatat.png' %}" alt="Petak" style="width: 110px; height: auto;" class="mb-2">
+        <p class="mt-2">Belum ada catatan untuk filter ini.</p>
+        <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-success">+ Tulis Catatan Pertama</a>
+    </div>
+    {% endif %}
 </div>
 
 <!-- CSRF token for delete forms in JS -->
@@ -147,18 +208,36 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script id="all-entries-data" type="application/json">{{ all_entries_json|safe }}</script>
+<script id="chart-data" type="application/json">{{ chart_data|safe }}</script>
+<div id="page-config"
+     data-plant-name="{{ plant_name|escape }}"
+     data-create-url="{% url 'garden_journal:create' %}?plant_name={{ plant_name|urlencode }}"
+     data-initial-page="{{ initial_page|default:0 }}"
+     data-mascot-healthy="{% static 'img/mascot/petak-senang.png' %}"
+     data-mascot-flowering="{% static 'img/mascot/petak-semangat.png' %}"
+     data-mascot-fruiting="{% static 'img/mascot/petak-bangga.png' %}"
+     data-mascot-harvest="{% static 'img/mascot/petak-bangga.png' %}"
+     data-mascot-wilting="{% static 'img/mascot/petak-layu.png' %}"
+     data-mascot-attention="{% static 'img/mascot/petak-penasaran.png' %}"
+     style="display:none;"></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 /* ===============================================================
    ALL JOURNAL ENTRIES (pre-loaded, no HTMX round-trip needed)
    =============================================================== */
-const ALL_ENTRIES   = {{ all_entries_json|safe }};
-const PLANT_NAME    = "{{ plant_name|escapejs }}";
-const CREATE_URL    = "{% url 'garden_journal:create' %}?plant_name={{ plant_name }}";
+const configEl      = document.getElementById('page-config');
+const ALL_ENTRIES   = JSON.parse(document.getElementById('all-entries-data')?.textContent || '[]');
+const CHART_DATA    = JSON.parse(document.getElementById('chart-data')?.textContent || '[]');
+const PLANT_NAME    = configEl ? configEl.dataset.plantName : '';
+const CREATE_URL    = configEl ? configEl.dataset.createUrl : '';
 const CSRF_INPUT    = document.querySelector('[name=csrfmiddlewaretoken]');
 const CSRF_TOKEN    = CSRF_INPUT ? CSRF_INPUT.value : '';
 
-let currentIdx = {{ initial_page|default:0 }};
+let currentIdx      = 0; // Selalu mulai dari lembar pertama (catatan paling baru)
 let filteredEntries = [...ALL_ENTRIES];
+let currentGrouping = 'week';
+let heightChartInstance = null;
 
 /* -------- View Toggle (Buku ↔ Riwayat) -------- */
 function switchView(mode) {
@@ -166,16 +245,24 @@ function switchView(mode) {
     const listPanel = document.getElementById('view-list');
     const btnBook   = document.getElementById('btn-view-book');
     const btnList   = document.getElementById('btn-view-list');
+
     if (mode === 'book') {
         if (bookPanel) bookPanel.style.display = '';
         if (listPanel) listPanel.style.display = 'none';
         if (btnBook) btnBook.classList.add('active');
         if (btnList) btnList.classList.remove('active');
+        renderPage(currentIdx);
     } else {
         if (bookPanel) bookPanel.style.display = 'none';
         if (listPanel) listPanel.style.display = '';
         if (btnBook) btnBook.classList.remove('active');
         if (btnList) btnList.classList.add('active');
+
+        // Render Riwayat list + chart
+        setTimeout(() => {
+            initHeightChart();
+            renderGroupedEntries(currentGrouping);
+        }, 30);
     }
     try {
         localStorage.setItem('journalView', mode);
@@ -228,19 +315,63 @@ function renderPage(idx) {
         condBadge.textContent = e.condition_display;
     }
 
+    // Update left page mascot expression based on plant condition
+    const mascotImg = document.getElementById('left-mascot-img');
+    if (mascotImg && e.plant_condition && configEl) {
+        const mascotMap = {
+            'healthy': configEl.dataset.mascotHealthy,
+            'flowering': configEl.dataset.mascotFlowering,
+            'fruiting': configEl.dataset.mascotFruiting,
+            'ready_to_harvest': configEl.dataset.mascotHarvest,
+            'wilting': configEl.dataset.mascotWilting,
+            'needs_attention': configEl.dataset.mascotAttention,
+        };
+        const targetSrc = mascotMap[e.plant_condition] || configEl.dataset.mascotHealthy;
+        if (targetSrc && !mascotImg.src.endsWith(targetSrc)) {
+            mascotImg.style.transform = 'scale(0.82)';
+            setTimeout(() => {
+                mascotImg.src = targetSrc;
+                mascotImg.style.transform = 'scale(1)';
+            }, 90);
+        }
+    }
+
     const isFirst = (idx === 0);
     const isLast  = (idx === filteredEntries.length - 1);
     const metaExtras = e.plant_height
-        ? `<span class="mx-1">&middot;</span><span>Tinggi ${e.plant_height}cm</span>`
+        ? `<span class="mx-1">&middot;</span><span>📏 ${e.plant_height} cm</span>`
         : '';
+
+    // Update petunjuk baca di halaman kiri secara dinamis
+    const hintTitle = document.getElementById('left-hint-title');
+    const hintDesc  = document.getElementById('left-hint-desc');
+    if (hintTitle && hintDesc) {
+        if (isFirst) {
+            hintTitle.textContent = 'Buku Terbuka di Catatan Terkini';
+            hintDesc.innerHTML = 'Menampilkan kondisi paling baru. Balik lembar (&rarr;) untuk melihat riwayat hari-hari sebelumnya.';
+        } else if (isLast && filteredEntries.length > 1) {
+            hintTitle.textContent = '🌱 Hari Pertama Dicatat';
+            hintDesc.innerHTML = 'Menampilkan catatan paling awal tanaman ini. Balik lembar (&larr;) untuk kembali ke catatan terkini.';
+        } else {
+            hintTitle.textContent = `📖 Lembar Riwayat #${idx + 1}`;
+            hintDesc.innerHTML = 'Balik lembar (&larr;) ke arah catatan terbaru atau (&rarr;) ke arah hari awal.';
+        }
+    }
+
+    const orderBadge = isFirst
+        ? `<span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold" style="font-size:0.73rem;">✨ Catatan Terkini</span>`
+        : (isLast && filteredEntries.length > 1
+            ? `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-semibold" style="font-size:0.73rem;">🌱 Hari Pertama Dicatat</span>`
+            : `<span class="badge bg-light text-muted border" style="font-size:0.72rem;">Lembar #${idx + 1}</span>`);
 
     if (el) {
         el.innerHTML = `
             <div class="d-flex flex-column justify-content-between h-100" style="min-height: 380px;">
                 <div>
                     <div class="entry-right-header">
-                        <div class="entry-right-meta">
+                        <div class="entry-right-meta d-flex align-items-center flex-wrap gap-2">
                             <span>📅 ${e.date}</span>${metaExtras}
+                            ${orderBadge}
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <button type="button" class="page-turn-btn ${isFirst ? 'disabled' : ''}"
@@ -266,15 +397,26 @@ function renderPage(idx) {
                     </div>
                     <p class="entry-right-notes" style="white-space: pre-wrap;">${escHtml(e.notes)}</p>
 
-                    <div class="photo-polaroid-slot mt-3">
-                        <span style="font-size:1.4rem;line-height:1;">📷</span>
-                        <span class="mt-1 fw-semibold small text-muted">+ Foto Tanaman</span>
-                        <span class="text-muted" style="font-size:0.7rem;">(segera hadir)</span>
-                    </div>
+                    ${e.image_url ? `
+                        <div class="journal-photo-polaroid mt-3">
+                            <div class="journal-polaroid-frame text-center p-2 bg-white shadow-sm rounded border" style="border-color: #efe4cb !important; display: inline-block;">
+                                <img src="${e.image_url}" alt="${escHtml(e.title)}" class="journal-polaroid-img rounded" style="max-height: 150px; max-width: 100%; object-fit: cover; cursor: pointer;" onclick="window.open('${e.image_url}', '_blank')">
+                                <div class="journal-polaroid-caption text-muted small mt-1" style="font-size: 0.72rem;">📸 ${e.date} (klik untuk perbesar)</div>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="photo-polaroid-slot mt-3" onclick="location.href='${e.edit_url}'" role="button" title="Klik untuk tambah foto">
+                            <span style="font-size:1.3rem;line-height:1;">📷</span>
+                            <span class="mt-1 fw-semibold small text-muted">+ Tambah Foto Tanaman</span>
+                            <span class="text-muted" style="font-size:0.7rem;">(klik untuk upload foto)</span>
+                        </div>
+                    `}
                 </div>
 
                 <div class="book-bottom-footer mt-4">
-                    <span class="fw-semibold text-muted">Hal. ${idx + 1} / ${filteredEntries.length}</span>
+                    <span class="fw-semibold text-muted">
+                        Hal. ${idx + 1} / ${filteredEntries.length} ${isFirst ? '· Terkini' : (isLast && filteredEntries.length > 1 ? '· Awal' : '')}
+                    </span>
                     <div class="d-flex gap-2">
                         <a href="${e.edit_url}" class="btn btn-sm btn-outline-secondary py-0 px-2">✏️ Edit</a>
                         <form method="post" action="${e.delete_url}"
@@ -294,13 +436,26 @@ function renderPage(idx) {
 /* -------- Dots Indicator -------- */
 function renderDots(activeIdx) {
     const container = document.getElementById('page-dots');
+    const btnNewest = document.getElementById('btn-jump-newest');
+    const btnOldest = document.getElementById('btn-jump-oldest');
+
+    if (btnNewest) {
+        btnNewest.disabled = (activeIdx === 0);
+        btnNewest.classList.toggle('opacity-50', activeIdx === 0);
+    }
+    if (btnOldest) {
+        const atOldest = (activeIdx === filteredEntries.length - 1 || filteredEntries.length <= 1);
+        btnOldest.disabled = atOldest;
+        btnOldest.classList.toggle('opacity-50', atOldest);
+    }
+
     if (!container) return;
     container.innerHTML = '';
     if (filteredEntries.length <= 1) return;
     filteredEntries.forEach((_, i) => {
         const dot = document.createElement('span');
         dot.className = 'page-dot' + (i === activeIdx ? ' active' : '');
-        dot.title = `Buka Halaman ${i + 1}`;
+        dot.title = i === 0 ? 'Halaman 1 (Terkini)' : (i === filteredEntries.length - 1 ? `Halaman ${i + 1} (Awal Menanam)` : `Halaman ${i + 1}`);
         dot.onclick = () => jumpTo(i);
         container.appendChild(dot);
     });
@@ -384,8 +539,7 @@ function applyFilters() {
         const condOk = !cond || e.plant_condition === cond;
         let dateOk = true;
         if (dateVal) {
-            const [year, month, day] = dateVal.split('-');
-            dateOk = e.date.includes(parseInt(day, 10).toString().padStart(2, '0'));
+            dateOk = (e.date_iso === dateVal);
         }
         return condOk && dateOk;
     });
@@ -395,12 +549,266 @@ function applyFilters() {
 
     currentIdx = 0;
     renderPage(currentIdx);
+    renderGroupedEntries(currentGrouping);
 }
 
-/* -------- Initialization -------- */
-document.addEventListener('DOMContentLoaded', function () {
-    renderPage(currentIdx);
+/* ================================================================
+   RIWAYAT VIEW: Chart.js + Grouped Entries (Per Minggu / Per Bulan)
+   ================================================================ */
 
+/* ---- Helpers ---- */
+function getWeekLabel(dateStr) {
+    // dateStr: "2026-09-24" ISO
+    const d = new Date(dateStr + 'T00:00:00');
+    const day = d.getDay(); // 0=Sun
+    const diffToMon = (day === 0) ? -6 : 1 - day;
+    const mon = new Date(d); mon.setDate(d.getDate() + diffToMon);
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    const fmt = dt => `${dt.getDate()} ${dt.toLocaleString('id-ID', {month:'short'})}`;
+    const yearSuffix = sun.getFullYear() !== new Date().getFullYear() ? ` ${sun.getFullYear()}` : '';
+    return `${fmt(mon)} – ${fmt(sun)} ${sun.getFullYear()}`;
+}
+
+function getMonthLabel(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+}
+
+let collapsedGroups = new Set();
+
+function getGroupKey(dateStr, mode) {
+    if (mode === 'all') return 'all';
+    const d = new Date(dateStr + 'T00:00:00');
+    if (mode === 'month') {
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    }
+    // week: ISO week key = monday date
+    const day = d.getDay();
+    const diffToMon = (day === 0) ? -6 : 1 - day;
+    const mon = new Date(d); mon.setDate(d.getDate() + diffToMon);
+    return mon.toISOString().slice(0,10);
+}
+
+function renderSingleEntryCard(e) {
+    return `
+        <div class="history-entry-card">
+            <div class="history-entry-left">
+                <div class="history-entry-color-bar bg-${e.badge}"></div>
+            </div>
+            <div class="history-entry-body">
+                <div class="history-entry-badges d-flex flex-wrap gap-2 mb-1">
+                    <span class="badge bg-${e.badge}-subtle text-${e.badge} border border-${e.badge}-subtle">${escHtml(e.condition_display)}</span>
+                    ${e.ecopatch_name ? `<span class="badge bg-white text-secondary border">🪴 ${escHtml(e.ecopatch_name)}</span>` : ''}
+                    ${e.plant_height ? `<span class="badge bg-white text-secondary border">📏 ${e.plant_height} cm</span>` : ''}
+                    <span class="ms-auto text-muted small">📅 ${e.date}</span>
+                </div>
+                <div class="history-entry-title">${escHtml(e.title)}</div>
+                <div class="history-entry-notes text-secondary" style="white-space:pre-wrap;">${escHtml(e.notes)}</div>
+                ${e.image_url ? `
+                    <div class="mt-2 mb-1">
+                        <img src="${e.image_url}" alt="Foto ${escHtml(e.title)}" style="max-height: 110px; max-width: 160px; object-fit: cover; border-radius: 8px; border: 1px solid #efe4cb; cursor: pointer;" onclick="window.open('${e.image_url}', '_blank')">
+                    </div>
+                ` : ''}
+                <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top">
+                    <small class="text-muted fst-italic">Dicatat ${e.created_at}</small>
+                    <div class="d-flex gap-2">
+                        <a href="${e.edit_url}" class="btn btn-sm btn-outline-secondary py-0 px-2">✏️ Edit</a>
+                        <form method="post" action="${e.delete_url}" onsubmit="return confirm('Hapus catatan ini?')" style="display:inline;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${CSRF_TOKEN}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function toggleGroup(key) {
+    const el = document.getElementById(`group-${key}`);
+    if (!el) return;
+    if (collapsedGroups.has(key)) {
+        collapsedGroups.delete(key);
+        el.classList.remove('collapsed');
+    } else {
+        collapsedGroups.add(key);
+        el.classList.add('collapsed');
+    }
+    updateToggleAllBtn();
+}
+
+function toggleAllGroups() {
+    const allGroupEls = document.querySelectorAll('.history-group');
+    if (!allGroupEls.length) return;
+    const hasOpen = Array.from(allGroupEls).some(g => !g.classList.contains('collapsed'));
+    allGroupEls.forEach(g => {
+        const key = g.getAttribute('data-group-key');
+        if (hasOpen) {
+            g.classList.add('collapsed');
+            if (key) collapsedGroups.add(key);
+        } else {
+            g.classList.remove('collapsed');
+            if (key) collapsedGroups.delete(key);
+        }
+    });
+    updateToggleAllBtn();
+}
+
+function updateToggleAllBtn() {
+    const btn = document.getElementById('btn-toggle-all');
+    if (!btn) return;
+    if (currentGrouping === 'all') {
+        btn.style.display = 'none';
+        return;
+    }
+    const allGroupEls = document.querySelectorAll('.history-group');
+    if (!allGroupEls.length) {
+        btn.style.display = 'none';
+        return;
+    }
+    btn.style.display = '';
+    const hasOpen = Array.from(allGroupEls).some(g => !g.classList.contains('collapsed'));
+    btn.innerHTML = hasOpen ? '📁 Sembunyikan Semua' : '📂 Tampilkan Semua';
+}
+
+/* ---- Render grouped entries ---- */
+function renderGroupedEntries(mode) {
+    const container = document.getElementById('grouped-entries-container');
+    if (!container) return;
+
+    if (!filteredEntries || filteredEntries.length === 0) {
+        container.innerHTML = `<div class="text-center py-4 text-muted">Tidak ada catatan untuk filter ini.</div>`;
+        updateToggleAllBtn();
+        return;
+    }
+
+    if (mode === 'all') {
+        const entriesHtml = filteredEntries.map(e => renderSingleEntryCard(e)).join('');
+        container.innerHTML = `
+            <div class="d-flex flex-column gap-3 mb-4">
+                ${entriesHtml}
+            </div>
+        `;
+        updateToggleAllBtn();
+        return;
+    }
+
+    // mode: week or month
+    const groups = {};
+    const groupOrder = [];
+    filteredEntries.forEach(e => {
+        const key = getGroupKey(e.date_iso, mode);
+        if (!groups[key]) {
+            groups[key] = { label: mode === 'week' ? getWeekLabel(e.date_iso) : getMonthLabel(e.date_iso), entries: [] };
+            groupOrder.push(key);
+        }
+        groups[key].entries.push(e);
+    });
+
+    container.innerHTML = groupOrder.map(key => {
+        const g = groups[key];
+        const count = g.entries.length;
+        const isCollapsed = collapsedGroups.has(key);
+        const entriesHtml = g.entries.map(e => renderSingleEntryCard(e)).join('');
+
+        return `
+            <div class="history-group mb-4 ${isCollapsed ? 'collapsed' : ''}" id="group-${key}" data-group-key="${key}">
+                <div class="history-group-header" onclick="toggleGroup('${key}')" role="button" tabindex="0" title="Klik untuk sembunyikan/tampilkan catatan">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="history-group-chevron" id="chevron-${key}">▼</span>
+                        <span class="history-group-label">${g.label}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="history-group-count">${count} catatan</span>
+                        <span class="text-muted small d-none d-sm-inline" style="font-size:0.75rem;">(buka/tutup)</span>
+                    </div>
+                </div>
+                <div class="history-group-entries d-flex flex-column gap-3" id="entries-${key}">
+                    ${entriesHtml}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    updateToggleAllBtn();
+}
+
+/* ---- Toggle week/month/all ---- */
+function switchGrouping(mode) {
+    currentGrouping = mode;
+    document.getElementById('tab-week')?.classList.toggle('active', mode === 'week');
+    document.getElementById('tab-month')?.classList.toggle('active', mode === 'month');
+    document.getElementById('tab-all')?.classList.toggle('active', mode === 'all');
+    renderGroupedEntries(mode);
+    try { localStorage.setItem('journalGrouping', mode); } catch(e) {}
+}
+
+/* ---- Chart.js line chart ---- */
+function initHeightChart() {
+    const canvas = document.getElementById('heightChart');
+    const noData = document.getElementById('chart-no-data');
+    if (!canvas) return;
+
+    if (!CHART_DATA || CHART_DATA.length === 0) {
+        canvas.style.display = 'none';
+        if (noData) noData.style.display = '';
+        return;
+    }
+
+    if (heightChartInstance) { heightChartInstance.destroy(); }
+
+    const labels = CHART_DATA.map(d => d.date);
+    const heights = CHART_DATA.map(d => d.height);
+
+    heightChartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Tinggi (cm)',
+                data: heights,
+                borderColor: '#1f9142',
+                backgroundColor: 'rgba(31, 145, 66, 0.08)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#1f9142',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                tension: 0.35,
+                fill: true,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.parsed.y} cm`,
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { font: { size: 11 }, color: '#8c7b5a', maxRotation: 30 },
+                    grid: { display: false },
+                    border: { display: false },
+                },
+                y: {
+                    ticks: { font: { size: 11 }, color: '#8c7b5a', callback: v => v + ' cm' },
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    border: { display: false },
+                }
+            }
+        }
+    });
+}
+
+/* ---- Init on load ---- */
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup filter change listeners
     const fCond = document.getElementById('filter-condition');
     if (fCond) fCond.addEventListener('change', applyFilters);
 
@@ -408,9 +816,17 @@ document.addEventListener('DOMContentLoaded', function () {
     if (fDate) fDate.addEventListener('change', applyFilters);
 
     try {
-        const saved = localStorage.getItem('journalView');
-        if (saved === 'list') switchView('list');
-    } catch (e) {}
+        const savedGroup = localStorage.getItem('journalGrouping') || 'week';
+        currentGrouping = savedGroup;
+        document.getElementById('tab-week')?.classList.toggle('active', savedGroup === 'week');
+        document.getElementById('tab-month')?.classList.toggle('active', savedGroup === 'month');
+        document.getElementById('tab-all')?.classList.toggle('active', savedGroup === 'all');
+
+        const savedView = localStorage.getItem('journalView') || 'book';
+        switchView(savedView);
+    } catch(e) {
+        switchView('book');
+    }
 });
 </script>
 {% endblock %}
