@@ -21,18 +21,23 @@
                         <span class="plant-meta">{{ plant.quantity }} tanaman{% if plant.planted_at %} &middot; mulai tanam {{ plant.planted_at|date:"j M Y" }}{% endif %}</span>
                     </div>
 
+                    {# Status: dropdown berisi tombol submit. Nilainya dikirim lewat name/value tombol yang diklik (htmx 1.9 dan form biasa sama-sama mendukung). #}
                     <form method="post" class="plant-status-form"
                           action="{% url 'my_ecopatch:plant_status' plant.pk %}"
                           hx-post="{% url 'my_ecopatch:plant_status' plant.pk %}"
-                          hx-trigger="change" hx-target="#patch-plants" hx-swap="outerHTML">
+                          hx-target="#patch-plants" hx-swap="outerHTML">
                         {% csrf_token %}
-                        <label class="visually-hidden" for="status-{{ plant.pk }}">Status {{ plant.plant_name }}</label>
-                        <select name="status" id="status-{{ plant.pk }}" class="plant-status-select patch-pill--{{ plant.status }}">
-                            {% for value, label in status_choices %}
-                                <option value="{{ value }}"{% if value == plant.status %} selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                        <noscript><button type="submit" class="btn btn-outline-success btn-sm">Simpan</button></noscript>
+                        <div class="dropdown">
+                            <button type="button" class="plant-status-btn patch-pill--{{ plant.status }} dropdown-toggle"
+                                    data-bs-toggle="dropdown" aria-expanded="false"
+                                    aria-label="Ubah status {{ plant.plant_name }}">{{ plant.get_status_display }}</button>
+                            <ul class="dropdown-menu dropdown-menu-end patch-menu">
+                                {% for value, label in status_choices %}
+                                    <li><button type="submit" name="status" value="{{ value }}"
+                                                class="dropdown-item patch-menu-item{% if value == plant.status %} active{% endif %}">{{ label }}</button></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </form>
 
                     <form method="post"

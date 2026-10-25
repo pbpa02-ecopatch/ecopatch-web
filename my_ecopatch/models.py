@@ -16,6 +16,23 @@ class EcoPatch(models.Model):
         PARTIAL = 'partial', 'Partial Sun'
         SHADE = 'shade', 'Shade'
 
+    # Daftar kota tetap sesuai README (bagian Open-Meteo): Smart Care mencari koordinat cuaca
+    # lewat nama kota ini, jadi nilainya harus persis sama dengan kunci CITY_COORDINATES.
+    CITY_CHOICES = [
+        ('Jakarta', 'Jakarta'),
+        ('Bogor', 'Bogor'),
+        ('Depok', 'Depok'),
+        ('Tangerang', 'Tangerang'),
+        ('Bekasi', 'Bekasi'),
+        ('Bandung', 'Bandung'),
+        ('Semarang', 'Semarang'),
+        ('Yogyakarta', 'Yogyakarta'),
+        ('Surabaya', 'Surabaya'),
+        ('Malang', 'Malang'),
+        ('Medan', 'Medan'),
+        ('Makassar', 'Makassar'),
+    ]  # noqa: RUF012
+
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -29,7 +46,7 @@ class EcoPatch(models.Model):
         help_text='Ukuran ruang (m²)',
     )
     sunlight = models.CharField(max_length=20, choices=Sunlight.choices, blank=True)
-    city = models.CharField(max_length=100)
+    city = models.CharField(max_length=50, choices=CITY_CHOICES)
     goal = models.TextField(blank=True, help_text='Tujuan berkebun')
     created_at = models.DateTimeField(auto_now_add=True)
 

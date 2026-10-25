@@ -16,13 +16,13 @@ class EcoPatchForm(forms.ModelForm):
             'goal': 'Tujuan berkebun',
         }
         help_texts = {
+            'city': 'Dipakai Smart Care untuk menampilkan cuaca kotamu.',
             'size_m2': 'Opsional.',
             'sunlight': 'Opsional.',
             'goal': 'Opsional.',
         }
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Contoh: Balkon Belakang'}),
-            'city': forms.TextInput(attrs={'placeholder': 'Contoh: Depok'}),
             'goal': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Contoh: menanam sayur untuk dikonsumsi sendiri'}),
         }
 
@@ -30,6 +30,7 @@ class EcoPatchForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Ganti opsi kosong bawaan Django ("---------") dengan teks yang lebih jelas.
         self.fields['space_type'].choices = [('', 'Pilih tipe ruang')] + list(EcoPatch.SpaceType.choices)
+        self.fields['city'].choices = [('', 'Pilih kota')] + list(EcoPatch.CITY_CHOICES)
         self.fields['sunlight'].choices = [('', 'Belum ditentukan')] + list(EcoPatch.Sunlight.choices)
 
 
