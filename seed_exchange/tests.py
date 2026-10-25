@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
@@ -122,8 +124,8 @@ class SeedExchangeViewTests(TestCase):
         self.assertFalse(SeedExchange.objects.filter(pk=self.listing.pk).exists())
 
     def test_filter_by_city_and_status(self):
-        make_listing(self.owner, title='Bibit Tomat Ceri', city='Bandung', status='reserved')
-        url = reverse('seed_exchange:list') + '?city=Bandung&status=reserved'
+        make_listing(self.owner, title='Bibit Tomat Ceri', city='Bandung', status='available')
+        url = reverse('seed_exchange:list') + '?city=Bandung&status=available'
         response = self.client.get(url)
         self.assertContains(response, 'Bibit Tomat Ceri')
         self.assertNotContains(response, 'Bibit Cabai Rawit')
@@ -161,11 +163,16 @@ class SeedExchangeFlowTests(TestCase):
     def test_my_section_separates_own_listings(self):
         self.client.login(username='rheina', password='test123')
         response = self.client.get(reverse('seed_exchange:list'))
+        # Tab navigation present
         self.assertContains(response, 'Listing Saya')
-        self.assertContains(response, 'Jelajahi Listing')
-        # Own listing not duplicated in browse section.
+        self.assertContains(response, 'Booking Saya')
+        self.assertContains(response, 'Jelajahi')
+        # Default tab is 'browse' (Jelajahi) - own listing should NOT appear there
         content = response.content.decode()
-        self.assertEqual(content.count('Bibit Cabai Rawit'), 1)
+        self.assertEqual(content.count('Bibit Cabai Rawit'), 0)
+        # Own listing appears in 'mine' tab via HTMX
+        response_mine = self.client.get(reverse('seed_exchange:list') + '?tab=mine', HTTP_HX_REQUEST='true')
+        self.assertContains(response_mine, 'Bibit Cabai Rawit')
 
     def test_other_can_reserve_available(self):
         self.client.login(username='teman', password='test123')
@@ -189,13 +196,13 @@ class SeedExchangeFlowTests(TestCase):
         response = self.client.post(reverse('seed_exchange:accept', args=[self.listing.pk]))
         self.assertEqual(response.status_code, 404)
 
-    def test_requester_sees_waiting_box_with_contact(self):
+    def test_requester_sees_waiting_box_without_contact(self):
         self._request_booking()
         self.client.login(username='teman', password='test123')
         content = self.client.get(reverse('seed_exchange:detail', args=[self.listing.pk])).content.decode()
         self.assertIn('menunggu konfirmasi', content)
-        self.assertIn('@rheina', content)
-        self.assertIn('0812-0000-0000', content)
+        self.assertNotIn('@rheina', content)
+        self.assertNotIn('0812-0000-0000', content)
         self.assertIn('Batalkan booking saya', content)
 
     def test_accepted_requester_sees_contact_no_cancel(self):
@@ -299,7 +306,7 @@ class SeedExchangeFlowTests(TestCase):
 
     def test_my_section_has_add_card_and_clean_cards(self):
         self.client.login(username='rheina', password='test123')
-        response = self.client.get(reverse('seed_exchange:list'))
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=mine')
         content = response.content.decode()
         # Dashed "New Listing" card at end of My Listings grid.
         self.assertIn('seed-card-add', content)
@@ -309,3 +316,84 @@ class SeedExchangeFlowTests(TestCase):
         self.assertNotContains(response, 'Buka kembali')
         self.assertNotContains(response, '>Reserve<')
         self.assertNotContains(response, '>Ubah<')
+
+
+class SeedExchangeTabAndFilterTests(TestCase):
+    """Section tabs + filters must not fight each other."""
+
+    def setUp(self):
+        self.owner = make_user('rheina')
+        self.other = make_user('teman', 'test123')
+        self.mine = make_listing(self.owner, title='Bibit Cabai Rawit', city='Depok')
+        self.other_bandung = make_listing(self.other, title='Stek Monstera', city='Bandung')
+        self.other_jakarta = make_listing(self.other, title='Biji Kemangi', city='Jakarta')
+
+    def test_tab_links_contain_a_single_tab_param(self):
+        self.client.login(username='rheina', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=mine&city=Depok')
+        content = response.content.decode()
+        # Regression: `active` used to leak `tab` into every link, producing
+        # ?tab=mine&...&tab=browse and Django read the LAST value (browse).
+        urls = re.findall(r'\?tab=[^"\s]+', content)
+        self.assertTrue(urls)
+        for url in urls:
+            self.assertEqual(url.count('tab='), 1, url)
+        self.assertIn('?tab=mine&city=Depok', content)
+
+    def test_tab_switch_keeps_filters(self):
+        self.client.login(username='rheina', password='test123')
+        for tab in ('bookings', 'browse', 'mine'):
+            response = self.client.get(
+                reverse('seed_exchange:list') + f'?tab={tab}&city=Bandung',
+                HTTP_HX_REQUEST='true',
+            )
+            self.assertContains(response, 'seed-filter--active')
+            self.assertContains(response, f'value="{tab}"')
+            self.assertContains(response, f'id="panel-{tab}"')
+            self.assertContains(response, f'aria-selected="true"', count=1)
+
+    def test_filter_link_keeps_current_tab(self):
+        self.client.login(username='rheina', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=mine')
+        self.assertContains(response, 'tab=mine&amp;item_type=seedling')
+
+    def test_reset_link_drops_filters_and_filter_form_does_not_inherit_include(self):
+        self.client.login(username='rheina', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=mine&city=Bandung')
+        content = response.content.decode()
+        # Reset must point at a clean URL (keeping only the current tab).
+        reset_urls = re.findall(r'class="seed-filter-reset" href="([^"]+)"', content)
+        self.assertEqual(reset_urls, ['/seed-exchange/?tab=mine'])
+        # Regression: hx-include on the form was inherited by filter/reset links,
+        # appending the old values after the new URL (so both seemed dead).
+        form_tag = re.search(r'<form id="seed-filter-form".*?>', content, re.S).group(0)
+        self.assertNotIn('hx-include', form_tag)
+
+    def test_two_filters_do_not_collapse(self):
+        self.client.login(username='rheina', password='test123')
+        url = reverse('seed_exchange:list') + '?tab=browse&city=Bandung&transaction_type=giveaway'
+        response = self.client.get(url, HTTP_HX_REQUEST='true')
+        content = response.content.decode()
+        self.assertIn('city=Bandung&amp;transaction_type=giveaway', content)
+        self.assertContains(response, 'Stek Monstera')
+        self.assertNotContains(response, 'Biji Kemangi')
+
+    def test_guest_sees_same_sections_with_login_gate(self):
+        response = self.client.get(reverse('seed_exchange:list'))
+        self.assertContains(response, 'Listing Saya')
+        self.assertContains(response, 'Booking Saya')
+        self.assertContains(response, 'Jelajahi')
+        # Guest can open a restricted section, but only sees a login prompt.
+        guest_mine = self.client.get(reverse('seed_exchange:list') + '?tab=mine', HTTP_HX_REQUEST='true')
+        self.assertContains(guest_mine, 'Masuk untuk melihat listingmu.')
+        self.assertNotContains(guest_mine, 'seed-card-add')
+
+    def test_booked_listing_not_in_browse(self):
+        self.mine.status = SeedExchange.Status.REQUESTED
+        self.mine.reserved_by = self.other
+        self.mine.save()
+        self.client.login(username='teman', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=browse', HTTP_HX_REQUEST='true')
+        self.assertNotContains(response, 'Bibit Cabai Rawit')
+        bookings = self.client.get(reverse('seed_exchange:list') + '?tab=bookings', HTTP_HX_REQUEST='true')
+        self.assertContains(bookings, 'Bibit Cabai Rawit')

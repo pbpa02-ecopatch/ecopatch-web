@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -9,9 +10,26 @@ from django.urls import reverse
 from .forms import SeedExchangeForm
 from .models import SeedExchange
 
+VALID_TABS = ('mine', 'bookings', 'browse')
+
+
+def _current_tab(request):
+    """Read and validate the ?tab= value (defaults to browse)."""
+    tab = request.GET.get('tab', 'browse')
+    return tab if tab in VALID_TABS else 'browse'
+
+
+def _search_filter(qs, q):
+    """Case-insensitive search over title, plant name and description."""
+    return qs.filter(
+        Q(title__icontains=q)
+        | Q(plant_name__icontains=q)
+        | Q(description__icontains=q)
+    )
+
 
 def _filtered_queryset(request):
-    """Filtered queryset for list view (item type, plant name, city, transaction, status)."""
+    """Filtered queryset for list view (search, item type, city, transaction, status)."""
     qs = SeedExchange.objects.select_related('user').order_by('-created_at')
 
     item_type = request.GET.get('item_type', '').strip()
@@ -28,9 +46,7 @@ def _filtered_queryset(request):
     if item_type in valid_item_types:
         qs = qs.filter(item_type=item_type)
     if q:
-        qs = qs.filter(title__icontains=q) | qs.filter(plant_name__icontains=q)
-        # `|` merges two filters; distinct() safe for future M2M joins.
-        qs = qs.distinct()
+        qs = _search_filter(qs, q)
     if city in valid_cities:
         qs = qs.filter(city=city)
     if transaction_type in valid_transactions:
@@ -48,18 +64,33 @@ def _filtered_queryset(request):
     return qs, active
 
 
+def _apply_filters_to_qs(qs, active):
+    """Apply the same filters from _filtered_queryset to any queryset."""
+    if active.get('item_type'):
+        qs = qs.filter(item_type=active['item_type'])
+    if active.get('q'):
+        qs = _search_filter(qs, active['q'])
+    if active.get('city'):
+        qs = qs.filter(city=active['city'])
+    if active.get('transaction_type'):
+        qs = qs.filter(transaction_type=active['transaction_type'])
+    if active.get('status'):
+        qs = qs.filter(status=active['status'])
+    return qs
+
+
 def _is_htmx(request):
     return request.headers.get('HX-Request') == 'true'
 
 
 def _filter_url(current, name, value):
-    """Build filter URL preserving other params (for custom dropdowns)."""
-    params = dict(current)
+    """Build filter URL preserving other params + the current tab (custom dropdowns)."""
+    params = {k: v for k, v in current.items() if v}
     if value:
         params[name] = value
     else:
         params.pop(name, None)
-    qs = urlencode({k: v for k, v in params.items() if v})
+    qs = urlencode(params)
     base = reverse('seed_exchange:list')
     return f'{base}?{qs}' if qs else base
 
@@ -91,35 +122,72 @@ def _filter_dropdowns(active):
             'name': name,
             'current_label': labels.get(current_value, all_label),
             'items': items,
+            'is_active': bool(current_value),
         })
     return dropdowns
 
 
 def listing_list(request):
-    """List view: guest read-only + HTMX filter; logged-in gets 'My Listings' + 'Browse' sections."""
+    """List view with 3 sections: Listing Saya, Booking Saya, Jelajahi."""
     qs, active = _filtered_queryset(request)
+    active_tab = _current_tab(request)
+    # Keep the tab inside `active` so filter URLs preserve it, but never build
+    # tab links from it (that produced duplicate ?tab= params).
+    active['tab'] = active_tab
+
+    browse_qs = qs.exclude(
+        status__in=[
+            SeedExchange.Status.REQUESTED,
+            SeedExchange.Status.RESERVED,
+            SeedExchange.Status.COMPLETED,
+        ]
+    )
+    my_listings = []
+    my_bookings = []
+
     if request.user.is_authenticated:
         my_listings = list(
-            SeedExchange.objects.filter(user=request.user)
-            .select_related('user')
-            .order_by('-created_at')
+            _apply_filters_to_qs(
+                SeedExchange.objects.filter(user=request.user).select_related('user'), active
+            ).order_by('-created_at')
         )
-        browse = qs.exclude(user=request.user)
-    else:
-        my_listings = None
-        browse = qs
+        my_bookings = list(
+            _apply_filters_to_qs(
+                SeedExchange.objects.filter(reserved_by=request.user)
+                .select_related('user', 'reserved_by')
+                .exclude(status=SeedExchange.Status.COMPLETED),
+                active,
+            ).order_by('-updated_at')
+        )
+        # Never show your own listings (or already booked ones) in Jelajahi.
+        browse_qs = browse_qs.exclude(user=request.user)
+
+    listings = list(browse_qs)
+
+    # Filters to carry across tab switches / search (URL encoded once here so
+    # templates never emit raw, unescaped values).
+    tab_filters = {k: v for k, v in active.items() if v and k != 'tab'}
+    q_clear_filters = {k: v for k, v in tab_filters.items() if k != 'q'}
+
     context = {
-        'listings': browse,
+        'listings': listings,
         'my_listings': my_listings,
+        'my_bookings': my_bookings,
         'active': active,
+        'active_tab': active_tab,
+        'tab_qs': urlencode(tab_filters),
+        'q_clear_qs': urlencode(q_clear_filters),
         'dropdowns': _filter_dropdowns(active),
         'item_types': SeedExchange.ItemType.choices,
         'transaction_types': SeedExchange.TransactionType.choices,
         'statuses': SeedExchange.Status.choices,
         'cities': SeedExchange.CITY_CHOICES,
     }
+
+    # Both guests and members swap the whole tabs+filter block via HTMX.
     if _is_htmx(request):
-        return render(request, 'seed_exchange/partials/cards.html', context)
+        return render(request, 'seed_exchange/partials/tabs_content.html', context)
+
     return render(request, 'seed_exchange/list.html', context)
 
 
