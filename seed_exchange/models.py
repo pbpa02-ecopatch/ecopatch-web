@@ -75,6 +75,12 @@ class SeedExchange(models.Model):
         default=Status.AVAILABLE,
     )
     description = models.TextField(blank=True, default='')
+    image = models.ImageField(
+        upload_to='seed_exchange/',
+        blank=False,
+        null=True,
+        help_text='Foto bibit/tanaman (wajib, JPG/PNG, maks 5 MB)',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

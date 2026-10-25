@@ -66,6 +66,13 @@
         background: var(--surface-200);
         box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
     }
+    .seed-detail-card--split {
+        display: grid;
+        grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+        gap: 28px;
+        align-items: start;
+    }
+    .seed-detail-body { min-width: 0; }
     .seed-detail-head {
         display: flex;
         align-items: flex-start;
@@ -73,6 +80,22 @@
         gap: 16px;
         flex-wrap: wrap;
         margin-bottom: 10px;
+    }
+    .seed-detail-media {
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        border-radius: 20px;
+        background: var(--surface-100);
+    }
+    .seed-detail-media img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    @media (max-width: 860px) {
+        .seed-detail-card--split { grid-template-columns: 1fr; gap: 20px; }
+        .seed-detail-media { aspect-ratio: 16 / 9; max-height: 320px; }
     }
     .seed-detail-title { margin: 0; font-size: clamp(1.6rem, 3vw, 2.1rem); }
     .seed-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
@@ -113,8 +136,30 @@
     .seed-desc { color: var(--ink-muted); line-height: 1.7; white-space: pre-line; }
     .seed-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
     .seed-actions form { display: inline; margin: 0; }
-    .seed-back { display: inline-block; margin-bottom: 16px; color: var(--ink-muted); text-decoration: none; font-weight: 600; }
-    .seed-back:hover { color: var(--ink); }
+    .seed-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+        padding: 8px 16px 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface-200);
+        color: var(--ink-muted);
+        font-size: 13.5px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 2px 6px rgba(34, 48, 31, 0.06);
+        transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+    .seed-back svg { width: 16px; height: 16px; }
+    .seed-back:hover {
+        border-color: var(--brand-500);
+        background: color-mix(in srgb, var(--brand-300) 30%, var(--surface-200));
+        color: var(--brand-600);
+        transform: translateX(-2px);
+    }
+    .seed-back:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-300); }
     .seed-hint { margin-top: 16px; color: var(--ink-muted); font-size: 14px; }
     .seed-hint a { color: var(--brand-600); font-weight: 700; }
 
@@ -212,9 +257,21 @@
 {% endblock %}
 
 {% block content %}
-<a class="seed-back" href="{% url 'seed_exchange:list' %}">&larr; Kembali ke Seed Exchange</a>
+<a class="seed-back" href="{{ back_url }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5"/>
+        <path d="m12 19-7-7 7-7"/>
+    </svg>
+    Kembali ke Seed Exchange
+</a>
 
-<article class="seed-detail-card">
+<article class="seed-detail-card{% if listing.image %} seed-detail-card--split{% endif %}">
+    {% if listing.image %}
+    <div class="seed-detail-media">
+        <img src="{{ listing.image.url }}" alt="{{ listing.title }}" loading="lazy" decoding="async">
+    </div>
+    {% endif %}
+    <div class="seed-detail-body">
     <div class="seed-detail-head">
         <h1 class="seed-detail-title">{{ listing.title }}</h1>
         <span class="seed-status seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
@@ -328,5 +385,6 @@
         {% url 'seed_exchange:detail' listing.pk as detail_url %}
         {% include "seed_exchange/partials/login_callout.html" with title="Ingin booking bibit ini?" text="Masuk untuk booking listing atau membuat listing punyamu sendiri. Belum punya akun? Daftar gratis, kok." next_url=detail_url %}
     {% endif %}
+    </div>
 </article>
 {% endblock %}

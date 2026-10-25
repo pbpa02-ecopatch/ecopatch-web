@@ -130,6 +130,9 @@ def _filter_dropdowns(active):
 @login_required
 def listing_list(request):
     """List view with 3 sections: Listing Saya, Booking Saya, Jelajahi."""
+    # Remember where the user was so the detail page can send them back to the
+    # same tab/filters even after an edit redirect (which drops the query string).
+    request.session['seed_exchange_last_list'] = request.get_full_path()
     qs, active = _filtered_queryset(request)
     active_tab = _current_tab(request)
     # Keep the tab inside `active` so filter URLs preserve it, but never build
@@ -195,6 +198,13 @@ def listing_list(request):
 @login_required
 def listing_detail(request, pk):
     listing = get_object_or_404(SeedExchange.objects.select_related('user', 'reserved_by'), pk=pk)
+    back_url = reverse('seed_exchange:list')
+    if request.GET:
+        back_url = f'{back_url}?{request.GET.urlencode()}'
+    else:
+        last_list = request.session.get('seed_exchange_last_list', '')
+        if last_list.startswith('/seed-exchange/'):
+            back_url = last_list
     is_owner = request.user.is_authenticated and listing.user_id == request.user.id
     is_requester = (
         request.user.is_authenticated
@@ -215,6 +225,7 @@ def listing_detail(request, pk):
     )
     return render(request, 'seed_exchange/detail.html', {
         'listing': listing,
+        'back_url': back_url,
         'is_owner': is_owner,
         'is_requester': is_requester,
         'is_accepted': is_accepted,
@@ -225,15 +236,17 @@ def listing_detail(request, pk):
 @login_required
 def listing_create(request):
     if request.method == 'POST':
-        form = SeedExchangeForm(request.POST)
+        form = SeedExchangeForm(request.POST, request.FILES, create=True)
         if form.is_valid():
             listing = form.save(commit=False)
             listing.user = request.user
+            # New listings always start as available; the owner changes status later.
+            listing.status = SeedExchange.Status.AVAILABLE
             listing.save()
             messages.success(request, 'Listing berhasil dibuat.')
             return redirect('seed_exchange:detail', pk=listing.pk)
     else:
-        form = SeedExchangeForm()
+        form = SeedExchangeForm(create=True)
     return render(request, 'seed_exchange/form.html', {
         'form': form,
         'rows': _form_rows(form),
@@ -245,7 +258,7 @@ def listing_create(request):
 def listing_update(request, pk):
     listing = get_object_or_404(SeedExchange, pk=pk, user=request.user)
     if request.method == 'POST':
-        form = SeedExchangeForm(request.POST, instance=listing)
+        form = SeedExchangeForm(request.POST, request.FILES, instance=listing)
         if form.is_valid():
             form.save()
             messages.success(request, 'Listing berhasil diperbarui.')

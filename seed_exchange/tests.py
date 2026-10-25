@@ -1,11 +1,22 @@
 import re
+import tempfile
+from io import BytesIO
 from urllib.parse import quote
 
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from PIL import Image as PILImage
 
 from .models import SeedExchange
+
+
+def make_image_upload(name='bibit.png'):
+    """Small in-memory PNG for upload tests."""
+    buffer = BytesIO()
+    PILImage.new('RGB', (24, 24), '#4a7c59').save(buffer, format='PNG')
+    return SimpleUploadedFile(name, buffer.getvalue(), content_type='image/png')
 
 
 def make_user(username='rheina', password='test123'):
@@ -72,19 +83,37 @@ class SeedExchangeViewTests(TestCase):
 
     def test_create_sets_owner(self):
         self.client.login(username='rheina', password='test123')
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            response = self.client.post(reverse('seed_exchange:create'), {
+                'title': 'Stek Sirih Gading',
+                'item_type': 'cutting',
+                'plant_name': 'Sirih Gading',
+                'city': 'Jakarta',
+                'contact': '0812-1111-2222',
+                'transaction_type': 'swap',
+                'status': 'available',
+                'description': 'Mau tukar dengan stek tanaman indoor lain.',
+                'image': make_image_upload(),
+            })
+            listing = SeedExchange.objects.get(title='Stek Sirih Gading')
+            self.assertEqual(listing.user, self.owner)
+            self.assertRedirects(response, reverse('seed_exchange:detail', args=[listing.pk]))
+
+    def test_create_requires_image(self):
+        self.client.login(username='rheina', password='test123')
         response = self.client.post(reverse('seed_exchange:create'), {
-            'title': 'Stek Sirih Gading',
-            'item_type': 'cutting',
-            'plant_name': 'Sirih Gading',
-            'city': 'Jakarta',
-            'contact': '0812-1111-2222',
-            'transaction_type': 'swap',
+            'title': 'Tanpa foto',
+            'item_type': 'seed',
+            'plant_name': '',
+            'city': 'Depok',
+            'contact': '0812-0000-0000',
+            'transaction_type': 'giveaway',
             'status': 'available',
-            'description': 'Mau tukar dengan stek tanaman indoor lain.',
+            'description': '',
         })
-        listing = SeedExchange.objects.get(title='Stek Sirih Gading')
-        self.assertEqual(listing.user, self.owner)
-        self.assertRedirects(response, reverse('seed_exchange:detail', args=[listing.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Foto listing wajib diunggah.')
+        self.assertFalse(SeedExchange.objects.filter(title='Tanpa foto').exists())
 
     def test_create_requires_contact(self):
         self.client.login(username='rheina', password='test123')
@@ -107,6 +136,67 @@ class SeedExchangeViewTests(TestCase):
         self.assertIn('data-seed-select', content)
         self.assertNotIn('---------', content)
         self.assertIn('wajib diisi', content)
+        self.assertIn('enctype="multipart/form-data"', content)
+        self.assertIn('seed-upload-zone', content)
+
+    def test_create_accepts_image_upload(self):
+        self.client.login(username='rheina', password='test123')
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            response = self.client.post(reverse('seed_exchange:create'), {
+                'title': 'Bibit dengan foto',
+                'item_type': 'seedling',
+                'plant_name': 'Tomat',
+                'city': 'Depok',
+                'contact': '0812-3333-4444',
+                'transaction_type': 'giveaway',
+                'status': 'available',
+                'description': 'Bibit tomat siap tanam.',
+                'image': make_image_upload(),
+            })
+            listing = SeedExchange.objects.get(title='Bibit dengan foto')
+            self.assertTrue(listing.image.name.startswith('seed_exchange/'))
+            self.assertRedirects(response, reverse('seed_exchange:detail', args=[listing.pk]))
+
+    def test_update_keeps_existing_image(self):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            self.listing.image = make_image_upload()
+            self.listing.save()
+            original_name = self.listing.image.name
+            self.client.login(username='rheina', password='test123')
+            response = self.client.post(reverse('seed_exchange:update', args=[self.listing.pk]), {
+                'title': 'Judul baru',
+                'item_type': self.listing.item_type,
+                'plant_name': self.listing.plant_name,
+                'city': self.listing.city,
+                'contact': self.listing.contact,
+                'transaction_type': self.listing.transaction_type,
+                'status': self.listing.status,
+                'description': 'Deskripsi baru.',
+            })
+            self.assertRedirects(response, reverse('seed_exchange:detail', args=[self.listing.pk]))
+            self.listing.refresh_from_db()
+            self.assertEqual(self.listing.title, 'Judul baru')
+            self.assertEqual(self.listing.image.name, original_name)
+
+    def test_update_replaces_image(self):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            self.listing.image = make_image_upload('lama.png')
+            self.listing.save()
+            self.client.login(username='rheina', password='test123')
+            response = self.client.post(reverse('seed_exchange:update', args=[self.listing.pk]), {
+                'title': self.listing.title,
+                'item_type': self.listing.item_type,
+                'plant_name': self.listing.plant_name,
+                'city': self.listing.city,
+                'contact': self.listing.contact,
+                'transaction_type': self.listing.transaction_type,
+                'status': self.listing.status,
+                'description': self.listing.description,
+                'image': make_image_upload('baru.png'),
+            })
+            self.assertRedirects(response, reverse('seed_exchange:detail', args=[self.listing.pk]))
+            self.listing.refresh_from_db()
+            self.assertTrue(self.listing.image.name.endswith('baru.png'))
 
     def test_non_owner_cannot_edit(self):
         self.client.login(username='teman', password='test123')
@@ -158,6 +248,45 @@ class SeedExchangeViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn('seed-card', response.content.decode())
+
+    def test_create_ignores_posted_status(self):
+        self.client.login(username='rheina', password='test123')
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            self.client.post(reverse('seed_exchange:create'), {
+                'title': 'Status diselundupkan',
+                'item_type': 'seed',
+                'plant_name': '',
+                'city': 'Depok',
+                'contact': '0812-0000-0000',
+                'transaction_type': 'giveaway',
+                'status': 'completed',
+                'description': '',
+                'image': make_image_upload(),
+            })
+        listing = SeedExchange.objects.get(title='Status diselundupkan')
+        self.assertEqual(listing.status, SeedExchange.Status.AVAILABLE)
+
+    def test_create_form_hides_status_field(self):
+        self.client.login(username='rheina', password='test123')
+        content = self.client.get(reverse('seed_exchange:create')).content.decode()
+        self.assertNotIn('id_status', content)
+
+    def test_detail_back_link_returns_to_previous_tab(self):
+        self.client.login(username='rheina', password='test123')
+        url = reverse('seed_exchange:detail', args=[self.listing.pk]) + '?tab=mine'
+        response = self.client.get(url)
+        self.assertContains(response, 'href="/seed-exchange/?tab=mine"')
+
+    def test_detail_back_link_uses_last_visited_tab(self):
+        self.client.login(username='rheina', password='test123')
+        self.client.get(reverse('seed_exchange:list') + '?tab=mine')
+        response = self.client.get(reverse('seed_exchange:detail', args=[self.listing.pk]))
+        self.assertContains(response, 'href="/seed-exchange/?tab=mine"')
+
+    def test_card_links_keep_current_tab(self):
+        self.client.login(username='rheina', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=mine')
+        self.assertContains(response, f'href="/seed-exchange/{self.listing.pk}/?tab=mine"')
 
 
 class SeedExchangeFlowTests(TestCase):
