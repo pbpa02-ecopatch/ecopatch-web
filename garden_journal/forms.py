@@ -16,6 +16,7 @@ class GardenJournalForm(ModelForm):
             "plant_height",
             "image",
             "cover_pattern",
+            "cover_color",
             "notes",
         ]
         labels = {
@@ -45,8 +46,9 @@ class GardenJournalForm(ModelForm):
             ),
             "image": forms.FileInput(attrs={"class": "form-control", "accept": "image/*"}),
             "cover_pattern": forms.RadioSelect(attrs={"class": "cover-radio-input"}),
+            "cover_color": forms.HiddenInput(attrs={"id": "id_cover_color"}),
             "notes": forms.Textarea(
-                attrs={"rows": 4, "class": "form-control", "placeholder": "Tulis perkembangan tanaman hari ini..."}
+                attrs={"rows": 4, "class": "form-control", "placeholder": "Ada daun baru? Perlu disiram? Tulis apa yang kamu lihat hari ini."}
             ),
         }
 

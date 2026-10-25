@@ -3,7 +3,11 @@
     <div class="book-shelf-grid">
         {% for book in books %}
             <a href="{% url 'garden_journal:plant_history' book.plant_name %}" class="book-item" title="Buka buku {{ book.plant_name }}">
+                {% if book.cover_pattern == "solid" and book.cover_color %}
+                <div class="book-cover-wrap pattern-solid" data-cover-color="{{ book.cover_color }}">
+                {% else %}
                 <div class="book-cover-wrap pattern-{{ book.cover_pattern }}">
+                {% endif %}
                     <div class="book-inner">
                         <div class="book-title-plate">
                             <h5 class="book-plant-name">{{ book.plant_name }}</h5>
@@ -19,6 +23,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <div class="book-label-area">
                     <div class="book-label-title">{{ book.plant_name }}</div>
