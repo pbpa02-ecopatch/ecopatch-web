@@ -121,6 +121,12 @@
                                 </button>
                             </div>
 
+                            <!-- Banner info jika tanaman sudah memiliki buku jurnal -->
+                            <div id="existingBookBanner" class="alert d-none d-flex align-items-center gap-2 mt-2 p-2.5 rounded-3 border-0" style="background: #eef7f0; color: #15652f; font-size: 0.84rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                <span>Buku untuk <strong id="existingBookPlantName">Tanaman</strong> sudah ada (<strong id="existingBookCount">0</strong> lembar). Sampul otomatis disinkronkan, catatan baru akan ditambahkan ke buku ini.</span>
+                            </div>
+
                             <!-- Real form inputs for Django POST submission -->
                             <div class="d-none">
                                 <input type="radio" name="cover_pattern" value="brushes" id="radio-brushes" {% if form.cover_pattern.value == "brushes" %}checked{% endif %}>
@@ -351,25 +357,39 @@
                         </div>
 
                         <div class="row g-3">
-                            <!-- Pilihan EcoPatch -->
+                            <!-- Pilihan EcoPatch (Scrollable Custom Dropdown) -->
                             <div class="col-12 col-md-6">
-                                <label for="id_ecopatch_name" class="form-label fw-semibold">
+                                <label for="ecopatchSelectBtn" class="form-label fw-semibold">
                                     EcoPatch <span class="text-danger">*</span>
                                 </label>
                                 {% if user_patches %}
-                                    <select name="ecopatch_name" id="id_ecopatch_name" class="form-select" required>
-                                        <option value="">-- Pilih EcoPatch Kamu --</option>
-                                        {% for patch in user_patches %}
-                                            <option value="{{ patch.name }}" {% if form.ecopatch_name.value == patch.name %}selected{% endif %}>
-                                                {{ patch.name }} ({{ patch.get_space_type_display }})
-                                            </option>
-                                        {% endfor %}
-                                        {% if form.ecopatch_name.value and form.ecopatch_name.value not in user_patches %}
-                                            <option value="{{ form.ecopatch_name.value }}" selected>{{ form.ecopatch_name.value }}</option>
-                                        {% endif %}
-                                    </select>
+                                    <div class="dropdown journal-select-wrapper" id="ecopatchSelectWrapper">
+                                        <input type="hidden" name="ecopatch_name" id="id_ecopatch_name" value="{{ form.ecopatch_name.value|default:'' }}">
+                                        <button type="button" class="journal-select-btn dropdown-toggle w-100" id="ecopatchSelectBtn"
+                                                data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
+                                            <span id="ecopatchSelectLabel" class="journal-select-label {% if not form.ecopatch_name.value %}text-muted{% endif %}">
+                                                {% if form.ecopatch_name.value %}
+                                                    {{ form.ecopatch_name.value }}
+                                                {% else %}
+                                                    -- Pilih EcoPatch Kamu --
+                                                {% endif %}
+                                            </span>
+                                            <svg class="journal-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                        </button>
+                                        <ul class="dropdown-menu journal-select-menu w-100 shadow-sm" id="ecopatchDropdownMenu" aria-labelledby="ecopatchSelectBtn">
+                                            {% for patch in user_patches %}
+                                                <li>
+                                                    <button type="button" class="dropdown-item journal-select-item {% if form.ecopatch_name.value == patch.name %}active{% endif %}"
+                                                            data-ecopatch-val="{{ patch.name }}">
+                                                        <span class="fw-semibold">{{ patch.name }}</span>
+                                                        <span class="badge rounded-pill bg-light text-muted border px-2 py-1" style="font-size: 11px;">{{ patch.get_space_type_display }}</span>
+                                                    </button>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
                                 {% else %}
-                                    {{ form.ecopatch_name }}
+                                    <input type="text" name="ecopatch_name" id="id_ecopatch_name" class="form-control" placeholder="Contoh: Balkon Depan" value="{{ form.ecopatch_name.value|default:'' }}" required>
                                 {% endif %}
                                 <div class="form-text small">Pilih lokasi EcoPatch tempat tanamanmu tumbuh.</div>
                                 {% if form.ecopatch_name.errors %}
@@ -377,19 +397,31 @@
                                 {% endif %}
                             </div>
 
-                            <!-- Nama Tanaman: Dropdown dari EcoPatch -->
+                            <!-- Nama Tanaman: Scrollable Custom Dropdown -->
                             <div class="col-12 col-md-6">
-                                <label for="id_plant_name_select" class="form-label fw-semibold">
+                                <label for="plantSelectBtn" class="form-label fw-semibold">
                                     Nama Tanaman <span class="text-danger">*</span>
                                 </label>
 
-                                <!-- Dropdown utama -->
-                                <select id="id_plant_name_select" class="form-select" required>
-                                    <option value="">-- Pilih tanaman --</option>
-                                </select>
-
-                                <!-- Hidden actual form field -->
-                                <input type="hidden" name="plant_name" id="id_plant_name" value="{{ form.plant_name.value|default:'' }}">
+                                <div class="dropdown journal-select-wrapper" id="plantSelectWrapper">
+                                    <!-- Hidden actual form field for POST & validation -->
+                                    <input type="hidden" name="plant_name" id="id_plant_name" value="{{ form.plant_name.value|default:'' }}">
+                                    
+                                    <button type="button" class="journal-select-btn dropdown-toggle w-100" id="plantSelectBtn"
+                                            data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
+                                        <span id="plantSelectLabel" class="journal-select-label {% if not form.plant_name.value %}text-muted{% endif %}">
+                                            {% if form.plant_name.value %}
+                                                {{ form.plant_name.value }}
+                                            {% else %}
+                                                -- Pilih tanaman --
+                                            {% endif %}
+                                        </span>
+                                        <svg class="journal-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </button>
+                                    <ul class="dropdown-menu journal-select-menu w-100 shadow-sm" id="plantDropdownMenu" aria-labelledby="plantSelectBtn">
+                                        <!-- Diisi secara dinamis oleh JS berdasarkan EcoPatch yang dipilih -->
+                                    </ul>
+                                </div>
 
                                 <div class="form-text small text-muted mt-1">Pilih tanaman yang terdaftar di EcoPatch kamu.</div>
                                 {% if form.plant_name.errors %}
@@ -652,9 +684,14 @@
     const btnBackToStep1     = document.getElementById('btnBackToStep1');
     const btnEditSetup       = document.getElementById('btnEditSetup');
 
-    const ecopatchSelect     = document.getElementById('id_ecopatch_name');
-    const plantInput         = document.getElementById('id_plant_name');       // hidden
-    const plantSelectUI      = document.getElementById('id_plant_name_select'); // visible dropdown
+    const ecopatchInput       = document.getElementById('id_ecopatch_name');
+    const plantInput          = document.getElementById('id_plant_name');       // hidden
+    const ecopatchSelectBtn   = document.getElementById('ecopatchSelectBtn');
+    const plantSelectBtn      = document.getElementById('plantSelectBtn');
+    const ecopatchSelectLabel = document.getElementById('ecopatchSelectLabel');
+    const plantSelectLabel    = document.getElementById('plantSelectLabel');
+    const ecopatchDropdownMenu= document.getElementById('ecopatchDropdownMenu');
+    const plantDropdownMenu   = document.getElementById('plantDropdownMenu');
 
     const summaryPlantName   = document.getElementById('summaryPlantNameText');
     const summaryEcoPatch    = document.getElementById('summaryEcoPatchText');
@@ -666,6 +703,14 @@
         patchPlantsData = JSON.parse(rawPatchPlantsData);
     } catch (e) {
         patchPlantsData = {};
+    }
+
+    const rawExistingBooks = '{{ existing_books_json|default:"{}"|escapejs }}';
+    let existingBooksData = {};
+    try {
+        existingBooksData = JSON.parse(rawExistingBooks);
+    } catch (e) {
+        existingBooksData = {};
     }
 
     // Modal Validasi Interaktif dengan Petak
@@ -699,11 +744,13 @@
         }
     }
 
-    function updatePlantDropdown() {
-        if (!plantSelectUI) return;
-        const selectedPatch = ecopatchSelect ? ecopatchSelect.value.trim() : '';
-        // Collect plants: from current patch first, else all patches
-        let plants = patchPlantsData[selectedPatch] || [];
+    function updatePlantDropdown(selectedPatch) {
+        if (!plantDropdownMenu) return;
+        if (!selectedPatch && ecopatchInput) {
+            selectedPatch = ecopatchInput.value.trim();
+        }
+
+        let plants = (selectedPatch && patchPlantsData[selectedPatch]) ? patchPlantsData[selectedPatch] : [];
         if (!plants.length) {
             const allPlants = [];
             Object.values(patchPlantsData).forEach(arr => arr.forEach(p => { if (!allPlants.includes(p)) allPlants.push(p); }));
@@ -711,45 +758,136 @@
         }
 
         const currentVal = plantInput ? plantInput.value.trim() : '';
-        plantSelectUI.innerHTML = '<option value="">-- Pilih tanaman --</option>';
+        plantDropdownMenu.innerHTML = '';
+
+        if (plants.length === 0) {
+            const emptyLi = document.createElement('li');
+            emptyLi.className = 'p-3 text-center text-muted small';
+            emptyLi.innerHTML = '<span class="text-muted">Belum ada tanaman di EcoPatch ini.</span>';
+            plantDropdownMenu.appendChild(emptyLi);
+
+            if (plantSelectLabel) {
+                plantSelectLabel.textContent = '-- Belum ada tanaman --';
+                plantSelectLabel.classList.add('text-muted');
+            }
+            if (plantInput) plantInput.value = '';
+            return;
+        }
+
+        let foundCurrent = false;
         plants.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p;
-            opt.textContent = p;
-            if (p === currentVal) opt.selected = true;
-            plantSelectUI.appendChild(opt);
+            const li = document.createElement('li');
+            const isSel = (p === currentVal);
+            if (isSel) foundCurrent = true;
+
+            const exBook = existingBooksData[p];
+            let badgeHtml = '';
+            if (exBook) {
+                badgeHtml = `<span class="badge rounded-pill bg-light text-muted border px-2 py-0.5" style="font-size: 10px;">Buku Ada (${exBook.entry_count} lembar)</span>`;
+            }
+            if (isSel) {
+                badgeHtml += `<span class="badge rounded-pill bg-success text-white px-2 py-0 ms-1" style="font-size: 10px;">Dipilih</span>`;
+            }
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'dropdown-item journal-select-item ' + (isSel ? 'active' : '');
+            btn.setAttribute('data-plant-val', p);
+            btn.innerHTML = `
+                <span class="d-flex align-items-center gap-2">
+                    <span class="fw-semibold">${p}</span>
+                </span>
+                <span class="d-flex align-items-center">${badgeHtml}</span>
+            `;
+            li.appendChild(btn);
+            plantDropdownMenu.appendChild(li);
         });
 
-        // Sync hidden field on dropdown change
-        if (!plantSelectUI._listenerAdded) {
-            plantSelectUI._listenerAdded = true;
-            plantSelectUI.addEventListener('change', () => {
-                if (plantInput) plantInput.value = plantSelectUI.value;
-                syncSummaryBar();
-            });
+        if (foundCurrent && currentVal) {
+            if (plantSelectLabel) {
+                plantSelectLabel.innerHTML = '<span class="fw-semibold">' + currentVal + '</span>';
+                plantSelectLabel.classList.remove('text-muted');
+            }
+        } else {
+            if (currentVal && !plants.includes(currentVal)) {
+                if (plantInput) plantInput.value = '';
+                if (plantSelectLabel) {
+                    plantSelectLabel.textContent = '-- Pilih tanaman --';
+                    plantSelectLabel.classList.add('text-muted');
+                }
+            } else if (!currentVal) {
+                if (plantSelectLabel) {
+                    plantSelectLabel.textContent = '-- Pilih tanaman --';
+                    plantSelectLabel.classList.add('text-muted');
+                }
+            }
         }
     }
 
-    if (ecopatchSelect) {
-        ecopatchSelect.addEventListener('change', updatePlantDropdown);
-        updatePlantDropdown();
+    if (ecopatchDropdownMenu) {
+        ecopatchDropdownMenu.addEventListener('click', function (e) {
+            const btn = e.target.closest('[data-ecopatch-val]');
+            if (!btn) return;
+            const patchName = btn.getAttribute('data-ecopatch-val') || '';
+
+            if (ecopatchInput) ecopatchInput.value = patchName;
+            if (ecopatchSelectLabel) {
+                ecopatchSelectLabel.innerHTML = '<span class="fw-semibold">' + (patchName || '-- Pilih EcoPatch Kamu --') + '</span>';
+                ecopatchSelectLabel.classList.remove('text-muted');
+            }
+
+            ecopatchDropdownMenu.querySelectorAll('[data-ecopatch-val]').forEach(item => {
+                item.classList.toggle('active', item === btn);
+            });
+
+            updatePlantDropdown(patchName);
+            syncSummaryBar();
+        });
+    }
+
+    if (plantDropdownMenu) {
+        plantDropdownMenu.addEventListener('click', function (e) {
+            const btn = e.target.closest('[data-plant-val]');
+            if (!btn) return;
+            const plantVal = btn.getAttribute('data-plant-val') || '';
+
+            if (plantInput) plantInput.value = plantVal;
+            if (plantSelectLabel) {
+                plantSelectLabel.innerHTML = '<span class="fw-semibold">' + plantVal + '</span>';
+                plantSelectLabel.classList.remove('text-muted');
+            }
+
+            plantDropdownMenu.querySelectorAll('[data-plant-val]').forEach(item => {
+                const isThis = (item === btn);
+                item.classList.toggle('active', isThis);
+                const badge = item.querySelector('.badge.bg-success');
+                if (isThis && !badge) {
+                    item.querySelector('.d-flex.align-items-center:last-child').insertAdjacentHTML('beforeend', '<span class="badge rounded-pill bg-success text-white px-2 py-0 ms-1" style="font-size: 10px;">Dipilih</span>');
+                } else if (!isThis && badge) {
+                    badge.remove();
+                }
+            });
+
+            syncExistingBookStatus(plantVal);
+            syncSummaryBar();
+        });
+    }
+
+    // Initial dropdown setup
+    if (ecopatchInput && ecopatchInput.value) {
+        updatePlantDropdown(ecopatchInput.value);
     } else {
-        // edit mode or single patch: just populate once
         updatePlantDropdown();
     }
 
     function syncSummaryBar() {
         if (summaryPlantName) {
-            const v = (plantSelectUI && plantSelectUI.value) || (plantInput && plantInput.value) || '';
+            const v = (plantInput && plantInput.value) || '';
             summaryPlantName.textContent = v.trim() || 'Tanaman';
         }
         if (summaryEcoPatch) {
-            if (ecopatchSelect) {
-                summaryEcoPatch.textContent = ecopatchSelect.value.trim() || 'EcoPatch';
-            } else {
-                const hiddenPatch = document.getElementById('id_ecopatch_name');
-                if (hiddenPatch) summaryEcoPatch.textContent = hiddenPatch.value.trim() || 'EcoPatch';
-            }
+            const patchVal = (ecopatchInput && ecopatchInput.value) || '';
+            summaryEcoPatch.textContent = patchVal.trim() || 'EcoPatch';
         }
         if (summaryCoverThumb) {
             if (thumbEl) {
@@ -767,13 +905,11 @@
     }
 
     function goToStep2() {
-        const patchVal = ecopatchSelect ? ecopatchSelect.value.trim() : '';
-        const plantVal = (plantSelectUI ? plantSelectUI.value.trim() : '') || (plantInput ? plantInput.value.trim() : '');
-        // sync hidden field
-        if (plantInput && plantSelectUI) plantInput.value = plantSelectUI.value;
+        const patchVal = ecopatchInput ? ecopatchInput.value.trim() : '';
+        const plantVal = plantInput ? plantInput.value.trim() : '';
 
         if (!patchVal) {
-            if (ecopatchSelect) ecopatchSelect.focus();
+            if (ecopatchSelectBtn) ecopatchSelectBtn.focus();
             showValidationAlert(
                 'Pilih EcoPatch dulu yuk!',
                 'Petak perlu tahu di EcoPatch mana tanamanmu tumbuh agar catatan terhubung dengan kebunmu.',
@@ -782,7 +918,7 @@
             return;
         }
         if (!plantVal) {
-            if (plantSelectUI) plantSelectUI.focus();
+            if (plantSelectBtn) plantSelectBtn.focus();
             showValidationAlert(
                 'Pilih tanaman dulu yuk!',
                 'Pilih nama tanaman dari dropdown supaya sampul bukumu ada namanya.',
@@ -946,6 +1082,35 @@
         }
 
         syncSummaryBar();
+    }
+
+    function syncExistingBookStatus(plantName) {
+        const banner = document.getElementById('existingBookBanner');
+        const plantNameSpan = document.getElementById('existingBookPlantName');
+        const countSpan = document.getElementById('existingBookCount');
+
+        const exBook = plantName ? existingBooksData[plantName] : null;
+        if (exBook && banner) {
+            if (plantNameSpan) plantNameSpan.textContent = plantName;
+            if (countSpan) countSpan.textContent = exBook.entry_count;
+            banner.classList.remove('d-none');
+
+            // Auto sync cover to existing book's cover pattern & color
+            if (exBook.cover_pattern) {
+                committed.pattern = (exBook.cover_pattern === 'solid') ? 'soft' : exBook.cover_pattern;
+                committed.type = (exBook.cover_pattern === 'solid') ? 'solid' : 'pattern';
+                committed.color = exBook.cover_color || '';
+                staged = Object.assign({}, committed);
+                syncCompactCard();
+            }
+        } else if (banner) {
+            banner.classList.add('d-none');
+        }
+    }
+
+    // Auto-sync existing book status on initial load
+    if (plantInput && plantInput.value.trim()) {
+        syncExistingBookStatus(plantInput.value.trim());
     }
 
     function updateModalUI() {
