@@ -1,9 +1,14 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ journal.title }} — Garden Journal{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=5.0">
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
+<div class="row justify-content-center journal-module">
     <div class="col-12 col-lg-8">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-3">
@@ -20,45 +25,55 @@
             </ol>
         </nav>
 
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
+        <div class="card card-ds border-0">
+            <div class="card-body p-4 p-md-5">
                 <!-- Header -->
                 <div class="d-flex justify-content-between align-items-start mb-3">
-                    <span class="badge bg-{{ journal.get_condition_display_badge }}-subtle
-                                 text-{{ journal.get_condition_display_badge }}
-                                 border border-{{ journal.get_condition_display_badge }}-subtle fs-6 px-3 py-2">
+                    <span class="badge {{ journal.get_condition_ds_class }} px-3 py-2 fs-6">
                         {{ journal.get_plant_condition_display }}
                     </span>
                     <small class="text-muted">{{ journal.date }}</small>
                 </div>
 
-                <h3 class="fw-bold mb-3">{{ journal.title }}</h3>
+                <h3 class="fw-bold mb-3 text-dark">{{ journal.title }}</h3>
 
                 <!-- Meta info -->
                 <div class="row g-2 mb-3">
                     {% if journal.ecopatch_name %}
                         <div class="col-auto">
-                            <span class="badge bg-light text-dark border">🪴 {{ journal.ecopatch_name }}</span>
+                            <span class="badge bg-light text-dark border px-3 py-2 d-inline-flex align-items-center">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M7 10h10l-1.5 9h-7z"/><path d="M12 10V4"/><path d="M8 6c0-1.1 1.8-2 4-2s4 .9 4 2"/></svg>
+                                {{ journal.ecopatch_name }}
+                            </span>
                         </div>
                     {% endif %}
                     {% if journal.plant_name %}
                         <div class="col-auto">
-                            <span class="badge bg-light text-dark border">🌱 {{ journal.plant_name }}</span>
+                            <span class="badge bg-light text-dark border px-3 py-2 d-inline-flex align-items-center">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M11 20A7 7 0 0 1 4 13C4 8 8 3 13 3c0 7-3 10-2 17Z"/><path d="M8 12c3-1 6-1 9 1"/></svg>
+                                {{ journal.plant_name }}
+                            </span>
                         </div>
                     {% endif %}
                     {% if journal.plant_height %}
                         <div class="col-auto">
-                            <span class="badge bg-light text-dark border">📏 {{ journal.plant_height }} cm</span>
+                            <span class="badge bg-light text-dark border px-3 py-2">Ukuran: {{ journal.plant_height }} cm</span>
                         </div>
                     {% endif %}
                 </div>
 
-                <hr>
+                {% if journal.image %}
+                    <div class="my-4">
+                        <img src="{{ journal.image.url }}" alt="{{ journal.title }}" class="img-fluid rounded-3 shadow-sm border" style="max-height: 380px; object-fit: cover;">
+                    </div>
+                {% endif %}
+
+                <hr class="my-4">
 
                 <!-- Catatan -->
                 <div class="mb-4">
                     <h6 class="text-muted fw-semibold small text-uppercase mb-2">Catatan</h6>
-                    <p class="text-body" style="white-space: pre-wrap;">{{ journal.notes }}</p>
+                    <p class="text-body" style="white-space: pre-wrap; font-size: 1rem; line-height: 1.6;">{{ journal.notes }}</p>
                 </div>
 
                 <!-- Footer info -->
@@ -72,17 +87,22 @@
             </div>
 
             <!-- Actions -->
-            <div class="card-footer bg-transparent border-0 px-4 pb-4 d-flex gap-2">
-                <a href="{% url 'garden_journal:edit' journal.pk %}" class="btn btn-outline-secondary">
-                    ✏️ Edit
+            <div class="card-footer bg-transparent border-0 px-4 px-md-5 pb-4 d-flex flex-wrap gap-2 align-items-center">
+                <a href="{% url 'garden_journal:edit' journal.pk %}" class="btn btn-ds-ghost">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    Edit Catatan
                 </a>
                 <form method="post" action="{% url 'garden_journal:delete' journal.pk %}"
                       onsubmit="return confirm('Yakin ingin menghapus catatan ini?')">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger">🗑️ Hapus</button>
+                    <button type="submit" class="btn btn-ds-danger">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        Hapus
+                    </button>
                 </form>
-                <a href="{% url 'garden_journal:list' %}" class="btn btn-link text-muted ms-auto">
-                    ← Kembali ke list
+                <a href="{% url 'garden_journal:list' %}" class="btn btn-link text-muted ms-auto d-inline-flex align-items-center text-decoration-none">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    Kembali ke Rak
                 </a>
             </div>
         </div>

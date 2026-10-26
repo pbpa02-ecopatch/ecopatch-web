@@ -4,7 +4,7 @@
 {% block title %}{{ action }} Catatan — Garden Journal{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/journal_books.css' %}">
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=5.0">
 {% endblock %}
 
 {% block content %}
@@ -27,423 +27,614 @@
             </ol>
         </nav>
 
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <h4 class="fw-bold mb-4">
-                    {% if action == "Tambah" %}📝 Tulis Jurnal Baru{% else %}✏️ Edit Catatan Jurnal{% endif %}
-                </h4>
+        {% if not has_ecopatch and action == "Tambah" %}
+        <!-- Empty State Jika Belum Punya EcoPatch -->
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-3 bg-white">
+            <div class="mb-3">
+                <img src="{% static 'img/mascot/petak-penasaran.png' %}" alt="Petak Penasaran" style="width: 110px; height: auto;">
+            </div>
+            <h4 class="fw-bold text-dark mb-2">Kamu Belum Punya EcoPatch</h4>
+            <p class="text-muted mx-auto mb-4" style="max-width: 480px; font-size: 0.95rem;">
+                Sebelum mulai menulis buku jurnal tanaman, buat ruang <strong>EcoPatch</strong> terlebih dahulu (misal: Balkon Timur, Rooftop, atau Pot Gantung) agar catatan perkembangan tanamanmu terhubung dengan kebunmu.
+            </p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="{% url 'my_ecopatch:create' %}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M12 5v14M5 12h14"/></svg>
+                    Buat EcoPatch Sekarang
+                </a>
+                <a href="{% url 'garden_journal:list' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                    Kembali ke Rak Buku
+                </a>
+            </div>
+        </div>
+        {% else %}
 
-                <form method="post" enctype="multipart/form-data" novalidate>
+        <div class="card border-0 rounded-4" style="border: 1.5px solid #e6cf95 !important; box-shadow: 0 6px 16px rgba(34,48,31,0.08); border-radius: 18px !important;">
+            <div class="card-body p-4 p-md-5">
+                
+                <!-- Wizard Step Bar Indicator (Hanya saat buat buku tanaman baru dari rak) -->
+                {% if action == "Tambah" and not is_adding_to_existing_book %}
+                <div class="wizard-steps-bar" id="wizardStepsBar">
+                    <div class="wizard-step-item {% if not start_at_step_2 %}active{% else %}completed clickable{% endif %}" id="stepIndicator1">
+                        <div class="step-circle">1</div>
+                        <span class="step-label">1. Setup Buku & Kebun</span>
+                    </div>
+                    <div class="wizard-step-line"></div>
+                    <div class="wizard-step-item {% if start_at_step_2 %}active{% endif %}" id="stepIndicator2">
+                        <div class="step-circle">2</div>
+                        <span class="step-label">2. Lembar Catatan</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <img src="{% static 'img/mascot/petak-mencatat.png' %}" alt="Petak Mencatat" style="width: 46px; height: auto;" class="d-none d-sm-block">
+                    <div>
+                        <h4 class="fw-bold mb-0 text-dark" id="formHeaderTitle">
+                            {% if action == "Tambah" %}
+                                {% if initial_plant %}Tambah Catatan: {{ initial_plant }}{% else %}Tulis Jurnal Baru{% endif %}
+                            {% else %}
+                                Edit Catatan Jurnal
+                            {% endif %}
+                        </h4>
+                        <div class="text-muted small">Catat pertumbuhan tanamanmu bersama Petak</div>
+                    </div>
+                </div>
+
+                {% if form.errors %}
+                <!-- Alert Error dengan Maskot Petak Layu/Penasaran -->
+                <div class="alert border-0 rounded-4 shadow-sm p-3 mb-4 d-flex align-items-center gap-3" style="background: #fff4ea; border-left: 5px solid #ff7043 !important;">
+                    <img src="{% static 'img/mascot/petak-layu.png' %}" alt="Petak" style="width: 54px; height: auto;" class="flex-shrink-0">
+                    <div>
+                        <h6 class="fw-bold text-danger mb-1">Ups, ada bagian wajib yang terlewat!</h6>
+                        <p class="text-muted small mb-0">Pastikan kolom bertanda bintang (*) seperti <strong>Nama Tanaman</strong>, <strong>Judul</strong>, dan <strong>Catatan</strong> sudah kamu isi lengkap ya.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" novalidate id="journalForm">
                     {% csrf_token %}
 
-                    <!-- Pilihan Sampul Buku (Compact Card & Modal) -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold mb-1 text-dark">
-                            Sampul buku
-                        </label>
-                        <p class="text-muted small mb-2">Yuk, pilih sampul favoritmu agar buku jurnal tanaman ini terlihat makin cantik!</p>
-                        <div class="cover-compact-card">
+                    {% if action == "Tambah" and not is_adding_to_existing_book %}
+                    <!-- ==========================================
+                         SECTION 1: SETUP JURNAL & BUKU TANAMAN
+                         ========================================== -->
+                    <div id="sectionSetup" class="{% if start_at_step_2 %}d-none{% endif %}">
+                        <!-- Pilihan Sampul Buku (Compact Card & Modal) -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold mb-1 text-dark">
+                                Sampul Buku Jurnal
+                            </label>
+                            <p class="text-muted small mb-2">Pilih motif atau warna sampul favoritmu untuk tanaman ini:</p>
+                            <div class="cover-compact-card">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="book-mini-thumb" id="current-cover-thumb"
+                                         data-initial-pattern="{{ form.cover_pattern.value|default:'soft' }}"
+                                         data-initial-color="{{ form.cover_color.value|default:'' }}"></div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0 text-dark" id="current-cover-name">Soft</h6>
+                                        <div class="text-muted small">Sampul buku jurnalmu</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-ganti-sampul" data-bs-toggle="modal" data-bs-target="#coverPickerModal">
+                                    Ganti sampul
+                                </button>
+                            </div>
+
+                            <!-- Real form inputs for Django POST submission -->
+                            <div class="d-none">
+                                <input type="radio" name="cover_pattern" value="brushes" id="radio-brushes" {% if form.cover_pattern.value == "brushes" %}checked{% endif %}>
+                                <input type="radio" name="cover_pattern" value="dots" id="radio-dots" {% if form.cover_pattern.value == "dots" %}checked{% endif %}>
+                                <input type="radio" name="cover_pattern" value="flowers" id="radio-flowers" {% if form.cover_pattern.value == "flowers" %}checked{% endif %}>
+                                <input type="radio" name="cover_pattern" value="seeds" id="radio-seeds" {% if form.cover_pattern.value == "seeds" %}checked{% endif %}>
+                                <input type="radio" name="cover_pattern" value="soft" id="radio-soft" {% if form.cover_pattern.value == "soft" or not form.cover_pattern.value %}checked{% endif %}>
+                                <input type="radio" name="cover_pattern" value="leaves" id="radio-leaves" {% if form.cover_pattern.value == "leaves" %}checked{% endif %}>
+                                <input type="radio" name="cover_pattern" value="bark" id="radio-bark" {% if form.cover_pattern.value == "bark" %}checked{% endif %}>
+                                <input type="radio" name="cover_pattern" value="terra" id="radio-terra" {% if form.cover_pattern.value == "terra" %}checked{% endif %}>
+                                <input type="radio" name="cover_pattern" value="moss" id="radio-moss" {% if form.cover_pattern.value == "moss" %}checked{% endif %}>
+                                <input type="radio" name="cover_pattern" value="clay" id="radio-clay" {% if form.cover_pattern.value == "clay" %}checked{% endif %}>
+                                <input type="radio" name="cover_pattern" value="solid" id="radio-solid" {% if form.cover_pattern.value == "solid" %}checked{% endif %}>
+                            </div>
+                            {{ form.cover_color }}
+                        </div>
+
+                        <!-- Modal Pilih Sampul -->
+                        <div class="modal fade" id="coverPickerModal" tabindex="-1" aria-labelledby="coverPickerModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+                                <div class="modal-content rounded-4 border-0 shadow-lg">
+                                    <div class="modal-header border-0 pb-0 pt-3 px-3 d-flex justify-content-between align-items-center">
+                                        <h5 class="modal-title fw-bold text-dark fs-6" id="coverPickerModalLabel">Pilih sampul</h5>
+                                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+
+                                    <div class="modal-body px-3 pt-1 pb-3" style="max-height: 75vh; overflow-y: auto;">
+                                        <div class="d-flex flex-column align-items-center py-2 mb-2">
+                                            <div class="modal-book-preview-wrap mb-2">
+                                                <div class="modal-book-preview" id="modalLiveBookPreview">
+                                                    <span class="modal-book-title-tag">Jurnal</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-muted small">Pilih motif atau warna sampul yang paling kamu sukai:</div>
+                                        </div>
+
+                                        <!-- Tabs: Motif | Warna polos -->
+                                        <div class="modal-cover-tabs d-flex mb-3">
+                                            <button type="button" class="modal-cover-tab active" id="modalTabMotif">Motif</button>
+                                            <button type="button" class="modal-cover-tab" id="modalTabColor">Warna polos</button>
+                                        </div>
+
+                                        <!-- Tab Pane 1: Motif -->
+                                        <div class="modal-tab-pane" id="paneMotif">
+                                            <div class="modal-pattern-grid">
+                                                <div class="modal-pattern-item selected" data-pattern="soft" data-label="Soft">
+                                                    <div class="modal-pattern-card pattern-soft">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Soft</span>
+                                                </div>
+
+                                                <div class="modal-pattern-item" data-pattern="brushes" data-label="Brushes">
+                                                    <div class="modal-pattern-card pattern-brushes">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Brushes</span>
+                                                </div>
+
+                                                <div class="modal-pattern-item" data-pattern="dots" data-label="Dots">
+                                                    <div class="modal-pattern-card pattern-dots">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Dots</span>
+                                                </div>
+
+                                                <div class="modal-pattern-item" data-pattern="flowers" data-label="Flowers">
+                                                    <div class="modal-pattern-card pattern-flowers">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Flowers</span>
+                                                </div>
+
+                                                <div class="modal-pattern-item" data-pattern="seeds" data-label="Seeds">
+                                                    <div class="modal-pattern-card pattern-seeds">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Seeds</span>
+                                                </div>
+
+                                                <div class="modal-pattern-item" data-pattern="leaves" data-label="Leaves">
+                                                    <div class="modal-pattern-card pattern-leaves">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Leaves</span>
+                                                </div>
+
+                                                <div class="modal-pattern-item" data-pattern="bark" data-label="Bark">
+                                                    <div class="modal-pattern-card pattern-bark">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Bark</span>
+                                                </div>
+
+                                                <div class="modal-pattern-item" data-pattern="terra" data-label="Terra">
+                                                    <div class="modal-pattern-card pattern-terra">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Terra</span>
+                                                </div>
+
+                                                <div class="modal-pattern-item" data-pattern="moss" data-label="Moss">
+                                                    <div class="modal-pattern-card pattern-moss">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Moss</span>
+                                                </div>
+
+                                                <div class="modal-pattern-item" data-pattern="clay" data-label="Clay">
+                                                    <div class="modal-pattern-card pattern-clay">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Clay</span>
+                                                </div>
+                                                <div class="modal-pattern-item" data-pattern="pebbles" data-label="Pebbles">
+                                                    <div class="modal-pattern-card pattern-pebbles">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Pebbles</span>
+                                                </div>
+
+                                                <div class="modal-pattern-item" data-pattern="polkadot" data-label="Polkadot">
+                                                    <div class="modal-pattern-card pattern-polkadot">
+                                                        <div class="modal-check-badge">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <span class="modal-pattern-label">Polkadot</span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <!-- Tab Pane 2: Warna Polos -->
+                                        <div class="modal-tab-pane d-none" id="paneColor">
+                                            <div class="py-2">
+                                                <div class="modal-swatch-section-title">Palet EcoPatch</div>
+                                                <div class="modal-swatch-row mb-3">
+                                                    <button type="button" class="modal-swatch-circle" data-color="#14401f" title="Dark Forest" style="background:#14401f"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#1f9142" title="Brand Green" style="background:#1f9142"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#4ecb72" title="Light Green" style="background:#4ecb72"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#93e0a8" title="Mint" style="background:#93e0a8"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#d7f4e0" title="Pale Mint" style="background:#d7f4e0"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#ff9d2e" title="Mango" style="background:#ff9d2e"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#7ea3b0" title="Mineral Sky" style="background:#7ea3b0"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#fdedc9" title="Cream" style="background:#fdedc9; border: 1px solid #e6cf95;"></button>
+                                                </div>
+
+                                                <div class="modal-swatch-section-title">Warna Netral</div>
+                                                <div class="modal-swatch-row mb-3">
+                                                    <button type="button" class="modal-swatch-circle" data-color="#ffffff" title="White" style="background:#ffffff; border: 1px solid #dee2e6;"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#f5f5f0" title="Off White" style="background:#f5f5f0; border: 1px solid #dee2e6;"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#e8e0d0" title="Warm Beige" style="background:#e8e0d0"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#d4c5ae" title="Taupe" style="background:#d4c5ae"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#b8b8b8" title="Light Gray" style="background:#b8b8b8"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#707070" title="Gray" style="background:#707070"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#3d3d3d" title="Charcoal" style="background:#3d3d3d"></button>
+                                                    <button type="button" class="modal-swatch-circle" data-color="#1a1a1a" title="Near Black" style="background:#1a1a1a"></button>
+                                                </div>
+
+                                                <div class="modal-swatch-section-title">Warna Kustom</div>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="position-relative" style="width: 40px; height: 40px;">
+                                                        <button type="button" class="modal-rainbow-btn w-100 h-100" id="btnCustomColorWheel" title="Pilih warna bebas"></button>
+                                                        <input type="color" id="modalHiddenColorInput"
+                                                               class="position-absolute top-0 start-0 w-100 h-100"
+                                                               style="opacity: 0; cursor: pointer; border: none; padding: 0;"
+                                                               value="#4ecb72">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer border-0 pt-0 pb-3 px-3">
+                                        <button type="button" class="btn btn-apply-cover w-100 rounded-pill py-2 fw-bold text-white shadow-sm" id="btnPakaiSampul">
+                                            Pakai sampul ini
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- Pilihan EcoPatch -->
+                            <div class="col-12 col-md-6">
+                                <label for="id_ecopatch_name" class="form-label fw-semibold">
+                                    EcoPatch <span class="text-danger">*</span>
+                                </label>
+                                {% if user_patches %}
+                                    <select name="ecopatch_name" id="id_ecopatch_name" class="form-select" required>
+                                        <option value="">-- Pilih EcoPatch Kamu --</option>
+                                        {% for patch in user_patches %}
+                                            <option value="{{ patch.name }}" {% if form.ecopatch_name.value == patch.name %}selected{% endif %}>
+                                                {{ patch.name }} ({{ patch.get_space_type_display }})
+                                            </option>
+                                        {% endfor %}
+                                        {% if form.ecopatch_name.value and form.ecopatch_name.value not in user_patches %}
+                                            <option value="{{ form.ecopatch_name.value }}" selected>{{ form.ecopatch_name.value }}</option>
+                                        {% endif %}
+                                    </select>
+                                {% else %}
+                                    {{ form.ecopatch_name }}
+                                {% endif %}
+                                <div class="form-text small">Pilih lokasi EcoPatch tempat tanamanmu tumbuh.</div>
+                                {% if form.ecopatch_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.ecopatch_name.errors.as_text }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Nama Tanaman: Dropdown dari EcoPatch -->
+                            <div class="col-12 col-md-6">
+                                <label for="id_plant_name_select" class="form-label fw-semibold">
+                                    Nama Tanaman <span class="text-danger">*</span>
+                                </label>
+
+                                <!-- Dropdown utama -->
+                                <select id="id_plant_name_select" class="form-select" required>
+                                    <option value="">-- Pilih tanaman --</option>
+                                </select>
+
+                                <!-- Hidden actual form field -->
+                                <input type="hidden" name="plant_name" id="id_plant_name" value="{{ form.plant_name.value|default:'' }}">
+
+                                <div class="form-text small text-muted mt-1">Pilih tanaman yang terdaftar di EcoPatch kamu.</div>
+                                {% if form.plant_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.plant_name.errors.as_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Tombol Lanjut ke Step 2 -->
+                        <div class="d-flex align-items-center gap-3 mt-4 pt-3 border-top">
+                            <button type="button" class="btn btn-ds-primary" id="btnNextToStep2">
+                                Lanjut ke Catatan
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="ms-2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            </button>
+                            <a href="{% if initial_plant %}{% url 'garden_journal:plant_history' initial_plant %}{% else %}{% url 'garden_journal:list' %}{% endif %}" class="btn btn-ds-ghost">
+                                Batal
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Mode Edit atau Tambah ke Buku Ada: Setup tidak ditampilkan. Nilai dikirim via hidden inputs -->
+                    <input type="hidden" name="plant_name" id="id_plant_name" value="{{ form.plant_name.value|default:'' }}">
+                    <input type="hidden" name="ecopatch_name" id="id_ecopatch_name" value="{{ form.ecopatch_name.value|default:'' }}">
+                    <input type="hidden" name="cover_pattern" id="id_cover_pattern" value="{{ form.cover_pattern.value|default:'soft' }}">
+                    <input type="hidden" name="cover_color" id="id_cover_color" value="{{ form.cover_color.value|default:'' }}">
+                    {% endif %}
+
+                    <!-- ==========================================
+                         SECTION 2: CATATAN HARIAN JURNAL
+                         ========================================== -->
+                    <div id="sectionNotes" class="{% if action == 'Tambah' and not is_adding_to_existing_book and not start_at_step_2 %}d-none{% endif %}">
+                        
+                        <!-- Top Summary Bar -->
+                        <div class="setup-summary-bar">
                             <div class="d-flex align-items-center gap-3">
-                                <div class="book-mini-thumb" id="current-cover-thumb"
+                                <div class="setup-summary-thumb book-mini-thumb" id="summaryCoverThumb"
                                      data-initial-pattern="{{ form.cover_pattern.value|default:'soft' }}"
                                      data-initial-color="{{ form.cover_color.value|default:'' }}"></div>
                                 <div>
-                                    <h6 class="fw-bold mb-0 text-dark" id="current-cover-name">Soft</h6>
-                                    <div class="text-muted small">Sampul buku jurnalmu</div>
+                                    <div class="text-muted small">Buku Jurnal Tanaman</div>
+                                    <h6 class="fw-bold mb-0 text-dark">
+                                        <span id="summaryPlantNameText">{{ form.plant_name.value|default:"Tanaman" }}</span>
+                                        <span class="text-muted fw-normal small">@ <span id="summaryEcoPatchText">{{ form.ecopatch_name.value|default:"EcoPatch" }}</span></span>
+                                    </h6>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-ganti-sampul" data-bs-toggle="modal" data-bs-target="#coverPickerModal">
-                                Ganti sampul
+                            {% if action == "Tambah" and not is_adding_to_existing_book %}
+                            <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center" id="btnEditSetup">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                Ubah Setup / Sampul
                             </button>
+                            {% endif %}
                         </div>
 
-                        <!-- Real form inputs for Django POST submission -->
-                        <div class="d-none">
-                            <input type="radio" name="cover_pattern" value="brushes" id="radio-brushes" {% if form.cover_pattern.value == "brushes" %}checked{% endif %}>
-                            <input type="radio" name="cover_pattern" value="dots" id="radio-dots" {% if form.cover_pattern.value == "dots" %}checked{% endif %}>
-                            <input type="radio" name="cover_pattern" value="flowers" id="radio-flowers" {% if form.cover_pattern.value == "flowers" %}checked{% endif %}>
-                            <input type="radio" name="cover_pattern" value="seeds" id="radio-seeds" {% if form.cover_pattern.value == "seeds" %}checked{% endif %}>
-                            <input type="radio" name="cover_pattern" value="soft" id="radio-soft" {% if form.cover_pattern.value == "soft" or not form.cover_pattern.value %}checked{% endif %}>
-                            <input type="radio" name="cover_pattern" value="leaves" id="radio-leaves" {% if form.cover_pattern.value == "leaves" %}checked{% endif %}>
-                            <input type="radio" name="cover_pattern" value="bark" id="radio-bark" {% if form.cover_pattern.value == "bark" %}checked{% endif %}>
-                            <input type="radio" name="cover_pattern" value="terra" id="radio-terra" {% if form.cover_pattern.value == "terra" %}checked{% endif %}>
-                            <input type="radio" name="cover_pattern" value="moss" id="radio-moss" {% if form.cover_pattern.value == "moss" %}checked{% endif %}>
-                            <input type="radio" name="cover_pattern" value="clay" id="radio-clay" {% if form.cover_pattern.value == "clay" %}checked{% endif %}>
-                            <input type="radio" name="cover_pattern" value="solid" id="radio-solid" {% if form.cover_pattern.value == "solid" %}checked{% endif %}>
-                        </div>
-                        {{ form.cover_color }}
-                    </div>
+                        <div class="row g-3">
+                            <!-- Judul Catatan -->
+                            <div class="col-12">
+                                <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+                                    Judul Catatan <span class="text-danger">*</span>
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.title.errors.as_text }}</div>
+                                {% endif %}
+                            </div>
 
-                    <!-- Modal Pilih Sampul -->
-                    <div class="modal fade" id="coverPickerModal" tabindex="-1" aria-labelledby="coverPickerModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
-                            <div class="modal-content rounded-4 border-0 shadow-lg">
-                                <!-- Modal Header -->
-                                <div class="modal-header border-0 pb-0 pt-3 px-3 d-flex justify-content-between align-items-center">
-                                    <h5 class="modal-title fw-bold text-dark fs-6" id="coverPickerModalLabel">Pilih sampul</h5>
-                                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <!-- Tanggal -->
+                            <div class="col-12 col-md-6">
+                                <label for="{{ form.date.id_for_label }}" class="form-label fw-semibold">
+                                    Tanggal <span class="text-danger">*</span>
+                                </label>
+                                {{ form.date }}
+                                {% if form.date.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.date.errors.as_text }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Ukuran / Tinggi Tanaman -->
+                            <div class="col-12 col-md-6">
+                                <label for="{{ form.plant_height.id_for_label }}" class="form-label fw-semibold">
+                                    Ukuran / Tinggi Tanaman <span class="text-muted small fw-normal">(opsional)</span>
+                                </label>
+                                <div class="input-group">
+                                    {{ form.plant_height }}
+                                    <span class="input-group-text bg-white text-muted">cm</span>
                                 </div>
+                                <div class="form-text small">Tinggi batang, panjang sulur, atau bentang tanaman dalam cm.</div>
+                                {% if form.plant_height.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.plant_height.errors.as_text }}</div>
+                                {% endif %}
+                            </div>
 
-                                <!-- Modal Body -->
-                                <div class="modal-body px-3 pt-1 pb-3" style="max-height: 75vh; overflow-y: auto;">
-                                    <!-- Live Book Cover Preview at Top -->
-                                    <div class="d-flex flex-column align-items-center py-2 mb-2">
-                                        <div class="modal-book-preview-wrap mb-2">
-                                            <div class="modal-book-preview" id="modalLiveBookPreview">
-                                                <span class="modal-book-title-tag">Jurnal</span>
-                                            </div>
+                            <!-- Kondisi Tanaman (Card Grid Mascot Petak) -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold mb-2">
+                                    Kondisi tanaman <span class="text-danger">*</span>
+                                </label>
+                                <input type="hidden" name="plant_condition" id="id_plant_condition" value="{{ form.plant_condition.value|default:'healthy' }}">
+                                
+                                <div class="condition-grid" id="conditionGrid">
+                                    <div class="condition-card" data-val="healthy">
+                                        <div class="condition-card-icon">
+                                            <img src="{% static 'img/mascot/petak-senang.png' %}" alt="Sehat" width="42" height="42" style="object-fit: contain;">
                                         </div>
-                                        <div class="text-muted small">Pilih motif atau warna sampul yang paling kamu sukai:</div>
+                                        <div class="condition-card-label">Sehat</div>
                                     </div>
-
-                                    <!-- Tabs: Motif | Warna polos -->
-                                    <div class="modal-cover-tabs d-flex mb-3">
-                                        <button type="button" class="modal-cover-tab-btn flex-fill active" id="modalTabMotif" data-tab="motif">
-                                            Motif
-                                        </button>
-                                        <button type="button" class="modal-cover-tab-btn flex-fill" id="modalTabColor" data-tab="color">
-                                            Warna polos
-                                        </button>
-                                    </div>
-
-                                    <!-- Tab Pane 1: Motif (All 10 patterns merged in single 3-column grid) -->
-                                    <div class="modal-tab-pane" id="paneMotif">
-                                        <div class="modal-pattern-grid">
-                                            <div class="modal-pattern-item" data-pattern="brushes" data-label="Brushes">
-                                                <div class="modal-pattern-card pattern-brushes">
-                                                    <div class="modal-check-badge">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <span class="modal-pattern-label">Brushes</span>
-                                            </div>
-
-                                            <div class="modal-pattern-item" data-pattern="dots" data-label="Dots">
-                                                <div class="modal-pattern-card pattern-dots">
-                                                    <div class="modal-check-badge">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <span class="modal-pattern-label">Dots</span>
-                                            </div>
-
-                                            <div class="modal-pattern-item" data-pattern="flowers" data-label="Flowers">
-                                                <div class="modal-pattern-card pattern-flowers">
-                                                    <div class="modal-check-badge">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <span class="modal-pattern-label">Flowers</span>
-                                            </div>
-
-                                            <div class="modal-pattern-item" data-pattern="seeds" data-label="Seeds">
-                                                <div class="modal-pattern-card pattern-seeds">
-                                                    <div class="modal-check-badge">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <span class="modal-pattern-label">Seeds</span>
-                                            </div>
-
-                                            <div class="modal-pattern-item" data-pattern="soft" data-label="Soft">
-                                                <div class="modal-pattern-card pattern-soft">
-                                                    <div class="modal-check-badge">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <span class="modal-pattern-label">Soft</span>
-                                            </div>
-
-                                            <div class="modal-pattern-item" data-pattern="leaves" data-label="Leaves">
-                                                <div class="modal-pattern-card pattern-leaves">
-                                                    <div class="modal-check-badge">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <span class="modal-pattern-label">Leaves</span>
-                                            </div>
-
-                                            <div class="modal-pattern-item" data-pattern="bark" data-label="Bark">
-                                                <div class="modal-pattern-card pattern-bark">
-                                                    <div class="modal-check-badge">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <span class="modal-pattern-label">Bark</span>
-                                            </div>
-
-                                            <div class="modal-pattern-item" data-pattern="terra" data-label="Terra">
-                                                <div class="modal-pattern-card pattern-terra">
-                                                    <div class="modal-check-badge">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <span class="modal-pattern-label">Terra</span>
-                                            </div>
-
-                                            <div class="modal-pattern-item" data-pattern="moss" data-label="Moss">
-                                                <div class="modal-pattern-card pattern-moss">
-                                                    <div class="modal-check-badge">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <span class="modal-pattern-label">Moss</span>
-                                            </div>
-
-                                            <div class="modal-pattern-item" data-pattern="clay" data-label="Clay">
-                                                <div class="modal-pattern-card pattern-clay">
-                                                    <div class="modal-check-badge">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <span class="modal-pattern-label">Clay</span>
-                                            </div>
+                                    <div class="condition-card" data-val="needs_attention">
+                                        <div class="condition-card-icon">
+                                            <img src="{% static 'img/mascot/petak-penasaran.png' %}" alt="Perlu perhatian" width="42" height="42" style="object-fit: contain;">
                                         </div>
+                                        <div class="condition-card-label">Perlu perhatian</div>
                                     </div>
+                                    <div class="condition-card" data-val="wilting">
+                                        <div class="condition-card-icon">
+                                            <img src="{% static 'img/mascot/petak-layu.png' %}" alt="Layu" width="42" height="42" style="object-fit: contain;">
+                                        </div>
+                                        <div class="condition-card-label">Layu</div>
+                                    </div>
+                                    <div class="condition-card" data-val="flowering">
+                                        <div class="condition-card-icon">
+                                            <img src="{% static 'img/mascot/petak-semangat.png' %}" alt="Berbunga" width="42" height="42" style="object-fit: contain;">
+                                        </div>
+                                        <div class="condition-card-label">Berbunga</div>
+                                    </div>
+                                    <div class="condition-card" data-val="fruiting">
+                                        <div class="condition-card-icon">
+                                            <img src="{% static 'img/mascot/petak-bangga.png' %}" alt="Berbuah" width="42" height="42" style="object-fit: contain;">
+                                        </div>
+                                        <div class="condition-card-label">Berbuah</div>
+                                    </div>
+                                    <div class="condition-card" data-val="ready_to_harvest">
+                                        <div class="condition-card-icon">
+                                            <img src="{% static 'img/mascot/petak-bangga.png' %}" alt="Siap panen" width="42" height="42" style="object-fit: contain;">
+                                        </div>
+                                        <div class="condition-card-label">Siap panen</div>
+                                    </div>
+                                </div>
+                                {% if form.plant_condition.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.plant_condition.errors.as_text }}</div>
+                                {% endif %}
+                            </div>
 
-                                    <!-- Tab Pane 2: Warna Polos -->
-                                    <div class="modal-tab-pane d-none" id="paneColor">
-                                        <div class="py-2">
-                                            <!-- Palet EcoPatch -->
-                                            <div class="modal-swatch-section-title">Palet EcoPatch</div>
-                                            <div class="modal-swatch-row mb-3">
-                                                <button type="button" class="modal-swatch-circle" data-color="#14401f" title="Dark Forest" style="background:#14401f"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#1f9142" title="Brand Green" style="background:#1f9142"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#4ecb72" title="Light Green" style="background:#4ecb72"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#93e0a8" title="Mint" style="background:#93e0a8"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#d7f4e0" title="Pale Mint" style="background:#d7f4e0"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#ff9d2e" title="Mango" style="background:#ff9d2e"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#29b6d8" title="Sky" style="background:#29b6d8"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#fdedc9" title="Cream" style="background:#fdedc9; border: 1px solid #e6cf95;"></button>
-                                            </div>
+                            <!-- Catatan Jurnal -->
+                            <div class="col-12">
+                                <label for="{{ form.notes.id_for_label }}" class="form-label fw-semibold">
+                                    Catatan jurnal <span class="text-danger">*</span>
+                                </label>
+                                {{ form.notes }}
+                                {% if form.notes.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.notes.errors.as_text }}</div>
+                                {% endif %}
+                            </div>
 
-                                            <!-- Warna Netral -->
-                                            <div class="modal-swatch-section-title">Warna Netral</div>
-                                            <div class="modal-swatch-row mb-3">
-                                                <button type="button" class="modal-swatch-circle" data-color="#ffffff" title="White" style="background:#ffffff; border: 1px solid #dee2e6;"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#f5f5f0" title="Off White" style="background:#f5f5f0; border: 1px solid #dee2e6;"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#e8e0d0" title="Warm Beige" style="background:#e8e0d0"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#d4c5ae" title="Taupe" style="background:#d4c5ae"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#b8b8b8" title="Light Gray" style="background:#b8b8b8"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#707070" title="Gray" style="background:#707070"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#3d3d3d" title="Charcoal" style="background:#3d3d3d"></button>
-                                                <button type="button" class="modal-swatch-circle" data-color="#1a1a1a" title="Near Black" style="background:#1a1a1a"></button>
-                                            </div>
+                            <!-- Foto Tanaman (Upload Galeri + Kamera Langsung) -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold mb-2">
+                                    Foto tanaman <span class="text-muted small fw-normal">(opsional)</span>
+                                </label>
 
-                                            <!-- Warna Kustom -->
-                                            <div class="modal-swatch-section-title">Warna Kustom</div>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="position-relative" style="width: 40px; height: 40px;">
-                                                    <button type="button" class="modal-rainbow-btn w-100 h-100" id="btnCustomColorWheel" title="Pilih warna bebas"></button>
-                                                    <input type="color" id="modalHiddenColorInput"
-                                                           class="position-absolute top-0 start-0 w-100 h-100"
-                                                           style="opacity: 0; cursor: pointer; border: none; padding: 0;"
-                                                           value="#4ecb72">
-                                                </div>
-                                            </div>
+                                <!-- Input galeri -->
+                                <input type="file" name="image" id="id_image" accept="image/*" class="d-none">
+                                <!-- Input kamera belakang -->
+                                <input type="file" id="id_image_camera" accept="image/*" capture="environment" class="d-none">
+                                <!-- Input kamera depan (selfie) -->
+                                <input type="file" id="id_image_selfie" accept="image/*" capture="user" class="d-none">
+                                <input type="checkbox" name="image-clear" id="image-clear_id" class="d-none">
+
+                                <!-- Preview box -->
+                                <div class="photo-upload-box p-4" id="photoDropArea"
+                                     data-existing-image="{% if journal and journal.image %}{{ journal.image.url }}{% endif %}" style="cursor: default;">
+                                    <div id="photoPlaceholder" class="photo-placeholder py-3">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#607659" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                        <div class="fw-bold text-dark mb-1">Belum ada foto</div>
+                                        <div class="text-muted small">JPG atau PNG, maks. 5 MB</div>
+                                    </div>
+                                    <div id="photoPreviewContainer" class="d-none text-center">
+                                        <div class="photo-preview-wrap">
+                                            <img id="photoPreviewImg" src="" alt="Preview Foto Tanaman" class="photo-preview-img mb-1">
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Modal Footer -->
-                                <div class="modal-footer border-0 pt-0 pb-3 px-3">
-                                    <button type="button" class="btn btn-apply-cover w-100 rounded-pill py-2 fw-bold text-white shadow-sm" id="btnPakaiSampul">
-                                        Pakai sampul ini
+                                <!-- Tombol aksi foto -->
+                                <div class="d-flex flex-wrap gap-2 mt-2">
+                                    <button type="button" class="btn btn-ds-secondary btn-sm d-inline-flex align-items-center" id="btnPickFromGallery">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                        Galeri / File
+                                    </button>
+                                    <button type="button" class="btn btn-ds-secondary btn-sm d-inline-flex align-items-center" id="btnOpenCamera">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                        Kamera Belakang
+                                    </button>
+                                    <button type="button" class="btn btn-ds-secondary btn-sm d-inline-flex align-items-center" id="btnOpenSelfie">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="12" r="3"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/></svg>
+                                        Selfie
+                                    </button>
+                                    <button type="button" class="btn btn-link text-danger text-decoration-none p-0 small fw-semibold d-none align-items-center" id="btnRemovePhoto">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                        Hapus foto
                                     </button>
                                 </div>
+                                {% if form.image.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.image.errors.as_text }}</div>
+                                {% endif %}
                             </div>
                         </div>
-                    </div>
 
-
-                    <div class="row g-3">
-                        <!-- Nama Tanaman -->
-                        <div class="col-12 col-md-6">
-                            <label for="{{ form.plant_name.id_for_label }}" class="form-label fw-semibold">
-                                Nama Tanaman <span class="text-danger">*</span>
-                            </label>
-                            {{ form.plant_name }}
-                            <div class="form-text small">Catatan akan masuk ke buku tanaman ini.</div>
-                            {% if form.plant_name.errors %}
-                                <div class="invalid-feedback d-block">{{ form.plant_name.errors.as_text }}</div>
+                        <!-- Tombol Aksi Step 2 -->
+                        <div class="d-flex flex-wrap align-items-center gap-3 mt-4 pt-3 border-top">
+                            {% if action == "Tambah" and not is_adding_to_existing_book %}
+                            <button type="button" class="btn btn-ds-ghost d-inline-flex align-items-center" id="btnBackToStep1">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                                Kembali ke Setup
+                            </button>
                             {% endif %}
+                            <a href="{% if journal %}{% url 'garden_journal:plant_history' journal.plant_name %}{% elif initial_plant %}{% url 'garden_journal:plant_history' initial_plant %}{% else %}{% url 'garden_journal:list' %}{% endif %}" class="btn btn-ds-ghost">
+                                Batal
+                            </a>
+                            <button type="submit" class="btn btn-ds-primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                {% if action == "Tambah" %}Simpan ke Buku{% else %}Update Catatan{% endif %}
+                            </button>
                         </div>
-
-                        <!-- Nama EcoPatch -->
-                        <div class="col-12 col-md-6">
-                            <label for="{{ form.ecopatch_name.id_for_label }}" class="form-label fw-semibold">
-                                Nama EcoPatch <span class="text-muted small">(opsional)</span>
-                            </label>
-                            {{ form.ecopatch_name }}
-                            <div class="form-text small">Contoh: Balkon Timur, Pot Gantung.</div>
-                            {% if form.ecopatch_name.errors %}
-                                <div class="invalid-feedback d-block">{{ form.ecopatch_name.errors.as_text }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Judul Catatan -->
-                        <div class="col-12">
-                            <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
-                                Judul Catatan <span class="text-danger">*</span>
-                            </label>
-                            {{ form.title }}
-                            {% if form.title.errors %}
-                                <div class="invalid-feedback d-block">{{ form.title.errors.as_text }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Tanggal -->
-                        <div class="col-12 col-md-6">
-                            <label for="{{ form.date.id_for_label }}" class="form-label fw-semibold">
-                                Tanggal <span class="text-danger">*</span>
-                            </label>
-                            {{ form.date }}
-                            {% if form.date.errors %}
-                                <div class="invalid-feedback d-block">{{ form.date.errors.as_text }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Tinggi Tanaman -->
-                        <div class="col-12 col-md-6">
-                            <label for="{{ form.plant_height.id_for_label }}" class="form-label fw-semibold">
-                                Tinggi <span class="text-muted small fw-normal">(opsional)</span>
-                            </label>
-                            <div class="input-group">
-                                {{ form.plant_height }}
-                                <span class="input-group-text bg-white text-muted">cm</span>
-                            </div>
-                            {% if form.plant_height.errors %}
-                                <div class="invalid-feedback d-block">{{ form.plant_height.errors.as_text }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Kondisi Tanaman (Card Grid) -->
-                        <div class="col-12">
-                            <label class="form-label fw-semibold mb-2">
-                                Kondisi tanaman <span class="text-danger">*</span>
-                            </label>
-                            <input type="hidden" name="plant_condition" id="id_plant_condition" value="{{ form.plant_condition.value|default:'healthy' }}">
-                            
-                            <div class="condition-grid" id="conditionGrid">
-                                <div class="condition-card" data-val="healthy">
-                                    <div class="condition-card-icon">
-                                        <img src="{% static 'img/mascot/petak-senang.png' %}" alt="Sehat" width="42" height="42" style="object-fit: contain;">
-                                    </div>
-                                    <div class="condition-card-label">Sehat</div>
-                                </div>
-                                <div class="condition-card" data-val="needs_attention">
-                                    <div class="condition-card-icon">
-                                        <img src="{% static 'img/mascot/petak-penasaran.png' %}" alt="Perlu perhatian" width="42" height="42" style="object-fit: contain;">
-                                    </div>
-                                    <div class="condition-card-label">Perlu perhatian</div>
-                                </div>
-                                <div class="condition-card" data-val="wilting">
-                                    <div class="condition-card-icon">
-                                        <img src="{% static 'img/mascot/petak-layu.png' %}" alt="Layu" width="42" height="42" style="object-fit: contain;">
-                                    </div>
-                                    <div class="condition-card-label">Layu</div>
-                                </div>
-                                <div class="condition-card" data-val="flowering">
-                                    <div class="condition-card-icon">
-                                        <img src="{% static 'img/mascot/petak-semangat.png' %}" alt="Berbunga" width="42" height="42" style="object-fit: contain;">
-                                    </div>
-                                    <div class="condition-card-label">Berbunga</div>
-                                </div>
-                                <div class="condition-card" data-val="fruiting">
-                                    <div class="condition-card-icon">
-                                        <img src="{% static 'img/mascot/petak-bangga.png' %}" alt="Berbuah" width="42" height="42" style="object-fit: contain;">
-                                    </div>
-                                    <div class="condition-card-label">Berbuah</div>
-                                </div>
-                                <div class="condition-card" data-val="ready_to_harvest">
-                                    <div class="condition-card-icon">
-                                        <img src="{% static 'img/mascot/petak-bangga.png' %}" alt="Siap panen" width="42" height="42" style="object-fit: contain;">
-                                    </div>
-                                    <div class="condition-card-label">Siap panen</div>
-                                </div>
-                            </div>
-                            {% if form.plant_condition.errors %}
-                                <div class="invalid-feedback d-block">{{ form.plant_condition.errors.as_text }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Catatan Jurnal -->
-                        <div class="col-12">
-                            <label for="{{ form.notes.id_for_label }}" class="form-label fw-semibold">
-                                Catatan jurnal <span class="text-danger">*</span>
-                            </label>
-                            {{ form.notes }}
-                            {% if form.notes.errors %}
-                                <div class="invalid-feedback d-block">{{ form.notes.errors.as_text }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Foto Tanaman (Dashed Upload Box with Preview & Hapus foto) -->
-                        <div class="col-12">
-                            <label class="form-label fw-semibold mb-2">
-                                Foto tanaman <span class="text-muted small fw-normal">(opsional)</span>
-                            </label>
-                            
-                            <div class="photo-upload-box p-4" id="photoDropArea"
-                                 data-existing-image="{% if journal and journal.image %}{{ journal.image.url }}{% endif %}">
-                                <input type="file" name="image" id="id_image" accept="image/*" class="d-none">
-                                <input type="checkbox" name="image-clear" id="image-clear_id" class="d-none">
-                                
-                                <div id="photoPlaceholder" class="photo-placeholder py-3">
-                                    <div class="mb-2 fs-3">📷</div>
-                                    <div class="fw-bold text-dark mb-1">Tambah foto</div>
-                                    <div class="text-muted small">JPG atau PNG</div>
-                                </div>
-
-                                <div id="photoPreviewContainer" class="d-none text-center">
-                                    <div class="photo-preview-wrap">
-                                        <img id="photoPreviewImg" src="" alt="Preview Foto Tanaman" class="photo-preview-img mb-1">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-2" id="photoActionRow" style="display: none;">
-                                <button type="button" class="btn btn-link text-danger text-decoration-none p-0 small fw-semibold" id="btnRemovePhoto">
-                                    Hapus foto
-                                </button>
-                            </div>
-                            {% if form.image.errors %}
-                                <div class="invalid-feedback d-block">{{ form.image.errors.as_text }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Tombol Aksi -->
-                    <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-success px-4">
-                            {% if action == "Tambah" %}💾 Simpan ke Buku{% else %}✅ Update Catatan{% endif %}
-                        </button>
-                        <a href="{% url 'garden_journal:list' %}" class="btn btn-outline-secondary">
-                            Batal
-                        </a>
                     </div>
                 </form>
             </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal Validasi Interaktif dengan Maskot Petak -->
+<div class="modal fade" id="validationAlertModal" tabindex="-1" aria-labelledby="validationModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content rounded-4 border-0 shadow-lg text-center p-4">
+            <div class="mb-3">
+                <img src="{% static 'img/mascot/petak-penasaran.png' %}" alt="Petak" id="validationPetakImg" style="width: 90px; height: auto;">
+            </div>
+            <h5 class="fw-bold text-dark mb-2" id="validationModalTitle">Bagian ini wajib diisi ya!</h5>
+            <p class="text-muted small mb-4" id="validationModalMessage">
+                Petak butuh informasi ini agar bisa mencatat lembaran buku jurnalmu.
+            </p>
+            <button type="button" class="btn btn-ds-primary w-100 rounded-pill py-2 fw-semibold" data-bs-dismiss="modal">
+                Oke, saya lengkapi sekarang
+            </button>
         </div>
     </div>
 </div>
@@ -452,6 +643,244 @@
 {% block extra_scripts %}
 <script>
 (function () {
+    // --- 2-STEP WIZARD LOGIC ---
+    const sectionSetup       = document.getElementById('sectionSetup');
+    const sectionNotes       = document.getElementById('sectionNotes');
+    const stepIndicator1     = document.getElementById('stepIndicator1');
+    const stepIndicator2     = document.getElementById('stepIndicator2');
+    const btnNextToStep2     = document.getElementById('btnNextToStep2');
+    const btnBackToStep1     = document.getElementById('btnBackToStep1');
+    const btnEditSetup       = document.getElementById('btnEditSetup');
+
+    const ecopatchSelect     = document.getElementById('id_ecopatch_name');
+    const plantInput         = document.getElementById('id_plant_name');       // hidden
+    const plantSelectUI      = document.getElementById('id_plant_name_select'); // visible dropdown
+
+    const summaryPlantName   = document.getElementById('summaryPlantNameText');
+    const summaryEcoPatch    = document.getElementById('summaryEcoPatchText');
+    const summaryCoverThumb  = document.getElementById('summaryCoverThumb');
+
+    const rawPatchPlantsData = '{{ patch_plants_json|default:"{}"|escapejs }}';
+    let patchPlantsData = {};
+    try {
+        patchPlantsData = JSON.parse(rawPatchPlantsData);
+    } catch (e) {
+        patchPlantsData = {};
+    }
+
+    // Modal Validasi Interaktif dengan Petak
+    const validationModalEl = document.getElementById('validationAlertModal');
+    let validationModal = null;
+
+    function showValidationAlert(title, message, mascotType) {
+        const titleEl = document.getElementById('validationModalTitle');
+        const msgEl   = document.getElementById('validationModalMessage');
+        const imgEl   = document.getElementById('validationPetakImg');
+
+        if (titleEl) titleEl.textContent = title;
+        if (msgEl)   msgEl.textContent = message;
+        if (imgEl) {
+            if (mascotType === 'mencatat') {
+                imgEl.src = "{% static 'img/mascot/petak-mencatat.png' %}";
+            } else if (mascotType === 'layu') {
+                imgEl.src = "{% static 'img/mascot/petak-layu.png' %}";
+            } else {
+                imgEl.src = "{% static 'img/mascot/petak-penasaran.png' %}";
+            }
+        }
+
+        if (!validationModal && validationModalEl && typeof bootstrap !== 'undefined') {
+            validationModal = new bootstrap.Modal(validationModalEl);
+        }
+        if (validationModal) {
+            validationModal.show();
+        } else {
+            alert(message);
+        }
+    }
+
+    function updatePlantDropdown() {
+        if (!plantSelectUI) return;
+        const selectedPatch = ecopatchSelect ? ecopatchSelect.value.trim() : '';
+        // Collect plants: from current patch first, else all patches
+        let plants = patchPlantsData[selectedPatch] || [];
+        if (!plants.length) {
+            const allPlants = [];
+            Object.values(patchPlantsData).forEach(arr => arr.forEach(p => { if (!allPlants.includes(p)) allPlants.push(p); }));
+            plants = allPlants;
+        }
+
+        const currentVal = plantInput ? plantInput.value.trim() : '';
+        plantSelectUI.innerHTML = '<option value="">-- Pilih tanaman --</option>';
+        plants.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.textContent = p;
+            if (p === currentVal) opt.selected = true;
+            plantSelectUI.appendChild(opt);
+        });
+
+        // Sync hidden field on dropdown change
+        if (!plantSelectUI._listenerAdded) {
+            plantSelectUI._listenerAdded = true;
+            plantSelectUI.addEventListener('change', () => {
+                if (plantInput) plantInput.value = plantSelectUI.value;
+                syncSummaryBar();
+            });
+        }
+    }
+
+    if (ecopatchSelect) {
+        ecopatchSelect.addEventListener('change', updatePlantDropdown);
+        updatePlantDropdown();
+    } else {
+        // edit mode or single patch: just populate once
+        updatePlantDropdown();
+    }
+
+    function syncSummaryBar() {
+        if (summaryPlantName) {
+            const v = (plantSelectUI && plantSelectUI.value) || (plantInput && plantInput.value) || '';
+            summaryPlantName.textContent = v.trim() || 'Tanaman';
+        }
+        if (summaryEcoPatch) {
+            if (ecopatchSelect) {
+                summaryEcoPatch.textContent = ecopatchSelect.value.trim() || 'EcoPatch';
+            } else {
+                const hiddenPatch = document.getElementById('id_ecopatch_name');
+                if (hiddenPatch) summaryEcoPatch.textContent = hiddenPatch.value.trim() || 'EcoPatch';
+            }
+        }
+        if (summaryCoverThumb) {
+            if (thumbEl) {
+                summaryCoverThumb.className = 'setup-summary-thumb book-mini-thumb ' + (thumbEl.className.replace('book-mini-thumb', '').trim());
+                summaryCoverThumb.style.backgroundColor = thumbEl.style.backgroundColor;
+            } else {
+                const p = summaryCoverThumb.dataset.initialPattern || 'soft';
+                const c = summaryCoverThumb.dataset.initialColor || '';
+                summaryCoverThumb.className = 'setup-summary-thumb book-mini-thumb pattern-' + p;
+                if (c && p === 'solid') {
+                    summaryCoverThumb.style.backgroundColor = c;
+                }
+            }
+        }
+    }
+
+    function goToStep2() {
+        const patchVal = ecopatchSelect ? ecopatchSelect.value.trim() : '';
+        const plantVal = (plantSelectUI ? plantSelectUI.value.trim() : '') || (plantInput ? plantInput.value.trim() : '');
+        // sync hidden field
+        if (plantInput && plantSelectUI) plantInput.value = plantSelectUI.value;
+
+        if (!patchVal) {
+            if (ecopatchSelect) ecopatchSelect.focus();
+            showValidationAlert(
+                'Pilih EcoPatch dulu yuk!',
+                'Petak perlu tahu di EcoPatch mana tanamanmu tumbuh agar catatan terhubung dengan kebunmu.',
+                'penasaran'
+            );
+            return;
+        }
+        if (!plantVal) {
+            if (plantSelectUI) plantSelectUI.focus();
+            showValidationAlert(
+                'Pilih tanaman dulu yuk!',
+                'Pilih nama tanaman dari dropdown supaya sampul bukumu ada namanya.',
+                'penasaran'
+            );
+            return;
+        }
+
+        syncSummaryBar();
+
+        if (sectionSetup) sectionSetup.classList.add('d-none');
+        if (sectionNotes) sectionNotes.classList.remove('d-none');
+
+        if (stepIndicator1) {
+            stepIndicator1.classList.remove('active');
+            stepIndicator1.classList.add('completed', 'clickable');
+        }
+        if (stepIndicator2) {
+            stepIndicator2.classList.add('active');
+        }
+
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+    }
+
+    function goToStep1() {
+        if (sectionNotes) sectionNotes.classList.add('d-none');
+        if (sectionSetup) sectionSetup.classList.remove('d-none');
+
+        if (stepIndicator1) {
+            stepIndicator1.classList.add('active');
+        }
+        if (stepIndicator2) {
+            stepIndicator2.classList.remove('active');
+        }
+
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+    }
+
+    if (btnNextToStep2) btnNextToStep2.addEventListener('click', goToStep2);
+    if (btnBackToStep1) btnBackToStep1.addEventListener('click', goToStep1);
+    if (btnEditSetup)   btnEditSetup.addEventListener('click', goToStep1);
+
+    // Form submit validation with Petak image
+    const journalForm = document.getElementById('journalForm');
+    if (journalForm) {
+        journalForm.addEventListener('submit', function (e) {
+            const titleInput = document.getElementById('id_title');
+            const dateInput  = document.getElementById('id_date');
+            const notesInput = document.getElementById('id_notes');
+
+            const titleVal = titleInput ? titleInput.value.trim() : '';
+            const dateVal  = dateInput ? dateInput.value.trim() : '';
+            const notesVal = notesInput ? notesInput.value.trim() : '';
+
+            if (!titleVal) {
+                e.preventDefault();
+                if (titleInput) titleInput.focus();
+                showValidationAlert(
+                    'Beri judul catatanmu ya!',
+                    'Tulis apa yang terjadi pada tanamanmu hari ini (misal: "Mulai tumbuh daun baru" atau "Merekah indah").',
+                    'mencatat'
+                );
+                return false;
+            }
+
+            if (!dateVal) {
+                e.preventDefault();
+                if (dateInput) dateInput.focus();
+                showValidationAlert(
+                    'Tanggalnya belum dipilih!',
+                    'Petak perlu tahu tanggal catatan ini agar lembar bukumu berurutan rapi.',
+                    'penasaran'
+                );
+                return false;
+            }
+
+            if (!notesVal) {
+                e.preventDefault();
+                if (notesInput) notesInput.focus();
+                showValidationAlert(
+                    'Catatan jurnal masih kosong!',
+                    'Petak butuh sedikit cerita atau catatan tentang kondisi tanamanmu hari ini sebelum disimpan.',
+                    'mencatat'
+                );
+                return false;
+            }
+        });
+    }
+
+    if (stepIndicator1) {
+        stepIndicator1.addEventListener('click', () => {
+            if (stepIndicator1.classList.contains('clickable')) {
+                goToStep1();
+            }
+        });
+    }
+
+    // --- COVER PICKER MODAL ---
     const modalEl             = document.getElementById('coverPickerModal');
     const modalLivePreview    = document.getElementById('modalLiveBookPreview');
     const modalTabMotif       = document.getElementById('modalTabMotif');
@@ -479,10 +908,11 @@
         'terra': 'Terra',
         'moss': 'Moss',
         'clay': 'Clay',
+        'pebbles': 'Pebbles',
+        'polkadot': 'Polkadot',
         'solid': 'Warna Polos'
     };
 
-    // Initial committed state from data-attributes (prevents editor linter squiggles)
     const initialPattern = thumbEl ? (thumbEl.dataset.initialPattern || 'soft') : 'soft';
     const initialColor   = thumbEl ? (thumbEl.dataset.initialColor || '') : '';
 
@@ -492,11 +922,10 @@
         color: initialColor || '#4ecb72'
     };
 
-    // Staged state while selecting in modal
     let staged = Object.assign({}, committed);
 
-    // Apply committed state to the compact card and hidden form inputs
     function syncCompactCard() {
+        if (!thumbEl || !nameEl) return;
         thumbEl.className = 'book-mini-thumb';
         if (committed.type === 'solid') {
             thumbEl.classList.add('pattern-solid');
@@ -508,76 +937,72 @@
             nameEl.textContent = PATTERN_LABELS[committed.pattern] || committed.pattern;
         }
 
-        // Sync radio for POST
         const targetPattern = committed.type === 'solid' ? 'solid' : committed.pattern;
         const radio = document.getElementById('radio-' + targetPattern);
         if (radio) radio.checked = true;
 
-        // Sync hidden color input for POST
         if (colorInput) {
             colorInput.value = committed.type === 'solid' ? committed.color : '';
         }
+
+        syncSummaryBar();
     }
 
-    // Update modal live preview and active selections
     function updateModalUI() {
+        if (!modalLivePreview) return;
         modalLivePreview.className = 'modal-book-preview';
         if (staged.type === 'solid') {
             modalLivePreview.classList.add('pattern-solid');
             modalLivePreview.style.backgroundColor = staged.color;
 
-            // Tabs
-            modalTabMotif.classList.remove('active');
-            modalTabColor.classList.add('active');
-            paneMotif.classList.add('d-none');
-            paneColor.classList.remove('d-none');
+            if (modalTabMotif) modalTabMotif.classList.remove('active');
+            if (modalTabColor) modalTabColor.classList.add('active');
+            if (paneMotif) paneMotif.classList.add('d-none');
+            if (paneColor) paneColor.classList.remove('d-none');
 
-            // Patterns deselect
             patternItems.forEach(item => item.classList.remove('selected'));
 
-            // Swatches highlight
             let matchedSwatch = false;
             swatchCircles.forEach(btn => {
                 const match = btn.dataset.color.toLowerCase() === staged.color.toLowerCase();
                 btn.classList.toggle('selected', match);
                 if (match) matchedSwatch = true;
             });
-            btnCustomColorWheel.classList.toggle('selected', !matchedSwatch);
+            if (btnCustomColorWheel) btnCustomColorWheel.classList.toggle('selected', !matchedSwatch);
         } else {
             modalLivePreview.classList.add('pattern-' + staged.pattern);
             modalLivePreview.style.backgroundColor = '';
 
-            // Tabs
-            modalTabMotif.classList.add('active');
-            modalTabColor.classList.remove('active');
-            paneMotif.classList.remove('d-none');
-            paneColor.classList.add('d-none');
+            if (modalTabMotif) modalTabMotif.classList.add('active');
+            if (modalTabColor) modalTabColor.classList.remove('active');
+            if (paneMotif) paneMotif.classList.remove('d-none');
+            if (paneColor) paneColor.classList.add('d-none');
 
-            // Patterns select
             patternItems.forEach(item => {
                 item.classList.toggle('selected', item.dataset.pattern === staged.pattern);
             });
 
-            // Swatches clear
             swatchCircles.forEach(btn => btn.classList.remove('selected'));
-            btnCustomColorWheel.classList.remove('selected');
+            if (btnCustomColorWheel) btnCustomColorWheel.classList.remove('selected');
         }
     }
 
-    // Modal tabs click
-    modalTabMotif.addEventListener('click', function () {
-        staged.type = 'pattern';
-        if (!staged.pattern) staged.pattern = 'soft';
-        updateModalUI();
-    });
+    if (modalTabMotif) {
+        modalTabMotif.addEventListener('click', function () {
+            staged.type = 'pattern';
+            if (!staged.pattern) staged.pattern = 'soft';
+            updateModalUI();
+        });
+    }
 
-    modalTabColor.addEventListener('click', function () {
-        staged.type = 'solid';
-        if (!staged.color) staged.color = '#4ecb72';
-        updateModalUI();
-    });
+    if (modalTabColor) {
+        modalTabColor.addEventListener('click', function () {
+            staged.type = 'solid';
+            if (!staged.color) staged.color = '#4ecb72';
+            updateModalUI();
+        });
+    }
 
-    // Pattern click
     patternItems.forEach(item => {
         item.addEventListener('click', function () {
             staged.type = 'pattern';
@@ -586,45 +1011,46 @@
         });
     });
 
-    // Swatch click
     swatchCircles.forEach(circle => {
         circle.addEventListener('click', function () {
             staged.type = 'solid';
             staged.color = circle.dataset.color;
-            modalColorInput.value = circle.dataset.color;
+            if (modalColorInput) modalColorInput.value = circle.dataset.color;
             updateModalUI();
         });
     });
 
-    // Color wheel click
-    btnCustomColorWheel.addEventListener('click', function () {
-        modalColorInput.click();
-    });
+    if (btnCustomColorWheel && modalColorInput) {
+        btnCustomColorWheel.addEventListener('click', function () {
+            modalColorInput.click();
+        });
+        modalColorInput.addEventListener('input', function () {
+            staged.type = 'solid';
+            staged.color = modalColorInput.value;
+            updateModalUI();
+        });
+    }
 
-    modalColorInput.addEventListener('input', function () {
-        staged.type = 'solid';
-        staged.color = modalColorInput.value;
-        updateModalUI();
-    });
+    if (modalEl) {
+        modalEl.addEventListener('show.bs.modal', function () {
+            staged = Object.assign({}, committed);
+            updateModalUI();
+        });
+    }
 
-    // Modal show event - reset staged to committed
-    modalEl.addEventListener('show.bs.modal', function () {
-        staged = Object.assign({}, committed);
-        updateModalUI();
-    });
+    if (btnPakaiSampul) {
+        btnPakaiSampul.addEventListener('click', function () {
+            committed = Object.assign({}, staged);
+            syncCompactCard();
+            const bsModal = bootstrap.Modal.getInstance(modalEl);
+            if (bsModal) bsModal.hide();
+        });
+    }
 
-    // "Pakai sampul ini" click
-    btnPakaiSampul.addEventListener('click', function () {
-        committed = Object.assign({}, staged);
-        syncCompactCard();
-        const bsModal = bootstrap.Modal.getInstance(modalEl);
-        if (bsModal) bsModal.hide();
-    });
-
-    // Initial render
     syncCompactCard();
+    syncSummaryBar();
 
-    // --- Condition Cards ---
+    // --- CONDITION CARDS ---
     const conditionInput = document.getElementById('id_plant_condition');
     const conditionCards = document.querySelectorAll('.condition-card');
 
@@ -643,59 +1069,84 @@
 
     syncConditionUI(conditionInput ? conditionInput.value || 'healthy' : 'healthy');
 
-    // --- Photo Upload, Preview & Remove ---
+    // --- PHOTO UPLOAD, PREVIEW & REMOVE (Galeri + Kamera) ---
     const photoDropArea    = document.getElementById('photoDropArea');
     const fileInput        = document.getElementById('id_image');
+    const cameraInput      = document.getElementById('id_image_camera');
     const clearCheckbox    = document.getElementById('image-clear_id');
     const placeholder      = document.getElementById('photoPlaceholder');
     const previewContainer = document.getElementById('photoPreviewContainer');
     const previewImg       = document.getElementById('photoPreviewImg');
-    const actionRow        = document.getElementById('photoActionRow');
     const btnRemovePhoto   = document.getElementById('btnRemovePhoto');
+    const btnPickGallery   = document.getElementById('btnPickFromGallery');
+    const btnOpenCamera    = document.getElementById('btnOpenCamera');
+    const btnOpenSelfie    = document.getElementById('btnOpenSelfie');
+    const selfieInput      = document.getElementById('id_image_selfie');
 
-    if (photoDropArea && fileInput) {
-        photoDropArea.addEventListener('click', (e) => {
-            if (e.target !== btnRemovePhoto) {
-                fileInput.click();
-            }
-        });
+    function showPhotoPreview(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImg.src = e.target.result;
+            if (placeholder) placeholder.classList.add('d-none');
+            if (previewContainer) previewContainer.classList.remove('d-none');
+            if (btnRemovePhoto) btnRemovePhoto.classList.remove('d-none');
+            if (btnRemovePhoto) btnRemovePhoto.classList.add('d-inline-flex');
+            if (clearCheckbox) clearCheckbox.checked = false;
+        };
+        reader.readAsDataURL(file);
+    }
 
+    function transferFileToMain(sourceInput) {
+        // Transfer file from camera input to the actual form file input
+        if (!sourceInput.files || !sourceInput.files[0]) return;
+        const dt = new DataTransfer();
+        dt.items.add(sourceInput.files[0]);
+        fileInput.files = dt.files;
+        showPhotoPreview(fileInput.files[0]);
+    }
+
+    if (btnPickGallery && fileInput) {
+        btnPickGallery.addEventListener('click', () => fileInput.click());
+    }
+    if (btnOpenCamera && cameraInput) {
+        btnOpenCamera.addEventListener('click', () => cameraInput.click());
+        cameraInput.addEventListener('change', () => transferFileToMain(cameraInput));
+    }
+    if (btnOpenSelfie && selfieInput) {
+        btnOpenSelfie.addEventListener('click', () => selfieInput.click());
+        selfieInput.addEventListener('change', () => transferFileToMain(selfieInput));
+    }
+
+    if (fileInput) {
         fileInput.addEventListener('change', () => {
             if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewImg.src = e.target.result;
-                    placeholder.classList.add('d-none');
-                    previewContainer.classList.remove('d-none');
-                    actionRow.style.display = 'block';
-                    if (clearCheckbox) clearCheckbox.checked = false;
-                };
-                reader.readAsDataURL(fileInput.files[0]);
+                showPhotoPreview(fileInput.files[0]);
             }
         });
+    }
 
-        if (btnRemovePhoto) {
-            btnRemovePhoto.addEventListener('click', (e) => {
-                e.stopPropagation();
-                fileInput.value = '';
-                previewImg.src = '';
-                previewContainer.classList.add('d-none');
-                placeholder.classList.remove('d-none');
-                actionRow.style.display = 'none';
-                if (clearCheckbox) clearCheckbox.checked = true;
-            });
-        }
+    if (btnRemovePhoto) {
+        btnRemovePhoto.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (fileInput) fileInput.value = '';
+            if (cameraInput) cameraInput.value = '';
+            if (selfieInput) selfieInput.value = '';
+            if (previewImg) previewImg.src = '';
+            if (previewContainer) previewContainer.classList.add('d-none');
+            if (placeholder) placeholder.classList.remove('d-none');
+            btnRemovePhoto.classList.add('d-none');
+            btnRemovePhoto.classList.remove('d-inline-flex');
+            if (clearCheckbox) clearCheckbox.checked = true;
+        });
+    }
 
-        // Restore image preview if editing existing journal with photo (clean JS, no linter squiggles)
-        const existingImageUrl = photoDropArea ? photoDropArea.dataset.existingImage : '';
-        if (existingImageUrl) {
-            previewImg.src = existingImageUrl;
-            placeholder.classList.add('d-none');
-            previewContainer.classList.remove('d-none');
-            actionRow.style.display = 'block';
-        }
+    const existingImageUrl = photoDropArea ? photoDropArea.dataset.existingImage : '';
+    if (existingImageUrl && previewImg) {
+        previewImg.src = existingImageUrl;
+        if (placeholder) placeholder.classList.add('d-none');
+        if (previewContainer) previewContainer.classList.remove('d-none');
+        if (btnRemovePhoto) { btnRemovePhoto.classList.remove('d-none'); btnRemovePhoto.classList.add('d-inline-flex'); }
     }
 })();
 </script>
 {% endblock %}
-

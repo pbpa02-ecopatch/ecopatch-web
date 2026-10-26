@@ -11,5 +11,6 @@ urlpatterns = [
     path("<int:pk>/", views.journal_detail, name="detail"),
     path("<int:pk>/edit/", views.journal_edit, name="edit"),
     path("<int:pk>/delete/", views.journal_delete, name="delete"),
+    path("<int:pk>/upload-photo/", views.journal_quick_upload_photo, name="upload_photo"),
     path("filter/", views.journal_filter_ajax, name="filter_ajax"),
 ]

@@ -4,27 +4,74 @@
 {% block title %}Garden Journal — EcoPatch{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/journal_books.css' %}">
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=5.0">
 {% endblock %}
 
 {% block content %}
-<div class="journal-page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
-    <div>
-        <h1 class="journal-title mb-1">Garden Journal</h1>
-        <p class="journal-subtitle mb-0">Pilih tanaman untuk melihat riwayat jurnalnya.</p>
+<section class="journal-hero-banner">
+    <!-- Floating background botanical decors -->
+    <div class="journal-hero-decors" aria-hidden="true">
+        <svg class="journal-decor-leaf journal-decor-leaf-1" width="48" height="48" viewBox="0 0 24 24" fill="#2d7d32"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2zm0 3c-3.866 0-7 3.134-7 7 0 2.22 1.033 4.198 2.645 5.48L12 11.5V5z"/></svg>
+        <svg class="journal-decor-leaf journal-decor-leaf-2" width="40" height="40" viewBox="0 0 24 24" fill="#529e46"><path d="M17.5 2C15 2 13 4 12 6c-1-2-3-4-5.5-4C3 2 1 4.5 1 8c0 5 7 11 11 14 4-3 11-9 11-14 0-3.5-2-6-5.5-6z"/></svg>
+        <span class="journal-decor-sparkle journal-decor-sparkle-1">✦</span>
+        <span class="journal-decor-sparkle journal-decor-sparkle-2">✦</span>
     </div>
-    <div>
-        <a href="{% url 'garden_journal:create' %}" class="btn btn-success">
-            + Tulis Jurnal Baru
-        </a>
+
+    <div class="row align-items-center g-4 position-relative" style="z-index: 1;">
+        <!-- Left: Branding & Intro -->
+        <div class="col-lg-8 col-md-7">
+            <div class="journal-hero-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                Jurnal Perkembangan Kebun
+            </div>
+            <h1 class="journal-hero-title">
+                Setiap Lembar, Rekam Cerita <span class="accent-journal">Tumbuh Kebunmu</span>
+            </h1>
+            <p class="journal-hero-lead">
+                Buka rak bukumu untuk mencatat tinggi berkala, amati perubahan kondisi tanaman, dan kumpulkan potret tanaman harian di setiap lembarnya.
+            </p>
+            <div class="journal-hero-chips">
+                <span class="journal-chip">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2d7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 5 5c0 2-2 3-5 5-3-2-5-3-5-5a5 5 0 0 1 5-5z"/><path d="M7 12h10l-1.5 8h-7z"/></svg>
+                    <strong>{{ total_plants|default:0 }}</strong> Buku Tanaman
+                </span>
+                <span class="journal-chip">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2d7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+                    <strong>{{ total_user_journals|default:0 }}</strong> Lembar Catatan
+                </span>
+                <span class="journal-chip">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2d7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    Foto Tanaman & Grafik
+                </span>
+            </div>
+        </div>
+
+        <!-- Right: Animated Mascot Petak Mencatat & CTA -->
+        <div class="col-lg-4 col-md-5 text-center">
+            <div class="journal-hero-right">
+                <div class="journal-hero-mascot-box">
+                    <div class="journal-mascot-speech">
+                        Catat kabar tanamanmu hari ini! 📝
+                    </div>
+                    <img src="{% static 'img/mascot/petak-mencatat.png' %}" alt="Petak Mencatat" class="journal-hero-mascot-img">
+                </div>
+                <a href="{% url 'garden_journal:create' %}" class="btn btn-ds-primary px-4 py-2 fw-semibold journal-hero-cta" style="border-radius: 999px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Tulis Jurnal Baru
+                </a>
+            </div>
+        </div>
     </div>
-</div>
+</section>
 
 <!-- Filter Bar: Pill style matching the design -->
 <form id="filter-form" class="d-flex flex-wrap align-items-center gap-2 mb-4">
     <!-- Filter EcoPatch -->
     <div class="filter-pill-btn">
-        <label for="id_ecopatch" class="mb-0 text-muted small">🪴</label>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#556b4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M7 10h10l-1.5 9h-7z"/><path d="M12 10V4"/><path d="M8 6c0-1.1 1.8-2 4-2s4 .9 4 2"/></svg>
         <select name="ecopatch_name" id="id_ecopatch" class="filter-pill-select"
                 hx-get="{% url 'garden_journal:filter_ajax' %}"
                 hx-target="#book-shelf-container"
@@ -41,7 +88,7 @@
 
     <!-- Filter Kondisi Tanaman -->
     <div class="filter-pill-btn">
-        <label for="id_condition" class="mb-0 text-muted small">🌿</label>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#556b4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M11 20A7 7 0 0 1 4 13C4 8 8 3 13 3c0 7-3 10-2 17Z"/><path d="M8 12c3-1 6-1 9 1"/></svg>
         <select name="condition" id="id_condition" class="filter-pill-select"
                 hx-get="{% url 'garden_journal:filter_ajax' %}"
                 hx-target="#book-shelf-container"
@@ -58,7 +105,7 @@
 
     <!-- Live Search Tanaman -->
     <div class="filter-pill-btn ms-auto">
-        <span class="text-muted small">🔍</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#798a72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" name="plant_name"
                class="border-0 bg-transparent text-dark small"
                style="outline: none; width: 140px;"
