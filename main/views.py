@@ -9,11 +9,22 @@ from django.shortcuts import redirect, render
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils import translation
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
+from django.views.static import serve
 
 from .auth_forms import EcoPasswordResetForm, RegisterForm
 
 from .forms import AvatarForm, BioForm, ChangePasswordForm, ContactForm, DeleteAccountForm, UserForm
 from .models import Profile
+
+
+def media(request, path):
+    """Serve uploaded files (profile photos, listing and journal photos), also when DEBUG is off.
+
+    WhiteNoise only serves static files and `static()` only works while DEBUG is on, so on a server such as
+    PWS every upload would 404. `serve` refuses paths that climb out of MEDIA_ROOT. MEDIA_ROOT is read on each
+    request, so a test can point it at a temporary folder.
+    """
+    return serve(request, path, document_root=settings.MEDIA_ROOT)
 
 
 def home(request):
