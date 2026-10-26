@@ -59,3 +59,21 @@ class Plant(models.Model):
     def __str__(self):
         return self.name
 
+    # Hari antar dua penyiraman menurut kolom watering. Dipakai Smart Care untuk saran siram.
+    WATERING_BASE_DAYS = {Watering.HIGH: 1, Watering.MODERATE: 2, Watering.LOW: 4}
+    WATERING_MAX_DAYS = 6
+
+    @property
+    def watering_interval_days(self):
+        """Perkiraan hari antar dua penyiraman, disesuaikan dengan tanamannya.
+
+        Dasar dari frekuensi penyiraman (sering 1, sedang 2, jarang 4). Tanaman dalam ruangan dan tanaman
+        tempat teduh lebih lambat kering, jadi masing-masing menambah satu hari. Paling lama 6 hari.
+        """
+        days = self.WATERING_BASE_DAYS.get(self.watering, self.WATERING_BASE_DAYS[self.Watering.MODERATE])
+        if self.indoor_outdoor == self.Placement.INDOOR or self.category == self.Category.INDOOR_LOW_LIGHT:
+            days += 1
+        if self.sunlight == self.Sunlight.SHADE:
+            days += 1
+        return min(days, self.WATERING_MAX_DAYS)
+

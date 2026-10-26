@@ -16,7 +16,15 @@ from my_ecopatch.models import EcoPatch, PatchPlant
 from plant_library.models import Plant
 
 from .models import CareTask
-from .plant_source import find_patch_plant, get_user_city, get_user_plants, link_task
+from .plant_source import (
+    find_patch_plant,
+    get_user_city,
+    get_user_plants,
+    get_user_watering_days,
+    is_outdoor,
+    link_task,
+    watering_days,
+)
 from .suggestions import INTERVALS, HistoryEntry, build_suggestions, plant_status
 from .tests import API_RESPONSE, fake_response
 from .views import GENERAL_TIPS, TIPS
@@ -50,11 +58,13 @@ def make_patch_plant(user, name="Cabai", patch=None, status="planted", **kwargs)
     return PatchPlant.objects.create(patch=patch or make_patch(user), plant_name=name, status=status, **kwargs)
 
 
-def make_library_plant(name):
-    return Plant.objects.create(
+def make_library_plant(name, **kwargs):
+    values = dict(
         name=name, category="herbs", sunlight="full", watering="moderate",
         difficulty="easy", indoor_outdoor="both", space_requirement="any",
     )
+    values.update(kwargs)
+    return Plant.objects.create(**values)
 
 
 class CacheClearingTestCase(TestCase):
@@ -123,6 +133,24 @@ class BuildSuggestionsTests(SimpleTestCase):
 
     def test_intervals_are_the_documented_defaults(self):
         self.assertEqual(INTERVALS, {"watering": 2, "fertilizing": 14, "inspection": 7})
+
+    def test_a_plant_with_its_own_watering_interval_follows_it(self):
+        plants = [("Bayam", True), ("Rosemary", True)]
+        history = [self.entry("watering", "completed", 2, "Bayam"), self.entry("watering", "completed", 2, "Rosemary")]
+        found = build_suggestions(plants, history, self.today, watering_days={"bayam": 1, "rosemary": 4})
+        watered = {item["plant_name"] for item in found if item["task_type"] == "watering"}
+        self.assertEqual(watered, {"Bayam"})  # 2 days ago is overdue for a daily plant, early for a 4-day one
+
+    def test_a_plant_missing_from_the_watering_days_keeps_the_default(self):
+        history = [self.entry("watering", "completed", 2)]
+        found = build_suggestions(self.plants, history, self.today, watering_days={"bayam": 6})
+        self.assertIn(("Cabai", "watering"), {(i["plant_name"], i["task_type"]) for i in found})
+
+    def test_the_watering_interval_never_changes_the_other_task_types(self):
+        history = [self.entry("fertilizing", "completed", 5), self.entry("inspection", "completed", 5)]
+        found = build_suggestions(self.plants, history, self.today, watering_days={"cabai": 1})
+        self.assertNotIn("fertilizing", {i["task_type"] for i in found})
+        self.assertNotIn("inspection", {i["task_type"] for i in found})
 
     def test_never_recorded_is_suggested_with_that_reason(self):
         found = self.suggested([])
@@ -223,6 +251,12 @@ class PlantStatusTests(SimpleTestCase):
         status = plant_status(self.plant, [self.done("watering", 1)], self.today, intervals={**INTERVALS, "watering": 4})
         self.assertEqual((status["water"], status["label"]), (0.75, "Siram 3 hari lagi"))
 
+    def test_a_plant_with_its_own_interval_fills_the_pot_by_it(self):
+        status = plant_status(self.plant, [self.done("watering", 1)], self.today, watering_days={"cabai": 4})
+        self.assertEqual((status["water"], status["label"]), (0.75, "Siram 3 hari lagi"))
+        daily = plant_status(self.plant, [self.done("watering", 1)], self.today, watering_days={"cabai": 1})
+        self.assertEqual((daily["water"], daily["label"]), (0.0, "Waktunya siram"))
+
     def test_the_latest_watering_counts(self):
         status = self.status([self.done("watering", 9), self.done("watering", 0)])
         self.assertEqual(status["water"], 1.0)
@@ -256,6 +290,33 @@ class PlantSourceTests(TestCase):
         make_patch_plant(self.other, "Tomat bob")
         self.assertEqual(get_user_plants(self.user), [("Cabai", True)])
         self.assertEqual(get_user_plants(self.other), [("Tomat bob", True)])
+
+    def test_the_library_label_decides_whether_a_plant_takes_the_rain_advice(self):
+        balcony, indoor_room = make_patch(self.user, "Balkon", "balcony"), make_patch(self.user, "Kamar", "indoor")
+        cases = [
+            ("Bayam", dict(indoor_outdoor="outdoor"), balcony, True),
+            ("Mint", dict(indoor_outdoor="both"), balcony, True),
+            ("Pothos", dict(indoor_outdoor="indoor"), balcony, False),  # the plant's label wins over the balcony
+            ("Cabai", dict(indoor_outdoor="outdoor"), indoor_room, False),  # an indoor EcoPatch always keeps it dry
+        ]
+        for name, fields, patch, expected in cases:
+            plant = make_patch_plant(self.user, name="", patch=patch, plant=make_library_plant(name, **fields))
+            self.assertEqual(is_outdoor(plant), expected, name)
+
+    def test_an_old_row_without_a_library_plant_follows_its_ecopatch(self):
+        self.assertTrue(is_outdoor(make_patch_plant(self.user, "Tomat", patch=make_patch(self.user, "A", "balcony"))))
+        self.assertFalse(is_outdoor(make_patch_plant(self.user, "Selada", patch=make_patch(self.user, "B", "indoor"))))
+
+    def test_the_watering_days_come_from_the_library_plant_and_default_to_two(self):
+        daily = make_patch_plant(self.user, name="", plant=make_library_plant("Bayam", watering="high"))
+        slow = make_patch_plant(self.user, name="", plant=make_library_plant("Rosemary", watering="low"))
+        old = make_patch_plant(self.user, "Tomat")
+        self.assertEqual((watering_days(daily), watering_days(slow), watering_days(old)), (1, 4, 2))
+        self.assertEqual(get_user_watering_days(self.user), {"bayam": 1, "rosemary": 4, "tomat": 2})
+
+    def test_only_the_users_own_plants_have_watering_days(self):
+        make_patch_plant(self.other, name="", plant=make_library_plant("Bayam", watering="high"))
+        self.assertEqual(get_user_watering_days(self.user), {})
 
     def test_tasks_alone_do_not_make_a_plant(self):
         make_task(self.user, plant_name="Cabai")
@@ -816,6 +877,21 @@ class SuggestionViewTests(CacheClearingTestCase):
 
     def todays(self, **filters):
         return CareTask.objects.filter(user=self.user, due_date=timezone.localdate(), **filters)
+
+    def test_each_plant_is_suggested_by_its_own_watering_interval(self):
+        patch = self.cabai.patch
+        make_patch_plant(self.user, name="", patch=patch, plant=make_library_plant("Bayam", watering="high"))
+        make_patch_plant(self.user, name="", patch=patch,
+                         plant=make_library_plant("Rosemary", watering="low", indoor_outdoor="outdoor"))
+        completed_task(self.user, "Bayam", "watering", 2)
+        completed_task(self.user, "Rosemary", "watering", 2)
+        response = self.client.get(reverse("smart_care:list"))
+        watering = {s["plant_name"] for s in response.context["suggestions"] if s["task_type"] == "watering"}
+        self.assertIn("Bayam", watering)  # daily plant, last watered 2 days ago
+        self.assertNotIn("Rosemary", watering)  # every 4 days, so not yet
+        labels = {pot["plant_name"]: pot["label"] for pot in response.context["pots"]}
+        self.assertEqual(labels["Rosemary"], "Siram 2 hari lagi")
+        self.assertEqual(labels["Bayam"], "Waktunya siram")
 
     def test_suggestions_appear_in_the_list_with_label_and_reason(self):
         response = self.client.get(reverse("smart_care:list"))

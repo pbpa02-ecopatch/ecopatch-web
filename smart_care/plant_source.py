@@ -8,7 +8,9 @@ from django.db.models import Q
 
 from my_ecopatch.models import EcoPatch, PatchPlant
 
-from .suggestions import normalize
+from plant_library.models import Plant
+
+from .suggestions import INTERVALS, normalize
 
 CARE_STATUSES = (PatchPlant.Status.PLANTED, PatchPlant.Status.GROWING)
 NAME_MAX_LENGTH = 80  # CareTask.plant_name
@@ -21,8 +23,19 @@ def patch_plant_name(patch_plant):
 
 
 def is_outdoor(patch_plant):
-    """Only an indoor EcoPatch keeps its plants out of the rain advice."""
-    return patch_plant.patch.space_type != EcoPatch.SpaceType.INDOOR
+    """Whether the rain advice applies. An indoor EcoPatch keeps its plants out of it, and so does a Plant
+    Library plant that is labelled indoor, wherever it was put; outdoor and both follow the EcoPatch."""
+    if patch_plant.patch.space_type == EcoPatch.SpaceType.INDOOR:
+        return False
+    return not (patch_plant.plant_id and patch_plant.plant.indoor_outdoor == Plant.Placement.INDOOR)
+
+
+def watering_days(patch_plant):
+    """Days between two waterings of this plant: the Plant Library estimate, or the default for an old row
+    that is not linked to the library yet."""
+    if patch_plant.plant_id:
+        return patch_plant.plant.watering_interval_days
+    return INTERVALS["watering"]
 
 
 def link_task(task, patch_plant):
@@ -60,6 +73,11 @@ def _one_per_name(user):
 def get_user_plants(user):
     """[(plant_name, is_outdoor)] sorted by name; this is what the suggestions and the pots are built from."""
     return [(patch_plant_name(patch_plant), is_outdoor(patch_plant)) for patch_plant in _one_per_name(user)]
+
+
+def get_user_watering_days(user):
+    """{normalized plant name: days between waterings} for the same plants get_user_plants returns."""
+    return {normalize(patch_plant_name(patch_plant)): watering_days(patch_plant) for patch_plant in _one_per_name(user)}
 
 
 def find_patch_plant(user, name):
