@@ -8,13 +8,13 @@
 <div class="care-form-wrap">
     <a href="{% url 'smart_care:list' %}" class="care-back">&larr; Kembali ke Smart Care</a>
     <section class="care-card care-form-card">
-        <h1 class="care-title">{% if is_edit %}Edit Care Task{% else %}Tambah Care Task{% endif %}</h1>
+        <h1 class="care-form-title">{% if is_edit %}Edit Care Task{% else %}Tambah Care Task{% endif %}</h1>
         <form method="post" class="care-form" novalidate>
             {% csrf_token %}
             {% include "smart_care/_task_fields.html" %}
             <div class="care-form-actions">
-                <a href="{% url 'smart_care:list' %}" class="btn btn-outline-success">Batal</a>
-                <button type="submit" class="btn btn-success">{% if is_edit %}Simpan Perubahan{% else %}Tambah Task{% endif %}</button>
+                <a href="{% url 'smart_care:list' %}" class="care-btn care-btn-ghost">Batal</a>
+                <button type="submit" class="care-btn care-btn-primary">{% if is_edit %}Simpan Perubahan{% else %}Tambah Task{% endif %}</button>
             </div>
         </form>
     </section>
