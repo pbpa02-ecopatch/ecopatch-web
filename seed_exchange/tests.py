@@ -9,6 +9,8 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from PIL import Image as PILImage
 
+from main.models import Profile
+
 from .models import SeedExchange
 
 
@@ -58,6 +60,23 @@ class SeedExchangeViewTests(TestCase):
         self.owner = make_user('rheina')
         self.other = make_user('teman', 'test123')
         self.listing = make_listing(self.owner)
+
+    def test_a_new_listing_starts_with_the_contact_from_the_profile(self):
+        Profile.objects.create(user=self.other, whatsapp='6281234567890', instagram='kebunku')
+        self.client.login(username='teman', password='test123')
+        response = self.client.get(reverse('seed_exchange:create'))
+        self.assertContains(response, 'WhatsApp +62 812-3456-7890 / Instagram @kebunku')
+
+    def test_without_a_profile_contact_the_field_starts_empty(self):
+        self.client.login(username='teman', password='test123')
+        response = self.client.get(reverse('seed_exchange:create'))
+        self.assertFalse(response.context['form']['contact'].value())
+
+    def test_editing_a_listing_keeps_its_own_contact_not_the_profile_one(self):
+        Profile.objects.create(user=self.owner, whatsapp='6281234567890')
+        self.client.login(username='rheina', password='test123')
+        response = self.client.get(reverse('seed_exchange:update', args=[self.listing.pk]))
+        self.assertNotContains(response, '+62 812-3456-7890')
 
     def test_guest_list_redirects_to_login(self):
         url = reverse('seed_exchange:list')

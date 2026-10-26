@@ -246,7 +246,10 @@ def listing_create(request):
             messages.success(request, 'Listing berhasil dibuat.')
             return redirect('seed_exchange:detail', pk=listing.pk)
     else:
-        form = SeedExchangeForm(create=True)
+        # The contact the user saved on their profile (WhatsApp / Instagram) is filled in; they can still change it.
+        profile = getattr(request.user, 'profile', None)
+        initial = {'contact': profile.contact_text()} if profile and profile.contact_text() else None
+        form = SeedExchangeForm(create=True, initial=initial)
     return render(request, 'seed_exchange/form.html', {
         'form': form,
         'rows': _form_rows(form),
