@@ -186,6 +186,10 @@ GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 GOOGLE_AUTH_ENABLED = bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
 
+# Load the starter plants (plant_library/fixtures/initial_plants.json) after `migrate` when the library is empty.
+# For a server where you cannot run `loaddata` yourself (PWS): set SEED_PLANTS_ON_MIGRATE=True in its environment.
+SEED_PLANTS_ON_MIGRATE = os.environ.get('SEED_PLANTS_ON_MIGRATE', 'False') == 'True'
+
 SITE_ID = 1
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
