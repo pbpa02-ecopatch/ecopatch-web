@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Plant Library - EcoPatch{% endblock %}
 
 {% block extra_head %}
@@ -52,6 +53,21 @@
         text-underline-offset: 5px;
         text-decoration-thickness: 3px;
     }
+    .pl-hero-mascot {
+    position: absolute;
+    right: 7%;
+    top: 70px;
+    width: 140px;
+    height: auto;
+}
+@media (max-width: 768px) {
+    .pl-hero-mascot {
+        position: static;
+        display: block;
+        width: 90px;
+        margin: 0 auto 12px;
+    }
+}
 
     /* ---------- Search Container ---------- */
     .pl-search-wrap {
@@ -349,7 +365,7 @@
 
 {% block content %}
 <section class="plant-page">
-
+    
     
     <div class="pl-hero mb-4">
 
@@ -370,6 +386,11 @@
             yang <span class="accent-green">cocok</span> untuk kamu
         </h1>
 
+        <img
+            src="{% static 'img/mascot/petak-semangat.png' %}"            
+            alt="Maskot pot tanaman EcoPatch"
+            class="pl-hero-mascot"
+>
         
         {% with cur_q=query cur_sun=selected_sunlight cur_diff=selected_difficulty cur_io=selected_indoor_outdoor cur_cat=selected_category cur_space=selected_space_requirement %}
         <form method="get" action="{% url 'plant_library:plant_list' %}" id="pl-search-form">
@@ -479,7 +500,6 @@
                 </div>
                 </div>
             </div>
-        </div>
         </form>
 
         
