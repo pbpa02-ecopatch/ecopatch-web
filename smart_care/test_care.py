@@ -19,6 +19,7 @@ from .models import CareTask
 from .plant_source import find_patch_plant, get_user_city, get_user_plants, link_task
 from .suggestions import INTERVALS, HistoryEntry, build_suggestions, plant_status
 from .tests import API_RESPONSE, fake_response
+from .views import GENERAL_TIPS, TIPS
 from .weather import WeatherUnavailable
 
 FAST_HASHER = override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
@@ -552,16 +553,18 @@ class CareViewTests(CacheClearingTestCase):
         self.assertEqual(response.context["progress"]["total"], 1)
 
     # ---- date browsing
-    def test_list_filters_by_date_and_builds_a_seven_day_strip(self):
+    def test_list_filters_by_date_and_builds_a_week_strip(self):
         make_task(self.user, plant_name="Hari ini", due_date=timezone.localdate())
         make_task(self.user, plant_name="Besok", due_date=timezone.localdate() + timedelta(days=1))
-        tomorrow = (timezone.localdate() + timedelta(days=1)).isoformat()
-        response = self.client.get(reverse("smart_care:list"), {"date": tomorrow})
+        tomorrow = timezone.localdate() + timedelta(days=1)
+        response = self.client.get(reverse("smart_care:list"), {"date": tomorrow.isoformat()})
         self.assertContains(response, "Besok")
         self.assertNotContains(response, 'care-task-name">Hari ini')  # today's task row is not shown on tomorrow
-        self.assertEqual(len(response.context["strip"]), 7)
-        self.assertEqual(response.context["strip"][3]["date"].isoformat(), tomorrow)
-        self.assertTrue(response.context["strip"][3]["is_selected"])
+        strip = response.context["strip"]
+        self.assertEqual(len(strip), 7)
+        self.assertEqual(strip[0]["date"].weekday(), 0)  # the week runs from Monday to Sunday ...
+        self.assertEqual(strip[6]["date"], strip[0]["date"] + timedelta(days=6))
+        self.assertEqual([day["date"] for day in strip if day["is_selected"]], [tomorrow])  # ... and holds the selected day
 
     def test_date_navigation_is_labelled(self):
         response = self.client.get(reverse("smart_care:list"))
@@ -574,13 +577,42 @@ class CareViewTests(CacheClearingTestCase):
 
     def test_strip_counts_pending_tasks_per_day(self):
         today = timezone.localdate()
+        other = today + timedelta(days=1) if today.weekday() < 6 else today - timedelta(days=1)  # same Monday to Sunday week
         make_task(self.user, due_date=today)
         make_task(self.user, due_date=today, plant_name="Selesai").toggle()
-        make_task(self.user, due_date=today + timedelta(days=2))
+        make_task(self.user, due_date=other)
         counts = {day["date"]: day["pending"] for day in self.client.get(reverse("smart_care:list")).context["strip"]}
         self.assertEqual(counts[today], 1)
-        self.assertEqual(counts[today + timedelta(days=2)], 1)
-        self.assertEqual(counts[today - timedelta(days=1)], 0)
+        self.assertEqual(counts[other], 1)
+        self.assertEqual(sorted(counts.values()), [0, 0, 0, 0, 0, 1, 1])
+
+    def test_each_day_of_the_strip_has_a_dot_per_task_in_its_state(self):
+        today = timezone.localdate()
+        monday = today - timedelta(days=today.weekday())
+        make_task(self.user, plant_name="A", due_date=today).toggle()
+        make_task(self.user, plant_name="B", due_date=today)
+        if monday != today:
+            make_task(self.user, plant_name="C", due_date=monday)  # before today and not done: late
+        cells = {day["date"]: day for day in self.client.get(reverse("smart_care:list")).context["strip"]}
+        self.assertEqual(cells[today]["dots"], ["done", "pending"])
+        if monday != today:
+            self.assertEqual(cells[monday]["dots"], ["late"])
+
+    def test_a_busy_day_shows_three_dots_and_counts_the_rest(self):
+        today = timezone.localdate()
+        for number in range(5):
+            make_task(self.user, plant_name=f"T{number}", due_date=today)
+        cell = next(day for day in self.client.get(reverse("smart_care:list")).context["strip"] if day["is_today"])
+        self.assertEqual((len(cell["dots"]), cell["more"], cell["pending"]), (3, 2, 5))
+
+    def test_a_skipped_task_leaves_no_dot(self):
+        make_task(self.user, plant_name="Dilewati").set_status(CareTask.Status.SKIPPED)
+        cell = next(day for day in self.client.get(reverse("smart_care:list")).context["strip"] if day["is_today"])
+        self.assertEqual(cell["dots"], [])
+
+    def test_the_dots_are_drawn_in_the_page(self):
+        make_task(self.user)
+        self.assertContains(self.client.get(reverse("smart_care:list")), 'class="care-dot is-pending"')
 
     def test_overdue_shows_only_when_viewing_today(self):
         yesterday = timezone.localdate() - timedelta(days=1)
@@ -595,10 +627,90 @@ class CareViewTests(CacheClearingTestCase):
         self.assertEqual(response.context["selected_date"], timezone.localdate())
 
     # ---- the weather card and the rain advice
-    def test_the_weather_card_labels_the_rain_figure(self):
+    def test_the_scene_has_the_places_the_script_fills_in(self):
         response = self.client.get(reverse("smart_care:list"))
-        self.assertContains(response, 'id="care-meta-note"')
-        self.assertContains(response, "peluang tertinggi hari ini")
+        for marker in ('id="care-scene"', 'id="care-temp"', 'id="care-condition"', 'id="care-mini"', 'id="care-pill"',
+                       'id="care-bubble-text"', 'id="care-retry"'):
+            self.assertContains(response, marker)
+        for mood in ("cheer", "happy", "curious", "proud"):
+            self.assertContains(response, f'data-k="{mood}"')  # Petak in four moods, the weather and the tasks pick one
+
+    def test_the_calendar_button_sits_next_to_the_date_and_the_arrows_surround_today(self):
+        html = self.client.get(reverse("smart_care:list")).content.decode()
+        head = html[html.index('class="care-datehead"'):html.index('class="care-ctl"')]
+        for marker in ('id="care-date-title"', 'id="care-cal-btn"', 'type="date"'):
+            self.assertIn(marker, head)
+        controls = html[html.index('class="care-ctl"'):html.index('id="care-week"')]
+        self.assertNotIn("care-cal-btn", controls)
+        self.assertLess(controls.index("Minggu lalu"), controls.index("Hari ini"))
+        self.assertLess(controls.index("Hari ini"), controls.index("Minggu depan"))
+
+    def test_smart_care_has_its_own_light_footer_and_the_other_modules_keep_the_shared_one(self):
+        own = self.client.get(reverse("smart_care:list"))
+        self.assertContains(own, "Tip Petak")
+        self.assertNotContains(own, "site-footer")
+        self.assertNotContains(own, '<main class="container')  # the scene needs the full width
+        other = self.client.get(reverse("my_ecopatch:list"))
+        self.assertContains(other, "site-footer")
+        self.assertContains(other, '<main class="container flex-grow-1 py-4">')
+        self.assertNotContains(other, "Tip Petak")
+
+    def test_the_tip_follows_the_day(self):
+        make_patch_plant(self.user, "Cabai")  # with plants the whole list is in play (without them, only the general tips)
+        for day in (date(2026, 11, 2), date(2026, 11, 3)):
+            tip = self.client.get(reverse("smart_care:list"), {"date": day.isoformat()}).context["tip"]
+            self.assertEqual(tip, TIPS[day.day % len(TIPS)])
+        self.assertNotEqual(TIPS[2], TIPS[3])
+
+    def test_only_the_coming_week_counts_as_a_forecast(self):
+        today = timezone.localdate()
+        flags = {
+            offset: self.client.get(reverse("smart_care:list"), {"date": (today + timedelta(days=offset)).isoformat()}).context["in_forecast"]
+            for offset in (-1, 0, 1, 6, 7, 30)
+        }
+        self.assertEqual(flags, {-1: False, 0: False, 1: True, 6: True, 7: False, 30: False})
+
+    def test_the_eyebrow_names_the_day_and_says_forecast_only_when_there_is_one(self):
+        today = timezone.localdate()
+        self.assertContains(self.client.get(reverse("smart_care:list")), "&middot; Hari ini</p>")
+        soon = self.client.get(reverse("smart_care:list"), {"date": (today + timedelta(days=2)).isoformat()})
+        later = self.client.get(reverse("smart_care:list"), {"date": (today + timedelta(days=20)).isoformat()})
+        self.assertContains(soon, "(prakiraan)")
+        self.assertNotContains(later, "(prakiraan)")
+
+    def test_overdue_rows_say_how_late_they_are(self):
+        make_task(self.user, plant_name="Telat", due_date=timezone.localdate() - timedelta(days=3))
+        response = self.client.get(reverse("smart_care:list"))
+        self.assertContains(response, "Terlambat 3 hari")
+        self.assertEqual(response.context["overdue_tasks"][0].days_late, 3)
+
+    def test_the_done_list_starts_folded_but_is_in_the_page(self):
+        make_task(self.user, plant_name="Beres").toggle()
+        response = self.client.get(reverse("smart_care:list"))
+        self.assertContains(response, 'id="care-done-list" hidden')
+        self.assertContains(response, "Beres")
+
+    def test_task_types_read_in_indonesian_and_each_has_an_icon_badge(self):
+        self.assertEqual(
+            [label for _, label in CareTask.TaskType.choices],
+            ["Penyiraman", "Pemupukan", "Pemangkasan", "Ganti pot", "Panen", "Pemeriksaan"],
+        )
+        for value, _ in CareTask.TaskType.choices:
+            make_task(self.user, plant_name=f"Untuk {value}", task_type=value)
+        response = self.client.get(reverse("smart_care:list"))
+        for value, label in CareTask.TaskType.choices:
+            self.assertContains(response, f'care-tb is-{value}')
+            self.assertContains(response, label)
+        self.assertContains(self.client.get(reverse("smart_care:create")), "Pemangkasan")
+
+    def test_the_form_speaks_indonesian_when_something_is_missing(self):
+        response = self.client.post(reverse("smart_care:create"), {"due_date": ""})
+        errors = {name: [str(e) for e in errs] for name, errs in response.context["form"].errors.items()}
+        self.assertEqual(errors["patch_plant"], ["Pilih tanamannya dulu."])
+        self.assertEqual(errors["task_type"], ["Pilih jenis tugasnya dulu."])
+        self.assertEqual(errors["due_date"], ["Isi tanggalnya dulu."])
+        response = self.client.post(reverse("smart_care:create"), {"due_date": "bukan-tanggal"})
+        self.assertEqual([str(e) for e in response.context["form"].errors["due_date"]], ["Tanggalnya belum benar."])
 
     def test_rows_say_which_plants_are_outdoor_because_rain_advice_is_only_for_those(self):
         indoor = make_patch_plant(self.user, "Lidah mertua", patch=make_patch(self.user, space_type="indoor"))
@@ -780,7 +892,7 @@ class SuggestionViewTests(CacheClearingTestCase):
         self.client.post(self.skip, self.watering)
         task = self.todays().get()
         self.assertEqual((task.status, task.source), ("skipped", "suggested"))
-        self.assertEqual(first["skipped"]["label"], "Watering")
+        self.assertEqual(first["skipped"]["label"], "Penyiraman")
         self.assertEqual(first["progress"]["total"], 2)  # the skipped one no longer counts
 
     def test_skip_hides_the_suggestion_but_offers_an_undo(self):
@@ -856,15 +968,79 @@ class SuggestionViewTests(CacheClearingTestCase):
         for url in (self.accept, self.skip, self.restore):
             self.assertEqual(self.client.get(url).status_code, 405)
 
-    def test_empty_state_for_a_user_without_plants(self):
+    def _login_without_plants(self, username="carol"):
         self.client.logout()
-        newbie = User.objects.create_user("carol", password="pass12345")
+        newbie = User.objects.create_user(username, password="pass12345")
         self.client.force_login(newbie)
+        return newbie
+
+    def test_a_user_without_plants_sees_one_empty_state_and_no_dead_end_button(self):
+        self._login_without_plants()
         response = self.client.get(reverse("smart_care:list"))
-        self.assertContains(response, "Tambahkan tanamanmu di")
-        self.assertContains(response, reverse("my_ecopatch:list"))
+        html = response.content.decode()
         self.assertFalse(response.context["has_plants"])
-        self.assertContains(response, "Tambah Care Task")
+        # Petak says it in his bubble, and below the calendar there is exactly one empty state
+        self.assertContains(response, 'id="care-bubble" role="status" aria-live="polite" data-petak')
+        self.assertContains(response, "is-onboarding")
+        self.assertContains(response, 'class="care-start"', count=1)
+        start = html.split('class="care-start"', 1)[1].split("</section>", 1)[0]
+        self.assertIn("Belum ada tanaman yang dirawat", start)
+        self.assertIn("Begitu tanamanmu ada di My EcoPatch, Petak langsung kasih saran perawatannya di sini.", start)
+        # the button comes right after the sentence and goes to My EcoPatch by its URL name
+        self.assertRegex(start, r"</p>\s*<a href=\"%s\" class=\"care-btn care-btn-primary\">Tambah tanaman di My EcoPatch</a>" % reverse("my_ecopatch:list"))
+        # Petak is puzzled: only that face is drawn
+        self.assertIn('data-k="curious"', start)
+        self.assertNotIn('data-k="cheer"', start)
+        # the garden row and the task lists stay closed, and a Care Task (it needs a plant) cannot be started
+        self.assertRegex(html, r'id="care-garden"[^>]*\shidden')
+        self.assertRegex(html, r'id="care-tasks"\s+hidden')
+        self.assertNotIn("care-btn-primary care-add", html)
+        self.assertNotContains(response, f'hx-get="{reverse("smart_care:create")}')
+
+    def test_a_user_with_plants_gets_the_weather_in_the_bubble_not_the_plant_request(self):
+        response = self.client.get(reverse("smart_care:list"))
+        html = response.content.decode()
+        self.assertTrue(response.context["has_plants"])
+        self.assertNotContains(response, "data-petak")
+        self.assertNotContains(response, "care-start")
+        self.assertNotContains(response, "is-onboarding")
+        self.assertNotRegex(html, r'id="care-garden"[^>]*\shidden')
+        self.assertNotRegex(html, r'id="care-tasks"\s+hidden')
+        self.assertContains(response, "care-add")
+        card = html.split('id="care-empty"', 1)[1].split("</section>", 1)[0]
+        self.assertIn("Tambah Care Task", card)
+        # all four faces are in the card for the script to switch between
+        for mood in ("cheer", "happy", "curious", "proud"):
+            self.assertIn(f'class="care-pet care-face" data-k="{mood}"', card)
+
+    def test_plants_of_other_users_do_not_count(self):
+        other = User.objects.create_user("dewi", password="pass12345")
+        make_patch_plant(other, "Basil")
+        self._login_without_plants()
+        response = self.client.get(reverse("smart_care:list"))
+        self.assertFalse(response.context["has_plants"])
+        self.assertContains(response, 'class="care-start"')
+
+    def test_a_plant_that_is_not_planted_or_growing_does_not_count(self):
+        newbie = self._login_without_plants()
+        make_patch_plant(newbie, "Bayam", status="planned")
+        response = self.client.get(reverse("smart_care:list"))
+        self.assertFalse(response.context["has_plants"])
+
+    def test_without_plants_the_tip_is_a_general_one_on_every_day(self):
+        self._login_without_plants()
+        for offset in range(7):
+            day = (timezone.localdate() + timedelta(days=offset)).isoformat()
+            tip = self.client.get(reverse("smart_care:list"), {"date": day}).context["tip"]
+            self.assertIn(tip, GENERAL_TIPS)
+        self.assertEqual(len(GENERAL_TIPS), 3)
+        for tip in GENERAL_TIPS:
+            self.assertNotRegex(tip.lower(), r"basil|pot|tunas|daun")
+
+    def test_a_suggestion_row_knows_its_date_so_the_forecast_advice_can_find_it(self):
+        response = self.client.get(reverse("smart_care:list"))
+        self.assertContains(response, f'data-due="{timezone.localdate().isoformat()}"')
+        self.assertContains(response, "care-hint")
 
     def test_suggestions_come_from_my_ecopatch_not_from_tasks(self):
         self.client.logout()

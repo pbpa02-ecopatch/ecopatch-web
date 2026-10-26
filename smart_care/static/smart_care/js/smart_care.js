@@ -1,6 +1,6 @@
-/* Smart Care page: weather panel, AJAX completion, suggestions (accept / skip / undo), the daily plant
-   and the delete / popup modals. All decision rules (suggestions, recommendations, hints, meter
-   percentages) come from Django; this file only renders what the JSON says. */
+/* Smart Care page: the weather scene, the week strip, the garden, AJAX completion with undo, suggestions
+   (accept / skip / undo), the pots and the popups. Every rule (rainy day, headline, advice, suggestions, pot
+   levels) comes from Django; this file only renders what the JSON says. */
 (function () {
   'use strict';
 
@@ -8,7 +8,13 @@
   if (!page) return;
 
   var csrf = page.dataset.csrf;
+  var TODAY = page.dataset.today;
+  var SELECTED = page.dataset.selected;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // What the page knows about the weather: undefined while loading, null when it could not be loaded
+  var weather;
+  var garden = { done: Number($('#care-garden').dataset.done) || 0, total: Number($('#care-garden').dataset.total) || 0 };
 
   function $(selector, root) { return (root || document).querySelector(selector); }
   function $all(selector, root) { return Array.prototype.slice.call((root || document).querySelectorAll(selector)); }
@@ -30,101 +36,200 @@
     });
   }
 
-  function fail() { window.alert('Belum bisa diperbarui. Coba lagi.'); }
+  function fail() { toast('Belum bisa diperbarui. Coba lagi.'); }
 
-  /* ------------------------------------------------------------------ date picker */
+  /* ------------------------------------------------------------------ small message with undo */
+  var toastTimer = 0;
+  var undoAction = null;
+
+  function toast(message, undo) {
+    var box = $('#care-toast');
+    $('#care-toast-text').textContent = message;
+    $('#care-toast-undo').hidden = !undo;
+    undoAction = undo || null;
+    box.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { box.classList.remove('is-on'); undoAction = null; }, 4500);
+  }
+
+  $('#care-toast-undo').addEventListener('click', function () {
+    var action = undoAction;
+    undoAction = null;
+    $('#care-toast').classList.remove('is-on');
+    if (action) action();
+  });
+
+  /* ------------------------------------------------------------------ icons for what the script draws */
+  var ICONS = {
+    rain: '<path d="M7 15a4 4 0 0 1-.6-7.96A5.5 5.5 0 0 1 17 6.5 4.3 4.3 0 0 1 17 15H7z"/><path d="M8 18l-1 2.5M12 18l-1 2.5M16 18l-1 2.5"/>',
+    cloud: '<path d="M7 18a4 4 0 0 1-.6-7.96A5.5 5.5 0 0 1 17 9.5 4.3 4.3 0 0 1 17 18H7z"/>',
+    cloudsun: '<path d="M12 3v1.5M5 6l1 1M19 6l-1 1M3.5 12H5"/><path d="M8 11a4 4 0 0 1 7.5-1"/><path d="M8 20a3.5 3.5 0 0 1-.4-7A5 5 0 0 1 17.5 13 3.7 3.7 0 0 1 17 20H8z"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>',
+  };
+
+  function icon(name) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || '') + '</svg>'; }
+
+  // 5,5 in Indonesian notation; "5" instead of "5,0"
+  function mm(value) { return value.toFixed(1).replace('.', ',').replace(',0', ''); }
+
+  function dayData(iso) {
+    var list = (weather && weather.daily) || [];
+    for (var i = 0; i < list.length; i++) if (list[i].date === iso) return list[i];
+    return null;
+  }
+
+  /* ------------------------------------------------------------------ date picker: the calendar button opens it */
   var jump = $('#care-jump-date');
-  if (jump) jump.addEventListener('change', function () { if (jump.value) jump.form.requestSubmit(); });
-
-  /* ------------------------------------------------------------------ weather ribbon + forecast in the date strip */
-  var weatherEl = $('#care-weather');
-  var errorLine = $('#care-weather-error');
-  var currentHints = {};
-
-  function whole(value) {
-    return typeof value === 'number' ? String(Math.round(value)) : '--';
+  var calendarButton = $('#care-cal-btn');
+  if (jump && calendarButton) {
+    calendarButton.addEventListener('click', function () {
+      try { jump.showPicker(); } catch (error) { jump.focus(); jump.click(); }
+    });
+    jump.addEventListener('change', function () { if (jump.value) jump.form.requestSubmit(); });
   }
 
-  // "sekitar 5 mm"; under 1 mm the number would only say "0"
-  function rainAmount(mm) {
-    if (typeof mm !== 'number') return '';
-    return mm < 1 ? 'kurang dari 1 mm' : 'sekitar ' + Math.round(mm) + ' mm';
+  /* ------------------------------------------------------------------ the scene: sky, Petak, headline */
+  var scene = $('#care-scene');
+  var PILL = { rain: 'is-rain', drizzle: 'is-soft', heat: 'is-heat', humid: 'is-soft', ok: 'is-ok' };
+
+  function setBubble(tone, pill, text) {
+    if ($('#care-bubble').hasAttribute('data-petak')) return; // Petak is asking for plants: keep his words
+    var chip = $('#care-pill');
+    chip.className = 'care-pill ' + tone;
+    chip.textContent = pill;
+    $('#care-bubble-text').textContent = text;
   }
 
-  function renderForecast(daily) {
-    var byDate = {};
-    daily.forEach(function (day) { byDate[day.date] = day; });
+  function renderScene() {
+    var proud = garden.total > 0 && garden.done === garden.total;
+    var isToday = SELECTED === TODAY;
+    var errorLine = $('#care-weather-error');
+    errorLine.hidden = weather !== null;
+
+    if (weather === undefined) return; // still loading: the first paint stays as the page was rendered
+
+    var day = dayData(SELECTED);
+    var sky = 'soft';
+    var pet = 'curious';
+
+    if (weather === null) {
+      $('#care-temp').textContent = '--°';
+      $('#care-condition').textContent = 'Tidak tersedia';
+      $('#care-mini').textContent = '';
+      setBubble('is-soft', 'Cuaca tidak tersedia', 'Saran sesuai cuaca muncul setelah data berhasil dimuat');
+    } else if (!day) {
+      $('#care-temp').textContent = '--°';
+      $('#care-condition').textContent = 'Tanpa prakiraan';
+      $('#care-mini').textContent = '';
+      setBubble('is-soft', 'Tanpa prakiraan', 'Prakiraan cuaca hanya tersedia untuk 7 hari ke depan.');
+    } else {
+      sky = day.outlook.sky;
+      pet = sky === 'rain' ? 'curious' : sky === 'soft' ? 'happy' : 'cheer';
+      var temperature = isToday ? weather.temperature : day.temperature_max;
+      $('#care-temp').textContent = (typeof temperature === 'number' ? Math.round(temperature) : '--') + '°';
+      $('#care-condition').textContent = isToday ? weather.condition : day.outlook.label;
+      var parts = [];
+      if (isToday && typeof weather.humidity === 'number') parts.push('Kelembapan <b>' + Math.round(weather.humidity) + '%</b>');
+      // the chance is the highest of the day's hours, which is why it can read 99% on a day with a few drops
+      if (typeof day.rain_probability === 'number') parts.push('Peluang hujan tertinggi <b>' + Math.round(day.rain_probability) + '%</b>');
+      if (typeof day.rain_mm === 'number') parts.push('Curah hujan <b>' + mm(day.rain_mm) + ' mm</b>');
+      $('#care-mini').innerHTML = parts.map(function (part) { return '<span>' + part + '</span>'; }).join('');
+      setBubble(PILL[day.recommendation.tone] || 'is-ok', day.recommendation.pill, day.recommendation.message);
+    }
+
+    if (proud) {
+      pet = 'proud';
+      setBubble('is-proud', 'Semua beres', isToday ? 'Kebun hari ini terawat. Petak bangga padamu!' : 'Semua tugas di hari itu sudah beres.');
+    }
+    scene.dataset.sky = sky;
+    scene.dataset.pet = pet;
+    // the empty-day card shows the same Petak (proud is for finished days, so an empty one is just happy)
+    var card = $('#care-empty');
+    card.dataset.mood = pet === 'proud' ? 'happy' : pet;
+  }
+
+  /* ------------------------------------------------------------------ the week strip: forecast per day */
+  function renderWeek() {
     $all('.care-day').forEach(function (cell) {
-      var day = byDate[cell.dataset.day];
-      var rain = $('[data-rain]', cell);
-      cell.classList.toggle('is-rainy', !!(day && day.rainy));
-      if (day && typeof day.rain_probability === 'number') {
-        $('b', rain).textContent = day.rain_probability + '%';
-        rain.classList.add('has-data');
-        cell.title = ['Peluang hujan tertinggi ' + day.rain_probability + '%', rainAmount(day.rain_mm)].filter(Boolean).join(', ');
-      } else {
-        rain.classList.remove('has-data');
+      var day = dayData(cell.dataset.day);
+      var slot = $('[data-weather]', cell);
+      if (!cell.dataset.label) cell.dataset.label = cell.getAttribute('aria-label');
+      if (!day) {
+        slot.className = 'care-day-w';
+        slot.innerHTML = '';
         cell.removeAttribute('title');
+        cell.setAttribute('aria-label', cell.dataset.label);
+        return;
       }
+      var amount = typeof day.rain_mm === 'number' && day.rain_mm >= 0.5 ? mm(day.rain_mm) : '';
+      slot.className = 'care-day-w' + (day.rainy ? ' is-heavy' : '');
+      slot.innerHTML = icon(day.outlook.icon) + (amount ? amount + '<span>mm</span>' : '');
+      cell.title = 'Peluang hujan tertinggi ' + Math.round(day.rain_probability) + '%' + (amount ? ', sekitar ' + amount + ' mm' : '');
+      cell.setAttribute('aria-label', cell.dataset.label + (day.rainy ? '. Hujan ' + amount + ' milimeter' : ''));
     });
   }
 
-  function renderWeather(data) {
-    errorLine.hidden = true;
-    weatherEl.dataset.ambient = data.ambient;
-    $('#care-condition').textContent = data.condition;
-    $('#care-temp').textContent = whole(data.temperature);
-    $('#care-advice').textContent = data.recommendation.message;
-    var parts = [];
-    if (typeof data.humidity === 'number') parts.push('Kelembapan ' + Math.round(data.humidity) + '%');
-    var hasRain = typeof data.rain_probability === 'number';
-    if (hasRain) parts.push('Hujan ' + Math.round(data.rain_probability) + '%');
-    if (hasRain && rainAmount(data.rain_mm)) parts.push(rainAmount(data.rain_mm));
-    $('#care-meta').textContent = parts.join(' \u00b7 ');
-    $('#care-meta-note').hidden = !hasRain;
-    renderForecast(data.daily || []);
-    currentHints = data.hints || {};
-    applyHints();
+  // A dot of a day changes state (pending, late, done) when one of its tasks is ticked or unticked
+  function moveDot(iso, from, to) {
+    var cell = $('.care-day[data-day="' + iso + '"]');
+    var dot = cell && $('.care-dot.is-' + from, cell);
+    if (dot) dot.className = 'care-dot is-' + to;
   }
 
-  function showWeatherError() {
-    $('#care-condition').textContent = 'Tidak tersedia';
-    $('#care-temp').textContent = '--';
-    $('#care-advice').textContent = 'Saran sesuai cuaca muncul setelah data berhasil dimuat';
-    $('#care-meta').textContent = '';
-    $('#care-meta-note').hidden = true;
-    renderForecast([]);
-    currentHints = {};
-    applyHints();
-    errorLine.hidden = false;
+  // A dot disappears (a skipped suggestion no longer counts); the "+N" of a busy day shrinks instead when the dot is hidden in it
+  function removeDot(iso, state) {
+    var cell = $('.care-day[data-day="' + iso + '"]');
+    if (!cell) return;
+    var dot = $('.care-dot.is-' + state, cell);
+    if (dot) { dot.remove(); return; }
+    var more = $('.care-dots small', cell);
+    if (!more) return;
+    var left = Number(more.textContent.replace('+', '')) - 1;
+    if (left > 0) more.textContent = '+' + left;
+    else more.remove();
+  }
+
+  function pendingState(iso) { return iso < TODAY ? 'late' : 'pending'; }
+
+  /* ------------------------------------------------------------------ advice on the rows: only outdoor, not done */
+  function renderHints() {
+    $all('.care-task', page).forEach(function (row) {
+      var hint = $('.care-hint', row);
+      var day = dayData(row.dataset.due);
+      var text = day && row.dataset.outdoor === '1' && !row.classList.contains('is-done') ? (day.hints || {})[row.dataset.type] : '';
+      if (!text) {
+        hint.hidden = true;
+        hint.textContent = '';
+        return;
+      }
+      var watering = row.dataset.type === 'watering';
+      hint.className = 'care-hint ' + (day.rainy && watering ? 'is-rain' : 'is-warn');
+      hint.innerHTML = icon(day.rainy ? (watering ? 'rain' : 'cloud') : 'sun') + '<span></span>';
+      $('span', hint).textContent = text;
+      hint.hidden = false;
+    });
   }
 
   function loadWeather() {
-    weatherEl.classList.add('is-loading');
-    errorLine.hidden = true;
+    scene.classList.add('is-loading');
     return fetch(page.dataset.weatherUrl, { headers: { Accept: 'application/json' }, credentials: 'same-origin' })
       .then(function (response) {
         return response.json().then(function (data) { return { ok: response.ok, data: data }; });
       })
       .then(function (result) {
         if (!result.ok || !result.data.available) throw new Error('weather unavailable');
-        renderWeather(result.data);
+        weather = result.data;
       })
-      .catch(showWeatherError)
-      .then(function () { weatherEl.classList.remove('is-loading'); });
+      .catch(function () { weather = null; })
+      .then(function () {
+        scene.classList.remove('is-loading');
+        renderScene();
+        renderWeek();
+        renderHints();
+      });
   }
 
-  // Per-row hints (manual and suggested rows alike): only outdoor rows that are not done yet
-  function applyHints() {
-    $all('.care-task').forEach(function (row) {
-      var hint = $('.care-task-hint', row);
-      var text = row.dataset.outdoor === '1' && !row.classList.contains('is-done') ? currentHints[row.dataset.type] : '';
-      hint.textContent = text || '';
-      hint.hidden = !text;
-    });
-  }
-
-  $('#care-retry').addEventListener('click', function () { loadWeather(); });
+  $('#care-retry').addEventListener('click', function () { weather = undefined; loadWeather(); });
   loadWeather();
 
   /* ------------------------------------------------------------------ pots (one per plant) */
@@ -153,8 +258,10 @@
   function showPlantRows(key) {
     var rows = $all('.care-task').filter(function (row) { return normalize(row.dataset.plant) === key; });
     if (!rows.length) return;
-    rows[0].scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
-    rows.forEach(function (row) {
+    var visible = rows.filter(function (row) { return row.offsetParent !== null; });
+    var target = visible.length ? visible : rows;
+    target[0].scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    target.forEach(function (row) {
       row.classList.remove('is-highlight');
       void row.offsetWidth; // restart the one-off highlight
       row.classList.add('is-highlight');
@@ -162,26 +269,21 @@
     });
   }
 
-  /* ------------------------------------------------------------------ progress + daily plant */
-  var plant = $('#care-plant');
-  var burst = $('#care-burst');
-  var lastPercent = Number($('#care-bar').getAttribute('aria-valuenow')) || 0;
-
-  function renderProgress(progress) {
-    $('#care-progress-label').textContent = progress.done + ' dari ' + progress.total + ' tugas selesai';
+  /* ------------------------------------------------------------------ garden: the plant, the label and the bar */
+  function renderGarden(progress) {
+    garden.done = progress.done;
+    garden.total = progress.total;
+    $('#care-plant').dataset.s = progress.stage;
+    $('#care-garden').classList.toggle('is-empty', !progress.total);
+    $('#care-progress-label').textContent = !progress.total
+      ? 'Belum ada tugas yang dijadwalkan.'
+      : progress.done === progress.total ? 'Semua beres. Kebunmu terawat.' : progress.done + ' dari ' + progress.total + ' tugas selesai';
     $('#care-bar-fill').style.width = progress.percent + '%';
     $('#care-bar').setAttribute('aria-valuenow', progress.percent);
-    plant.dataset.stage = progress.stage;
-    if (progress.percent === 100 && lastPercent < 100 && !reduceMotion) {
-      burst.classList.remove('is-active');
-      void burst.getBoundingClientRect(); // restart the one-off animation
-      burst.classList.add('is-active');
-      setTimeout(function () { burst.classList.remove('is-active'); }, 900);
-    }
-    lastPercent = progress.percent;
+    renderScene(); // Petak is proud when everything is done
   }
 
-  /* ------------------------------------------------------------------ groups, counts, empty states */
+  /* ------------------------------------------------------------------ groups, counts, empty state */
   var lists = {
     overdue: $('#care-overdue-list'),
     pending: $('#care-pending-list'),
@@ -199,24 +301,16 @@
     $('#care-overdue-count').textContent = overdue;
     $('#care-skipped-count').textContent = skipped;
     $('#care-overdue').hidden = overdue === 0;
+    $('#care-pending-group').hidden = pending === 0;
     $('#care-done-group').hidden = done === 0;
     $('#care-skipped').hidden = skipped === 0;
     var empty = $('#care-empty');
-    if (pending + done === 0 && skipped > 0) $('p', empty).textContent = empty.dataset.skipped;
+    var allSkipped = pending + done === 0 && skipped > 0;
+    $('b', empty).textContent = allSkipped ? 'Semua saran hari ini dilewati' : empty.dataset.default;
+    $('p', empty).textContent = allSkipped
+      ? 'Buka "Dilewati hari ini" di bawah kalau mau mengembalikannya.'
+      : 'Hari yang santai untuk kebunmu. Tambah Care Task kalau ada yang perlu dijadwalkan.';
     empty.hidden = pending + done > 0;
-    $('#care-allclear').hidden = !(pending === 0 && done > 0);
-  }
-
-  function setStripCount(iso, value) {
-    var day = $('.care-day[data-day="' + iso + '"] [data-count]');
-    if (!day) return;
-    day.textContent = Math.max(0, value);
-    day.classList.toggle('is-zero', value <= 0);
-  }
-
-  function shiftStripCount(iso, delta) {
-    var day = $('.care-day[data-day="' + iso + '"] [data-count]');
-    if (day) setStripCount(iso, Number(day.textContent) + delta);
   }
 
   // FLIP: rows slide from where they were to where they are now
@@ -227,6 +321,7 @@
     refreshGroups();
     if (reduceMotion) return;
     rows.forEach(function (el, index) {
+      if (el.offsetParent === null) return; // inside a collapsed list: nothing to see
       var delta = before[index] - el.getBoundingClientRect().top;
       if (delta) {
         el.animate(
@@ -247,23 +342,30 @@
   }
 
   /* ------------------------------------------------------------------ complete / reopen a task */
-  function applyCompletion(row, data) {
+  function applyCompletion(row, data, silent) {
     var button = $('.care-check', row);
+    var overdue = row.hasAttribute('data-overdue');
     row.classList.toggle('is-done', data.is_completed);
-    button.setAttribute('aria-pressed', data.is_completed ? 'true' : 'false');
+    button.setAttribute('aria-checked', data.is_completed ? 'true' : 'false');
     renderPot(data.pot, data.is_completed && row.dataset.type === 'watering');
+    if (data.is_completed) moveDot(data.due_date, pendingState(data.due_date), 'done');
+    else moveDot(data.due_date, 'done', pendingState(data.due_date));
 
-    if (row.hasAttribute('data-overdue')) {
+    if (overdue) {
       // An overdue task is not part of today's progress; completing it just clears it from "Terlewat"
-      shiftStripCount(data.due_date, data.is_completed ? -1 : 1);
       setTimeout(function () { fadeOut(row); }, reduceMotion ? 0 : 650);
     } else {
-      setStripCount(data.due_date, data.progress.pending);
       // let the tick finish drawing before the row moves
       setTimeout(function () { moveRow(row, data.is_completed ? lists.done : lists.pending); }, reduceMotion ? 0 : 520);
-      renderProgress(data.progress);
+      renderGarden(data.progress);
     }
-    applyHints();
+    renderHints();
+
+    if (silent) return;
+    var undo = overdue
+      ? function () { post(row.dataset.completeUrl).then(function () { window.location.reload(); }).catch(fail); }
+      : function () { post(row.dataset.completeUrl).then(function (back) { applyCompletion(row, back, true); }).catch(fail); };
+    toast(data.is_completed ? 'Selesai. Kerja bagus!' : 'Dikembalikan ke belum selesai.', undo);
   }
 
   /* ------------------------------------------------------------------ suggestions */
@@ -274,7 +376,7 @@
       holder.innerHTML = data.html.trim();
       var fresh = holder.firstElementChild;
       fresh.classList.remove('is-done');
-      $('.care-check', fresh).setAttribute('aria-pressed', 'false');
+      $('.care-check', fresh).setAttribute('aria-checked', 'false');
       row.replaceWith(fresh);
       if (window.htmx) window.htmx.process(fresh);
       requestAnimationFrame(function () { requestAnimationFrame(function () { applyCompletion(fresh, data); }); });
@@ -298,10 +400,11 @@
       li.appendChild(label);
       li.appendChild(undo);
       lists.skipped.appendChild(li);
-      renderProgress(data.progress);
-      setStripCount(data.due_date, data.progress.pending);
+      renderGarden(data.progress);
+      removeDot(data.due_date, 'pending'); // a skipped suggestion no longer waits for you
       fadeOut(row);
-      applyHints();
+      renderHints();
+      toast('Saran dilewati.', function () { restoreSuggestion(undo).catch(fail); });
     });
   }
 
@@ -318,6 +421,14 @@
     var restore = event.target.closest('.care-restore');
     var remove = event.target.closest('[data-delete-url]');
     var potButton = event.target.closest('.care-pot-btn');
+    var fold = event.target.closest('.care-fold');
+
+    if (fold) {
+      var open = fold.getAttribute('aria-expanded') !== 'true';
+      fold.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.getElementById(fold.getAttribute('aria-controls')).hidden = !open;
+      return;
+    }
 
     if (potButton) {
       showPlantRows(potButton.closest('.care-pot').dataset.key);

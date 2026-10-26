@@ -10,7 +10,7 @@
         {% include "smart_care/_task_fields.html" %}
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn btn-success">{% if is_edit %}Simpan Perubahan{% else %}Tambah Task{% endif %}</button>
+        <button type="button" class="care-btn care-btn-ghost" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" class="care-btn care-btn-primary">{% if is_edit %}Simpan Perubahan{% else %}Tambah Task{% endif %}</button>
     </div>
 </form>

@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -16,10 +16,24 @@ from .forms import CareTaskForm
 from .models import CareTask
 from .plant_source import find_patch_plant, get_user_city, get_user_plants, is_outdoor, patch_plant_name
 from .suggestions import INTERVALS, HistoryEntry, build_suggestions, normalize, plant_status
-from .weather import CITIES, DEFAULT_CITY, WeatherUnavailable, weather_payload
+from .weather import CITIES, DEFAULT_CITY, FORECAST_DAYS, WeatherUnavailable, weather_payload
 
-STRIP_RADIUS = 3  # 3 days either side of the selected date = a 7 day strip
+STRIP_DOTS = 3  # a day of the week strip shows up to this many dots, then "+N"
 Status = CareTask.Status
+
+# One tip under the page, picked by the day of the month of the selected date
+TIPS = (
+    "Siram di pagi hari, bukan siang bolong. Air lebih sempat diserap sebelum panas.",
+    "Cek tanah dengan jari: kalau 2 cm teratas masih lembap, tunda menyiram.",
+    "Pupuk cair paling baik diberikan saat tanah sudah sedikit lembap, bukan kering kerontang.",
+    "Putar pot indoor seperempat putaran tiap minggu supaya daunnya tumbuh seimbang.",
+    "Daun menguning bisa tanda kelebihan air. Cek lubang drainase potmu.",
+    "Pangkas ujung tunas basil supaya ia tumbuh bercabang dan makin rimbun.",
+    "Hujan deras bisa mencuci pupuk dari tanah. Tunda pemupukan outdoor setelah hujan.",
+)
+
+# Before there is any plant the tip stays general: nothing that talks about a particular plant or pot
+GENERAL_TIPS = TIPS[:3]
 
 
 def _profile_city(user):
@@ -97,24 +111,43 @@ def _progress(tasks, suggestions):
 
 
 def _week_strip(user, selected, today, open_suggestions):
-    first = selected - timedelta(days=STRIP_RADIUS)
-    last = selected + timedelta(days=STRIP_RADIUS)
-    pending = dict(
-        CareTask.objects.filter(user=user, due_date__range=(first, last), status=Status.PENDING)
-        .values_list("due_date")
-        .annotate(total=Count("pk"))
+    """The Monday to Sunday week of the selected day. Each day has dots for its tasks: done, still to do, or late."""
+    first = selected - timedelta(days=selected.weekday())
+    rows = (
+        CareTask.objects.filter(user=user, due_date__range=(first, first + timedelta(days=6)))
+        .exclude(status=Status.SKIPPED)
+        .order_by("created_at", "pk")
+        .values_list("due_date", "status")
     )
-    return [
-        {
+    by_day = {}
+    for day, status in rows:
+        by_day.setdefault(day, []).append("done" if status == Status.COMPLETED else "late" if day < today else "pending")
+
+    strip = []
+    for offset in range(7):
+        day = first + timedelta(days=offset)
+        dots = list(by_day.get(day, []))
+        if day == today:
+            # open suggestions only exist for today, so they only add to today's dots
+            dots += ["pending"] * open_suggestions
+        strip.append({
             "date": day,
-            # open suggestions only exist for today, so they only add to today's count
-            "pending": pending.get(day, 0) + (open_suggestions if day == today else 0),
+            "pending": sum(1 for dot in dots if dot != "done"),
+            "dots": dots[:STRIP_DOTS],
+            "more": max(0, len(dots) - STRIP_DOTS),
             "is_selected": day == selected,
             "is_today": day == today,
             "url": _list_url(day),
-        }
-        for day in (first + timedelta(days=offset) for offset in range(2 * STRIP_RADIUS + 1))
-    ]
+        })
+    return strip
+
+
+def _overdue(user, today):
+    """Pending tasks from before today, oldest first, each knowing how many days late it is."""
+    tasks = list(CareTask.objects.filter(user=user, status=Status.PENDING, due_date__lt=today).order_by("due_date"))
+    for task in tasks:
+        task.days_late = (today - task.due_date).days
+    return tasks
 
 
 def _skipped_suggestions(user, today):
@@ -127,6 +160,7 @@ def care_task_list(request):
     today = timezone.localdate()
     selected = _parse_date(request.GET.get("date")) or today
     plants = get_user_plants(request.user)
+    tips = TIPS if plants else GENERAL_TIPS
     tasks, suggestions = _day_state(request.user, selected, today, plants)
     for suggestion in suggestions:
         suggestion["label"] = CareTask.TaskType(suggestion["task_type"]).label
@@ -136,6 +170,8 @@ def care_task_list(request):
         "selected_date": selected,
         "today": today,
         "is_today": is_today,
+        # the forecast reaches from today to six days ahead; any other day has none
+        "in_forecast": 0 < (selected - today).days < FORECAST_DAYS,
         "pending_tasks": [t for t in tasks if t.status == Status.PENDING],
         "done_tasks": [t for t in tasks if t.status == Status.COMPLETED],
         "suggestions": suggestions,
@@ -143,12 +179,13 @@ def care_task_list(request):
         "has_plants": bool(plants),
         "pots": _pots(plants, _history(request.user, today), today),
         # Overdue tasks only show up when looking at today
-        "overdue_tasks": CareTask.objects.filter(user=request.user, status=Status.PENDING, due_date__lt=today).order_by("due_date") if is_today else [],
+        "overdue_tasks": _overdue(request.user, today) if is_today else [],
         "progress": _progress(tasks, suggestions),
         "strip": _week_strip(request.user, selected, today, len(suggestions)),
         "prev_week_url": _list_url(selected - timedelta(days=7)),
         "next_week_url": _list_url(selected + timedelta(days=7)),
         "today_url": _list_url(),
+        "tip": tips[selected.day % len(tips)],
         "city": _current_city(request.user),
     }
     return render(request, "smart_care/list.html", context)

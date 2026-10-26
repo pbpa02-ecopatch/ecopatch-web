@@ -6,12 +6,12 @@ from django.utils import timezone
 
 class CareTask(models.Model):
     class TaskType(models.TextChoices):
-        WATERING = "watering", "Watering"
-        FERTILIZING = "fertilizing", "Fertilizing"
-        PRUNING = "pruning", "Pruning"
-        REPOTTING = "repotting", "Repotting"
-        HARVESTING = "harvesting", "Harvesting"
-        INSPECTION = "inspection", "Inspection"
+        WATERING = "watering", "Penyiraman"
+        FERTILIZING = "fertilizing", "Pemupukan"
+        PRUNING = "pruning", "Pemangkasan"
+        REPOTTING = "repotting", "Ganti pot"
+        HARVESTING = "harvesting", "Panen"
+        INSPECTION = "inspection", "Pemeriksaan"
 
     class Status(models.TextChoices):
         PENDING = "pending", "Belum selesai"
