@@ -1,9 +1,11 @@
+from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import GardenJournalForm
@@ -77,16 +79,36 @@ def _get_plant_books(request):
 
 
 def _get_user_patch_plants(user):
-    """Mengambil daftar nama tanaman milik user dari My EcoPatch."""
-    from my_ecopatch.models import EcoPatch
-    user_patches = EcoPatch.objects.filter(owner=user).prefetch_related("plants__plant")
+    """Mengambil daftar nama tanaman milik user dari My EcoPatch.
+
+    Opsi 2 (Fleksibel & Terintegrasi):
+    Mengambil semua tanaman yang ada di My EcoPatch (Planned, Planted, Growing, Harvested)
+    kecuali yang berstatus Removed. Pengguna dapat langsung menulis jurnal sejak tahap
+    perencanaan bibit tanpa terblokir.
+    """
+    from my_ecopatch.models import PatchPlant
+    patch_plants = (
+        PatchPlant.objects.filter(patch__owner=user)
+        .exclude(status=PatchPlant.Status.REMOVED)
+        .select_related("plant", "patch")
+        .order_by("patch__name", "plant__name", "plant_name")
+    )
+    seen = set()
     plants = []
-    for patch in user_patches:
-        for pp in patch.plants.all():
-            p_name = pp.plant.name if pp.plant else pp.custom_plant_name
-            if p_name and p_name not in plants:
-                plants.append(p_name)
+    for pp in patch_plants:
+        p_name = pp.plant.name if pp.plant_id else pp.plant_name
+        if p_name and p_name not in seen:
+            seen.add(p_name)
+            plants.append(p_name)
     return plants
+
+
+def _has_planned_plants(user):
+    """Mengecek apakah user memiliki tanaman yang masih berstatus Planned."""
+    from my_ecopatch.models import PatchPlant
+    return PatchPlant.objects.filter(
+        patch__owner=user, status=PatchPlant.Status.PLANNED
+    ).exists()
 
 
 @login_required
@@ -98,6 +120,7 @@ def journal_list(request):
     books = _get_plant_books(request)
     has_ecopatch = EcoPatch.objects.filter(owner=request.user).exists()
     user_plants = _get_user_patch_plants(request.user)
+    has_planned_plants = _has_planned_plants(request.user)
 
     ecopatch_names = (
         user_journals.exclude(ecopatch_name="")
@@ -105,11 +128,31 @@ def journal_list(request):
         .distinct()
     )
 
+    today = timezone.localdate()
+    last_7_dates = [today - timedelta(days=i) for i in range(6, -1, -1)]
+    journal_dates_set = set(
+        user_journals.filter(date__in=last_7_dates).values_list("date", flat=True)
+    )
+    id_day_names = {0: "Sen", 1: "Sel", 2: "Rab", 3: "Kam", 4: "Jum", 5: "Sab", 6: "Min"}
+    last_7_days = [
+        {
+            "date": d,
+            "day_name": id_day_names.get(d.weekday(), d.strftime("%a")),
+            "has_entry": d in journal_dates_set,
+            "is_today": d == today,
+        }
+        for d in last_7_dates
+    ]
+    days_written_count = user_journals.values("date").distinct().count()
+
     context = {
         "books": books,
         "total_journals": user_journals.count(),
         "total_user_journals": user_journals.count(),
         "total_plants": len(books),
+        "total_user_plants": len(user_plants),
+        "days_written_count": days_written_count,
+        "last_7_days": last_7_days,
         "ecopatch_names": ecopatch_names,
         "conditions": GardenJournal.CONDITION_CHOICES,
         "selected_ecopatch_name": request.GET.get("ecopatch_name", ""),
@@ -119,6 +162,7 @@ def journal_list(request):
         "date_to": request.GET.get("date_to", ""),
         "has_ecopatch": has_ecopatch,
         "has_user_plants": len(user_plants) > 0,
+        "has_planned_plants": has_planned_plants,
         "user_plants": user_plants,
     }
     return render(request, "garden_journal/list.html", context)
@@ -331,6 +375,20 @@ def journal_create(request):
                 plants.append(p_name)
         patch_plants_data[patch.name] = plants
 
+    existing_books_data = {}
+    for j in GardenJournal.objects.filter(user=request.user).order_by("created_at"):
+        if j.plant_name:
+            if j.plant_name not in existing_books_data:
+                existing_books_data[j.plant_name] = {
+                    "cover_pattern": j.cover_pattern or "soft",
+                    "cover_color": j.cover_color or "",
+                    "ecopatch_name": j.ecopatch_name or "",
+                    "entry_count": 0,
+                }
+            existing_books_data[j.plant_name]["cover_pattern"] = j.cover_pattern or "soft"
+            existing_books_data[j.plant_name]["cover_color"] = j.cover_color or ""
+            existing_books_data[j.plant_name]["entry_count"] += 1
+
     return render(
         request,
         "garden_journal/form.html",
@@ -341,6 +399,7 @@ def journal_create(request):
             "has_ecopatch": has_ecopatch,
             "user_patches": user_patches,
             "patch_plants_json": json.dumps(patch_plants_data),
+            "existing_books_json": json.dumps(existing_books_data),
             "start_at_step_2": start_at_step_2,
             "is_adding_to_existing_book": is_adding_to_existing_book,
             "initial_plant": initial_plant,
