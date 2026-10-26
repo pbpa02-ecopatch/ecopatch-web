@@ -833,3 +833,37 @@ class DeleteAccountTests(TestCase):
         self.assertTrue(os.path.exists(path))
         self.client.post(self.url, {'action': 'delete', 'password': 'lama-12345'})
         self.assertFalse(os.path.exists(path))
+
+
+class NotFoundPageTests(TestCase):
+    """Every URL that does not exist gets the EcoPatch 404 page (Django shows it whenever DEBUG is off)."""
+
+    def assertIsOurNotFoundPage(self, response):
+        self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, '404.html')
+        self.assertContains(response, 'Halaman yang kamu cari tidak ketemu.', status_code=404)
+        self.assertContains(response, f'href="{reverse("main:home")}"', status_code=404)
+        self.assertContains(response, 'noindex', status_code=404)
+
+    def test_an_unknown_url_shows_the_page_to_a_guest(self):
+        self.assertIsOurNotFoundPage(self.client.get('/tidak-ada-halaman-ini/'))
+
+    def test_an_unknown_url_shows_the_page_to_a_logged_in_user(self):
+        self.client.force_login(get_user_model().objects.create_user('tanam', 't@example.com', 'pass12345'))
+        self.assertIsOurNotFoundPage(self.client.get('/smart-care/tidak-ada/'))
+
+    def test_a_missing_object_shows_it_too(self):
+        self.client.force_login(get_user_model().objects.create_user('tanam', 't@example.com', 'pass12345'))
+        self.assertIsOurNotFoundPage(self.client.get(reverse('plant_library:plant_detail', args=[99999])))
+
+    def test_the_page_is_self_contained(self):
+        body = self.client.get('/tidak-ada/').content.decode()
+        self.assertNotIn('site-navbar', body)  # it does not extend base.html
+        self.assertEqual(body.count('<!doctype html>'), 1)
+        self.assertNotIn('{%', body)
+        self.assertNotIn('{{', body)
+
+    def test_the_game_still_has_its_five_pieces(self):
+        body = self.client.get('/tidak-ada/').content.decode()
+        self.assertEqual(body.count('class="shard"'), 5)
+        self.assertEqual(body.count('class="hole"'), 5)
