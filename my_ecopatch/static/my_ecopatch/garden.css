@@ -117,3 +117,37 @@ body.mep-module{background:#fdf7e8;color:#17301f}
   .mep-module .plant-status-form{flex-basis:auto}
   .mep-module .plant-remove{margin-left:auto;display:inline-flex;align-items:center}
 }
+
+/* PatchPlant controls: form first, branded dropdowns, and in-page confirmation. */
+.mep-module .patch-plant-form { margin: 0 0 36px; scroll-margin-top: 96px; }
+.mep-module .mep-select { min-width: 0; width: 100%; }
+.mep-module .mep-select .patch-select-btn {
+  width: 100%; min-height: 48px; padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: #fffef9; border: 1.5px solid #aa9a70; border-radius: 14px;
+  color: #17301f; font: inherit; text-align: left; white-space: normal;
+}
+.mep-module .mep-select .patch-select-btn::after { flex-shrink: 0; }
+.mep-module .mep-select .patch-menu {
+  max-height: 260px; overflow-y: auto; overscroll-behavior: contain;
+  background: #fffdf6; border-color: #d8c7a3; border-radius: 16px;
+}
+.mep-module .mep-select .patch-menu-item { min-height: 44px; white-space: normal; }
+.mep-module .mep-select .patch-menu-item.active { background: #bdeec7; color: #175e30; }
+.mep-module .mep-select .patch-menu-item:hover,
+.mep-module .mep-select .patch-menu-item:focus-visible { background: #e2f4e5; color: #17301f; }
+.mep-module .mep-select-status { width: 150px; }
+.mep-module .mep-select-status .patch-select-btn { border-radius: 999px; background: #e2f4e5; font-weight: 700; font-size: .85rem; }
+.mep-module .mep-select [aria-invalid="true"] { border-color: #a3301f; }
+.mep-module .mep-select select[hidden] { display: none !important; }
+.mep-delete-dialog {
+  width: min(460px, calc(100% - 32px)); max-height: calc(100dvh - 32px);
+  padding: 28px; border: 1px solid #d8c7a3; border-radius: 28px;
+  background: #fffaf0; color: #17301f; box-shadow: 0 24px 70px #17301f40;
+}
+.mep-delete-dialog::backdrop { background: #17301f80; backdrop-filter: blur(4px); }
+.mep-delete-dialog h2 { font: 800 1.9rem/1.2 'Baloo 2', sans-serif; margin: 14px 0 12px; }
+.mep-delete-dialog p { overflow-wrap: anywhere; }
+.mep-delete-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 16px; background: #fbe1d6; color: #a3301f; font-size: 2rem; }
+.mep-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+@media(max-width:480px) { .mep-delete-dialog { padding: 24px; } .mep-dialog-actions .btn { flex: 1 1 auto; } }
