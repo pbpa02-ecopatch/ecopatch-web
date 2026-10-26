@@ -41,18 +41,24 @@ def _reason(task_type, last_completed, today):
     return f"Terakhir {verb} kemarin" if days == 1 else f"Terakhir {verb} {days} hari lalu"
 
 
-def build_suggestions(plants, history, today, intervals=INTERVALS, never_recorded=NEVER_RECORDED_TYPES):
+def build_suggestions(plants, history, today, intervals=INTERVALS, never_recorded=NEVER_RECORDED_TYPES,
+                      watering_days=None):
     """Return [{plant_name, task_type, is_outdoor, reason}] for `today`.
 
     plants:  iterable of (plant_name, is_outdoor)
     history: iterable of HistoryEntry. It must include every task dated `today` (any status), so a
              pair that already has a task today is not suggested again, plus completed tasks.
+    watering_days: optional {normalized plant name: days}; a plant listed there is watered at its own
+             interval instead of intervals["watering"]. Other task types never change.
     """
+    watering_days = watering_days or {}
     history = list(history)
     suggestions = []
     for plant_name, is_outdoor in plants:
         key = normalize(plant_name)
         for task_type, interval in intervals.items():
+            if task_type == "watering":
+                interval = watering_days.get(key, interval)
             same = [e for e in history if normalize(e.plant_name) == key and e.task_type == task_type]
             if any(e.due_date == today for e in same):
                 continue
@@ -78,11 +84,12 @@ def _days_since(history, key, task_type, today):
     return (today - max(done)).days if done else None
 
 
-def plant_status(plant, history, today, intervals=INTERVALS):
+def plant_status(plant, history, today, intervals=INTERVALS, watering_days=None):
     """How one plant is doing, for its pot. An estimate from the schedule, not a sensor reading.
 
     plant:   (plant_name, is_outdoor)
     history: iterable of HistoryEntry (same shape as for build_suggestions)
+    watering_days: optional {normalized plant name: days}, as for build_suggestions
 
     Returns water (0..1, what is left of the watering interval), a short label, watering_due, never_recorded
     and fertilizing_ok / inspection_ok (True while the last completion is still inside its interval).
@@ -91,7 +98,7 @@ def plant_status(plant, history, today, intervals=INTERVALS):
     key = normalize(plant_name)
     history = list(history)
 
-    interval = intervals["watering"]
+    interval = (watering_days or {}).get(key, intervals["watering"])
     days = _days_since(history, key, "watering", today)
     if days is None:
         water, label, due, never = 0.0, "Belum dicatat", False, True

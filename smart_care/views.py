@@ -14,7 +14,14 @@ from django.views.decorators.http import require_GET, require_POST
 
 from .forms import CareTaskForm
 from .models import CareTask
-from .plant_source import find_patch_plant, get_user_city, get_user_plants, is_outdoor, patch_plant_name
+from .plant_source import (
+    find_patch_plant,
+    get_user_city,
+    get_user_plants,
+    get_user_watering_days,
+    is_outdoor,
+    patch_plant_name,
+)
 from .suggestions import INTERVALS, HistoryEntry, build_suggestions, normalize, plant_status
 from .weather import CITIES, DEFAULT_CITY, FORECAST_DAYS, WeatherUnavailable, weather_payload
 
@@ -77,19 +84,20 @@ def _history(user, today):
     return entries
 
 
-def _suggestions_for_today(user, today, plants=None):
+def _suggestions_for_today(user, today, plants=None, watering_days=None):
     plants = get_user_plants(user) if plants is None else plants
-    return build_suggestions(plants, _history(user, today), today)
+    watering_days = get_user_watering_days(user) if watering_days is None else watering_days
+    return build_suggestions(plants, _history(user, today), today, watering_days=watering_days)
 
 
-def _pots(plants, history, today):
-    return [plant_status(plant, history, today) for plant in plants]
+def _pots(plants, history, today, watering_days=None):
+    return [plant_status(plant, history, today, watering_days=watering_days) for plant in plants]
 
 
-def _day_state(user, day, today, plants=None):
+def _day_state(user, day, today, plants=None, watering_days=None):
     """The visible tasks of one day (skipped ones hidden) and, for today only, the open suggestions."""
     tasks = [t for t in CareTask.objects.filter(user=user, due_date=day).order_by("created_at") if t.status != Status.SKIPPED]
-    suggestions = _suggestions_for_today(user, today, plants) if day == today else []
+    suggestions = _suggestions_for_today(user, today, plants, watering_days) if day == today else []
     return tasks, suggestions
 
 
@@ -160,8 +168,9 @@ def care_task_list(request):
     today = timezone.localdate()
     selected = _parse_date(request.GET.get("date")) or today
     plants = get_user_plants(request.user)
+    watering_days = get_user_watering_days(request.user)
     tips = TIPS if plants else GENERAL_TIPS
-    tasks, suggestions = _day_state(request.user, selected, today, plants)
+    tasks, suggestions = _day_state(request.user, selected, today, plants, watering_days)
     for suggestion in suggestions:
         suggestion["label"] = CareTask.TaskType(suggestion["task_type"]).label
     is_today = selected == today
@@ -177,7 +186,7 @@ def care_task_list(request):
         "suggestions": suggestions,
         "skipped_suggestions": list(_skipped_suggestions(request.user, today)) if is_today else [],
         "has_plants": bool(plants),
-        "pots": _pots(plants, _history(request.user, today), today),
+        "pots": _pots(plants, _history(request.user, today), today, watering_days),
         # Overdue tasks only show up when looking at today
         "overdue_tasks": _overdue(request.user, today) if is_today else [],
         "progress": _progress(tasks, suggestions),
@@ -262,12 +271,13 @@ def care_task_delete(request, pk):
 def _state_payload(user, task):
     """Shared by toggle, accept and skip, so the JS can reuse one handler for all three."""
     today = timezone.localdate()
-    tasks, suggestions = _day_state(user, task.due_date, today)
+    watering_days = get_user_watering_days(user)
+    tasks, suggestions = _day_state(user, task.due_date, today, watering_days=watering_days)
     # the plant's pot changes when its watering / fertilizing / inspection is ticked
     wanted = normalize(task.plant_name)
     plants = [plant for plant in get_user_plants(user) if normalize(plant[0]) == wanted]
     return {
-        "pot": _pots(plants, _history(user, today), today)[0] if plants else None,
+        "pot": _pots(plants, _history(user, today), today, watering_days)[0] if plants else None,
         "id": task.pk,
         "status": task.status,
         "is_completed": task.is_completed,
