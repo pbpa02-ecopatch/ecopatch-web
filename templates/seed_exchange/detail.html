@@ -1,390 +1,150 @@
 {% extends "base.html" %}
+{% load static asset_version %}
 {% block title %}{{ listing.title }} - Seed Exchange{% endblock %}
 
 {% block extra_head %}
-<style>
-    /* --- Consistent button styles (shared with list page) --- */
-    .btn-seed-primary {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 999px;
-        background: var(--brand-500);
-        color: #fff;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .btn-seed-primary:hover { background: var(--brand-600); }
-    .btn-seed-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-300); }
-
-    .btn-seed-secondary {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        background: var(--surface-200);
-        color: var(--ink);
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        transition: background-color 0.2s ease, border-color 0.2s ease;
-    }
-    .btn-seed-secondary:hover { background: var(--surface-300); }
-    .btn-seed-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-300); }
-
-    .btn-seed-danger {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        border: 1px solid color-mix(in srgb, var(--accent-mango) 40%, var(--border));
-        border-radius: 999px;
-        background: color-mix(in srgb, var(--accent-mango) 12%, transparent);
-        color: var(--accent-mango);
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.2s ease, border-color 0.2s ease;
-    }
-    .btn-seed-danger:hover { background: var(--accent-mango); color: #fff; border-color: var(--accent-mango); }
-    .btn-seed-danger:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-mango) 40%, transparent); }
-
-    .btn-seed-sm { padding: 6px 12px; font-size: 13px; }
-
-    .seed-detail-card {
-        padding: 28px;
-        border: 1px solid var(--border);
-        border-radius: 28px;
-        background: var(--surface-200);
-        box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
-    }
-    .seed-detail-card--split {
-        display: grid;
-        grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
-        gap: 28px;
-        align-items: start;
-    }
-    .seed-detail-body { min-width: 0; }
-    .seed-detail-head {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 16px;
-        flex-wrap: wrap;
-        margin-bottom: 10px;
-    }
-    .seed-detail-media {
-        aspect-ratio: 4 / 3;
-        overflow: hidden;
-        border-radius: 20px;
-        background: var(--surface-100);
-    }
-    .seed-detail-media img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    @media (max-width: 860px) {
-        .seed-detail-card--split { grid-template-columns: 1fr; gap: 20px; }
-        .seed-detail-media { aspect-ratio: 16 / 9; max-height: 320px; }
-    }
-    .seed-detail-title { margin: 0; font-size: clamp(1.6rem, 3vw, 2.1rem); }
-    .seed-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    .seed-pill {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-    .seed-pill--type { background: var(--surface-300); color: color-mix(in srgb, var(--ink-muted) 70%, var(--ink)); }
-    .seed-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 14px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 700;
-        line-height: 1.4;
-        white-space: nowrap;
-    }
-    .seed-pill--giveaway { background: var(--brand-300); color: color-mix(in srgb, var(--brand-600) 65%, var(--ink)); }
-    .seed-pill--swap { background: color-mix(in srgb, var(--accent-mango) 22%, var(--surface-200)); color: color-mix(in srgb, var(--accent-mango) 50%, var(--ink)); }
-    .seed-pill--available { background: color-mix(in srgb, var(--brand-300) 70%, var(--surface-200)); color: color-mix(in srgb, var(--brand-600) 70%, var(--ink)); }
-    .seed-pill--requested { background: color-mix(in srgb, var(--accent-mango) 22%, var(--surface-200)); color: color-mix(in srgb, var(--accent-mango) 50%, var(--ink)); }
-    .seed-pill--reserved { background: color-mix(in srgb, var(--accent-sky) 16%, var(--surface-200)); color: color-mix(in srgb, var(--accent-sky) 48%, var(--ink)); }
-    .seed-pill--completed { background: var(--surface-300); color: color-mix(in srgb, var(--ink-muted) 60%, var(--ink)); }
-    .seed-meta-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 12px;
-        margin: 18px 0;
-    }
-    .seed-meta { margin: 0; }
-    .seed-meta dt { color: var(--ink-muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
-    .seed-meta dd { margin: 4px 0 0; color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
-    .seed-desc { color: var(--ink-muted); line-height: 1.7; white-space: pre-line; }
-    .seed-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
-    .seed-actions form { display: inline; margin: 0; }
-    .seed-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 18px;
-        padding: 8px 16px 8px 12px;
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        background: var(--surface-200);
-        color: var(--ink-muted);
-        font-size: 13.5px;
-        font-weight: 600;
-        text-decoration: none;
-        box-shadow: 0 2px 6px rgba(34, 48, 31, 0.06);
-        transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-    }
-    .seed-back svg { width: 16px; height: 16px; }
-    .seed-back:hover {
-        border-color: var(--brand-500);
-        background: color-mix(in srgb, var(--brand-300) 30%, var(--surface-200));
-        color: var(--brand-600);
-        transform: translateX(-2px);
-    }
-    .seed-back:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-300); }
-    .seed-hint { margin-top: 16px; color: var(--ink-muted); font-size: 14px; }
-    .seed-hint a { color: var(--brand-600); font-weight: 700; }
-
-    /* --- Guest callout (shared with the list page) --- */
-    .seed-login-hint {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-top: 22px;
-        padding: 18px 20px;
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        background: linear-gradient(135deg, color-mix(in srgb, var(--brand-300) 45%, var(--surface-200)), var(--surface-200) 70%);
-        box-shadow: 0 6px 16px rgba(34, 48, 31, 0.08);
-    }
-    .seed-login-hint-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        width: 44px;
-        height: 44px;
-        border-radius: 14px;
-        background: var(--brand-300);
-        color: var(--brand-600);
-    }
-    .seed-login-hint-icon svg { width: 24px; height: 24px; }
-    .seed-login-hint-body { flex: 1 1 auto; min-width: 0; }
-    .seed-login-hint-title {
-        margin: 0 0 2px;
-        color: var(--ink);
-        font-size: 15px;
-        font-weight: 700;
-    }
-    .seed-login-hint-text {
-        margin: 0;
-        color: var(--ink-muted);
-        font-size: 14px;
-        line-height: 1.5;
-    }
-    .seed-login-hint-actions {
-        display: flex;
-        gap: 8px;
-        flex-shrink: 0;
-    }
-    @media (max-width: 640px) {
-        .seed-login-hint { flex-wrap: wrap; padding: 16px; }
-        .seed-login-hint-body { flex-basis: calc(100% - 60px); }
-        .seed-login-hint-actions { width: 100%; }
-        .seed-login-hint-actions .btn-seed-primary,
-        .seed-login-hint-actions .btn-seed-secondary { flex: 1; justify-content: center; }
-    }
-    .seed-owner-note {
-        margin-top: 16px;
-        padding: 12px 16px;
-        border-radius: 16px;
-        background: var(--surface-100);
-        color: var(--ink-muted);
-        font-size: 14px;
-    }
-    .seed-reserve-box {
-        margin-top: 22px;
-        padding: 20px 22px;
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        background: color-mix(in srgb, var(--brand-300) 40%, var(--surface-200));
-    }
-    .seed-reserve-box p { margin: 0 0 10px; color: var(--ink); font-size: 15px; }
-    .seed-reserve-contact {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 10px;
-        margin: 12px 0 14px;
-    }
-    .seed-contact-name {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 700;
-    }
-    .seed-contact-avatar {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: var(--brand-300);
-        color: var(--brand-600);
-        font-weight: 700;
-    }
-    .seed-contact-value { color: var(--ink-muted); font-size: 14px; }
-</style>
+<link rel="stylesheet" href="{% static_v 'seed_exchange/css/seed_exchange.css' %}">
 {% endblock %}
 
 {% block content %}
-<a class="seed-back" href="{{ back_url }}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M19 12H5"/>
-        <path d="m12 19-7-7 7-7"/>
-    </svg>
-    Kembali ke Seed Exchange
-</a>
+<div class="seed-page seed-page--detail">
+    <a class="seed-back" href="{{ back_url }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 12H5"/>
+            <path d="m12 19-7-7 7-7"/>
+        </svg>
+        Kembali ke Seed Exchange
+    </a>
 
-<article class="seed-detail-card{% if listing.image %} seed-detail-card--split{% endif %}">
-    {% if listing.image %}
-    <div class="seed-detail-media">
-        <img src="{{ listing.image.url }}" alt="{{ listing.title }}" loading="lazy" decoding="async">
-    </div>
-    {% endif %}
-    <div class="seed-detail-body">
-    <div class="seed-detail-head">
-        <h1 class="seed-detail-title">{{ listing.title }}</h1>
-        <span class="seed-status seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
-    </div>
-    <div class="seed-badges">
-        <span class="seed-pill seed-pill--type">{{ listing.get_item_type_display }}</span>
-        <span class="seed-pill seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
-    </div>
-
-    <dl class="seed-meta-grid">
-        <div class="seed-meta">
-            <dt>Tanaman</dt>
-            <dd>{{ listing.plant_name|default:"-" }}</dd>
-        </div>
-        <div class="seed-meta">
-            <dt>Kota</dt>
-            <dd>{{ listing.city }}</dd>
-        </div>
-        <div class="seed-meta">
-            <dt>Pemilik</dt>
-            <dd>{{ listing.user.username }}</dd>
-        </div>
-        {% if is_owner %}
-        <div class="seed-meta">
-            <dt>Kontak</dt>
-            <dd>{{ listing.contact|default:"-" }}</dd>
+    <article class="seed-detail-card{% if listing.image %} seed-detail-card--split{% endif %}">
+        {% if listing.image %}
+        <div class="seed-detail-media">
+            <img src="{{ listing.image.url }}" alt="{{ listing.title }}" loading="lazy" decoding="async">
         </div>
         {% endif %}
-        <div class="seed-meta">
-            <dt>Diperbarui</dt>
-            <dd>{{ listing.updated_at|date:"d M Y" }}</dd>
-        </div>
-    </dl>
-
-    <p class="seed-desc">{{ listing.description|default:"Belum ada deskripsi." }}</p>
-
-    {% if is_owner %}
-        <div class="seed-actions">
-            <a class="btn btn-outline-success" href="{% url 'seed_exchange:update' listing.pk %}">Ubah</a>
-            <a class="btn btn-outline-success" href="{% url 'seed_exchange:delete' listing.pk %}">Hapus</a>
-            {% if listing.status == 'requested' %}
-            <form method="post" action="{% url 'seed_exchange:accept' listing.pk %}">
-                {% csrf_token %}
-                <button class="btn btn-success" type="submit">Terima</button>
-            </form>
-            <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
-                {% csrf_token %}
-                <button class="btn btn-outline-success" type="submit">Tolak</button>
-            </form>
-            {% endif %}
-            {% if listing.status == 'reserved' %}
-            <form method="post" action="{% url 'seed_exchange:complete' listing.pk %}">
-                {% csrf_token %}
-                <button class="btn btn-success" type="submit">Tandai selesai</button>
-            </form>
-            <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
-                {% csrf_token %}
-                <button class="btn btn-outline-success" type="submit">Buka kembali</button>
-            </form>
-            {% endif %}
-            {% if listing.status == 'completed' %}
-            <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
-                {% csrf_token %}
-                <button class="btn btn-outline-success" type="submit">Buka kembali</button>
-            </form>
-            {% endif %}
-        </div>
-        {% if listing.status == 'requested' and listing.reserved_by %}
-        <p class="seed-owner-note">Dipesan oleh <strong>@{{ listing.reserved_by.username }}</strong>. Tekan <strong>Terima</strong> kalau setuju (lanjut atur serah terima via kontakmu), atau <strong>Tolak</strong> untuk membuka listing kembali.</p>
-        {% elif listing.status == 'reserved' and listing.reserved_by %}
-        <p class="seed-owner-note">Sudah diterima <strong>@{{ listing.reserved_by.username }}</strong>. Tandai <strong>Selesai</strong> setelah serah terima terjadi.</p>
-        {% else %}
-        <p class="seed-owner-note">Ini listing punyamu. Pastikan kontakmu benar agar peminat bisa menghubungimu.</p>
-        {% endif %}
-    {% elif is_requester %}
-        <div class="seed-reserve-box">
-            <p><strong>Booking-mu menunggu konfirmasi</strong></p>
-            <p>Pemilik akan menerima atau menolak. Selama belum diterima, kamu bisa membatalkan booking ini.</p>
-            <form method="post" action="{% url 'seed_exchange:cancel_reserve' listing.pk %}">
-                {% csrf_token %}
-                <button class="btn-seed-danger btn-seed-sm" type="submit">Batalkan booking saya</button>
-            </form>
-        </div>
-    {% elif is_accepted %}
-        <div class="seed-reserve-box">
-            <p><strong>Diterima! 🎉</strong></p>
-            <p>Pemilik sudah menerima booking-mu. Hubungi untuk atur waktu &amp; tempat serah terima. Pembatalan sekarang lewat pemilik langsung.</p>
-            <div class="seed-reserve-contact">
-                <span class="seed-contact-avatar" aria-hidden="true">{{ listing.user.username|first|upper }}</span>
-                <span class="seed-contact-name">@{{ listing.user.username }}</span>
-                <span class="seed-contact-value">{{ listing.contact }}</span>
-                {% if listing.user.email %}
-                <a class="btn-seed-secondary btn-seed-sm" href="mailto:{{ listing.user.email }}">Hubungi via Email</a>
-                {% endif %}
+        <div class="seed-detail-body">
+            <p class="seed-detail-kicker">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 21v-8"/>
+                    <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                    <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                </svg>
+                Listing warga <b>&middot; {{ listing.get_item_type_display }}</b>
+            </p>
+            <div class="seed-detail-head">
+                <h1 class="seed-detail-title">{{ listing.title }}</h1>
+                <span class="seed-status seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
             </div>
+            <div class="seed-badges">
+                <span class="seed-pill seed-pill--type">{{ listing.get_item_type_display }}</span>
+                <span class="seed-pill seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
+            </div>
+
+            <dl class="seed-meta-grid">
+                <div class="seed-meta">
+                    <dt>Tanaman</dt>
+                    <dd>{{ listing.plant_name|default:"-" }}</dd>
+                </div>
+                <div class="seed-meta">
+                    <dt>Kota</dt>
+                    <dd>{{ listing.city }}</dd>
+                </div>
+                <div class="seed-meta">
+                    <dt>Pemilik</dt>
+                    <dd>{{ listing.user.username }}</dd>
+                </div>
+                {% if is_owner %}
+                <div class="seed-meta">
+                    <dt>Kontak</dt>
+                    <dd>{{ listing.contact|default:"-" }}</dd>
+                </div>
+                {% endif %}
+                <div class="seed-meta">
+                    <dt>Diperbarui</dt>
+                    <dd>{{ listing.updated_at|date:"d M Y" }}</dd>
+                </div>
+            </dl>
+
+            <p class="seed-desc">{{ listing.description|default:"Belum ada deskripsi." }}</p>
+
+            {% if is_owner %}
+                <div class="seed-actions">
+                    <a class="btn-seed-secondary" href="{% url 'seed_exchange:update' listing.pk %}">Ubah</a>
+                    <a class="btn-seed-danger" href="{% url 'seed_exchange:delete' listing.pk %}">Hapus</a>
+                    {% if listing.status == 'requested' %}
+                    <form method="post" action="{% url 'seed_exchange:accept' listing.pk %}">
+                        {% csrf_token %}
+                        <button class="btn-seed-primary" type="submit">Terima</button>
+                    </form>
+                    <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
+                        {% csrf_token %}
+                        <button class="btn-seed-secondary" type="submit">Tolak</button>
+                    </form>
+                    {% endif %}
+                    {% if listing.status == 'reserved' %}
+                    <form method="post" action="{% url 'seed_exchange:complete' listing.pk %}">
+                        {% csrf_token %}
+                        <button class="btn-seed-primary" type="submit">Tandai selesai</button>
+                    </form>
+                    <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
+                        {% csrf_token %}
+                        <button class="btn-seed-secondary" type="submit">Buka kembali</button>
+                    </form>
+                    {% endif %}
+                    {% if listing.status == 'completed' %}
+                    <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
+                        {% csrf_token %}
+                        <button class="btn-seed-secondary" type="submit">Buka kembali</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% if listing.status == 'requested' and listing.reserved_by %}
+                <p class="seed-owner-note">Dipesan oleh <strong>@{{ listing.reserved_by.username }}</strong>. Tekan <strong>Terima</strong> kalau setuju (lanjut atur serah terima via kontakmu), atau <strong>Tolak</strong> untuk membuka listing kembali.</p>
+                {% elif listing.status == 'reserved' and listing.reserved_by %}
+                <p class="seed-owner-note">Sudah diterima <strong>@{{ listing.reserved_by.username }}</strong>. Tandai <strong>Selesai</strong> setelah serah terima terjadi.</p>
+                {% else %}
+                <p class="seed-owner-note">Ini listing punyamu. Pastikan kontakmu benar agar peminat bisa menghubungimu.</p>
+                {% endif %}
+            {% elif is_requester %}
+                <div class="seed-reserve-box">
+                    <p><strong>Booking-mu menunggu konfirmasi</strong></p>
+                    <p>Pemilik akan menerima atau menolak. Selama belum diterima, kamu bisa membatalkan booking ini.</p>
+                    <form method="post" action="{% url 'seed_exchange:cancel_reserve' listing.pk %}">
+                        {% csrf_token %}
+                        <button class="btn-seed-danger btn-seed-sm" type="submit">Batalkan booking saya</button>
+                    </form>
+                </div>
+            {% elif is_accepted %}
+                <div class="seed-reserve-box">
+                    <p><strong>Diterima! 🎉</strong></p>
+                    <p>Pemilik sudah menerima booking-mu. Hubungi untuk atur waktu &amp; tempat serah terima. Pembatalan sekarang lewat pemilik langsung.</p>
+                    <div class="seed-reserve-contact">
+                        <span class="seed-contact-avatar" aria-hidden="true">{{ listing.user.username|first|upper }}</span>
+                        <span class="seed-contact-name">@{{ listing.user.username }}</span>
+                        <span class="seed-contact-value">{{ listing.contact }}</span>
+                        {% if listing.user.email %}
+                        <a class="btn-seed-secondary btn-seed-sm" href="mailto:{{ listing.user.email }}">Hubungi via Email</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% elif can_reserve %}
+                <div class="seed-actions">
+                    <form method="post" action="{% url 'seed_exchange:reserve' listing.pk %}">
+                        {% csrf_token %}
+                        <button class="btn-seed-primary" type="submit">Booking listing ini</button>
+                    </form>
+                </div>
+            {% elif user.is_authenticated and listing.status == 'requested' %}
+                <p class="seed-hint">Listing ini sedang dipesan orang lain dan menunggu konfirmasi pemilik.</p>
+            {% elif user.is_authenticated and listing.status == 'reserved' %}
+                <p class="seed-hint">Listing ini sudah diterima orang lain.</p>
+            {% elif user.is_authenticated and listing.status == 'completed' %}
+                <p class="seed-hint">Listing ini sudah selesai.</p>
+            {% else %}
+                {% url 'seed_exchange:detail' listing.pk as detail_url %}
+                {% include "seed_exchange/partials/login_callout.html" with title="Ingin booking bibit ini?" text="Masuk untuk booking listing atau membuat listing punyamu sendiri. Belum punya akun? Daftar gratis, kok." next_url=detail_url %}
+            {% endif %}
         </div>
-    {% elif can_reserve %}
-        <div class="seed-actions">
-            <form method="post" action="{% url 'seed_exchange:reserve' listing.pk %}">
-                {% csrf_token %}
-                <button class="btn-seed-primary" type="submit">Booking listing ini</button>
-            </form>
-        </div>
-    {% elif user.is_authenticated and listing.status == 'requested' %}
-        <p class="seed-hint">Listing ini sedang dipesan orang lain dan menunggu konfirmasi pemilik.</p>
-    {% elif user.is_authenticated and listing.status == 'reserved' %}
-        <p class="seed-hint">Listing ini sudah diterima orang lain.</p>
-    {% elif user.is_authenticated and listing.status == 'completed' %}
-        <p class="seed-hint">Listing ini sudah selesai.</p>
-    {% else %}
-        {% url 'seed_exchange:detail' listing.pk as detail_url %}
-        {% include "seed_exchange/partials/login_callout.html" with title="Ingin booking bibit ini?" text="Masuk untuk booking listing atau membuat listing punyamu sendiri. Belum punya akun? Daftar gratis, kok." next_url=detail_url %}
-    {% endif %}
-    </div>
-</article>
+    </article>
+</div>
 {% endblock %}
