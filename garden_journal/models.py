@@ -23,6 +23,8 @@ class GardenJournal(models.Model):
         ("terra", "Terra"),
         ("moss", "Moss"),
         ("clay", "Clay"),
+        ("pebbles", "Pebbles"),
+        ("polkadot", "Polkadot"),
         ("solid", "Solid Color"),
     ]
 
@@ -89,3 +91,16 @@ class GardenJournal(models.Model):
             "ready_to_harvest": "secondary",
         }
         return badge_map.get(self.plant_condition, "secondary")
+
+    @property
+    def get_condition_ds_class(self):
+        """Mapping status condition ke kelas badge Design System (badge-ds-*)."""
+        ds_map = {
+            "healthy": "badge-ds-healthy",
+            "needs_attention": "badge-ds-attention",
+            "wilting": "badge-ds-wilting",
+            "flowering": "badge-ds-flowering",
+            "fruiting": "badge-ds-planned",
+            "ready_to_harvest": "badge-ds-healthy",
+        }
+        return ds_map.get(self.plant_condition, "badge-ds-attention")
