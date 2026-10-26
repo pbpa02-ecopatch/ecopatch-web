@@ -1,0 +1,633 @@
+{% extends "base.html" %}
+{% block title %}Plant Library - EcoPatch{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ================================================================
+       PLANT LIBRARY – Scoped styles
+       Background: warm cream #FFF9EA, search bar putih dengan divider
+       ================================================================ */
+
+    /* Wrap seluruh section dalam background cream */
+    .plant-page {
+        background: #FFF0CC;
+        border-radius: 24px;
+        padding: 0 0 32px;
+        min-height: 60vh;
+    }
+
+    /* ---------- Hero Section ---------- */
+    .pl-hero {
+        background: #FFF0CC;
+        border-radius: 28px 28px 0 0;
+        padding: 48px 40px 32px;
+        text-align: center;
+        margin-bottom: 0;
+        position: relative;
+    }
+    .pl-hero-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        color: #2d7d32;
+        margin-bottom: 16px;
+    }
+    .pl-hero-label svg { flex-shrink: 0; }
+    .pl-hero-title {
+        font-family: 'Baloo 2', sans-serif;
+        font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+        font-weight: 800;
+        color: #1a2b1a;
+        line-height: 1.22;
+        margin-bottom: 32px;
+    }
+    .pl-hero-title .accent-green {
+        color: #2d7d32;
+        text-decoration: underline;
+        text-decoration-color: #f5a623;
+        text-underline-offset: 5px;
+        text-decoration-thickness: 3px;
+    }
+
+    /* ---------- Search Container ---------- */
+    .pl-search-wrap {
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 8px 32px rgba(34, 48, 31, 0.10), 0 1px 4px rgba(34, 48, 31, 0.06);
+        padding: 0;
+        max-width: 900px;
+        margin: 0 auto;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* Top row: search icon + input */
+    .pl-search-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 20px 14px 22px;
+    }
+    .pl-search-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 1rem;
+        color: #1a2b1a;
+        padding: 0;
+        min-width: 0;
+    }
+    .pl-search-input::placeholder { color: #9aab9a; font-size: 0.97rem; }
+    .pl-search-icon {
+        color: #9aab9a;
+        flex-shrink: 0;
+    }
+
+    /* Divider between input and chips */
+    .pl-search-divider {
+        height: 1px;
+        background: #eeeeee;
+        margin: 0 20px;
+    }
+
+    /* Bottom row: chips + submit button */
+    .pl-search-bottom {
+        display: flex;
+        align-items: center;
+        padding: 10px 14px 14px 20px;
+        gap: 8px;
+    }
+
+    /* Chips row */
+    .pl-chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        flex: 1;
+        min-width: 0;
+    }
+    .pl-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        border: 1.5px solid #dde8dd;
+        background: #fff;
+        color: #3d5c3d;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        line-height: 1;
+        transition: border-color 0.15s, background 0.15s, color 0.15s;
+        cursor: pointer;
+    }
+    .pl-chip:hover {
+        border-color: #2d7d32;
+        background: #f2faf2;
+        color: #2d7d32;
+        text-decoration: none;
+    }
+    .pl-chip.active {
+        background: #2d7d32;
+        border-color: #2d7d32;
+        color: #fff;
+    }
+    .pl-chip.active:hover {
+        background: #245e27;
+        border-color: #245e27;
+        color: #fff;
+    }
+
+    /* Submit button – round green, bottom-right */
+    .pl-submit-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #2d7d32;
+        border: none;
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.15s;
+        margin-left: auto;
+    }
+    .pl-submit-btn:hover {
+        background: #245e27;
+        transform: scale(1.06);
+    }
+
+    /* ---------- Action buttons below hero ---------- */
+    .pl-hero-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 24px auto 0;
+        width: 100%;
+    }
+
+    /* ---------- Filter lainnya (details) ---------- */
+    .pl-filter-extra {
+        max-width: 680px;
+        margin: 10px auto 0;
+    }
+    .pl-filter-extra summary {
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #5a7c5a;
+        list-style: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 0;
+        user-select: none;
+    }
+    .pl-filter-extra summary::-webkit-details-marker { display: none; }
+    .pl-filter-extra summary .arrow { transition: transform 0.2s; }
+    .pl-filter-extra[open] summary .arrow { transform: rotate(90deg); }
+    .pl-filter-extra-body {
+        background: #fff;
+        border: 1px solid #dde8dd;
+        border-radius: 18px;
+        padding: 14px 18px;
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: flex-end;
+    }
+    .pl-filter-select {
+        border: 1px solid #c8d8c8;
+        border-radius: 999px;
+        background: #fafff8;
+        color: #1a2b1a;
+        font-size: 0.88rem;
+        padding: 7px 14px;
+        flex: 1 1 180px;
+        min-width: 150px;
+    }
+    .pl-filter-select:focus {
+        border-color: #2d7d32;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(45, 125, 50, 0.15);
+    }
+    .pl-reset-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 7px 16px;
+        border-radius: 999px;
+        border: 1.5px dashed #b8ccb8;
+        background: transparent;
+        color: #5a7c5a;
+        font-size: 0.84rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.15s;
+        white-space: nowrap;
+    }
+    .pl-reset-btn:hover { background: #f2faf2; border-color: #2d7d32; color: #2d7d32; }
+
+    /* ---------- Count info ---------- */
+    .plant-count-info {
+        font-weight: 600;
+        color: #5a7c5a;
+        font-size: 0.95rem;
+        margin-bottom: 18px;
+        padding: 0 8px;
+    }
+
+    /* ================================================================
+       PLANT CARDS – tidak berubah dari sebelumnya
+       ================================================================ */
+    .plant-card {
+        background: var(--surface-200);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: 0 6px 16px rgba(34, 48, 31, 0.08);
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .plant-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(34, 48, 31, 0.14);
+    }
+    .plant-card-media {
+        width: 100%;
+        height: 190px;
+        background: linear-gradient(135deg, var(--surface-300) 0%, var(--surface-100) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+    .plant-card-media img { width: 100%; height: 100%; object-fit: cover; }
+    .plant-card-placeholder-icon { font-size: 3.5rem; user-select: none; }
+    .plant-card-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    .plant-badge-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .plant-badge {
+        font-size: 0.76rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        letter-spacing: 0.2px;
+    }
+    .plant-badge--category { background: var(--brand-300); color: var(--brand-600); }
+    .plant-badge--diff-easy { background: #e6f4ea; color: #137333; }
+    .plant-badge--diff-medium { background: #fef7e0; color: #b06000; }
+    .plant-badge--diff-hard { background: #fce8e6; color: #c5221f; }
+    .plant-card-title { font-size: 1.35rem; color: var(--ink); margin: 0 0 4px; font-family: 'Baloo 2', sans-serif; }
+    .plant-card-scientific { color: var(--ink-muted); font-style: italic; font-size: 0.88rem; margin-bottom: 14px; }
+    .plant-specs-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        background: var(--surface-100);
+        padding: 10px 12px;
+        border-radius: 14px;
+        font-size: 0.82rem;
+        color: var(--ink);
+        margin-bottom: 14px;
+    }
+    .plant-specs-item {
+        display: flex; align-items: center; gap: 6px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .plant-desc-snippet {
+        font-size: 0.88rem; color: var(--ink-muted); line-height: 1.5;
+        margin-bottom: 18px; flex-grow: 1;
+    }
+    .plant-card-footer { margin-top: auto; }
+    .plant-empty-state {
+        text-align: center; padding: 60px 20px;
+        background: var(--surface-200); border: 2px dashed var(--border); border-radius: 28px;
+    }
+    .plant-empty-icon { font-size: 3.5rem; margin-bottom: 12px; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 768px) {
+        .pl-hero { padding: 36px 20px 24px; }
+        .pl-search-wrap { border-radius: 20px; }
+        .pl-search-row { padding: 14px 14px 12px 16px; }
+        .pl-search-bottom { padding: 8px 10px 12px 14px; gap: 6px; }
+        .pl-search-divider { margin: 0 14px; }
+        .pl-chip { font-size: 0.75rem; padding: 4px 10px; }
+        .pl-submit-btn { width: 40px; height: 40px; }
+        .pl-hero-actions .btn { font-size: 0.88rem; padding: 8px 14px; }
+    }
+    @media (max-width: 480px) {
+        .pl-hero { padding: 28px 12px 20px; }
+        .pl-search-row { padding: 12px 12px 10px 14px; }
+        .pl-search-bottom { padding: 8px 10px 10px 12px; flex-wrap: wrap; }
+        .pl-submit-btn { margin-left: auto; }
+        .pl-chip-row { gap: 5px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="plant-page">
+
+    
+    <div class="pl-hero mb-4">
+
+        
+        <div class="pl-hero-label">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <rect x="1" y="1" width="7" height="7" rx="2" fill="#2d7d32"/>
+                <rect x="12" y="1" width="7" height="7" rx="2" fill="#2d7d32" opacity=".55"/>
+                <rect x="1" y="12" width="7" height="7" rx="2" fill="#2d7d32" opacity=".55"/>
+                <rect x="12" y="12" width="7" height="7" rx="2" fill="#2d7d32"/>
+            </svg>
+            Plant Library
+        </div>
+
+        
+        <h1 class="pl-hero-title">
+            Ayo temukan tanaman<br>
+            yang <span class="accent-green">cocok</span> untuk kamu
+        </h1>
+
+        
+        {% with cur_q=query cur_sun=selected_sunlight cur_diff=selected_difficulty cur_io=selected_indoor_outdoor cur_cat=selected_category cur_space=selected_space_requirement %}
+        <form method="get" action="{% url 'plant_library:plant_list' %}" id="pl-search-form">
+            
+            {% if cur_cat %}<input type="hidden" name="category" value="{{ cur_cat }}">{% endif %}
+            {% if cur_sun %}<input type="hidden" name="sunlight" value="{{ cur_sun }}">{% endif %}
+            {% if cur_diff %}<input type="hidden" name="difficulty" value="{{ cur_diff }}">{% endif %}
+            {% if cur_io %}<input type="hidden" name="indoor_outdoor" value="{{ cur_io }}">{% endif %}
+            {% if cur_space %}<input type="hidden" name="space_requirement" value="{{ cur_space }}">{% endif %}
+
+            <div class="pl-search-wrap">
+                <div class="pl-search-row">
+                    <svg class="pl-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" name="q" value="{{ cur_q }}"
+                           class="pl-search-input"
+                           placeholder='Coba "tanaman yang mudah dirawat dan teduh"'
+                           autocomplete="off">
+                </div>
+
+                <div class="pl-search-divider"></div>
+
+                <div class="pl-search-bottom">
+                <div class="pl-chip-row">
+                    
+                    
+                    {% if cur_sun == 'full' %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}{% if cur_diff %}difficulty={{ cur_diff }}&{% endif %}{% if cur_io %}indoor_outdoor={{ cur_io }}&{% endif %}{% if cur_cat %}category={{ cur_cat }}&{% endif %}{% if cur_space %}space_requirement={{ cur_space }}&{% endif %}"
+                           class="pl-chip active" title="Klik untuk matikan filter">
+                            ☀️ Cahaya penuh
+                        </a>
+                    {% else %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}sunlight=full{% if cur_diff %}&difficulty={{ cur_diff }}{% endif %}{% if cur_io %}&indoor_outdoor={{ cur_io }}{% endif %}{% if cur_cat %}&category={{ cur_cat }}{% endif %}{% if cur_space %}&space_requirement={{ cur_space }}{% endif %}"
+                           class="pl-chip">
+                            ☀️ Cahaya penuh
+                        </a>
+                    {% endif %}
+
+                    
+                    {% if cur_sun == 'shade' %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}{% if cur_diff %}difficulty={{ cur_diff }}&{% endif %}{% if cur_io %}indoor_outdoor={{ cur_io }}&{% endif %}{% if cur_cat %}category={{ cur_cat }}&{% endif %}{% if cur_space %}space_requirement={{ cur_space }}&{% endif %}"
+                           class="pl-chip active" title="Klik untuk matikan filter">
+                            🌥️ Teduh
+                        </a>
+                    {% else %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}sunlight=shade{% if cur_diff %}&difficulty={{ cur_diff }}{% endif %}{% if cur_io %}&indoor_outdoor={{ cur_io }}{% endif %}{% if cur_cat %}&category={{ cur_cat }}{% endif %}{% if cur_space %}&space_requirement={{ cur_space }}{% endif %}"
+                           class="pl-chip">
+                            🌥️ Teduh
+                        </a>
+                    {% endif %}
+
+                    
+                    
+                    {% if cur_diff == 'easy' %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}{% if cur_sun %}sunlight={{ cur_sun }}&{% endif %}{% if cur_io %}indoor_outdoor={{ cur_io }}&{% endif %}{% if cur_cat %}category={{ cur_cat }}&{% endif %}{% if cur_space %}space_requirement={{ cur_space }}&{% endif %}"
+                           class="pl-chip active" title="Klik untuk matikan filter">
+                            🌱 Mudah dirawat
+                        </a>
+                    {% else %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}{% if cur_sun %}sunlight={{ cur_sun }}&{% endif %}difficulty=easy{% if cur_io %}&indoor_outdoor={{ cur_io }}{% endif %}{% if cur_cat %}&category={{ cur_cat }}{% endif %}{% if cur_space %}&space_requirement={{ cur_space }}{% endif %}"
+                           class="pl-chip">
+                            🌱 Mudah dirawat
+                        </a>
+                    {% endif %}
+
+                    
+                    {% if cur_diff == 'medium' %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}{% if cur_sun %}sunlight={{ cur_sun }}&{% endif %}{% if cur_io %}indoor_outdoor={{ cur_io }}&{% endif %}{% if cur_cat %}category={{ cur_cat }}&{% endif %}{% if cur_space %}space_requirement={{ cur_space }}&{% endif %}"
+                           class="pl-chip active" title="Klik untuk matikan filter">
+                            🌿 Perawatan sedang
+                        </a>
+                    {% else %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}{% if cur_sun %}sunlight={{ cur_sun }}&{% endif %}difficulty=medium{% if cur_io %}&indoor_outdoor={{ cur_io }}{% endif %}{% if cur_cat %}&category={{ cur_cat }}{% endif %}{% if cur_space %}&space_requirement={{ cur_space }}{% endif %}"
+                           class="pl-chip">
+                            🌿 Perawatan sedang
+                        </a>
+                    {% endif %}
+
+                    
+                    
+                    {% if cur_io == 'indoor' %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}{% if cur_sun %}sunlight={{ cur_sun }}&{% endif %}{% if cur_diff %}difficulty={{ cur_diff }}&{% endif %}{% if cur_cat %}category={{ cur_cat }}&{% endif %}{% if cur_space %}space_requirement={{ cur_space }}&{% endif %}"
+                           class="pl-chip active" title="Klik untuk matikan filter">
+                            🏠 Indoor
+                        </a>
+                    {% else %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}{% if cur_sun %}sunlight={{ cur_sun }}&{% endif %}{% if cur_diff %}difficulty={{ cur_diff }}&{% endif %}indoor_outdoor=indoor{% if cur_cat %}&category={{ cur_cat }}{% endif %}{% if cur_space %}&space_requirement={{ cur_space }}{% endif %}"
+                           class="pl-chip">
+                            🏠 Indoor
+                        </a>
+                    {% endif %}
+
+                    
+                    {% if cur_io == 'outdoor' %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}{% if cur_sun %}sunlight={{ cur_sun }}&{% endif %}{% if cur_diff %}difficulty={{ cur_diff }}&{% endif %}{% if cur_cat %}category={{ cur_cat }}&{% endif %}{% if cur_space %}space_requirement={{ cur_space }}&{% endif %}"
+                           class="pl-chip active" title="Klik untuk matikan filter">
+                            🌳 Outdoor
+                        </a>
+                    {% else %}
+                        <a href="{% url 'plant_library:plant_list' %}?{% if cur_q %}q={{ cur_q }}&{% endif %}{% if cur_sun %}sunlight={{ cur_sun }}&{% endif %}{% if cur_diff %}difficulty={{ cur_diff }}&{% endif %}indoor_outdoor=outdoor{% if cur_cat %}&category={{ cur_cat }}{% endif %}{% if cur_space %}&space_requirement={{ cur_space }}{% endif %}"
+                           class="pl-chip">
+                            🌳 Outdoor
+                        </a>
+                    {% endif %}
+                </div>
+                </div>
+            </div>
+        </div>
+        </form>
+
+        
+        <div class="pl-filter-extra">
+            <details {% if cur_cat or cur_space %}open{% endif %}>
+                <summary>
+                    <span class="arrow">▶</span>
+                    Filter lainnya
+                    {% if cur_cat or cur_space %}
+                        <span style="background:#2d7d32;color:#fff;border-radius:999px;font-size:0.72rem;padding:1px 7px;">aktif</span>
+                    {% endif %}
+                </summary>
+                <form method="get" action="{% url 'plant_library:plant_list' %}" class="pl-filter-extra-body">
+                    
+                    {% if cur_q %}<input type="hidden" name="q" value="{{ cur_q }}">{% endif %}
+                    {% if cur_sun %}<input type="hidden" name="sunlight" value="{{ cur_sun }}">{% endif %}
+                    {% if cur_diff %}<input type="hidden" name="difficulty" value="{{ cur_diff }}">{% endif %}
+                    {% if cur_io %}<input type="hidden" name="indoor_outdoor" value="{{ cur_io }}">{% endif %}
+
+                    <select name="category" class="pl-filter-select">
+                        <option value="">Semua Kategori</option>
+                        {% for val, label in categories %}
+                            <option value="{{ val }}" {% if cur_cat == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="space_requirement" class="pl-filter-select">
+                        <option value="">Semua Kebutuhan Ruang</option>
+                        {% for val, label in space_choices %}
+                            <option value="{{ val }}" {% if cur_space == val %}selected{% endif %}>📐 {{ label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit" class="btn btn-success btn-sm" style="border-radius:999px;padding:7px 18px;font-weight:700;">
+                        Terapkan
+                    </button>
+                    {% if has_active_filters %}
+                        <a href="{% url 'plant_library:plant_list' %}" class="pl-reset-btn">↺ Reset semua</a>
+                    {% endif %}
+                </form>
+            </details>
+        </div>
+
+        
+        <div class="pl-hero-actions">
+            {% if user.is_authenticated %}
+                <a href="{% url 'plant_library:plant_recommend' %}" class="btn btn-outline-success d-inline-flex align-items-center gap-2">
+                    <span>✨</span>
+                    <span>Rekomendasi Tanaman</span>
+                </a>
+            {% endif %}
+            {% if user.is_staff %}
+                <a href="{% url 'plant_library:plant_create' %}" class="btn btn-success d-inline-flex align-items-center gap-2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                    Tambah Tanaman
+                </a>
+            {% endif %}
+        </div>
+        {% endwith %}
+    </div>
+
+
+    <div class="d-flex justify-content-between align-items-center plant-count-info mt-4">
+        <span>Menampilkan <strong>{{ plants|length }}</strong> tanaman</span>
+        {% if query %}
+            <small class="text-muted">Hasil pencarian: "<em>{{ query }}</em>"</small>
+        {% endif %}
+    </div>
+
+
+    {% if plants %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for plant in plants %}
+                <div class="col">
+                    <article class="plant-card">
+                        <div class="plant-card-media">
+                            {% if plant.image_url %}
+                                <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="plant-card-placeholder-icon" style="display: none;" aria-hidden="true">🪴</span>
+                            {% else %}
+                                <span class="plant-card-placeholder-icon" aria-hidden="true">🪴</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="plant-card-body">
+                            <div class="plant-badge-list">
+                                <span class="plant-badge plant-badge--category">{{ plant.get_category_display }}</span>
+                                {% if plant.difficulty == 'easy' %}
+                                    <span class="plant-badge plant-badge--diff-easy">Mudah</span>
+                                {% elif plant.difficulty == 'medium' %}
+                                    <span class="plant-badge plant-badge--diff-medium">Sedang</span>
+                                {% else %}
+                                    <span class="plant-badge plant-badge--diff-hard">Sulit</span>
+                                {% endif %}
+                            </div>
+
+                            <h2 class="plant-card-title">{{ plant.name }}</h2>
+                            {% if plant.scientific_name %}
+                                <p class="plant-card-scientific">{{ plant.scientific_name }}</p>
+                            {% endif %}
+
+                            <div class="plant-specs-grid">
+                                <div class="plant-specs-item" title="Sinar Matahari">
+                                    <span>☀️</span> <span>{{ plant.get_sunlight_display }}</span>
+                                </div>
+                                <div class="plant-specs-item" title="Frekuensi Penyiraman">
+                                    <span>💧</span> <span>{{ plant.get_watering_display }}</span>
+                                </div>
+                                <div class="plant-specs-item" title="Penempatan">
+                                    <span>🏡</span> <span>{{ plant.get_indoor_outdoor_display }}</span>
+                                </div>
+                                <div class="plant-specs-item" title="Kebutuhan Ruang">
+                                    <span>📐</span> <span>{{ plant.get_space_requirement_display }}</span>
+                                </div>
+                            </div>
+
+                            <p class="plant-desc-snippet">
+                                {{ plant.description|default:"Tidak ada deskripsi tambahan."|truncatewords:16 }}
+                            </p>
+
+                            <div class="plant-card-footer d-flex flex-column gap-2">
+                                <a href="{% url 'plant_library:plant_detail' plant.pk %}" class="btn btn-outline-success w-100">
+                                    Lihat Detail Tanaman
+                                </a>
+                                {% if user.is_staff %}
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'plant_library:plant_update' plant.pk %}" class="btn btn-sm btn-light border flex-grow-1 text-center" title="Ubah tanaman">
+                                            ✏️ Ubah
+                                        </a>
+                                        <a href="{% url 'plant_library:plant_delete' plant.pk %}" class="btn btn-sm btn-light border text-danger flex-grow-1 text-center" title="Hapus tanaman">
+                                            🗑️ Hapus
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="plant-empty-state">
+            <div class="plant-empty-icon">🌿</div>
+            <h3 class="mb-2" style="font-family: 'Baloo 2', sans-serif;">Tidak ada tanaman ditemukan</h3>
+            <p class="text-muted mb-4">Coba sesuaikan kata kunci pencarian atau ubah kombinasi filter yang Anda pilih.</p>
+            <a href="{% url 'plant_library:plant_list' %}" class="btn btn-success">Lihat Semua Tanaman</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

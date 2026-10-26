@@ -1,27 +1,37 @@
-<nav class="navbar navbar-expand-md site-navbar">
+<nav class="navbar navbar-expand-md site-navbar{% if user.is_authenticated %} site-navbar--side{% endif %}">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'main:home' %}">🌱 EcoPatch</a>
+        <div class="sidebar-head">
+            <a class="navbar-brand" href="{% url 'main:home' %}">🌱 <span class="brand-text">EcoPatch</span></a>
+            {% if user.is_authenticated %}
+                <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Ciutkan menu" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+            {% endif %}
+        </div>
 
         {% if user.is_authenticated %}
-            <div class="d-flex align-items-center order-md-3">
+            {% firstof user.get_full_name user.username as display_name %}
+            <div class="d-flex d-md-none align-items-center order-md-3">
                 <div class="dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="navbar-avatar">{{ user.username|first|upper }}</span>
+                    <a class="nav-link dropdown-toggle avatar-toggle d-flex align-items-center" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu profil">
+                        <span class="navbar-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ display_name|first|upper }}{% endif %}</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><h6 class="dropdown-header">{{ user.username }}</h6></li>
-                        <li><span class="dropdown-item-text text-muted small">{{ user.email }}</span></li>
-                        <li><hr class="dropdown-divider"></li>
-                        {# TODO: ganti href="#" jadi {% url 'main:profile' %} begitu halaman profil tersedia #}
-                        <li><a class="dropdown-item" href="#">Profil Saya</a></li>
-                        {# TODO: ganti href="#" jadi {% url 'main:settings' %} begitu halaman pengaturan tersedia #}
-                        <li><a class="dropdown-item" href="#">Pengaturan</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                    <ul class="dropdown-menu dropdown-menu-end profile-menu">
+                        <li class="profile-menu-head">
+                            <span class="profile-menu-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ display_name|first|upper }}{% endif %}</span>
+                            <div class="profile-menu-id">
+                                <p class="profile-menu-name">{{ display_name }}</p>
+                                {% if user.email %}<p class="profile-menu-email">{{ user.email }}</p>{% endif %}
+                            </div>
+                        </li>
+                        <li class="profile-menu-divider" role="separator"></li>
+                        <li><a class="profile-menu-item profile-menu-item--primary" href="{% url 'main:profile' %}">Profil Saya</a></li>
+                        <li class="profile-menu-divider" role="separator"></li>
                         <li>
                             <form action="{% url 'main:logout' %}" method="post">
                                 {% csrf_token %}
-                                <button type="submit" class="dropdown-item dropdown-item-danger">Keluar</button>
+                                <button type="submit" class="profile-menu-item profile-menu-item--danger">Keluar</button>
                             </form>
                         </li>
                     </ul>
@@ -29,8 +39,8 @@
             </div>
         {% else %}
             <div class="d-flex align-items-center gap-2 order-md-3">
-                <a href="{% url 'main:login' %}" class="btn btn-outline-success">Masuk</a>
-                <a href="{% url 'main:register' %}" class="btn btn-success">Daftar</a>
+                <a href="{% url 'main:login' %}{% if request.resolver_match.app_name == 'plant_library' %}?next={{ request.get_full_path|urlencode }}{% endif %}" class="btn btn-outline-success">Masuk</a>
+                <a href="{% url 'main:register' %}{% if request.resolver_match.app_name == 'plant_library' %}?next={{ request.get_full_path|urlencode }}{% endif %}" class="btn btn-success">Daftar</a>
             </div>
         {% endif %}
 
@@ -39,25 +49,40 @@
         </button>
 
         <div class="collapse navbar-collapse flex-grow-1 order-md-2" id="navbarMain">
-            {# TODO: ganti href="#" jadi {% url '<app>:list' %} begitu urls.py tiap modul tersedia (lihat ecopatch_project/urls.py) #}
             {% if user.is_authenticated %}
                 {% with active_app=request.resolver_match.app_name %}
-                <ul class="navbar-nav mx-auto gap-2">
-                    <li class="nav-item"><a class="nav-link{% if active_app == 'plant_library' %} active{% endif %}" href="#">Plant Library</a></li>
-                    <li class="nav-item"><a class="nav-link{% if active_app == 'my_ecopatch' %} active{% endif %}" href="#">My EcoPatch</a></li>
+                <ul class="navbar-nav nav-auth mx-auto gap-2">
+                    <li class="nav-item"><a class="nav-link{% if active_app == 'plant_library' %} active{% endif %}" href="{% url 'plant_library:plant_list' %}">Plant Library</a></li>
+                    <li class="nav-item"><a class="nav-link{% if active_app == 'my_ecopatch' %} active{% endif %}" href="{% url 'my_ecopatch:list' %}">My EcoPatch</a></li>
                     <li class="nav-item"><a class="nav-link{% if active_app == 'smart_care' %} active{% endif %}" href="#">Smart Care</a></li>
-                    <li class="nav-item"><a class="nav-link{% if active_app == 'garden_journal' %} active{% endif %}" href="#">Garden Journal</a></li>
-                    <li class="nav-item"><a class="nav-link{% if active_app == 'seed_exchange' %} active{% endif %}" href="#">Seed Exchange</a></li>
+                    <li class="nav-item"><a class="nav-link{% if active_app == 'garden_journal' %} active{% endif %}" href="{% url 'garden_journal:list' %}">Garden Journal</a></li>
+                    <li class="nav-item"><a class="nav-link{% if active_app == 'seed_exchange' %} active{% endif %}" href="{% url 'seed_exchange:list' %}">Seed Exchange</a></li>
                 </ul>
                 {% endwith %}
             {% else %}
                 {# Landing-page anchors; the url prefix keeps them working from /login/ and /register/ too #}
-                <ul class="navbar-nav ms-auto gap-2">
+                <ul class="navbar-nav mx-auto gap-2">
                     <li class="nav-item"><a class="nav-link" href="{% url 'main:home' %}#fitur">Fitur</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'main:home' %}#faq">FAQ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Plant Library</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'plant_library:plant_list' %}">Plant Library</a></li>
                 </ul>
             {% endif %}
         </div>
+
+        {% if user.is_authenticated %}
+            <div class="sidebar-user">
+                <a href="{% url 'main:profile' %}" title="{{ display_name }}{% if user.email %} - {{ user.email }}{% endif %}" class="sidebar-user-link{% if request.resolver_match.url_name == 'profile' %} active{% endif %}">
+                    <span class="navbar-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ display_name|first|upper }}{% endif %}</span>
+                    <span class="sidebar-user-id">
+                        <span class="sidebar-user-name">{{ display_name }}</span>
+                        <span class="sidebar-user-sub">Profil Saya</span>
+                    </span>
+                </a>
+                <form action="{% url 'main:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="sidebar-logout">Keluar</button>
+                </form>
+            </div>
+        {% endif %}
     </div>
 </nav>

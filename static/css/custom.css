@@ -1346,3 +1346,1651 @@ h1, h2, h3, .navbar-brand {
         animation: none;
     }
 }
+
+.site-navbar .navbar-brand-auth {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.5rem;
+}
+
+.brand-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--brand-300);
+    color: var(--brand-600);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.brand-name {
+    line-height: 1;
+}
+
+.site-navbar .navbar-nav.nav-auth .nav-link {
+    padding: 8px 18px;
+    border-radius: 999px;
+    color: var(--ink-muted);
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.site-navbar .navbar-nav.nav-auth .nav-link:hover:not(.active),
+.site-navbar .navbar-nav.nav-auth .nav-link:focus-visible:not(.active) {
+    background: color-mix(in srgb, var(--brand-300) 45%, transparent);
+    color: var(--ink);
+}
+
+.site-navbar .navbar-nav.nav-auth .nav-link.active {
+    color: var(--brand-600);
+    font-weight: 600;
+}
+
+.site-navbar .navbar-avatar {
+    width: 44px;
+    height: 44px;
+}
+
+@media (max-width: 575.98px) {
+    .site-navbar .navbar-brand-auth {
+        font-size: 1.2rem;
+    }
+
+    .brand-mark,
+    .site-navbar .navbar-avatar {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* ================= My EcoPatch ================= */
+.patch-page-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.patch-page-title {
+    margin: 0 0 6px;
+    color: var(--ink);
+    font-size: clamp(1.9rem, 3vw, 2.4rem);
+    font-weight: 800;
+}
+
+.patch-page-lead {
+    margin: 0;
+    color: var(--ink-muted);
+}
+
+.patch-create-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.patch-create-btn .ico {
+    width: 18px;
+    height: 18px;
+}
+
+.patch-empty {
+    margin-bottom: 20px;
+    color: var(--ink-muted);
+}
+
+.patch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.patch-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    background: var(--surface-200);
+    box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
+}
+
+.patch-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.patch-card-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.35rem;
+    line-height: 1.2;
+}
+
+.patch-card-city {
+    margin: 0 0 14px;
+    color: var(--ink-muted);
+}
+
+.patch-card-count {
+    margin: 0 0 14px;
+    color: var(--ink);
+    font-weight: 500;
+}
+
+.patch-status-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.patch-pill {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--tone-soft);
+    color: var(--tone-text);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.patch-pill--space,
+.patch-pill--growing {
+    --tone-soft: var(--brand-300);
+    --tone-text: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+}
+
+.patch-pill--planned {
+    --tone-soft: color-mix(in srgb, var(--accent-mango) 25%, var(--surface-200));
+    --tone-text: color-mix(in srgb, var(--accent-mango) 45%, var(--ink));
+}
+
+.patch-pill--planted {
+    --tone-soft: color-mix(in srgb, var(--accent-sky) 18%, var(--surface-200));
+    --tone-text: color-mix(in srgb, var(--accent-sky) 45%, var(--ink));
+}
+
+.patch-pill--harvested,
+.patch-pill--removed {
+    --tone-soft: var(--surface-300);
+    --tone-text: color-mix(in srgb, var(--ink-muted) 60%, var(--ink));
+}
+
+/* "Buat EcoPatch Baru" placeholder card */
+.patch-card-add {
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    border: 2px dashed var(--border);
+    background: transparent;
+    box-shadow: none;
+    color: var(--ink-muted);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.patch-card-add:hover,
+.patch-card-add:focus-visible {
+    border-color: var(--brand-500);
+    background: color-mix(in srgb, var(--brand-300) 25%, transparent);
+    color: var(--brand-600);
+}
+
+.patch-card-add:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 2px;
+}
+
+.patch-add-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface-200);
+    color: var(--brand-600);
+}
+
+.patch-add-icon .ico {
+    width: 24px;
+    height: 24px;
+}
+
+.site-navbar .avatar-toggle {
+    padding: 0;
+}
+
+.site-navbar .avatar-toggle::after {
+    display: none;
+}
+
+.site-navbar .avatar-toggle:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 3px;
+    border-radius: 50%;
+}
+
+.site-navbar .profile-menu.dropdown-menu {
+    width: 240px;
+    max-width: calc(100vw - 32px);
+    margin-top: 10px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface-200);
+    box-shadow: 0 12px 32px rgba(34, 48, 31, 0.18);
+}
+
+.profile-menu > li + li {
+    margin-top: 8px;
+}
+
+.profile-menu-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-menu-avatar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--brand-300);
+    color: var(--brand-600);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.profile-menu-id {
+    min-width: 0;
+}
+
+.profile-menu-name {
+    margin: 0;
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.profile-menu-email {
+    margin: 2px 0 0;
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+}
+
+.profile-menu > .profile-menu-divider {
+    height: 0;
+    margin: 10px 0;
+    border-top: 1.5px solid var(--border);
+}
+
+.profile-menu-item {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.profile-menu-item:hover,
+.profile-menu-item:focus-visible {
+    background: color-mix(in srgb, var(--brand-300) 30%, var(--surface-200));
+    color: var(--ink);
+}
+
+.profile-menu-item:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 2px;
+}
+
+.profile-menu-item--primary {
+    border-color: transparent;
+    background: var(--brand-300);
+    color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+}
+
+.profile-menu-item--primary:hover,
+.profile-menu-item--primary:focus-visible {
+    background: color-mix(in srgb, var(--brand-500) 30%, var(--brand-300));
+    color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
+}
+
+/* "Keluar" */
+.profile-menu-item--danger,
+.profile-menu-item--danger:hover,
+.profile-menu-item--danger:focus-visible {
+    color: color-mix(in srgb, var(--danger) 60%, var(--ink));
+}
+
+.profile-menu-item--danger:hover,
+.profile-menu-item--danger:focus-visible {
+    background: color-mix(in srgb, var(--danger) 12%, var(--surface-200));
+}
+
+@media (max-width: 575.98px) {
+    .site-navbar .dropdown {
+        position: static;
+    }
+
+    .site-navbar .profile-menu.dropdown-menu {
+        right: 0;
+        left: 0;
+        width: auto;
+        max-width: none;
+        padding: 16px;
+    }
+}
+/* ================= Profile page ================= */
+.profile-page {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    max-width: 960px;
+    margin: 8px auto 32px;
+}
+
+.profile-card,
+.profile-edit {
+    border: 1px solid var(--border);
+    border-radius: 32px;
+    background: var(--surface-200);
+    box-shadow: 0 18px 40px rgba(34, 48, 31, 0.12);
+}
+
+.profile-edit {
+    padding: 32px 28px;
+}
+
+.profile-side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.profile-card {
+    overflow: hidden;
+    text-align: center;
+}
+
+.profile-banner {
+    height: 104px;
+    background:
+        radial-gradient(circle at 18% 120%, color-mix(in srgb, var(--accent-mango) 55%, transparent), transparent 55%),
+        radial-gradient(circle at 88% -10%, color-mix(in srgb, var(--accent-sky) 45%, transparent), transparent 50%),
+        linear-gradient(135deg, var(--brand-300), var(--brand-500));
+}
+
+.profile-card-body {
+    padding: 0 24px 20px;
+}
+
+.profile-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    margin: -60px auto 14px;
+    overflow: hidden;
+    border: 5px solid var(--surface-200);
+    border-radius: 50%;
+    background: var(--brand-300);
+    box-shadow: 0 8px 20px rgba(34, 48, 31, 0.2);
+    color: var(--brand-600);
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 3.2rem;
+    font-weight: 800;
+}
+
+.profile-avatar img,
+.navbar-avatar img,
+.profile-menu-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.navbar-avatar,
+.profile-menu-avatar {
+    overflow: hidden;
+}
+
+.profile-name {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.6rem;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.profile-handle {
+    margin: 2px 0 12px;
+    color: var(--ink-muted);
+    font-weight: 600;
+}
+
+.profile-badge {
+    display: inline-block;
+    margin-bottom: 14px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--brand-300);
+    color: var(--brand-600);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.profile-bio {
+    margin: 0;
+    color: var(--ink);
+    font-size: 14.5px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.profile-bio--empty {
+    color: var(--ink-muted);
+    font-style: italic;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 0;
+    border-top: 1px dashed var(--border);
+    background: var(--surface-100);
+}
+
+.profile-stats div {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    padding: 14px 4px;
+}
+
+.profile-stats div + div {
+    border-left: 1px dashed var(--border);
+}
+
+.profile-stats dd {
+    margin: 0;
+    color: var(--brand-600);
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.profile-stats dt {
+    margin-top: 2px;
+    color: var(--ink-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.profile-email {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
+    padding: 14px 20px 18px;
+    background: var(--surface-100);
+    color: var(--ink-muted);
+    font-size: 13.5px;
+    overflow-wrap: anywhere;
+}
+
+.profile-email .ico {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.profile-edit-title {
+    margin: 0 0 20px;
+    color: var(--ink);
+    font-size: 2rem;
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.profile-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+.profile-form input[type="text"],
+.profile-form input[type="email"],
+.profile-form input[type="password"],
+.profile-form select,
+.profile-form textarea {
+    width: 100%;
+    padding: 13px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface-100);
+    color: var(--ink);
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.profile-form textarea {
+    resize: vertical;
+}
+
+.profile-form input[type="file"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px dashed var(--border);
+    border-radius: 16px;
+    background: var(--surface-100);
+    color: var(--ink-muted);
+    font-size: 14px;
+}
+
+.profile-form input[type="text"]:focus,
+.profile-form input[type="email"]:focus,
+.profile-form input[type="password"]:focus,
+.profile-form select:focus,
+.profile-form textarea:focus {
+    outline: none;
+    border-color: var(--brand-500);
+    background: var(--surface-200);
+    box-shadow: 0 0 0 4px var(--brand-300);
+}
+
+.profile-field.has-error input,
+.profile-field.has-error textarea {
+    border-color: var(--danger);
+}
+
+.profile-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    color: var(--ink-muted);
+    font-size: 14px;
+}
+
+.profile-submit {
+    align-self: flex-start;
+    padding: 12px 28px;
+    font-size: 16px;
+}
+
+@media (min-width: 768px) {
+    .profile-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 992px) {
+    .profile-page {
+        grid-template-columns: 300px 1fr;
+        align-items: start;
+    }
+
+    .profile-edit {
+        padding: 40px 36px;
+    }
+}
+
+.profile-divider {
+    margin: 32px 0 24px;
+    border: 0;
+    border-top: 1px dashed var(--border);
+    opacity: 1;
+}
+
+.profile-edit-title--sub {
+    font-size: 1.5rem;
+}
+
+/* ================= Toast notifications (Django messages), pojok kanan atas ================= */
+.site-toasts {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 1090;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(360px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+.site-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--brand-500);
+    border-radius: 16px;
+    background: var(--surface-200);
+    box-shadow: 0 12px 28px rgba(34, 48, 31, 0.18);
+    color: var(--ink);
+    pointer-events: auto;
+}
+
+.site-toast--danger {
+    border-left-color: var(--danger);
+}
+
+.site-toast--warning {
+    border-left-color: var(--accent-mango);
+}
+
+.site-toast--info,
+.site-toast--debug {
+    border-left-color: var(--accent-sky);
+}
+
+.site-toast-body {
+    flex: 1 1 auto;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.site-toast-close {
+    flex: 0 0 auto;
+    margin-top: 2px;
+    font-size: 11px;
+}
+
+.profile-security {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.profile-security .profile-edit-title {
+    margin-bottom: 2px;
+}
+
+.profile-security-text {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 14px;
+}
+
+.profile-modal .modal-content {
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    background: var(--surface-200);
+}
+
+.profile-modal .modal-header,
+.profile-modal .modal-footer {
+    border-color: var(--border);
+}
+
+.profile-modal .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.profile-modal .modal-title {
+    font-size: 1.5rem;
+}
+
+/* Lebarnya mengikuti kolom card (.profile-main), bukan seluruh halaman */
+.profile-main .profile-danger-zone {
+    padding: 20px 28px;
+    border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--border));
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--danger) 5%, var(--surface-200));
+}
+
+.profile-danger .profile-edit-title--sub {
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+}
+
+.profile-main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+}
+
+.profile-main .profile-edit {
+    padding: 24px 28px 28px;
+}
+
+.profile-main .profile-edit-title {
+    margin-bottom: 16px;
+}
+
+.profile-main .profile-security .profile-edit-title {
+    margin-bottom: 2px;
+}
+
+/* Foto dan nama dalam satu card */
+.profile-photo-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.profile-photo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+}
+
+.profile-photo-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 104px;
+    height: 104px;
+    overflow: hidden;
+    border: 3px solid var(--brand-300);
+    border-radius: 50%;
+    background: var(--brand-300);
+    color: var(--brand-600);
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 2.6rem;
+    font-weight: 800;
+}
+
+.profile-photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-photo-btn {
+    margin: 0;
+    cursor: pointer;
+}
+
+.profile-photo-frame {
+    position: relative;
+}
+
+.profile-photo-remove {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 3px solid var(--surface-200);
+    border-radius: 50%;
+    background: var(--danger);
+    box-shadow: 0 4px 10px rgba(34, 48, 31, 0.25);
+    color: #fff;
+    cursor: pointer;
+}
+
+.profile-photo-remove[hidden] {
+    display: none;
+}
+
+.profile-photo-remove:hover {
+    background: color-mix(in srgb, var(--danger) 85%, #000);
+}
+
+.profile-photo-remove:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--danger) 35%, transparent);
+    outline-offset: 2px;
+}
+
+.profile-photo-remove svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+/* Input file asli disembunyikan; label "Pilih foto" yang jadi tombolnya */
+.profile-photo input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.profile-photo input[type="file"]:focus-visible + .profile-check,
+.profile-photo:focus-within .profile-photo-btn {
+    outline: 3px solid var(--brand-300);
+}
+
+.profile-photo-fields {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 18px;
+    min-width: 0;
+}
+
+@media (min-width: 576px) {
+    .profile-photo-row {
+        grid-template-columns: 170px 1fr;
+        align-items: center;
+    }
+}
+
+.profile-city {
+    margin: -6px 0 12px;
+    color: var(--ink-muted);
+    font-size: 13.5px;
+}
+
+/* ================= Sidebar navigation (logged-in users, md and up) ================= */
+.sidebar-user {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    body.has-sidebar {
+        padding-left: 248px;
+    }
+
+    .site-navbar.site-navbar--side {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 248px;
+        margin: 0;
+        padding: 20px 14px;
+        overflow-y: auto;
+        border-right: 1px solid var(--border);
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .site-navbar--side > .container {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
+        height: 100%;
+        max-width: none;
+        padding: 0;
+    }
+
+    .site-navbar--side .navbar-brand {
+        margin: 0 8px 24px;
+        font-size: 1.5rem;
+    }
+
+    .site-navbar--side .navbar-collapse {
+        flex-direction: column;
+        flex-grow: 1;
+        align-items: stretch;
+    }
+
+    .site-navbar.site-navbar--side .navbar-nav {
+        flex-direction: column;
+        gap: 4px !important;
+        margin: 0 !important;
+    }
+
+    .site-navbar.site-navbar--side .navbar-nav .nav-link,
+    .site-navbar.site-navbar--side .navbar-nav .nav-link.active {
+        padding: 10px 14px;
+        border-radius: 14px;
+    }
+
+    /* Menu, lalu kartu profil, lalu ruang kosong; Keluar menempel di dasar sidebar */
+    /* Bootstrap memberi .navbar-collapse order-md-2 dan flex-grow-1 (!important); urutan akhir:
+       brand, menu (2), kartu profil (3), Keluar (4, menempel di dasar) */
+    .site-navbar--side .navbar-collapse {
+        flex-grow: 0 !important;
+        padding-bottom: 14px;
+        border-bottom: 1px dashed var(--border);
+    }
+
+    .sidebar-user {
+        display: contents;
+    }
+
+    .sidebar-user-link {
+        order: 3;
+        margin-top: 14px;
+    }
+
+    .sidebar-user form {
+        order: 4;
+        margin-top: auto;
+    }
+
+    .sidebar-user-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        border-radius: 14px;
+        color: var(--ink);
+        text-decoration: none;
+    }
+
+    .sidebar-user-link:hover,
+    .sidebar-user-link.active {
+        background: color-mix(in srgb, var(--brand-300) 45%, transparent);
+        color: var(--ink);
+    }
+
+    .sidebar-user-id {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        line-height: 1.25;
+    }
+
+    .sidebar-user-name {
+        overflow: hidden;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .sidebar-user-sub {
+        color: var(--ink-muted);
+        font-size: 12.5px;
+    }
+
+    .sidebar-logout {
+        width: 100%;
+        padding: 8px 14px;
+        border: 0;
+        border-radius: 14px;
+        background: transparent;
+        color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+        font-weight: 600;
+        text-align: left;
+    }
+
+    .sidebar-logout:hover,
+    .sidebar-logout:focus-visible {
+        background: color-mix(in srgb, var(--danger) 12%, var(--surface-200));
+    }
+}
+
+/* Sidebar: ikon per menu (CSS mask, jadi markup link di header.html tidak perlu diubah)
+   Ikon dipetakan lewat urutan <li>; kalau urutan menu berubah, sesuaikan nth-child di bawah. */
+@media (min-width: 768px) {
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        border-radius: 14px;
+        color: var(--ink);
+        font-size: 15.5px;
+        font-weight: 500;
+    }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-link::before {
+        content: "";
+        flex: 0 0 auto;
+        width: 22px;
+        height: 22px;
+        background-color: currentColor;
+        -webkit-mask: var(--nav-icon) center / contain no-repeat;
+        mask: var(--nav-icon) center / contain no-repeat;
+    }
+
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link.active {
+        background: color-mix(in srgb, var(--brand-300) 50%, var(--surface-200));
+        color: var(--ink);
+        font-weight: 600;
+    }
+
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link.active::before {
+        color: var(--brand-600);
+    }
+
+    /* Plant Library */
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1) .nav-link {
+        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M2%204h6a4%204%200%200%201%204%204v13a3%203%200%200%200-3-3H2z%27/%3E%3Cpath%20d=%27M22%204h-6a4%204%200%200%200-4%204v13a3%203%200%200%201%203-3h7z%27/%3E%3C/svg%3E");
+    }
+
+    /* My EcoPatch */
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(2) .nav-link {
+        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Crect%20x=%273%27%20y=%273%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%2714%27%20y=%273%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%273%27%20y=%2714%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%2714%27%20y=%2714%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3C/svg%3E");
+    }
+
+    /* Smart Care */
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3) .nav-link {
+        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M12%203s6%206.2%206%2010.5A6%206%200%200%201%206%2013.5C6%209.2%2012%203%2012%203z%27/%3E%3C/svg%3E");
+    }
+
+    /* Garden Journal */
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(4) .nav-link {
+        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M5%203h12a2%202%200%200%201%202%202v16H7a2%202%200%200%201-2-2z%27/%3E%3Cpath%20d=%27M9%203v18M12%208h4M12%2012h4%27/%3E%3C/svg%3E");
+    }
+
+    /* Seed Exchange */
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) .nav-link {
+        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M7%207h13l-3-3M17%2017H4l3%203%27/%3E%3C/svg%3E");
+    }
+}
+
+/* ================= Collapsible sidebar ================= */
+.sidebar-head {
+    display: contents;
+}
+
+.sidebar-toggle {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    body.has-sidebar,
+    .site-navbar.site-navbar--side {
+        transition: padding-left 0.2s ease, width 0.2s ease;
+    }
+
+    .sidebar-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .sidebar-head .navbar-brand {
+        white-space: nowrap;
+    }
+
+    .sidebar-toggle {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        margin-top: 2px;
+        padding: 0;
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        background: var(--surface-200);
+        color: var(--ink-muted);
+    }
+
+    .sidebar-toggle:hover,
+    .sidebar-toggle:focus-visible {
+        background: color-mix(in srgb, var(--brand-300) 45%, transparent);
+        color: var(--ink);
+    }
+
+    .sidebar-toggle svg {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: transform 0.2s ease;
+    }
+
+    /* ---- collapsed: icons only ---- */
+    html.sidebar-collapsed body.has-sidebar {
+        padding-left: 80px;
+    }
+
+    html.sidebar-collapsed .site-navbar.site-navbar--side {
+        width: 80px;
+        padding: 20px 12px;
+    }
+
+    html.sidebar-collapsed .site-navbar--side .sidebar-head {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    html.sidebar-collapsed .site-navbar--side .navbar-brand {
+        margin: 0;
+        font-size: 1.7rem;
+    }
+
+    html.sidebar-collapsed .site-navbar--side .brand-text,
+    html.sidebar-collapsed .site-navbar--side .sidebar-user-id {
+        display: none;
+    }
+
+    html.sidebar-collapsed .sidebar-toggle svg {
+        transform: rotate(180deg);
+    }
+
+    html.sidebar-collapsed .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link {
+        justify-content: center;
+        gap: 0;
+        padding: 12px 0;
+        font-size: 0;
+    }
+
+    html.sidebar-collapsed .sidebar-user-link {
+        justify-content: center;
+        padding: 6px 0;
+    }
+
+    html.sidebar-collapsed .sidebar-logout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 0;
+        font-size: 0;
+    }
+
+    html.sidebar-collapsed .sidebar-logout::before {
+        content: "";
+        width: 22px;
+        height: 22px;
+        background-color: currentColor;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5M21 12H9'/%3E%3C/svg%3E") center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5M21 12H9'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+}
+
+/* ================= Sidebar colour: cream, one step darker than the page ================= */
+@media (min-width: 768px) {
+    .site-navbar.site-navbar--side {
+        --side-bg: var(--surface-300);
+        --side-text: var(--ink);
+        --side-muted: var(--ink-muted);
+        --side-hover: color-mix(in srgb, var(--ink) 7%, transparent);
+        --side-active: var(--surface-200);
+        --side-line: var(--border);
+        background: var(--side-bg);
+        color: var(--side-text);
+    }
+
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link {
+        color: var(--side-text);
+    }
+
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link:hover:not(.active),
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link:focus-visible:not(.active) {
+        background: var(--side-hover);
+    }
+
+    .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link.active {
+        background: var(--side-active);
+        box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 12%, transparent);
+    }
+
+    .site-navbar--side .navbar-collapse {
+        border-bottom-color: var(--side-line);
+    }
+
+    .site-navbar--side .sidebar-user-link {
+        color: var(--side-text);
+    }
+
+    .site-navbar--side .sidebar-user-link:hover,
+    .site-navbar--side .sidebar-user-link.active {
+        background: var(--side-hover);
+        color: var(--side-text);
+    }
+
+    .site-navbar--side .sidebar-user-sub {
+        color: var(--side-muted);
+    }
+
+    .site-navbar--side .sidebar-logout:hover,
+    .site-navbar--side .sidebar-logout:focus-visible {
+        background: color-mix(in srgb, var(--danger) 14%, transparent);
+    }
+
+    .site-navbar--side .sidebar-toggle {
+        border-color: var(--side-line);
+        background: var(--surface-200);
+        color: var(--side-text);
+    }
+
+    .site-navbar--side .sidebar-toggle:hover,
+    .site-navbar--side .sidebar-toggle:focus-visible {
+        background: var(--brand-300);
+    }
+}
+
+/* ================= Sidebar v2: grouped menu + user row at the bottom ================= */
+@media (min-width: 768px) {
+    .site-navbar.site-navbar--side {
+        --logout-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5M21 12H9'/%3E%3C/svg%3E");
+    }
+
+    /* Menu dikelompokkan lewat CSS (berdasarkan urutan <li>), jadi markup link di header.html tidak berubah */
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1) { --nav-group: "Kebun"; }
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3) { --nav-group: "Perawatan"; }
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) { --nav-group: "Komunitas"; }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1)::before,
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3)::before,
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5)::before {
+        display: block;
+        content: var(--nav-group);
+        padding: 4px 14px 6px;
+        color: var(--side-muted);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+    }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3),
+    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) {
+        margin-top: 10px;
+        padding-top: 12px;
+        border-top: 1px solid var(--side-line);
+    }
+
+    .site-navbar.site-navbar--side .navbar-collapse {
+        border-bottom: 0;
+    }
+
+    /* Baris pengguna di dasar: avatar + nama di kiri, ikon keluar di kanan */
+    .site-navbar--side .sidebar-user {
+        display: flex;
+        order: 3;
+        align-items: center;
+        gap: 6px;
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid var(--side-line);
+    }
+
+    .site-navbar--side .sidebar-user-link {
+        order: 0;
+        flex: 1 1 auto;
+        min-width: 0;
+        margin-top: 0;
+    }
+
+    .site-navbar--side .sidebar-user form {
+        order: 0;
+        flex: 0 0 auto;
+        margin-top: 0;
+    }
+
+    .site-navbar--side .sidebar-user-sub {
+        display: none;
+    }
+
+    .site-navbar--side .sidebar-logout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        border-radius: 10px;
+        font-size: 0;
+    }
+
+    .site-navbar--side .sidebar-logout::before {
+        content: "";
+        width: 20px;
+        height: 20px;
+        background-color: currentColor;
+        -webkit-mask: var(--logout-icon) center / contain no-repeat;
+        mask: var(--logout-icon) center / contain no-repeat;
+    }
+
+    /* ---- collapsed rail: judul grup hilang, garis pemisah tetap; avatar lalu ikon keluar di bawah ---- */
+    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item::before {
+        display: none;
+    }
+
+    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3),
+    html.sidebar-collapsed .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) {
+        margin-top: 8px;
+        padding-top: 8px;
+    }
+
+    html.sidebar-collapsed .site-navbar--side .sidebar-user {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    html.sidebar-collapsed .site-navbar--side .sidebar-user-link {
+        flex: 0 0 auto;
+    }
+}
+
+
+/* my-ecopatch */
+.patch-card {
+    position: relative;
+}
+
+.patch-card-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.patch-card-link:hover,
+.patch-card-link:focus-visible {
+    color: var(--brand-600);
+}
+
+.patch-back {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: var(--ink-muted);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.patch-back:hover {
+    color: var(--brand-600);
+}
+
+.patch-head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn-success.patch-btn-danger {
+    background: var(--danger);
+}
+
+.btn-success.patch-btn-danger:hover,
+.btn-success.patch-btn-danger:focus-visible {
+    background: color-mix(in srgb, var(--danger) 80%, var(--ink));
+}
+
+.btn-outline-success.patch-btn-danger {
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+}
+
+.btn-outline-success.patch-btn-danger:hover,
+.btn-outline-success.patch-btn-danger:focus-visible {
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+}
+
+.patch-form-shell {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.patch-form-shell .patch-page-lead {
+    margin-bottom: 24px;
+}
+
+.patch-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    background: var(--surface-200);
+    box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
+}
+
+form.patch-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.patch-form-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.25rem;
+}
+
+.patch-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.patch-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.patch-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.patch-form input:not([type="hidden"]),
+.patch-form select,
+.patch-form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface-100);
+    color: var(--ink);
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.patch-form input::placeholder,
+.patch-form textarea::placeholder {
+    color: var(--ink-muted);
+}
+
+.patch-form input:focus,
+.patch-form select:focus,
+.patch-form textarea:focus {
+    outline: none;
+    border-color: var(--brand-500);
+    background: var(--surface-200);
+    box-shadow: 0 0 0 4px var(--brand-300);
+}
+
+.patch-field.has-error input,
+.patch-field.has-error select,
+.patch-field.has-error textarea {
+    border-color: var(--danger);
+}
+
+.patch-help {
+    margin: 6px 0 0;
+    color: var(--ink-muted);
+    font-size: 12.5px;
+}
+
+.patch-error {
+    margin: 6px 0 0;
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.patch-alert {
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--danger) 12%, var(--surface-200));
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.patch-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px 24px;
+    margin: 0 0 32px;
+    padding: 22px 26px;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--surface-200);
+    box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
+}
+
+.patch-info dt {
+    margin-bottom: 2px;
+    color: var(--ink-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.patch-info dd {
+    margin: 0;
+    color: var(--ink);
+    font-weight: 500;
+}
+
+.patch-info-wide {
+    grid-column: 1 / -1;
+}
+
+/* Detail: plants panel */
+.patch-plants-head {
+    margin-bottom: 16px;
+}
+
+.patch-section-title {
+    margin: 0 0 4px;
+    color: var(--ink);
+    font-size: 1.5rem;
+}
+
+.patch-plants-head .patch-card-count {
+    margin-bottom: 10px;
+}
+
+.plant-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0 0 24px;
+    padding: 0;
+    list-style: none;
+}
+
+.plant-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+    padding: 14px 20px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface-200);
+}
+
+.plant-main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 160px;
+}
+
+.plant-name {
+    color: var(--ink);
+}
+
+.plant-meta {
+    color: var(--ink-muted);
+    font-size: 13px;
+}
+
+/* Status select reuses the pill tones (.patch-pill--growing, etc. only set --tone-* variables) */
+.plant-status-select {
+    padding: 6px 30px 6px 14px;
+    border: none;
+    border-radius: 999px;
+    background-color: var(--tone-soft);
+    color: var(--tone-text);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.plant-status-select:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 2px;
+}
+
+.plant-remove {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.plant-remove:hover,
+.plant-remove:focus-visible {
+    background: color-mix(in srgb, var(--danger) 12%, var(--surface-200));
+}
+
+.htmx-request.plant-status-form,
+.htmx-request .plant-status-select {
+    opacity: 0.6;
+}
