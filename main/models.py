@@ -16,6 +16,12 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to='avatars/', blank=True)
     bio = models.TextField(max_length=300, blank=True)
     city = models.CharField(max_length=50, choices=CITY_CHOICES, blank=True)
+    # Dipakai ulang sebagai kontak default saat membuat listing Seed Exchange.
+    contact = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text='Nomor WA, email, atau akun sosmed yang bisa dihubungi.',
+    )
 
     def __str__(self):
         return f'Profil {self.user}'

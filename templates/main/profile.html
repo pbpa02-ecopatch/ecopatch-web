@@ -99,6 +99,15 @@
                         <div class="auth-help">{{ bio_form.city.help_text }}</div>
                     {% endif %}
                 </div>
+                <div class="profile-field{% if bio_form.contact.errors %} has-error{% endif %}">
+                    <label class="auth-label" for="{{ bio_form.contact.id_for_label }}">{{ bio_form.contact.label }}</label>
+                    {{ bio_form.contact }}
+                    {% if bio_form.contact.errors %}
+                        <div class="auth-error">{{ bio_form.contact.errors|join:" " }}</div>
+                    {% else %}
+                        <div class="auth-help">{{ bio_form.contact.help_text }}</div>
+                    {% endif %}
+                </div>
                 <div class="profile-field{% if bio_form.bio.errors %} has-error{% endif %}">
                     <label class="auth-label" for="{{ bio_form.bio.id_for_label }}">{{ bio_form.bio.label }}</label>
                     {{ bio_form.bio }}

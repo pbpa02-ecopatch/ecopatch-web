@@ -1,150 +1,219 @@
 {% extends "base.html" %}
 {% load static asset_version %}
 {% block title %}{{ listing.title }} - Seed Exchange{% endblock %}
+{% block body_class %} seed-body{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static_v 'seed_exchange/css/seed_exchange.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="seed-page seed-page--detail">
-    <a class="seed-back" href="{{ back_url }}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M19 12H5"/>
-            <path d="m12 19-7-7 7-7"/>
-        </svg>
-        Kembali ke Seed Exchange
-    </a>
+{% block main %}
+<main class="seed-main flex-grow-1">
+<div class="seed-page">
+    <div class="seed-inner">
+        <a class="seed-back" href="{{ back_url }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5"/>
+                <path d="m12 19-7-7 7-7"/>
+            </svg>
+            Kembali ke Seed Exchange
+        </a>
 
-    <article class="seed-detail-card{% if listing.image %} seed-detail-card--split{% endif %}">
-        {% if listing.image %}
-        <div class="seed-detail-media">
-            <img src="{{ listing.image.url }}" alt="{{ listing.title }}" loading="lazy" decoding="async">
-        </div>
-        {% endif %}
-        <div class="seed-detail-body">
-            <p class="seed-detail-kicker">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 21v-8"/>
-                    <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
-                    <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
-                </svg>
-                Listing warga <b>&middot; {{ listing.get_item_type_display }}</b>
-            </p>
-            <div class="seed-detail-head">
-                <h1 class="seed-detail-title">{{ listing.title }}</h1>
-                <span class="seed-status seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
-            </div>
-            <div class="seed-badges">
-                <span class="seed-pill seed-pill--type">{{ listing.get_item_type_display }}</span>
-                <span class="seed-pill seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
+        <article class="seed-detail-card seed-detail-card--split">
+            <div class="seed-detail-side">
+                <figure class="seed-detail-media">
+                    {% if listing.image %}
+                    <img src="{{ listing.image.url }}" alt="{{ listing.title }}" loading="lazy" decoding="async">
+                    {% else %}
+                    <img class="seed-detail-media-pet" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" width="160" height="160" loading="lazy" decoding="async">
+                    {% endif %}
+                    <span class="seed-detail-sticker seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
+                </figure>
+
+                <div class="seed-detail-owner">
+                    <span class="seed-detail-avatar" aria-hidden="true">{{ listing.user.username|first|upper }}</span>
+                    <div class="seed-detail-owner-copy">
+                        <span class="seed-detail-owner-label">Pemilik listing</span>
+                        <strong class="seed-detail-owner-name">{{ listing.user.username }}</strong>
+                        <span class="seed-detail-owner-city">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z"/>
+                                <circle cx="12" cy="10" r="2.4"/>
+                            </svg>
+                            {{ listing.city }}
+                        </span>
+                    </div>
+                    {% if is_owner %}
+                    <div class="seed-detail-contact">
+                        <span class="seed-detail-contact-label">Kontak</span>
+                        <span class="seed-detail-contact-value">{{ listing.contact|default:"-" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
 
-            <dl class="seed-meta-grid">
-                <div class="seed-meta">
-                    <dt>Tanaman</dt>
-                    <dd>{{ listing.plant_name|default:"-" }}</dd>
+            <div class="seed-detail-body">
+                <p class="seed-detail-kicker">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 21v-8"/>
+                        <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                        <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                    </svg>
+                    Listing warga <b>&middot; {{ listing.get_item_type_display }}</b>
+                </p>
+                <div class="seed-detail-head">
+                    <h1 class="seed-detail-title">{{ listing.title }}</h1>
+                    <span class="seed-status seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
                 </div>
-                <div class="seed-meta">
-                    <dt>Kota</dt>
-                    <dd>{{ listing.city }}</dd>
-                </div>
-                <div class="seed-meta">
-                    <dt>Pemilik</dt>
-                    <dd>{{ listing.user.username }}</dd>
-                </div>
+                <section class="seed-note{% if not listing.description %} seed-note--empty{% endif %}" aria-label="Catatan dari pemilik">
+                    <p class="seed-note-kicker">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M16.5 4.5 19 7l-9.5 9.5L6 18l1.5-3.5L17 5Z"/>
+                            <path d="m14.5 6.5 3 3"/>
+                        </svg>
+                        Catatan dari pemilik
+                    </p>
+                    {% if listing.description %}
+                    <p class="seed-note-text">{{ listing.description }}</p>
+                    {% else %}
+                    <p class="seed-note-text seed-note-text--empty">Pemilik belum menulis catatan. Tanya lewat booking, ya.</p>
+                    {% endif %}
+                </section>
+
+                <dl class="seed-meta-grid">
+                    <div class="seed-meta">
+                        <dt>Tanaman</dt>
+                        <dd>{{ listing.plant_name|default:"-" }}</dd>
+                    </div>
+                    <div class="seed-meta">
+                        <dt>Kota</dt>
+                        <dd>{{ listing.city }}</dd>
+                    </div>
+                    <div class="seed-meta">
+                        <dt>Diperbarui</dt>
+                        <dd>{{ listing.updated_at|date:"d M Y" }}</dd>
+                    </div>
+                </dl>
+
                 {% if is_owner %}
-                <div class="seed-meta">
-                    <dt>Kontak</dt>
-                    <dd>{{ listing.contact|default:"-" }}</dd>
-                </div>
-                {% endif %}
-                <div class="seed-meta">
-                    <dt>Diperbarui</dt>
-                    <dd>{{ listing.updated_at|date:"d M Y" }}</dd>
-                </div>
-            </dl>
-
-            <p class="seed-desc">{{ listing.description|default:"Belum ada deskripsi." }}</p>
-
-            {% if is_owner %}
-                <div class="seed-actions">
-                    <a class="btn-seed-secondary" href="{% url 'seed_exchange:update' listing.pk %}">Ubah</a>
-                    <a class="btn-seed-danger" href="{% url 'seed_exchange:delete' listing.pk %}">Hapus</a>
-                    {% if listing.status == 'requested' %}
-                    <form method="post" action="{% url 'seed_exchange:accept' listing.pk %}">
-                        {% csrf_token %}
-                        <button class="btn-seed-primary" type="submit">Terima</button>
-                    </form>
-                    <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
-                        {% csrf_token %}
-                        <button class="btn-seed-secondary" type="submit">Tolak</button>
-                    </form>
-                    {% endif %}
-                    {% if listing.status == 'reserved' %}
-                    <form method="post" action="{% url 'seed_exchange:complete' listing.pk %}">
-                        {% csrf_token %}
-                        <button class="btn-seed-primary" type="submit">Tandai selesai</button>
-                    </form>
-                    <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
-                        {% csrf_token %}
-                        <button class="btn-seed-secondary" type="submit">Buka kembali</button>
-                    </form>
-                    {% endif %}
-                    {% if listing.status == 'completed' %}
-                    <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
-                        {% csrf_token %}
-                        <button class="btn-seed-secondary" type="submit">Buka kembali</button>
-                    </form>
-                    {% endif %}
-                </div>
-                {% if listing.status == 'requested' and listing.reserved_by %}
-                <p class="seed-owner-note">Dipesan oleh <strong>@{{ listing.reserved_by.username }}</strong>. Tekan <strong>Terima</strong> kalau setuju (lanjut atur serah terima via kontakmu), atau <strong>Tolak</strong> untuk membuka listing kembali.</p>
-                {% elif listing.status == 'reserved' and listing.reserved_by %}
-                <p class="seed-owner-note">Sudah diterima <strong>@{{ listing.reserved_by.username }}</strong>. Tandai <strong>Selesai</strong> setelah serah terima terjadi.</p>
-                {% else %}
-                <p class="seed-owner-note">Ini listing punyamu. Pastikan kontakmu benar agar peminat bisa menghubungimu.</p>
-                {% endif %}
-            {% elif is_requester %}
-                <div class="seed-reserve-box">
-                    <p><strong>Booking-mu menunggu konfirmasi</strong></p>
-                    <p>Pemilik akan menerima atau menolak. Selama belum diterima, kamu bisa membatalkan booking ini.</p>
-                    <form method="post" action="{% url 'seed_exchange:cancel_reserve' listing.pk %}">
-                        {% csrf_token %}
-                        <button class="btn-seed-danger btn-seed-sm" type="submit">Batalkan booking saya</button>
-                    </form>
-                </div>
-            {% elif is_accepted %}
-                <div class="seed-reserve-box">
-                    <p><strong>Diterima! 🎉</strong></p>
-                    <p>Pemilik sudah menerima booking-mu. Hubungi untuk atur waktu &amp; tempat serah terima. Pembatalan sekarang lewat pemilik langsung.</p>
-                    <div class="seed-reserve-contact">
-                        <span class="seed-contact-avatar" aria-hidden="true">{{ listing.user.username|first|upper }}</span>
-                        <span class="seed-contact-name">@{{ listing.user.username }}</span>
-                        <span class="seed-contact-value">{{ listing.contact }}</span>
-                        {% if listing.user.email %}
-                        <a class="btn-seed-secondary btn-seed-sm" href="mailto:{{ listing.user.email }}">Hubungi via Email</a>
+                    <div class="seed-actions">
+                        <a class="btn-seed-secondary" href="{% url 'seed_exchange:update' listing.pk %}">Ubah</a>
+                        <button type="button" class="btn-seed-danger" data-bs-toggle="modal" data-bs-target="#seedDeleteModal">Hapus</button>
+                        {% if listing.status == 'requested' %}
+                        <form method="post" action="{% url 'seed_exchange:accept' listing.pk %}">
+                            {% csrf_token %}
+                            <button class="btn-seed-primary" type="submit">Terima</button>
+                        </form>
+                        <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
+                            {% csrf_token %}
+                            <button class="btn-seed-secondary" type="submit">Tolak</button>
+                        </form>
+                        {% endif %}
+                        {% if listing.status == 'reserved' %}
+                        <form method="post" action="{% url 'seed_exchange:complete' listing.pk %}">
+                            {% csrf_token %}
+                            <button class="btn-seed-primary" type="submit">Tandai selesai</button>
+                        </form>
+                        <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
+                            {% csrf_token %}
+                            <button class="btn-seed-secondary" type="submit">Buka kembali</button>
+                        </form>
+                        {% endif %}
+                        {% if listing.status == 'completed' %}
+                        <form method="post" action="{% url 'seed_exchange:reopen' listing.pk %}">
+                            {% csrf_token %}
+                            <button class="btn-seed-secondary" type="submit">Buka kembali</button>
+                        </form>
                         {% endif %}
                     </div>
+                    {% if listing.status == 'requested' and listing.reserved_by %}
+                    <p class="seed-owner-note">Dipesan oleh <strong>@{{ listing.reserved_by.username }}</strong>. Tekan <strong>Terima</strong> kalau setuju (lanjut atur serah terima via kontakmu), atau <strong>Tolak</strong> untuk membuka listing kembali.</p>
+                    {% elif listing.status == 'reserved' and listing.reserved_by %}
+                    <p class="seed-owner-note">Sudah diterima <strong>@{{ listing.reserved_by.username }}</strong>. Tandai <strong>Selesai</strong> setelah serah terima terjadi.</p>
+                    {% else %}
+                    <p class="seed-owner-note">Ini listing punyamu. Pastikan kontakmu benar agar peminat bisa menghubungimu.</p>
+                    {% endif %}
+                {% elif is_requester %}
+                    <div class="seed-reserve-box">
+                        <p><strong>Booking-mu menunggu konfirmasi</strong></p>
+                        <p>Pemilik akan menerima atau menolak. Selama belum diterima, kamu bisa membatalkan booking ini.</p>
+                        <form method="post" action="{% url 'seed_exchange:cancel_reserve' listing.pk %}">
+                            {% csrf_token %}
+                            <button class="btn-seed-danger btn-seed-sm" type="submit">Batalkan booking saya</button>
+                        </form>
+                    </div>
+                {% elif is_accepted %}
+                    <div class="seed-reserve-box">
+                        <p><strong>Diterima! 🎉</strong></p>
+                        <p>Pemilik sudah menerima booking-mu. Hubungi untuk atur waktu &amp; tempat serah terima. Pembatalan sekarang lewat pemilik langsung.</p>
+                        <div class="seed-reserve-contact">
+                            <span class="seed-contact-avatar" aria-hidden="true">{{ listing.user.username|first|upper }}</span>
+                            <span class="seed-contact-name">@{{ listing.user.username }}</span>
+                            <span class="seed-contact-value">{{ listing.contact }}</span>
+                            {% if listing.user.email %}
+                            <a class="btn-seed-secondary btn-seed-sm" href="mailto:{{ listing.user.email }}">Hubungi via Email</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% elif can_reserve %}
+                    <div class="seed-actions">
+                        <form method="post" action="{% url 'seed_exchange:reserve' listing.pk %}">
+                            {% csrf_token %}
+                            <button class="btn-seed-primary" type="submit">Booking listing ini</button>
+                        </form>
+                    </div>
+                {% elif user.is_authenticated and listing.status == 'requested' %}
+                    <p class="seed-hint">Listing ini sedang dipesan orang lain dan menunggu konfirmasi pemilik.</p>
+                {% elif user.is_authenticated and listing.status == 'reserved' %}
+                    <p class="seed-hint">Listing ini sudah diterima orang lain.</p>
+                {% elif user.is_authenticated and listing.status == 'completed' %}
+                    <p class="seed-hint">Listing ini sudah selesai.</p>
+                {% else %}
+                    {% url 'seed_exchange:detail' listing.pk as detail_url %}
+                    {% include "seed_exchange/partials/login_callout.html" with title="Ingin booking bibit ini?" text="Masuk untuk booking listing atau membuat listing punyamu sendiri. Belum punya akun? Daftar gratis, kok." next_url=detail_url %}
+                {% endif %}
+            </div>
+        </article>
+    </div>
+
+    {% if is_owner %}
+    <div class="modal fade seed-modal" id="seedDeleteModal" tabindex="-1" aria-labelledby="seedDeleteTitle" aria-describedby="seedDeleteText" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="seed-modal-preview">
+                        <span class="seed-modal-thumb">
+                            {% if listing.image %}
+                            <img src="{{ listing.image.url }}" alt="" loading="lazy" decoding="async">
+                            {% else %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 21v-9.5"/>
+                                <path d="M12 12.5C12 8.6 9 5.5 4 5.5c0 4.9 3 8 8 7Z"/>
+                                <path d="M12 14.5c0-3.9 3-7 8-7 0 4.9-3 8-8 7Z"/>
+                            </svg>
+                            {% endif %}
+                        </span>
+                        <span class="seed-modal-preview-copy">
+                            <span class="seed-modal-preview-kicker">Listing yang akan dihapus</span>
+                            <strong class="seed-modal-preview-title">{{ listing.title }}</strong>
+                            <span class="seed-modal-preview-meta">{{ listing.city }} &middot; {{ listing.get_item_type_display }}</span>
+                        </span>
+                    </div>
+
+                    <h2 class="seed-modal-title" id="seedDeleteTitle">Yakin mau hapus?</h2>
+                    <p class="seed-modal-text" id="seedDeleteText">Listing ini akan hilang dari kebunmu dan tidak bisa dikembalikan.</p>
                 </div>
-            {% elif can_reserve %}
-                <div class="seed-actions">
-                    <form method="post" action="{% url 'seed_exchange:reserve' listing.pk %}">
+                <div class="modal-footer">
+                    <button type="button" class="btn-seed-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form method="post" action="{% url 'seed_exchange:delete' listing.pk %}">
                         {% csrf_token %}
-                        <button class="btn-seed-primary" type="submit">Booking listing ini</button>
+                        <button type="submit" class="btn-seed-danger">Hapus</button>
                     </form>
                 </div>
-            {% elif user.is_authenticated and listing.status == 'requested' %}
-                <p class="seed-hint">Listing ini sedang dipesan orang lain dan menunggu konfirmasi pemilik.</p>
-            {% elif user.is_authenticated and listing.status == 'reserved' %}
-                <p class="seed-hint">Listing ini sudah diterima orang lain.</p>
-            {% elif user.is_authenticated and listing.status == 'completed' %}
-                <p class="seed-hint">Listing ini sudah selesai.</p>
-            {% else %}
-                {% url 'seed_exchange:detail' listing.pk as detail_url %}
-                {% include "seed_exchange/partials/login_callout.html" with title="Ingin booking bibit ini?" text="Masuk untuk booking listing atau membuat listing punyamu sendiri. Belum punya akun? Daftar gratis, kok." next_url=detail_url %}
-            {% endif %}
+            </div>
         </div>
-    </article>
+    </div>
+    {% endif %}
 </div>
+</main>
 {% endblock %}

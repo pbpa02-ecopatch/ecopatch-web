@@ -1,4 +1,4 @@
-<article class="seed-card" id="seed-card-{{ listing.pk }}">
+<article class="seed-card" id="seed-card-{{ listing.pk }}" style="--seed-i: {{ forloop.counter0|default:0 }}">
     {% if listing.image %}
     <div class="seed-card-media">
         <img src="{{ listing.image.url }}" alt="" loading="lazy" decoding="async">

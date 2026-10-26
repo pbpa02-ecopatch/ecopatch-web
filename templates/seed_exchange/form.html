@@ -1,102 +1,178 @@
 {% extends "base.html" %}
 {% load static asset_version %}
 {% block title %}{% if mode == "update" %}Ubah Listing{% else %}Buat Listing{% endif %} - Seed Exchange{% endblock %}
+{% block body_class %} seed-body{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static_v 'seed_exchange/css/seed_exchange.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="seed-page seed-page--form">
-    <div class="seed-form-card">
-        <header class="seed-form-hero">
-            <p class="seed-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 21v-9"/>
-                    <path d="M12 12C12 8 9 5 4 5c0 5 3 8 8 7Z"/>
-                    <path d="M12 14c0-4 3-7 8-7 0 5-3 8-8 7Z"/>
-                    <path d="M7 21h10"/>
-                </svg>
-                Seed Exchange <b>&middot; {% if mode == "update" %}ubah listing{% else %}listing baru{% endif %}</b>
-            </p>
-            <h1 class="seed-form-title">{% if mode == "update" %}Ubah Listing{% else %}Buat Listing{% endif %}</h1>
-            <p class="seed-form-lead">Bagikan atau tukar bibit, stek, biji, dan tanamanmu.</p>
-            <p class="seed-form-legend"><span class="seed-required">*</span> wajib diisi</p>
+{% block main %}
+<main class="seed-main flex-grow-1">
+<div class="seed-page">
+    <div class="seed-inner">
+        <a class="seed-back" href="{% if mode == 'update' %}{% url 'seed_exchange:detail' listing.pk %}{% else %}{% url 'seed_exchange:list' %}?tab=mine{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5"/>
+                <path d="m12 19-7-7 7-7"/>
+            </svg>
+            {% if mode == 'update' %}Kembali ke listing{% else %}Kembali ke Seed Exchange{% endif %}
+        </a>
+
+        <header class="seed-head seed-head--form">
+            <div class="seed-head-copy">
+                <p class="seed-eyebrow">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 21v-8"/>
+                        <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                        <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                        <path d="M5 21h14"/>
+                    </svg>
+                    Komunitas &middot; {% if mode == 'update' %}ubah listing{% else %}listing baru{% endif %}
+                </p>
+                <h1 class="seed-title">{% if mode == 'update' %}Ubah Listing{% else %}Buat Listing{% endif %}</h1>
+                <p class="seed-sub">{% if mode == 'update' %}Segarkan foto dan detail listingmu, biar makin gampang ketemu tetangga.{% else %}Bagikan atau tukar bibit, stek, biji, dan tanamanmu.{% endif %}</p>
+                <p class="seed-form-legend"><span class="seed-required" aria-hidden="true">*</span> wajib diisi</p>
+            </div>
+            <div class="seed-head-art" aria-hidden="true">
+                <img src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" width="150" height="150" loading="lazy" decoding="async">
+            </div>
         </header>
 
-        <form method="post" enctype="multipart/form-data" class="seed-form">
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-            {% endif %}
-            {% for row in rows %}
-                {% with field=row.field %}
-                {% if field.name == 'image' %}
-                <div class="seed-field seed-field--{{ field.name }}">
-                    <span class="seed-label">
-                        {{ field.label }}
-                        {% if field.field.required %}<span class="seed-required" aria-hidden="true">*</span>
-                        {% else %}<span class="seed-optional-tag">(opsional)</span>{% endif %}
-                    </span>
-                    <div class="seed-uploader" data-seed-uploader>
-                        {{ field }}
-                        <label class="seed-upload-zone" for="{{ field.id_for_label }}">
-                            <span class="seed-upload-visual" data-seed-preview>
-                                {% if listing.image %}
-                                <img src="{{ listing.image.url }}" alt="Foto listing saat ini" data-seed-preview-img>
-                                {% else %}
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-seed-placeholder>
-                                    <path d="M12 21v-9.5"/>
-                                    <path d="M12 12.5C12 8.6 9 5.5 4 5.5c0 4.9 3 8 8 7Z"/>
-                                    <path d="M12 14.5c0-3.9 3-7 8-7 0 4.9-3 8-8 7Z"/>
+        <div class="seed-form-card">
+            <p class="seed-form-note">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 21v-8"/>
+                    <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                    <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                </svg>
+                <span>
+                    Isi sekali di <a href="{% url 'main:profile' %}">profil</a>, semua listingmu langsung memakai kota dan kontak yang sama.
+                </span>
+            </p>
+
+            <form method="post" enctype="multipart/form-data" class="seed-form">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+                {% for row in rows %}
+                    {% with field=row.field %}
+                    {% if forloop.first %}<h2 class="seed-form-section">Detail bibit</h2>{% endif %}
+                    {% if field.name == 'description' %}
+                    <h2 class="seed-form-section">Lokasi &amp; kontak</h2>
+                    <div class="seed-loc{% if not location_ready %} seed-loc--missing{% endif %}">
+                        <span class="seed-loc-pin" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 21s-6.5-5.4-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21Z"/>
+                                <circle cx="12" cy="10.5" r="2.4"/>
+                            </svg>
+                        </span>
+                        <div class="seed-loc-body">
+                            {% if location_ready %}
+                            <p class="seed-loc-kicker">Dari profil <b>@{{ user.username }}</b></p>
+                            <div class="seed-loc-facts">
+                                <span class="seed-loc-fact">
+                                    <span class="seed-loc-label">Kota</span>
+                                    <strong>{{ location_city }}</strong>
+                                </span>
+                                <span class="seed-loc-fact">
+                                    <span class="seed-loc-label">Kontak</span>
+                                    <strong>{{ location_contact }}</strong>
+                                </span>
+                            </div>
+                            <p class="seed-loc-hint">
+                                Dipakai di semua listingmu.
+                                <a href="{% url 'main:profile' %}">Ubah di profil</a>
+                            </p>
+                            {% else %}
+                            <p class="seed-loc-kicker">Hampir siap</p>
+                            <p class="seed-loc-title">Lengkapi kota &amp; kontak di profil dulu, yuk.</p>
+                            <p class="seed-loc-hint">Sekarang data ini diambil dari profil supaya peminat selalu menghubungi kontak yang benar. Isi sekali saja, semua listing ikut.</p>
+                            <a class="seed-loc-cta" href="{% url 'main:profile' %}">
+                                Lengkapi profil
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M5 12h14"/>
+                                    <path d="m13 6 6 6-6 6"/>
                                 </svg>
-                                {% endif %}
-                            </span>
-                            <span class="seed-upload-copy">
-                                <span class="seed-upload-title" data-seed-filename>{% if listing.image %}Ganti foto listing{% else %}Pilih foto listing{% endif %}</span>
-                                <span class="seed-upload-hint">JPG/PNG, maks 5 MB. Foto asli bibit/stekmu bikin listing lebih cepat dilirik.</span>
-                            </span>
-                        </label>
+                            </a>
+                            {% endif %}
+                        </div>
                     </div>
-                    {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
-                </div>
-                {% else %}
-                <div class="seed-field seed-field--{{ field.name }}">
-                    <label class="seed-label" for="id_{{ field.name }}">
-                        {{ field.label }}
-                        {% if field.field.required %}<span class="seed-required" aria-hidden="true">*</span>
-                        {% else %}<span class="seed-optional-tag">(opsional)</span>{% endif %}
-                    </label>
-                    {% if row.select %}
-                    <div class="dropdown" data-seed-select>
-                        <input type="hidden" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ row.select.value }}">
-                        <button type="button" class="form-control seed-input seed-select-btn dropdown-toggle"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                            <span data-seed-label>{% if row.select.display %}{{ row.select.display }}{% else %}<span class="seed-placeholder">Pilih {{ field.label|lower }}…</span>{% endif %}</span>
-                        </button>
-                        <ul class="dropdown-menu seed-menu">
-                            {% for opt in row.select.options %}
-                            <li><button type="button" class="dropdown-item seed-menu-item{% if opt.selected %} active{% endif %}"
-                                        data-seed-option data-value="{{ opt.value }}">{{ opt.label }}</button></li>
-                            {% endfor %}
-                        </ul>
+                    <input type="hidden" name="city" id="id_city" value="{{ location_city }}">
+                    <input type="hidden" name="contact" id="id_contact" value="{{ location_contact }}">
+                    {% for error in form.city.errors %}<div class="seed-error seed-loc-error">{{ error }}</div>{% endfor %}
+                    {% for error in form.contact.errors %}<div class="seed-error seed-loc-error">{{ error }}</div>{% endfor %}
+                    <h2 class="seed-form-section">Foto &amp; catatan</h2>
+                    {% endif %}
+                    {% if field.name == 'image' %}
+                    <div class="seed-field seed-field--{{ field.name }}">
+                        <span class="seed-label">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="seed-required" aria-hidden="true">*</span>
+                            {% else %}<span class="seed-optional-tag">(opsional)</span>{% endif %}
+                        </span>
+                        <div class="seed-uploader" data-seed-uploader>
+                            {{ field }}
+                            <label class="seed-upload-zone" for="{{ field.id_for_label }}">
+                                <span class="seed-upload-visual" data-seed-preview>
+                                    {% if listing.image %}
+                                    <img src="{{ listing.image.url }}" alt="Foto listing saat ini" data-seed-preview-img>
+                                    {% else %}
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-seed-placeholder>
+                                        <path d="M12 21v-9.5"/>
+                                        <path d="M12 12.5C12 8.6 9 5.5 4 5.5c0 4.9 3 8 8 7Z"/>
+                                        <path d="M12 14.5c0-3.9 3-7 8-7 0 4.9-3 8-8 7Z"/>
+                                    </svg>
+                                    {% endif %}
+                                </span>
+                                <span class="seed-upload-copy">
+                                    <span class="seed-upload-title" data-seed-filename>{% if listing.image %}Ganti foto listing{% else %}Pilih foto listing{% endif %}</span>
+                                    <span class="seed-upload-hint">JPG/PNG, maks 5 MB. Foto asli bibit/stekmu bikin listing lebih cepat dilirik.</span>
+                                </span>
+                            </label>
+                        </div>
+                        {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
                     </div>
                     {% else %}
-                    {{ field }}
+                    <div class="seed-field seed-field--{{ field.name }}{% if mode == 'create' and field.name == 'transaction_type' %} seed-field--wide{% endif %}">
+                        <label class="seed-label" for="id_{{ field.name }}">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="seed-required" aria-hidden="true">*</span>
+                            {% else %}<span class="seed-optional-tag">(opsional)</span>{% endif %}
+                        </label>
+                        {% if row.select %}
+                        <div class="dropdown" data-seed-select>
+                            <input type="hidden" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ row.select.value }}">
+                            <button type="button" class="seed-select-btn dropdown-toggle"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <span data-seed-label>{% if row.select.display %}{{ row.select.display }}{% else %}<span class="seed-placeholder">Pilih {{ field.label|lower }}…</span>{% endif %}</span>
+                            </button>
+                            <ul class="dropdown-menu seed-menu">
+                                {% for opt in row.select.options %}
+                                <li><button type="button" class="dropdown-item seed-menu-item{% if opt.selected %} active{% endif %}"
+                                            data-seed-option data-value="{{ opt.value }}">{{ opt.label }}</button></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% else %}
+                        {{ field }}
+                        {% endif %}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
+                    </div>
                     {% endif %}
-                    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
-                    {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
+                    {% endwith %}
+                {% endfor %}
+                <div class="seed-form-actions">
+                    <button type="submit" class="btn-seed-primary">{% if mode == "update" %}Simpan perubahan{% else %}Simpan listing{% endif %}</button>
+                    <a class="btn-seed-secondary" href="{% if mode == "update" %}{% url 'seed_exchange:detail' listing.pk %}{% else %}{% url 'seed_exchange:list' %}?tab=mine{% endif %}">Batal</a>
                 </div>
-                {% endif %}
-                {% endwith %}
-            {% endfor %}
-            <div class="seed-form-actions">
-                <button type="submit" class="btn-seed-primary">{% if mode == "update" %}Simpan perubahan{% else %}Simpan listing{% endif %}</button>
-                <a class="btn-seed-secondary" href="{% if mode == "update" %}{% url 'seed_exchange:detail' listing.pk %}{% else %}{% url 'seed_exchange:list' %}{% endif %}">Batal</a>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
+</main>
 {% endblock %}
 
 {% block extra_scripts %}

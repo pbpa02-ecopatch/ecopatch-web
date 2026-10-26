@@ -47,10 +47,20 @@ class AvatarForm(forms.ModelForm):
 class BioForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['city', 'bio']
-        labels = {'city': 'Kota tempat tinggal', 'bio': 'Deskripsi'}
-        help_texts = {'city': 'Dipakai untuk menampilkan cuaca di Smart Care.'}
+        fields = ['city', 'contact', 'bio']
+        labels = {
+            'city': 'Kota tempat tinggal',
+            'contact': 'Kontak yang bisa dihubungi',
+            'bio': 'Deskripsi',
+        }
+        help_texts = {
+            'city': 'Dipakai untuk cuaca di Smart Care dan otomatis terisi di listing Seed Exchange.',
+            'contact': 'Otomatis dipakai sebagai kontak di listing Seed Exchange.',
+        }
         widgets = {
+            'contact': forms.TextInput(attrs={
+                'placeholder': 'cth: 0812-3456-7890 / nama@email.com',
+            }),
             'bio': forms.Textarea(attrs={
                 'rows': 4,
                 'maxlength': 300,
