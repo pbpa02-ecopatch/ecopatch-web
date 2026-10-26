@@ -17,12 +17,15 @@
     </script>
     {% block extra_head %}{% endblock %}
 </head>
-<body class="d-flex flex-column min-vh-100{% if user.is_authenticated %} has-sidebar{% endif %}">
+<body class="d-flex flex-column min-vh-100{% if user.is_authenticated %} has-sidebar{% endif %}{% block body_class %}{% endblock %}">
     {% include "header.html" %}
 
+    {# A page that needs the full width (like Smart Care's scene) overrides "main"; everyone else just fills "content" #}
+    {% block main %}
     <main class="container flex-grow-1 py-4">
         {% block content %}{% endblock %}
     </main>
+    {% endblock %}
 
     {% if messages %}
         <div class="toast-container site-toasts" aria-live="polite">
@@ -36,7 +39,7 @@
         </div>
     {% endif %}
 
-    {% include "footer.html" %}
+    {% block footer %}{% include "footer.html" %}{% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rellax/1.12.1/rellax.min.js"></script>
