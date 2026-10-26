@@ -1540,18 +1540,25 @@ body.has-sidebar.care-body {
 
 /* No plants yet: no box, it sits on the sheet like the other sections; one tight group, the button right under the words */
 .care-start {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 20px;
+    row-gap: 8px;
+    align-items: center;
     color: var(--care-muted);
 }
 
+.care-start > :not(.care-start-pet) {
+    grid-column: 2;
+}
+
 .care-start-pet {
+    grid-column: 1;
+    grid-row: 1 / span 3;
     display: block;
-    width: 120px;
-    height: 118px;
-    margin: -10px 0 -6px -8px;
+    width: 132px;
+    height: 130px;
+    margin: -8px 0 -8px -8px;
 }
 
 .care-start-pet .care-face {
@@ -1575,6 +1582,7 @@ body.has-sidebar.care-body {
 }
 
 .care-start .care-btn {
+    justify-self: start;
     margin-top: 8px;
 }
 
@@ -1584,9 +1592,20 @@ body.has-sidebar.care-body {
     padding-top: 0;
 }
 
-@media (max-width: 767.98px) {
+/* narrow screens: Petak on top, the button as wide as the column */
+@media (max-width: 575.98px) {
+    .care-start {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .care-start > :not(.care-start-pet),
+    .care-start-pet {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
     .care-start .care-btn {
-        width: 100%;
+        justify-self: stretch;
         justify-content: center;
     }
 }
