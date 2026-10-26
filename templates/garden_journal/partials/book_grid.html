@@ -92,11 +92,11 @@
                     <p class="onboarding-step-desc">Daftarkan tanaman di My EcoPatch. Nama bukunya mengikuti nama tanamanmu.</p>
                     <div id="step1BottomSlot" class="mt-auto pt-1">
                         {% if not has_user_plants %}
-                            <span class="badge py-1 px-2 d-inline-block" style="background: #fdf5ea; color: #b45309; border: 1px solid #fde4c3; font-size: 0.72rem;">
+                            <span class="badge py-1 px-2 d-inline-block mb-1" style="background: #fdf5ea; color: #b45309; border: 1px solid #fde4c3; font-size: 0.72rem;">
                                 Belum ada tanaman
                             </span>
                             <div>
-                                <a href="{% url 'my_ecopatch:list' %}" class="btn-link text-success fw-bold small text-decoration-none mt-2 d-inline-block" style="font-size: 0.78rem;">
+                                <a href="{% url 'my_ecopatch:list' %}" class="btn btn-sm btn-outline-success fw-semibold mt-1 px-3 py-1" style="font-size: 0.76rem; border-radius: 999px;">
                                     Buka My EcoPatch &rarr;
                                 </a>
                             </div>
@@ -159,23 +159,15 @@
                 </div>
             </div>
 
-            <!-- Tombol Aksi Utama -->
+            {% if has_user_plants %}
+            <!-- Tombol Aksi Utama (hanya saat tanaman sudah siap) -->
             <div class="text-center mt-3" id="onboardingActionArea">
-                {% if not has_user_plants %}
-                    <a href="{% url 'my_ecopatch:list' %}" class="btn btn-ds-primary px-4 py-2 fw-semibold" id="onboardingMainBtn" style="border-radius: 999px; font-size: 0.95rem;">
-                        Tambah tanaman di My EcoPatch
-                    </a>
-                    <div class="mt-2" id="onboardingSubLink">
-                        <a href="{% url 'garden_journal:create' %}" class="text-success small fw-semibold text-decoration-underline">
-                            Sudah punya tanaman? Tulis jurnal
-                        </a>
-                    </div>
-                {% else %}
-                    <a href="{% url 'garden_journal:create' %}" class="btn btn-ds-primary px-4 py-2 fw-semibold" id="onboardingMainBtn" style="border-radius: 999px; font-size: 0.95rem;">
-                        + Tulis Jurnal Baru
-                    </a>
-                {% endif %}
+                <a href="{% url 'garden_journal:create' %}" class="btn btn-ds-primary px-4 py-2 fw-semibold d-inline-flex align-items-center" id="onboardingMainBtn" style="border-radius: 999px; font-size: 0.95rem;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="me-1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Tulis Jurnal Baru
+                </a>
             </div>
+            {% endif %}
         </div>
     {% endif %}
 {% endif %}
