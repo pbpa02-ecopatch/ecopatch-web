@@ -30,6 +30,20 @@
                 <div><dt>Jurnal</dt><dd>{{ stats.journals }}</dd></div>
                 <div><dt>Bibit</dt><dd>{{ stats.listings }}</dd></div>
             </dl>
+            {% if profile.whatsapp or profile.instagram %}
+                <ul class="profile-contacts" aria-label="Kontakmu">
+                    {% if profile.whatsapp %}
+                        <li><a href="{{ profile.whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="profile-contact profile-contact--wa">
+                            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12Z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2L9 8.5Z"/></svg>
+                            <span>{{ profile.whatsapp_display }}</span></a></li>
+                    {% endif %}
+                    {% if profile.instagram %}
+                        <li><a href="{{ profile.instagram_url }}" target="_blank" rel="noopener noreferrer" class="profile-contact profile-contact--ig">
+                            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></svg>
+                            <span>@{{ profile.instagram }}</span></a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
             {% if user.email %}
                 <p class="profile-email"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg>{{ user.email }}</p>
             {% endif %}
@@ -106,6 +120,46 @@
                     {% if bio_form.bio.errors %}<div class="auth-error">{{ bio_form.bio.errors|join:" " }}</div>{% endif %}
                 </div>
                 <button type="submit" class="btn btn-success profile-submit">Simpan</button>
+            </form>
+        </section>
+
+        <section class="profile-edit" aria-labelledby="sec-contact">
+            <h2 class="profile-edit-title profile-edit-title--sub" id="sec-contact">Kontak</h2>
+            <p class="profile-note">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                Opsional, dan hanya kamu yang melihatnya. Dipakai untuk mengisi kolom Kontak saat membuat listing di Seed Exchange.
+            </p>
+            <form method="post" class="profile-form" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="contact">
+                <div class="profile-row profile-row--2">
+                    <div class="profile-field{% if contact_form.whatsapp.errors %} has-error{% endif %}">
+                        <label class="auth-label" for="{{ contact_form.whatsapp.id_for_label }}">WhatsApp</label>
+                        <div class="profile-input-icon profile-input-icon--wa">
+                            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12Z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2L9 8.5Z"/></svg>
+                            {{ contact_form.whatsapp }}
+                        </div>
+                        {% if contact_form.whatsapp.errors %}
+                            <div class="auth-error">{{ contact_form.whatsapp.errors|join:" " }}</div>
+                        {% else %}
+                            <div class="auth-help">{{ contact_form.whatsapp.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="profile-field{% if contact_form.instagram.errors %} has-error{% endif %}">
+                        <label class="auth-label" for="{{ contact_form.instagram.id_for_label }}">Instagram</label>
+                        <div class="profile-input-icon profile-input-icon--ig">
+                            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></svg>
+                            <span class="profile-at" aria-hidden="true">@</span>
+                            {{ contact_form.instagram }}
+                        </div>
+                        {% if contact_form.instagram.errors %}
+                            <div class="auth-error">{{ contact_form.instagram.errors|join:" " }}</div>
+                        {% else %}
+                            <div class="auth-help">{{ contact_form.instagram.help_text }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success profile-submit">Simpan kontak</button>
             </form>
         </section>
 

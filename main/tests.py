@@ -524,6 +524,87 @@ class ProfileViewTests(TestCase):
         data.update(overrides)
         return self.client.post(self.url, data)
 
+    # ---- contact (WhatsApp, Instagram): optional and private
+    def post_contact(self, **data):
+        return self.client.post(self.url, {'action': 'contact', **data})
+
+    def test_contact_is_saved_in_one_tidy_format(self):
+        response = self.post_contact(whatsapp='+62 812-3456-7890', instagram='@Kebunku.Id')
+        self.assertRedirects(response, self.url)
+        profile = Profile.objects.get(user=self.user)
+        self.assertEqual((profile.whatsapp, profile.instagram), ('6281234567890', 'kebunku.id'))
+        self.assertEqual(profile.whatsapp_display, '+62 812-3456-7890')
+        self.assertEqual(profile.whatsapp_url, 'https://wa.me/6281234567890')
+        self.assertEqual(profile.instagram_url, 'https://instagram.com/kebunku.id')
+
+    def test_whatsapp_accepts_the_usual_ways_of_writing_a_number(self):
+        for typed in ('081234567890', '0812 3456 7890', '+6281234567890', '6281234567890', '(0812) 3456-7890', '81234567890'):
+            self.post_contact(whatsapp=typed)
+            self.assertEqual(Profile.objects.get(user=self.user).whatsapp, '6281234567890', typed)
+
+    def test_a_number_from_another_country_is_kept(self):
+        self.post_contact(whatsapp='+60 12-345 6789')
+        self.assertEqual(Profile.objects.get(user=self.user).whatsapp, '60123456789')
+
+    def test_bad_whatsapp_numbers_are_refused(self):
+        for typed in ('abc123', '0812', '0712 3456 7890', '0812 3456 7890 1234 5678', '12'):
+            response = self.post_contact(whatsapp=typed)
+            self.assertEqual(response.status_code, 200, typed)
+            self.assertTrue(response.context['contact_form'].errors['whatsapp'], typed)
+        self.assertEqual(Profile.objects.get(user=self.user).whatsapp, '')
+
+    def test_instagram_takes_a_username_a_handle_or_a_pasted_link(self):
+        for typed in ('kebunku', '@kebunku', 'https://www.instagram.com/kebunku/', 'instagram.com/kebunku?igsh=abc'):
+            self.post_contact(instagram=typed)
+            self.assertEqual(Profile.objects.get(user=self.user).instagram, 'kebunku', typed)
+
+    def test_bad_instagram_usernames_are_refused(self):
+        for typed in ('kebun ku', 'kebun!', 'a' * 31, 'kebunku.', 'ke..bun', 'https://example.com/kebunku'):
+            response = self.post_contact(instagram=typed)
+            self.assertTrue(response.context['contact_form'].errors['instagram'], typed)
+
+    def test_both_fields_are_optional_and_can_be_cleared(self):
+        self.post_contact(whatsapp='0812 3456 7890', instagram='kebunku')
+        response = self.post_contact(whatsapp='', instagram='')
+        self.assertRedirects(response, self.url)
+        profile = Profile.objects.get(user=self.user)
+        self.assertEqual((profile.whatsapp, profile.instagram, profile.contact_text()), ('', '', ''))
+
+    def test_the_contact_shows_on_the_owners_profile_with_links(self):
+        self.post_contact(whatsapp='0812 3456 7890', instagram='kebunku')
+        response = self.client.get(self.url)
+        self.assertContains(response, 'href="https://wa.me/6281234567890"')
+        self.assertContains(response, '+62 812-3456-7890')
+        self.assertContains(response, 'href="https://instagram.com/kebunku"')
+        self.assertContains(response, 'rel="noopener noreferrer"')
+        self.assertContains(response, 'hanya kamu yang melihatnya')
+
+    def test_the_saved_number_is_shown_in_the_field_in_its_readable_form_and_can_be_saved_again(self):
+        self.post_contact(whatsapp='081234567890')
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['contact_form']['whatsapp'].value(), '+62 812-3456-7890')
+        self.post_contact(whatsapp='+62 812-3456-7890')  # what the field now holds goes back in unchanged
+        self.assertEqual(Profile.objects.get(user=self.user).whatsapp, '6281234567890')
+
+    def test_without_contact_the_card_has_no_contact_chips(self):
+        self.assertNotContains(self.client.get(self.url), 'class="profile-contacts"')
+
+    def test_one_users_contact_never_reaches_another_users_pages(self):
+        self.post_contact(whatsapp='0812 3456 7890', instagram='sawah_rahasia')
+        other = get_user_model().objects.create_user('lain', 'lain@example.com', 'pass12345')
+        self.client.force_login(other)
+        for name in ('main:profile', 'seed_exchange:list', 'seed_exchange:create'):
+            body = self.client.get(reverse(name)).content.decode()
+            self.assertNotIn('6281234567890', body, name)
+            self.assertNotIn('sawah_rahasia', body, name)
+
+    def test_contact_text_joins_what_is_filled_in(self):
+        profile = Profile(whatsapp='6281234567890', instagram='kebunku')
+        self.assertEqual(profile.contact_text(), 'WhatsApp +62 812-3456-7890 / Instagram @kebunku')
+        self.assertEqual(Profile(instagram='kebunku').contact_text(), 'Instagram @kebunku')
+        self.assertEqual(Profile().contact_text(), '')
+
+
     def test_requires_login(self):
         self.client.logout()
         response = self.client.get(self.url)
