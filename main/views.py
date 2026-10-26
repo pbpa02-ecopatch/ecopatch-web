@@ -12,7 +12,7 @@ from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 
 from .auth_forms import EcoPasswordResetForm, RegisterForm
 
-from .forms import AvatarForm, BioForm, ChangePasswordForm, DeleteAccountForm, UserForm
+from .forms import AvatarForm, BioForm, ChangePasswordForm, ContactForm, DeleteAccountForm, UserForm
 from .models import Profile
 
 
@@ -61,6 +61,7 @@ def profile(request):
         'user_form': UserForm(instance=user),
         'avatar_form': AvatarForm(instance=profile_obj),
         'bio_form': BioForm(instance=profile_obj),
+        'contact_form': ContactForm(instance=profile_obj),
         'password_form': ChangePasswordForm(user),
         'delete_form': DeleteAccountForm(user),
     }
@@ -81,6 +82,12 @@ def profile(request):
             if forms_ctx['bio_form'].is_valid():
                 forms_ctx['bio_form'].save()
                 messages.success(request, 'Deskripsi diperbarui.')
+                return redirect('main:profile')
+        elif action == 'contact':
+            forms_ctx['contact_form'] = ContactForm(request.POST, instance=profile_obj)
+            if forms_ctx['contact_form'].is_valid():
+                forms_ctx['contact_form'].save()
+                messages.success(request, 'Kontak diperbarui.')
                 return redirect('main:profile')
         elif action == 'password':
             forms_ctx['password_form'] = ChangePasswordForm(user, request.POST)

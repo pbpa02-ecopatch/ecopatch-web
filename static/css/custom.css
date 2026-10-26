@@ -2240,6 +2240,109 @@ h1, h2, h3, .navbar-brand {
     font-size: 13.5px;
 }
 
+/* ---- Contact (WhatsApp, Instagram): optional, private ---- */
+.profile-contacts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0 20px 14px;
+    list-style: none;
+}
+
+.profile-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px 7px 11px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-100);
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.profile-contact:hover {
+    border-color: var(--brand-500);
+    background: var(--surface-200);
+    color: var(--ink);
+}
+
+.profile-contact .ico {
+    width: 17px;
+    height: 17px;
+    flex: none;
+}
+
+.profile-contact--wa .ico,
+.profile-input-icon--wa .ico {
+    color: var(--brand-600);
+}
+
+.profile-contact--ig .ico,
+.profile-input-icon--ig .ico {
+    color: var(--accent-mango);
+}
+
+.profile-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: -6px 0 18px;
+    color: var(--ink-muted);
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+.profile-note .ico {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    margin-top: 2px;
+}
+
+.profile-input-icon {
+    position: relative;
+}
+
+.profile-input-icon > .ico {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    width: 19px;
+    height: 19px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.profile-form .profile-input-icon input[type="text"] {
+    padding-left: 44px;
+}
+
+.profile-at {
+    position: absolute;
+    top: 50%;
+    left: 41px;
+    transform: translateY(-50%);
+    color: var(--ink-muted);
+    font-size: 15px;
+    pointer-events: none;
+}
+
+.profile-form .profile-input-icon--ig input[type="text"] {
+    padding-left: 54px;
+}
+
+@media (min-width: 768px) {
+    .profile-row--2 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 /* ================= Floating sidebar (logged-in users, md and up) =================
    A rounded card that floats over the page with a gap on every side. Top: logo. Middle: the menu in groups.
    Bottom: the profile row (opens a small menu with Profil Saya and Keluar), then the collapse button. Expanded it shows labels; collapsed
