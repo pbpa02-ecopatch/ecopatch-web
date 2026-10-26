@@ -27,6 +27,10 @@ class CareTaskForm(forms.ModelForm):
             "due_date": "Tanggal",
             "notes": "Catatan",
         }
+        error_messages = {
+            "task_type": {"required": "Pilih jenis tugasnya dulu.", "invalid_choice": "Jenis tugas ini tidak tersedia."},
+            "due_date": {"required": "Isi tanggalnya dulu.", "invalid": "Tanggalnya belum benar."},
+        }
         widgets = {
             "due_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
             "notes": forms.Textarea(attrs={"rows": 3, "placeholder": "Opsional, misalnya: pakai pupuk kompos cair"}),
