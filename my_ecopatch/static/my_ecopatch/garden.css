@@ -1,0 +1,119 @@
+/* Module-only theme. Shared navigation and other modules keep their own styles. */
+body.mep-module{background:#fdf7e8;color:#17301f}
+.mep-module #mep-main{background:linear-gradient(#fdf7e8 50%,#faefd5);min-width:0}
+.mep-content{max-width:1120px;margin:auto;padding:36px clamp(20px,4vw,56px) 48px}
+.mep-hero{position:relative;isolation:isolate;background:linear-gradient(#d9f1de,#eaf7e6);min-height:310px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:42px clamp(20px,4vw,56px) 34px;overflow:hidden;border-bottom:4px solid #c5d5a9}
+.mep-hero:before{content:"";position:absolute;inset:0;z-index:-1;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect x='5' y='5' width='38' height='38' rx='11' fill='%2335c065' fill-opacity='.15'/%3E%3Crect x='53' y='5' width='38' height='38' rx='11' fill='%235ccf82' fill-opacity='.17'/%3E%3Crect x='5' y='53' width='38' height='38' rx='11' fill='%231f9142' fill-opacity='.12'/%3E%3Crect x='53' y='53' width='38' height='38' rx='11' fill='%23ff9d2e' fill-opacity='.16'/%3E%3C/svg%3E")}
+.mep-hero-copy{max-width:590px;flex:1}
+.mep-eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.13em;color:#496a4e;margin:0 0 12px}
+.mep-hero h1{font:800 clamp(3rem,5.2vw,4.8rem)/1 'Baloo 2',sans-serif;letter-spacing:-.03em;margin:0 0 14px}
+.mep-hero-copy>p:not(.mep-eyebrow){font-size:1.05rem;max-width:36ch}
+.mep-stats{display:flex;gap:12px 24px;flex-wrap:wrap;list-style:none;margin:24px 0 0;padding:0;font-size:.88rem}
+.mep-stats strong{font-size:1.25rem}
+.mep-mascot{width:240px;flex:none;align-self:flex-end;display:flex;align-items:center;flex-direction:column;margin-bottom:-55px}
+.mep-mascot img{max-width:100%}
+.mep-speech{background:#fffef7;border-radius:20px 20px 6px 20px;padding:14px 18px;font-size:.85rem;line-height:1.5;box-shadow:0 7px 20px #17301f12;margin:0}
+.mep-toolbar,.mep-seed-tray{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.mep-module .btn{border-radius:999px;min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;padding:10px 22px;white-space:normal}
+.mep-module .btn-success{background:#167a38;border-color:#167a38;box-shadow:0 4px 0 #0f5a28}
+.mep-module .btn-success:hover{background:#0f622b;transform:translateY(-1px)}
+.mep-module .btn-outline-success{color:#175e30;border:1.5px solid #9b9e70;background:#fffdf5}
+.mep-module .btn-outline-success:hover{background:#e2f4e5}
+.mep-module :focus-visible{outline:3px solid #dc7d16;outline-offset:4px}
+.mep-filters{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:28px 0 16px;border-bottom:1px solid #b69a6361;padding-bottom:22px}
+.mep-filters>div:first-child{flex:1;min-width:180px}
+.mep-filters label{display:block;font-size:.8rem;font-weight:700;margin-bottom:6px}
+.mep-filters input,.mep-filters select{width:100%;min-height:46px;border:1px solid #ae9e75;border-radius:14px;padding:10px 14px;background:#fffdf6;color:#17301f}
+.mep-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:32px 26px;margin-top:26px}
+.mep-garden{min-width:0}
+.mep-garden-link{text-decoration:none;color:#17301f;display:block;border-radius:24px}
+.mep-garden h2{font:800 1.55rem/1.15 'Baloo 2',sans-serif;margin:18px 0 6px;overflow-wrap:anywhere}
+.mep-garden-link:hover{color:#167a38}
+.mep-location,.mep-count{margin:0 0 6px;font-size:.86rem;color:#4c6853}
+.mep-count{color:#17301f;font-weight:600}
+/* Each planting space has its own illustrated setting; live plants sit in front. */
+.mep-bed {
+  position: relative;
+  aspect-ratio: 1;
+  border: 3px solid #ac8961;
+  border-radius: 28px;
+  background: #dfbc87 url("place-indoor.svg") center / cover;
+  box-shadow: 0 6px 0 #79532840;
+  overflow: hidden;
+  transition: transform .2s;
+}
+.mep-garden-link:hover .mep-bed { transform: translateY(-5px) rotate(-1deg); }
+.mep-bed--indoor { background-image: url("place-indoor.svg"); }
+.mep-bed--balcony { background-image: url("place-balcony.svg"); border-color: #72998b; }
+.mep-bed--terrace { background-image: url("place-terrace.svg"); border-color: #bc936c; }
+.mep-bed--rooftop { background-image: url("place-rooftop.svg"); border-color: #8ca6a7; }
+.mep-bed--small_yard { background-image: url("place-small_yard.svg"); border-color: #73a965; }
+.mep-bed-plants {
+  position: absolute;
+  inset: 48% 8% 5%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  align-items: center;
+  justify-items: center;
+  gap: 0 4px;
+}
+.mep-sprout{width:100%;height:100%;max-height:52px;overflow:visible}
+.mep-pot{fill:#885a36;stroke:#eab179;stroke-width:4}
+.mep-leaf{fill:#2d9948;stroke:#176132;stroke-width:1.5}
+.mep-sprout--planned .mep-leaf{transform:scale(.35);transform-origin:center;fill:#eecf94;stroke:none}
+.mep-sprout--planned .mep-pot{fill:transparent;stroke:#f8dfb2;stroke-dasharray:5 4}
+.mep-sprout--removed{opacity:.5}.mep-sprout--removed .mep-leaf{fill:#8b7751}
+.mep-sprout--planted .mep-leaf{transform:scale(.65);transform-origin:center}
+.mep-bed-empty{grid-column:1/-1;text-align:center;font-weight:700;color:#564025;border:2px dashed #8a6a4a;border-radius:50%;padding:10px;width:auto;font-size:.8rem;justify-self:center;background:#fff7df80}
+.mep-bed-more{position:absolute;bottom:12px;right:12px;background:#293c26;color:white;border-radius:20px;padding:3px 10px;font-size:.75rem}
+.mep-add-bed{aspect-ratio:1;align-self:start;border:2px dashed #b6a174;border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#4c6853;text-decoration:none;padding:18px;background:#f6edda}
+.mep-add-bed>span{font-size:3rem;line-height:1.4;color:#167a38}.mep-add-bed small{margin-top:7px}.mep-add-bed:hover{background:#e7efda;color:#175e30}
+.mep-empty{grid-column:1/-1;background:#fff9ed;border-radius:24px;padding:30px;border:1px dashed #b6a174}
+.mep-empty h2{font-family:'Baloo 2',sans-serif}.mep-empty p{max-width:65ch;margin:0}
+.mep-seed-tray{margin:44px 0 24px;padding:26px 0;border-top:2px solid #8a6a4a66;border-bottom:1px solid #b69a6361}
+.mep-seed-tray p:last-child{font-size:.9rem;margin-bottom:0;max-width:52ch;color:#4c6853}
+.mep-module .patch-page-title{font-family:'Baloo 2',sans-serif;font-size:clamp(2rem,4vw,3rem);overflow-wrap:anywhere}
+.mep-module .patch-info{background:transparent;box-shadow:none;border:0;border-top:1px solid #b69a6361;border-bottom:1px solid #b69a6361;border-radius:0;padding:24px 0}
+.mep-module .patch-info dd{overflow-wrap:anywhere}
+.mep-module .patch-form-shell{max-width:760px;margin:auto}
+.mep-module .patch-form{background:#fffaf0;border:1px solid #d8c7a3;box-shadow:none;border-radius:24px;padding:26px}
+.mep-module .patch-form input:not([type=hidden]),.mep-module .patch-form select,.mep-module .patch-form textarea{background:#fffef9;border:1.5px solid #aa9a70;border-radius:14px;min-height:48px;width:100%;max-width:100%;color:#17301f;font-size:1rem}
+.mep-module .patch-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mep-module .patch-field{min-width:0}.mep-module .patch-form-actions{gap:12px}
+.mep-module .plant-list{gap:0}
+.mep-module .plant-row{background:transparent;border:0;border-bottom:1px solid #b69a6361;border-radius:0;padding:18px 0;gap:14px}
+.mep-module .plant-name{font:700 1.3rem 'Baloo 2',sans-serif;overflow-wrap:anywhere}
+.mep-module .plant-main{min-width:140px}
+.mep-module .plant-remove{min-height:44px;text-decoration:underline}
+.mep-module .patch-pill{font-size:.72rem}
+.mep-module .patch-btn-danger{color:#a3301f;border-color:#c88e70}
+.mep-module .btn-success.patch-btn-danger{background:#a3301f;color:white;box-shadow:0 4px 0 #712417}
+.mep-feedback{margin:0 0 16px;color:#175e30;font-weight:600}.mep-feedback:empty{display:none}
+.mep-module .htmx-request{opacity:.65;pointer-events:none}
+@media(max-width:1000px){.mep-mascot{width:180px}.mep-hero h1{font-size:3rem}.mep-stats{gap:8px 14px}}
+@media(max-width:600px){.mep-content{padding:26px 20px 36px}.mep-hero{padding:30px 20px 20px;min-height:280px;gap:8px;align-items:flex-start}.mep-hero-copy{min-width:0}.mep-hero h1{font-size:2.7rem}.mep-hero-copy>p:not(.mep-eyebrow){font-size:.9rem}.mep-mascot{width:100px;position:absolute;right:8px;bottom:18px;margin:0}.mep-mascot img{width:100px;height:auto}.mep-speech{display:none}.mep-stats{max-width:calc(100% - 90px);font-size:.8rem}.mep-map{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 16px}.mep-garden h2{font-size:1.25rem}.mep-bed{border-radius:20px}.mep-bed-empty{width:auto;font-size:.75rem;padding:14px}.mep-add-bed{font-size:.85rem;border-radius:20px;padding:12px}.mep-add-bed small{font-size:.7rem}.mep-module .patch-form{padding:20px}.mep-module .patch-form-grid{grid-template-columns:1fr}.mep-filters>div{flex:1;min-width:130px}.mep-location{font-size:.75rem}.mep-module .patch-head-actions{width:100%}.mep-module .patch-page-head{gap:20px}.mep-module .plant-status-form{flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){.mep-module *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+.mep-module .plant-status-form{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mep-module .plant-status-select{min-height:44px;max-width:100%;border:1px solid #b6a174;padding:8px 30px 8px 12px}
+.mep-status-save{background:#e2f4e5;border:1px solid #9ec5a4;border-radius:999px;padding:8px 14px;min-height:44px;font-weight:700;color:#175e30}
+.mep-status-save:hover{background:#cee8d1}.mep-module .patch-error:empty{display:none}
+.mep-module .patch-error{padding-left:0;list-style:none}
+.mep-module .patch-form input[aria-invalid=true],.mep-module .patch-form select[aria-invalid=true]{border-color:#a3301f}
+.mep-module .patch-back{display:inline-block;min-height:36px}
+.mep-module .patch-field+.patch-field{margin-top:16px}.mep-module .patch-form-grid .patch-field{margin-top:0}
+/* Fit shared footer inside this module's sidebar-reduced content width. */
+.mep-module .footer-grid{grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr))}
+@media(min-width:768px) and (max-width:1050px){
+  .mep-map{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px}
+  .mep-mascot{width:120px}.mep-speech{display:none}
+  .mep-hero-copy{min-width:0}.mep-hero h1{font-size:2.8rem}
+  .mep-content{padding-left:24px;padding-right:24px}
+  .mep-module .patch-form-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .mep-module .plant-main{flex-basis:100%}
+  .mep-module .plant-status-form{flex-basis:auto}
+  .mep-module .plant-remove{margin-left:auto;display:inline-flex;align-items:center}
+}
