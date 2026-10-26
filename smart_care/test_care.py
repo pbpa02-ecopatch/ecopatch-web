@@ -716,6 +716,14 @@ class CareViewTests(CacheClearingTestCase):
         self.assertContains(other, '<main class="container flex-grow-1 py-4">')
         self.assertNotContains(other, "Tip Petak")
 
+    def test_the_footer_is_just_the_tip_and_the_copyright_with_no_placeholder_links(self):
+        html = self.client.get(reverse("smart_care:list")).content.decode()
+        foot = html.split('<footer class="care-foot">', 1)[1].split("</footer>", 1)[0]
+        self.assertIn("EcoPatch", foot)
+        self.assertIn("Small Spaces, Greener Living.", foot)
+        self.assertNotIn("<a ", foot)
+        self.assertNotIn('href="#"', foot)
+
     def test_the_tip_follows_the_day(self):
         make_patch_plant(self.user, "Cabai")  # with plants the whole list is in play (without them, only the general tips)
         for day in (date(2026, 11, 2), date(2026, 11, 3)):
