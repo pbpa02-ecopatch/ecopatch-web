@@ -1,0 +1,23 @@
+<li class="care-task is-suggestion" data-suggestion data-plant="{{ suggestion.plant_name }}" data-type="{{ suggestion.task_type }}"
+    data-outdoor="{{ suggestion.is_outdoor|yesno:'1,0' }}" data-due="{{ today|date:'Y-m-d' }}">
+    <button type="button" class="care-check" role="checkbox" aria-checked="false"
+            aria-label="Tandai {{ suggestion.plant_name }} ({{ suggestion.label }}) selesai">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+    </button>
+    <span class="care-tb is-{{ suggestion.task_type }}" aria-hidden="true">{% include "smart_care/_type_icon.html" with type=suggestion.task_type %}</span>
+    <div class="care-task-body">
+        <div class="care-task-line">
+            <span class="care-task-name">{{ suggestion.plant_name }}</span>
+            <small class="care-task-place">{% if suggestion.is_outdoor %}Outdoor{% else %}Indoor{% endif %}</small>
+        </div>
+        <div class="care-task-meta">
+            <span>{{ suggestion.label }}</span>
+            <span class="care-tag">Saran</span>
+        </div>
+        <span class="care-task-reason">{{ suggestion.reason }}</span>
+        <div class="care-hint" hidden></div>
+    </div>
+    <div class="care-task-actions">
+        <button type="button" class="care-skip" aria-label="Lewati saran {{ suggestion.label }} untuk {{ suggestion.plant_name }}">Lewati</button>
+    </div>
+</li>

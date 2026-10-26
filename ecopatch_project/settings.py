@@ -35,6 +35,8 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ["salwa-alifia-eco-patch.pws.cs.ui.ac.id", "localhost", "127.0.0.1"]
 
+CSRF_TRUSTED_ORIGINS = ["https://salwa-alifia-eco-patch.pws.cs.ui.ac.id"]
+
 
 # Application definition
 

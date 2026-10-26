@@ -1,6 +1,7 @@
 from django.conf import settings
-from django.contrib.auth import logout
+from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 from allauth.account.models import EmailAddress
 from django.contrib import messages
 from django.db import IntegrityError
@@ -8,8 +9,22 @@ from django.shortcuts import redirect, render
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils import translation
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
+from django.views.static import serve
 
 from .auth_forms import EcoPasswordResetForm, RegisterForm
+
+from .forms import AvatarForm, BioForm, ChangePasswordForm, ContactForm, DeleteAccountForm, UserForm
+from .models import Profile
+
+
+def media(request, path):
+    """Serve uploaded files (profile photos, listing and journal photos), also when DEBUG is off.
+
+    WhiteNoise only serves static files and `static()` only works while DEBUG is on, so on a server such as
+    PWS every upload would 404. `serve` refuses paths that climb out of MEDIA_ROOT. MEDIA_ROOT is read on each
+    request, so a test can point it at a temporary folder.
+    """
+    return serve(request, path, document_root=settings.MEDIA_ROOT)
 
 
 def home(request):
@@ -45,6 +60,72 @@ def register(request):
             form = RegisterForm()
 
         return render(request, 'main/register.html', {'form': form})
+
+
+@login_required
+def profile(request):
+    profile_obj, _ = Profile.objects.get_or_create(user=request.user)
+    user = request.user
+
+    # Tiap section punya form sendiri; field tersembunyi `action` menandai mana yang dikirim
+    forms_ctx = {
+        'user_form': UserForm(instance=user),
+        'avatar_form': AvatarForm(instance=profile_obj),
+        'bio_form': BioForm(instance=profile_obj),
+        'contact_form': ContactForm(instance=profile_obj),
+        'password_form': ChangePasswordForm(user),
+        'delete_form': DeleteAccountForm(user),
+    }
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'profile':
+            # Foto dan nama satu card, disimpan bersamaan
+            forms_ctx['user_form'] = UserForm(request.POST, instance=user)
+            forms_ctx['avatar_form'] = AvatarForm(request.POST, request.FILES, instance=profile_obj)
+            if forms_ctx['user_form'].is_valid() and forms_ctx['avatar_form'].is_valid():
+                forms_ctx['user_form'].save()
+                forms_ctx['avatar_form'].save()
+                messages.success(request, 'Profil diperbarui.')
+                return redirect('main:profile')
+        elif action == 'bio':
+            forms_ctx['bio_form'] = BioForm(request.POST, instance=profile_obj)
+            if forms_ctx['bio_form'].is_valid():
+                forms_ctx['bio_form'].save()
+                messages.success(request, 'Deskripsi diperbarui.')
+                return redirect('main:profile')
+        elif action == 'contact':
+            forms_ctx['contact_form'] = ContactForm(request.POST, instance=profile_obj)
+            if forms_ctx['contact_form'].is_valid():
+                forms_ctx['contact_form'].save()
+                messages.success(request, 'Kontak diperbarui.')
+                return redirect('main:profile')
+        elif action == 'password':
+            forms_ctx['password_form'] = ChangePasswordForm(user, request.POST)
+            if forms_ctx['password_form'].is_valid():
+                user = forms_ctx['password_form'].save()
+                update_session_auth_hash(request, user)  # tetap login setelah ganti password
+                messages.success(request, 'Password berhasil diubah.')
+                return redirect('main:profile')
+        elif action == 'delete':
+            forms_ctx['delete_form'] = DeleteAccountForm(user, request.POST)
+            if forms_ctx['delete_form'].is_valid():
+                profile_obj.avatar.delete(save=False)  # hapus file foto dari storage
+                logout(request)
+                user.delete()  # data milik user di modul lain ikut terhapus (CASCADE)
+                messages.success(request, 'Akunmu sudah dihapus. Sampai jumpa lagi!')
+                return redirect('main:home')
+
+    return render(request, 'main/profile.html', {
+        **forms_ctx,
+        'profile': profile_obj,
+        # Hitungan read-only dari relasi modul lain (related_name milik masing-masing model)
+        'stats': {
+            'patches': request.user.eco_patches.count(),
+            'journals': request.user.garden_journals.count(),
+            'listings': request.user.seed_listings.count(),
+        },
+    })
 
 
 def logout_view(request):

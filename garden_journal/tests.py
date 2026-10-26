@@ -120,3 +120,51 @@ class GardenJournalViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Buku Jurnal: Cabai")
         self.assertContains(response, "Catatan Azizah")
+
+    def test_create_journal_without_ecopatch_shows_warning(self):
+        self.client.login(username="azizah", password="password123")
+        response = self.client.get(reverse("garden_journal:create"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Kamu Belum Punya EcoPatch")
+
+    def test_create_journal_existing_plant_starts_at_step_2(self):
+        from my_ecopatch.models import EcoPatch
+        EcoPatch.objects.create(owner=self.user, name="Balkon", space_type="balcony", city="Jakarta")
+        self.client.login(username="azizah", password="password123")
+        response = self.client.get(reverse("garden_journal:create"), {"plant_name": "Cabai"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["start_at_step_2"])
+
+    def test_edit_journal_starts_at_step_2(self):
+        self.client.login(username="azizah", password="password123")
+        response = self.client.get(reverse("garden_journal:edit", args=[self.journal.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["start_at_step_2"])
+        # Pastikan tidak ada wizard bar dan setup section pada edit
+        self.assertNotContains(response, 'id="wizardStepsBar"')
+        self.assertNotContains(response, 'id="sectionSetup"')
+        self.assertNotContains(response, 'Ubah Setup / Sampul')
+        self.assertNotContains(response, 'Kembali ke Setup')
+
+    def test_quick_upload_photo(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        self.client.login(username="azizah", password="password123")
+        # 1x1 GIF dummy
+        dummy_gif = (
+            b"\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00"
+            b"\xff\xff\xff\x00\x00\x00\x21\xf9\x04\x01\x00\x00\x00"
+            b"\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02"
+            b"\x44\x01\x00\x3b"
+        )
+        photo = SimpleUploadedFile("tanaman.gif", dummy_gif, content_type="image/gif")
+        response = self.client.post(
+            reverse("garden_journal:upload_photo", args=[self.journal.pk]),
+            {"image": photo},
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data.get("success"))
+        self.assertTrue(data.get("image_url"))
+        self.journal.refresh_from_db()
+        self.assertTrue(self.journal.image)
+

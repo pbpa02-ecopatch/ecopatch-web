@@ -11,6 +11,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='main/login.html', redirect_authenticated_user=True), name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('profile/', views.profile, name='profile'),
 
     # "Lupa password": ask for the email, send a link, choose a new password
     path('lupa-password/', views.PasswordResetView.as_view(), name='password_reset'),

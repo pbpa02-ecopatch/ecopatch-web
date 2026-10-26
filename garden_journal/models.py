@@ -19,6 +19,13 @@ class GardenJournal(models.Model):
         ("seeds", "Seeds"),
         ("soft", "Soft"),
         ("leaves", "Leaves"),
+        ("bark", "Bark"),
+        ("terra", "Terra"),
+        ("moss", "Moss"),
+        ("clay", "Clay"),
+        ("pebbles", "Pebbles"),
+        ("polkadot", "Polkadot"),
+        ("solid", "Solid Color"),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="garden_journals")
@@ -51,6 +58,12 @@ class GardenJournal(models.Model):
         default="flowers",
         help_text="Sampul buku jurnal",
     )
+    cover_color = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        help_text="Warna hex untuk sampul polos (misal: #1f9142)",
+    )
     image = models.ImageField(
         upload_to="journal_photos/",
         blank=True,
@@ -78,3 +91,16 @@ class GardenJournal(models.Model):
             "ready_to_harvest": "secondary",
         }
         return badge_map.get(self.plant_condition, "secondary")
+
+    @property
+    def get_condition_ds_class(self):
+        """Mapping status condition ke kelas badge Design System (badge-ds-*)."""
+        ds_map = {
+            "healthy": "badge-ds-healthy",
+            "needs_attention": "badge-ds-attention",
+            "wilting": "badge-ds-wilting",
+            "flowering": "badge-ds-flowering",
+            "fruiting": "badge-ds-planned",
+            "ready_to_harvest": "badge-ds-healthy",
+        }
+        return ds_map.get(self.plant_condition, "badge-ds-attention")

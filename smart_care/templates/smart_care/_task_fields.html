@@ -1,0 +1,27 @@
+{% if form.non_field_errors %}
+    <div class="care-form-alert" role="alert">{{ form.non_field_errors|join:" " }}</div>
+{% endif %}
+{% if not form.has_plants %}
+    <div class="care-form-alert" role="status">
+        Belum ada tanaman yang sedang ditanam. Tambahkan di <a href="{% url 'my_ecopatch:list' %}">My EcoPatch</a>, lalu ubah statusnya menjadi Planted atau Growing.
+    </div>
+{% endif %}
+{% for field in form %}
+    {% if field.field.widget.input_type == "checkbox" %}
+        <div class="care-field care-field-check{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>
+            {% if field.help_text %}<small class="care-help">{{ field.help_text }}</small>{% endif %}
+            {% if field.errors %}<div class="care-field-error">{{ field.errors|join:" " }}</div>{% endif %}
+        </div>
+    {% else %}
+        <div class="care-field{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+                <div class="care-field-error">{{ field.errors|join:" " }}</div>
+            {% elif field.help_text %}
+                <small class="care-help">{{ field.help_text }}</small>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endfor %}

@@ -1,8 +1,24 @@
+import re
+import tempfile
+from io import BytesIO
+from urllib.parse import quote
+
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from PIL import Image as PILImage
+
+from main.models import Profile
 
 from .models import SeedExchange
+
+
+def make_image_upload(name='bibit.png'):
+    """Small in-memory PNG for upload tests."""
+    buffer = BytesIO()
+    PILImage.new('RGB', (24, 24), '#4a7c59').save(buffer, format='PNG')
+    return SimpleUploadedFile(name, buffer.getvalue(), content_type='image/png')
 
 
 def make_user(username='rheina', password='test123'):
@@ -45,14 +61,40 @@ class SeedExchangeViewTests(TestCase):
         self.other = make_user('teman', 'test123')
         self.listing = make_listing(self.owner)
 
-    def test_guest_can_view_list(self):
-        response = self.client.get(reverse('seed_exchange:list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Bibit Cabai Rawit')
+    def test_a_new_listing_starts_with_the_contact_from_the_profile(self):
+        Profile.objects.create(user=self.other, whatsapp='6281234567890', instagram='kebunku')
+        self.client.login(username='teman', password='test123')
+        response = self.client.get(reverse('seed_exchange:create'))
+        self.assertContains(response, 'WhatsApp +62 812-3456-7890 / Instagram @kebunku')
 
-    def test_guest_can_view_detail(self):
-        response = self.client.get(reverse('seed_exchange:detail', args=[self.listing.pk]))
-        self.assertEqual(response.status_code, 200)
+    def test_without_a_profile_contact_the_field_starts_empty(self):
+        self.client.login(username='teman', password='test123')
+        response = self.client.get(reverse('seed_exchange:create'))
+        self.assertFalse(response.context['form']['contact'].value())
+
+    def test_editing_a_listing_keeps_its_own_contact_not_the_profile_one(self):
+        Profile.objects.create(user=self.owner, whatsapp='6281234567890')
+        self.client.login(username='rheina', password='test123')
+        response = self.client.get(reverse('seed_exchange:update', args=[self.listing.pk]))
+        self.assertNotContains(response, '+62 812-3456-7890')
+
+    def test_guest_list_redirects_to_login(self):
+        url = reverse('seed_exchange:list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, f'/login/?next={quote(url)}')
+
+    def test_guest_htmx_list_redirects_to_login(self):
+        url = reverse('seed_exchange:list')
+        response = self.client.get(url, HTTP_HX_REQUEST='true')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, f'/login/?next={quote(url)}')
+
+    def test_guest_detail_redirects_to_login(self):
+        url = reverse('seed_exchange:detail', args=[self.listing.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, f'/login/?next={quote(url)}')
 
     def test_guest_cannot_access_create(self):
         response = self.client.get(reverse('seed_exchange:create'))
@@ -60,19 +102,37 @@ class SeedExchangeViewTests(TestCase):
 
     def test_create_sets_owner(self):
         self.client.login(username='rheina', password='test123')
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            response = self.client.post(reverse('seed_exchange:create'), {
+                'title': 'Stek Sirih Gading',
+                'item_type': 'cutting',
+                'plant_name': 'Sirih Gading',
+                'city': 'Jakarta',
+                'contact': '0812-1111-2222',
+                'transaction_type': 'swap',
+                'status': 'available',
+                'description': 'Mau tukar dengan stek tanaman indoor lain.',
+                'image': make_image_upload(),
+            })
+            listing = SeedExchange.objects.get(title='Stek Sirih Gading')
+            self.assertEqual(listing.user, self.owner)
+            self.assertRedirects(response, reverse('seed_exchange:detail', args=[listing.pk]))
+
+    def test_create_requires_image(self):
+        self.client.login(username='rheina', password='test123')
         response = self.client.post(reverse('seed_exchange:create'), {
-            'title': 'Stek Sirih Gading',
-            'item_type': 'cutting',
-            'plant_name': 'Sirih Gading',
-            'city': 'Jakarta',
-            'contact': '0812-1111-2222',
-            'transaction_type': 'swap',
+            'title': 'Tanpa foto',
+            'item_type': 'seed',
+            'plant_name': '',
+            'city': 'Depok',
+            'contact': '0812-0000-0000',
+            'transaction_type': 'giveaway',
             'status': 'available',
-            'description': 'Mau tukar dengan stek tanaman indoor lain.',
+            'description': '',
         })
-        listing = SeedExchange.objects.get(title='Stek Sirih Gading')
-        self.assertEqual(listing.user, self.owner)
-        self.assertRedirects(response, reverse('seed_exchange:detail', args=[listing.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Foto listing wajib diunggah.')
+        self.assertFalse(SeedExchange.objects.filter(title='Tanpa foto').exists())
 
     def test_create_requires_contact(self):
         self.client.login(username='rheina', password='test123')
@@ -95,6 +155,67 @@ class SeedExchangeViewTests(TestCase):
         self.assertIn('data-seed-select', content)
         self.assertNotIn('---------', content)
         self.assertIn('wajib diisi', content)
+        self.assertIn('enctype="multipart/form-data"', content)
+        self.assertIn('seed-upload-zone', content)
+
+    def test_create_accepts_image_upload(self):
+        self.client.login(username='rheina', password='test123')
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            response = self.client.post(reverse('seed_exchange:create'), {
+                'title': 'Bibit dengan foto',
+                'item_type': 'seedling',
+                'plant_name': 'Tomat',
+                'city': 'Depok',
+                'contact': '0812-3333-4444',
+                'transaction_type': 'giveaway',
+                'status': 'available',
+                'description': 'Bibit tomat siap tanam.',
+                'image': make_image_upload(),
+            })
+            listing = SeedExchange.objects.get(title='Bibit dengan foto')
+            self.assertTrue(listing.image.name.startswith('seed_exchange/'))
+            self.assertRedirects(response, reverse('seed_exchange:detail', args=[listing.pk]))
+
+    def test_update_keeps_existing_image(self):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            self.listing.image = make_image_upload()
+            self.listing.save()
+            original_name = self.listing.image.name
+            self.client.login(username='rheina', password='test123')
+            response = self.client.post(reverse('seed_exchange:update', args=[self.listing.pk]), {
+                'title': 'Judul baru',
+                'item_type': self.listing.item_type,
+                'plant_name': self.listing.plant_name,
+                'city': self.listing.city,
+                'contact': self.listing.contact,
+                'transaction_type': self.listing.transaction_type,
+                'status': self.listing.status,
+                'description': 'Deskripsi baru.',
+            })
+            self.assertRedirects(response, reverse('seed_exchange:detail', args=[self.listing.pk]))
+            self.listing.refresh_from_db()
+            self.assertEqual(self.listing.title, 'Judul baru')
+            self.assertEqual(self.listing.image.name, original_name)
+
+    def test_update_replaces_image(self):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            self.listing.image = make_image_upload('lama.png')
+            self.listing.save()
+            self.client.login(username='rheina', password='test123')
+            response = self.client.post(reverse('seed_exchange:update', args=[self.listing.pk]), {
+                'title': self.listing.title,
+                'item_type': self.listing.item_type,
+                'plant_name': self.listing.plant_name,
+                'city': self.listing.city,
+                'contact': self.listing.contact,
+                'transaction_type': self.listing.transaction_type,
+                'status': self.listing.status,
+                'description': self.listing.description,
+                'image': make_image_upload('baru.png'),
+            })
+            self.assertRedirects(response, reverse('seed_exchange:detail', args=[self.listing.pk]))
+            self.listing.refresh_from_db()
+            self.assertTrue(self.listing.image.name.endswith('baru.png'))
 
     def test_non_owner_cannot_edit(self):
         self.client.login(username='teman', password='test123')
@@ -122,13 +243,15 @@ class SeedExchangeViewTests(TestCase):
         self.assertFalse(SeedExchange.objects.filter(pk=self.listing.pk).exists())
 
     def test_filter_by_city_and_status(self):
-        make_listing(self.owner, title='Bibit Tomat Ceri', city='Bandung', status='reserved')
-        url = reverse('seed_exchange:list') + '?city=Bandung&status=reserved'
+        self.client.login(username='teman', password='test123')
+        make_listing(self.owner, title='Bibit Tomat Ceri', city='Bandung', status='available')
+        url = reverse('seed_exchange:list') + '?city=Bandung&status=available'
         response = self.client.get(url)
         self.assertContains(response, 'Bibit Tomat Ceri')
         self.assertNotContains(response, 'Bibit Cabai Rawit')
 
     def test_custom_dropdowns_render_with_labels(self):
+        self.client.login(username='rheina', password='test123')
         response = self.client.get(reverse('seed_exchange:list'))
         self.assertContains(response, 'seed-menu')
         self.assertContains(response, 'Semua kota')
@@ -137,12 +260,52 @@ class SeedExchangeViewTests(TestCase):
         self.assertContains(response, 'transaction_type=swap')
 
     def test_htmx_returns_partial(self):
+        self.client.login(username='teman', password='test123')
         response = self.client.get(
             reverse('seed_exchange:list'),
             HTTP_HX_REQUEST='true',
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn('seed-card', response.content.decode())
+
+    def test_create_ignores_posted_status(self):
+        self.client.login(username='rheina', password='test123')
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            self.client.post(reverse('seed_exchange:create'), {
+                'title': 'Status diselundupkan',
+                'item_type': 'seed',
+                'plant_name': '',
+                'city': 'Depok',
+                'contact': '0812-0000-0000',
+                'transaction_type': 'giveaway',
+                'status': 'completed',
+                'description': '',
+                'image': make_image_upload(),
+            })
+        listing = SeedExchange.objects.get(title='Status diselundupkan')
+        self.assertEqual(listing.status, SeedExchange.Status.AVAILABLE)
+
+    def test_create_form_hides_status_field(self):
+        self.client.login(username='rheina', password='test123')
+        content = self.client.get(reverse('seed_exchange:create')).content.decode()
+        self.assertNotIn('id_status', content)
+
+    def test_detail_back_link_returns_to_previous_tab(self):
+        self.client.login(username='rheina', password='test123')
+        url = reverse('seed_exchange:detail', args=[self.listing.pk]) + '?tab=mine'
+        response = self.client.get(url)
+        self.assertContains(response, 'href="/seed-exchange/?tab=mine"')
+
+    def test_detail_back_link_uses_last_visited_tab(self):
+        self.client.login(username='rheina', password='test123')
+        self.client.get(reverse('seed_exchange:list') + '?tab=mine')
+        response = self.client.get(reverse('seed_exchange:detail', args=[self.listing.pk]))
+        self.assertContains(response, 'href="/seed-exchange/?tab=mine"')
+
+    def test_card_links_keep_current_tab(self):
+        self.client.login(username='rheina', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=mine')
+        self.assertContains(response, f'href="/seed-exchange/{self.listing.pk}/?tab=mine"')
 
 
 class SeedExchangeFlowTests(TestCase):
@@ -161,11 +324,16 @@ class SeedExchangeFlowTests(TestCase):
     def test_my_section_separates_own_listings(self):
         self.client.login(username='rheina', password='test123')
         response = self.client.get(reverse('seed_exchange:list'))
+        # Tab navigation present
         self.assertContains(response, 'Listing Saya')
-        self.assertContains(response, 'Jelajahi Listing')
-        # Own listing not duplicated in browse section.
+        self.assertContains(response, 'Booking Saya')
+        self.assertContains(response, 'Jelajahi')
+        # Default tab is 'browse' (Jelajahi) - own listing should NOT appear there
         content = response.content.decode()
-        self.assertEqual(content.count('Bibit Cabai Rawit'), 1)
+        self.assertEqual(content.count('Bibit Cabai Rawit'), 0)
+        # Own listing appears in 'mine' tab via HTMX
+        response_mine = self.client.get(reverse('seed_exchange:list') + '?tab=mine', HTTP_HX_REQUEST='true')
+        self.assertContains(response_mine, 'Bibit Cabai Rawit')
 
     def test_other_can_reserve_available(self):
         self.client.login(username='teman', password='test123')
@@ -189,13 +357,13 @@ class SeedExchangeFlowTests(TestCase):
         response = self.client.post(reverse('seed_exchange:accept', args=[self.listing.pk]))
         self.assertEqual(response.status_code, 404)
 
-    def test_requester_sees_waiting_box_with_contact(self):
+    def test_requester_sees_waiting_box_without_contact(self):
         self._request_booking()
         self.client.login(username='teman', password='test123')
         content = self.client.get(reverse('seed_exchange:detail', args=[self.listing.pk])).content.decode()
         self.assertIn('menunggu konfirmasi', content)
-        self.assertIn('@rheina', content)
-        self.assertIn('0812-0000-0000', content)
+        self.assertNotIn('@rheina', content)
+        self.assertNotIn('0812-0000-0000', content)
         self.assertIn('Batalkan booking saya', content)
 
     def test_accepted_requester_sees_contact_no_cancel(self):
@@ -299,7 +467,7 @@ class SeedExchangeFlowTests(TestCase):
 
     def test_my_section_has_add_card_and_clean_cards(self):
         self.client.login(username='rheina', password='test123')
-        response = self.client.get(reverse('seed_exchange:list'))
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=mine')
         content = response.content.decode()
         # Dashed "New Listing" card at end of My Listings grid.
         self.assertIn('seed-card-add', content)
@@ -309,3 +477,83 @@ class SeedExchangeFlowTests(TestCase):
         self.assertNotContains(response, 'Buka kembali')
         self.assertNotContains(response, '>Reserve<')
         self.assertNotContains(response, '>Ubah<')
+
+
+class SeedExchangeTabAndFilterTests(TestCase):
+    """Section tabs + filters must not fight each other."""
+
+    def setUp(self):
+        self.owner = make_user('rheina')
+        self.other = make_user('teman', 'test123')
+        self.mine = make_listing(self.owner, title='Bibit Cabai Rawit', city='Depok')
+        self.other_bandung = make_listing(self.other, title='Stek Monstera', city='Bandung')
+        self.other_jakarta = make_listing(self.other, title='Biji Kemangi', city='Jakarta')
+
+    def test_tab_links_contain_a_single_tab_param(self):
+        self.client.login(username='rheina', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=mine&city=Depok')
+        content = response.content.decode()
+        # Regression: `active` used to leak `tab` into every link, producing
+        # ?tab=mine&...&tab=browse and Django read the LAST value (browse).
+        urls = re.findall(r'\?tab=[^"\s]+', content)
+        self.assertTrue(urls)
+        for url in urls:
+            self.assertEqual(url.count('tab='), 1, url)
+        self.assertIn('?tab=mine&city=Depok', content)
+
+    def test_tab_switch_keeps_filters(self):
+        self.client.login(username='rheina', password='test123')
+        for tab in ('bookings', 'browse', 'mine'):
+            response = self.client.get(
+                reverse('seed_exchange:list') + f'?tab={tab}&city=Bandung',
+                HTTP_HX_REQUEST='true',
+            )
+            self.assertContains(response, 'seed-filter--active')
+            self.assertContains(response, f'value="{tab}"')
+            self.assertContains(response, f'id="panel-{tab}"')
+            self.assertContains(response, f'aria-selected="true"', count=1)
+
+    def test_filter_link_keeps_current_tab(self):
+        self.client.login(username='rheina', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=mine')
+        self.assertContains(response, 'tab=mine&amp;item_type=seedling')
+
+    def test_reset_link_drops_filters_and_filter_form_does_not_inherit_include(self):
+        self.client.login(username='rheina', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=mine&city=Bandung')
+        content = response.content.decode()
+        # Reset must point at a clean URL (keeping only the current tab).
+        reset_urls = re.findall(r'class="seed-filter-reset" href="([^"]+)"', content)
+        self.assertEqual(reset_urls, ['/seed-exchange/?tab=mine'])
+        # Regression: hx-include on the form was inherited by filter/reset links,
+        # appending the old values after the new URL (so both seemed dead).
+        form_tag = re.search(r'<form id="seed-filter-form".*?>', content, re.S).group(0)
+        self.assertNotIn('hx-include', form_tag)
+
+    def test_two_filters_do_not_collapse(self):
+        self.client.login(username='rheina', password='test123')
+        url = reverse('seed_exchange:list') + '?tab=browse&city=Bandung&transaction_type=giveaway'
+        response = self.client.get(url, HTTP_HX_REQUEST='true')
+        content = response.content.decode()
+        self.assertIn('city=Bandung&amp;transaction_type=giveaway', content)
+        self.assertContains(response, 'Stek Monstera')
+        self.assertNotContains(response, 'Biji Kemangi')
+
+    def test_guest_cannot_view_sections_or_my_tab(self):
+        # The whole page (including HTMX swaps) is behind login now.
+        response = self.client.get(reverse('seed_exchange:list'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response.url)
+        guest_mine = self.client.get(reverse('seed_exchange:list') + '?tab=mine', HTTP_HX_REQUEST='true')
+        self.assertEqual(guest_mine.status_code, 302)
+        self.assertIn('/login/', guest_mine.url)
+
+    def test_booked_listing_not_in_browse(self):
+        self.mine.status = SeedExchange.Status.REQUESTED
+        self.mine.reserved_by = self.other
+        self.mine.save()
+        self.client.login(username='teman', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=browse', HTTP_HX_REQUEST='true')
+        self.assertNotContains(response, 'Bibit Cabai Rawit')
+        bookings = self.client.get(reverse('seed_exchange:list') + '?tab=bookings', HTTP_HX_REQUEST='true')
+        self.assertContains(bookings, 'Bibit Cabai Rawit')

@@ -133,6 +133,11 @@
         color: var(--ink);
         font-weight: 600;
     }
+    .plant-spec-note {
+        font-size: 0.82rem;
+        color: var(--ink-muted);
+        margin-top: 2px;
+    }
     .plant-desc-box {
         padding: 0 32px 32px;
     }
@@ -250,6 +255,7 @@
                         <div>
                             <div class="plant-spec-label">Frekuensi Penyiraman</div>
                             <div class="plant-spec-val">{{ plant.get_watering_display }}</div>
+                            <div class="plant-spec-note">Smart Care menyarankan menyiram sekitar tiap {{ plant.watering_interval_days }} hari</div>
                         </div>
                     </div>
 

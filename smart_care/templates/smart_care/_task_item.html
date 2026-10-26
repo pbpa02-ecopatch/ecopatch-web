@@ -1,0 +1,34 @@
+{% load i18n %}<li class="care-task{% if task.is_completed %} is-done{% endif %}" id="task-{{ task.pk }}"
+    data-plant="{{ task.plant_name }}" data-type="{{ task.task_type }}" data-outdoor="{{ task.is_outdoor|yesno:'1,0' }}"
+    data-due="{{ task.due_date|date:'Y-m-d' }}" data-complete-url="{% url 'smart_care:complete' task.pk %}"{% if overdue %} data-overdue{% endif %}>
+    <button type="button" class="care-check" role="checkbox" aria-checked="{{ task.is_completed|yesno:'true,false' }}"
+            aria-label="Tandai {{ task.plant_name }} ({{ task.get_task_type_display }}) selesai">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+    </button>
+    <span class="care-tb is-{{ task.task_type }}" aria-hidden="true">{% include "smart_care/_type_icon.html" with type=task.task_type %}</span>
+    <div class="care-task-body">
+        <div class="care-task-line">
+            <span class="care-task-name">{{ task.plant_name }}</span>
+            <small class="care-task-place">{% if task.is_outdoor %}Outdoor{% else %}Indoor{% endif %}</small>
+        </div>
+        <div class="care-task-meta">
+            <span>{{ task.get_task_type_display }}</span>
+            {% if overdue %}{% language 'id' %}<span>{{ task.due_date|date:"j M" }}</span>{% endlanguage %}<span class="care-late">Terlambat {{ task.days_late }} hari</span>{% endif %}
+            {% if task.source == "suggested" %}<span class="care-tag">Saran</span>{% endif %}
+        </div>
+        {% if task.notes %}<span class="care-task-notes">{{ task.notes|truncatechars:90 }}</span>{% endif %}
+        <div class="care-hint" hidden></div>
+    </div>
+    <div class="care-task-actions">
+        <a href="{% url 'smart_care:update' task.pk %}" class="care-act" aria-label="Edit {{ task.plant_name }}" title="Edit"
+           hx-get="{% url 'smart_care:update' task.pk %}" hx-target="#care-modal-content"
+           data-bs-toggle="modal" data-bs-target="#care-modal">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1z"/><path d="M14.5 6.5l3 3"/></svg>
+        </a>
+        <button type="button" class="care-act care-act-danger" aria-label="Hapus {{ task.plant_name }}" title="Hapus"
+                data-delete-url="{% url 'smart_care:delete' task.pk %}"
+                data-delete-name="{{ task.plant_name }} ({{ task.get_task_type_display }})">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13"/></svg>
+        </button>
+    </div>
+</li>

@@ -59,6 +59,58 @@
     }
     .seed-error { margin-top: 6px; font-size: 13px; color: color-mix(in srgb, var(--danger) 75%, var(--ink)); }
     .seed-form-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+    /* --- Foto listing --- */
+    .seed-file-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+    }
+    .seed-uploader { display: flex; flex-direction: column; gap: 10px; }
+    .seed-upload-zone {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        border: 1.5px dashed var(--border);
+        border-radius: 20px;
+        background: var(--surface-100);
+        cursor: pointer;
+        transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+    .seed-upload-zone:hover {
+        border-color: var(--brand-500);
+        background: color-mix(in srgb, var(--brand-300) 18%, var(--surface-100));
+    }
+    .seed-file-input:focus-visible + .seed-upload-zone {
+        outline: 3px solid var(--brand-300);
+        outline-offset: 2px;
+    }
+    .seed-upload-visual {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 96px;
+        height: 96px;
+        overflow: hidden;
+        border-radius: 16px;
+        background:
+            radial-gradient(circle at 95% 0%, color-mix(in srgb, var(--accent-mango) 26%, transparent), transparent 55%),
+            linear-gradient(140deg, color-mix(in srgb, var(--brand-300) 70%, var(--surface-200)), color-mix(in srgb, var(--brand-300) 25%, var(--surface-200)));
+        color: color-mix(in srgb, var(--brand-600) 55%, transparent);
+    }
+    .seed-upload-visual img { width: 100%; height: 100%; object-fit: cover; }
+    .seed-upload-visual svg { width: 44px; height: 44px; }
+    .seed-upload-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .seed-upload-title { color: var(--ink); font-size: 14.5px; font-weight: 700; overflow-wrap: anywhere; }
+    .seed-upload-hint { color: var(--ink-muted); font-size: 13px; line-height: 1.5; }
 </style>
 {% endblock %}
 
@@ -68,13 +120,43 @@
     <p class="seed-form-lead">Bagikan atau tukar bibit, stek, biji, dan tanamanmu.</p>
     <p class="seed-form-legend"><span class="seed-required">*</span> wajib diisi</p>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.non_field_errors %}
             <div class="alert alert-danger">{{ form.non_field_errors }}</div>
         {% endif %}
         {% for row in rows %}
             {% with field=row.field %}
+            {% if field.name == 'image' %}
+            <div class="seed-field">
+                <span class="seed-label">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="seed-required" aria-hidden="true">*</span>
+                    {% else %}<span class="seed-optional-tag">(opsional)</span>{% endif %}
+                </span>
+                <div class="seed-uploader" data-seed-uploader>
+                    {{ field }}
+                    <label class="seed-upload-zone" for="{{ field.id_for_label }}">
+                        <span class="seed-upload-visual" data-seed-preview>
+                            {% if listing.image %}
+                            <img src="{{ listing.image.url }}" alt="Foto listing saat ini" data-seed-preview-img>
+                            {% else %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-seed-placeholder>
+                                <path d="M12 21v-9.5"/>
+                                <path d="M12 12.5C12 8.6 9 5.5 4 5.5c0 4.9 3 8 8 7Z"/>
+                                <path d="M12 14.5c0-3.9 3-7 8-7 0 4.9-3 8-8 7Z"/>
+                            </svg>
+                            {% endif %}
+                        </span>
+                        <span class="seed-upload-copy">
+                            <span class="seed-upload-title" data-seed-filename>{% if listing.image %}Ganti foto listing{% else %}Pilih foto listing{% endif %}</span>
+                            <span class="seed-upload-hint">JPG/PNG, maks 5 MB. Foto asli bibit/stekmu bikin listing lebih cepat dilirik.</span>
+                        </span>
+                    </label>
+                </div>
+                {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
+            </div>
+            {% else %}
             <div class="seed-field">
                 <label class="seed-label" for="id_{{ field.name }}">
                     {{ field.label }}
@@ -101,6 +183,7 @@
                 {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
                 {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
             </div>
+            {% endif %}
             {% endwith %}
         {% endfor %}
         <div class="seed-form-actions">
@@ -123,6 +206,34 @@ document.querySelectorAll('[data-seed-select]').forEach(function (root) {
             root.querySelectorAll('[data-seed-option]').forEach(function (b) { b.classList.remove('active'); });
             btn.classList.add('active');
         });
+    });
+});
+
+document.querySelectorAll('[data-seed-uploader]').forEach(function (root) {
+    var input = root.querySelector('input[type="file"]');
+    if (!input) return;
+    var preview = root.querySelector('[data-seed-preview]');
+    var filename = root.querySelector('[data-seed-filename]');
+    var defaultLabel = filename ? filename.textContent : '';
+
+    input.addEventListener('change', function () {
+        var file = input.files && input.files[0];
+        if (!file) {
+            if (filename) filename.textContent = defaultLabel;
+            return;
+        }
+        if (filename) filename.textContent = file.name;
+        if (!preview) return;
+        var img = preview.querySelector('img');
+        if (!img) {
+            img = document.createElement('img');
+            img.setAttribute('data-seed-preview-img', '');
+            preview.appendChild(img);
+        }
+        img.src = URL.createObjectURL(file);
+        img.alt = 'Pratinjau foto listing';
+        var placeholder = preview.querySelector('[data-seed-placeholder]');
+        if (placeholder) placeholder.remove();
     });
 });
 </script>

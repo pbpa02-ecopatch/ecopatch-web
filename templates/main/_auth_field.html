@@ -1,0 +1,18 @@
+<div class="auth-field{% if field.errors %} has-error{% endif %}">
+    <label class="auth-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {% if field.field.widget.input_type == "password" %}
+        <div class="auth-password">
+            {{ field }}
+            <button type="button" class="auth-toggle" data-toggle-password aria-label="Tampilkan password" aria-pressed="false">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+        </div>
+    {% else %}
+        {{ field }}
+    {% endif %}
+    {% if field.errors %}
+        <div class="auth-error">{{ field.errors|join:" " }}</div>
+    {% elif show_help and field.help_text %}
+        <div class="auth-help">{{ field.help_text|safe }}</div>
+    {% endif %}
+</div>

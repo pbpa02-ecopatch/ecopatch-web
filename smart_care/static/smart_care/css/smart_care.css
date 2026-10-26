@@ -1,0 +1,2032 @@
+/* Smart Care: the landing's world inside the app. A full-width balcony scene reacts to the weather of the selected
+   day, then a cream sheet with the calendar, the garden, the tasks as plain rows and a light footer.
+   Every class is prefixed care- so nothing leaks into the other modules. Tokens are --care-* for the same reason. */
+:root {
+    --care-sheet-top: #fdf7e8;
+    --care-sheet-bot: #faefd5;
+    --care-line: rgba(182, 154, 99, 0.38);
+    --care-line-strong: #b9a46a;
+    --care-soil: #8a6a4a;
+    --care-fg: #17301f;
+    --care-muted: #4c6853;
+    --care-brand: #2fbf5c;
+    --care-brand-strong: #167a38;
+    --care-brand-edge: #0f5a28;
+    --care-brand-soft: #e2f4e5;
+    --care-mango: #ff9d2e;
+    --care-rain: #1f6f99;
+    --care-rain-bg: #dcedf3;
+    --care-water: #4aa6cf;
+    --care-warn: #9a4a12;
+    --care-warn-bg: #fde5cb;
+    --care-late: #a3301f;
+    --care-late-bg: #fbdcd5;
+    --care-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+    --care-body: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    /* the floating sidebar (custom.css) is this wide plus a gap on each side; on a phone there is none */
+    --care-offset: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2);
+}
+
+/* The scene runs under the floating sidebar, so the page does not make room for it with padding */
+body.has-sidebar.care-body {
+    padding-left: 0;
+    background: var(--care-sheet-bot);
+}
+
+.care-page [hidden] {
+    display: none !important;
+}
+
+.care-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.care-page {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    color: var(--care-fg);
+    font: 400 1rem/1.55 var(--care-body);
+    -webkit-text-size-adjust: 100%;
+}
+
+.care-page svg {
+    flex: none;
+}
+
+.care-page :focus-visible {
+    outline: 3px solid var(--care-mango);
+    outline-offset: 3px;
+    border-radius: 12px;
+}
+
+/* ---------------------------------------------------------------- Buttons */
+.care-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 50px;
+    padding: 0 24px;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    font: 700 1rem/1 var(--care-body);
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.2s, border-color 0.2s;
+}
+
+.care-btn svg {
+    width: 1.25em;
+    height: 1.25em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.care-btn-primary {
+    background: var(--care-brand-strong);
+    color: #fff;
+    box-shadow: 0 5px 0 var(--care-brand-edge);
+}
+
+.care-btn-primary:hover {
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 var(--care-brand-edge);
+}
+
+.care-btn-primary:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 var(--care-brand-edge);
+}
+
+.care-btn-ghost {
+    background: #fff;
+    border-color: var(--care-line-strong);
+    color: var(--care-fg);
+}
+
+.care-btn-ghost:hover {
+    border-color: var(--care-fg);
+    color: var(--care-fg);
+}
+
+.care-btn-danger {
+    background: #b3261e;
+    color: #fff;
+    box-shadow: 0 5px 0 #7d1a15;
+}
+
+.care-btn-danger:hover {
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 #7d1a15;
+}
+
+/* ---------------------------------------------------------------- Scene: the sky, the city, the balcony */
+.care-scene {
+    --fh: clamp(190px, 32vh, 260px);
+    position: relative;
+    overflow: hidden;
+    min-height: clamp(430px, 56vh, 520px);
+    /* the balcony owns the bottom --fh of the scene: the words stay above the railing, however short the screen is */
+    padding-bottom: calc(var(--fh) + 24px);
+    isolation: isolate;
+}
+
+.care-sk {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.9s ease;
+    z-index: -6;
+}
+
+.care-sk-clear {
+    background: linear-gradient(180deg, #fde9c0 0%, #fdd9a0 55%, #fcc885 100%);
+}
+
+.care-sk-soft {
+    background: linear-gradient(180deg, #e7ecea 0%, #f3e6c8 58%, #f7dcae 100%);
+}
+
+.care-sk-rain {
+    background: linear-gradient(180deg, #8eaebd 0%, #b6cdd0 52%, #e2e1c8 100%);
+}
+
+.care-scene[data-sky="clear"] .care-sk-clear,
+.care-scene[data-sky="soft"] .care-sk-soft,
+.care-scene[data-sky="rain"] .care-sk-rain {
+    opacity: 1;
+}
+
+.care-sun {
+    position: absolute;
+    left: 68%;
+    bottom: calc(var(--fh) + 10px);
+    width: clamp(180px, 22vw, 300px);
+    aspect-ratio: 1;
+    margin-left: calc(clamp(180px, 22vw, 300px) / -2);
+    z-index: -5;
+    transform: translateY(34%);
+    opacity: 0;
+    transition: opacity 1s ease, transform 1.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.care-sun i {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff6c9 0 34%, #ffd871 35% 56%, rgba(255, 200, 90, 0.45) 57% 72%, rgba(255, 200, 90, 0.16) 73% 86%, transparent 87%);
+}
+
+.care-scene[data-sky="clear"] .care-sun {
+    opacity: 1;
+}
+
+.care-scene[data-sky="soft"] .care-sun {
+    opacity: 0.55;
+    transform: translateY(48%);
+}
+
+.care-clouds {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 46%;
+    z-index: -4;
+    fill: #fff;
+    opacity: 0.35;
+    transition: opacity 0.9s, fill 0.9s;
+}
+
+.care-c1 {
+    transform: translate(8%, 38px) scale(1.6);
+    animation: care-drift 60s linear infinite alternate;
+}
+
+.care-c2 {
+    transform: translate(52%, 12px) scale(1.4);
+    animation: care-drift2 80s linear infinite alternate;
+}
+
+.care-c3 {
+    transform: translate(82%, 52px) scale(1.2);
+    animation: care-drift 70s linear infinite alternate;
+}
+
+@keyframes care-drift {
+    to { translate: 80px 0; }
+}
+
+@keyframes care-drift2 {
+    to { translate: -90px 0; }
+}
+
+.care-scene[data-sky="soft"] .care-clouds {
+    opacity: 0.85;
+}
+
+.care-scene[data-sky="rain"] .care-clouds {
+    opacity: 1;
+    fill: #dfe8ea;
+}
+
+.care-skyline {
+    position: absolute;
+    left: -3%;
+    width: 106%;
+    bottom: calc(var(--fh) * 0.17);
+    height: 170px;
+    z-index: -3;
+    transition: filter 0.9s;
+}
+
+.care-skyline.is-far {
+    opacity: 0.75;
+    bottom: calc(var(--fh) * 0.17 + 12px);
+}
+
+.care-scene[data-sky="rain"] .care-skyline {
+    filter: saturate(0.5) brightness(0.9);
+}
+
+.care-tint {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: linear-gradient(180deg, rgba(60, 100, 125, 0.08), rgba(60, 100, 125, 0.32));
+    opacity: 0;
+    transition: opacity 0.9s;
+}
+
+.care-scene[data-sky="rain"] .care-tint {
+    opacity: 1;
+}
+
+.care-rainfx {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.8s;
+    stroke: #5b93b3;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+}
+
+.care-scene[data-sky="rain"] .care-rainfx {
+    opacity: 0.75;
+}
+
+.care-rainfx line {
+    opacity: 0;
+    animation: care-fall 0.9s linear infinite;
+}
+
+@keyframes care-fall {
+    0% { opacity: 0; transform: translate(0, -30px); }
+    12% { opacity: 0.8; }
+    88% { opacity: 0.8; }
+    100% { opacity: 0; transform: translate(-14px, 110px); }
+}
+
+.care-floor {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: var(--fh);
+    display: block;
+    z-index: 2;
+}
+
+.care-floor .care-pp {
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.care-floor .care-pp .care-pet {
+    animation: care-breathe 3.8s ease-in-out infinite;
+    transform-origin: 50% 92%;
+}
+
+.care-floor .care-pet .care-p-sprout {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: care-sway 3.2s ease-in-out infinite;
+}
+
+.care-floor .care-pet .care-p-eyes {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: care-blink 4.8s infinite;
+}
+
+@keyframes care-breathe {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes care-sway {
+    0%, 100% { transform: rotate(-2.6deg); }
+    50% { transform: rotate(2.6deg); }
+}
+
+@keyframes care-blink {
+    0%, 91%, 100% { transform: scaleY(1); }
+    94.5% { transform: scaleY(0.08); }
+}
+
+.care-scene[data-pet="cheer"] .care-pp[data-k="cheer"],
+.care-scene[data-pet="happy"] .care-pp[data-k="happy"],
+.care-scene[data-pet="curious"] .care-pp[data-k="curious"],
+.care-scene[data-pet="proud"] .care-pp[data-k="proud"] {
+    opacity: 1;
+}
+
+.care-floor .care-pg {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: care-grow 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes care-grow {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+/* the planters' plants grow one after another, each with its own --g delay (set on its wrapper) */
+.care-floor .care-pw .care-pg {
+    animation-delay: var(--g);
+}
+
+.care-floor .care-umb {
+    opacity: 0;
+    transform: translateY(-16px);
+    transition: opacity 0.4s, transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.care-scene[data-sky="rain"] .care-floor .care-umb {
+    opacity: 1;
+    transform: none;
+}
+
+.care-scene[data-pet="proud"] .care-floor .care-umb {
+    opacity: 0;
+    transform: translateY(-16px);
+}
+
+.care-scene::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 10px;
+    background: linear-gradient(180deg, rgba(23, 48, 31, 0), rgba(23, 48, 31, 0.12));
+    z-index: 3;
+}
+
+/* ---------------------------------------------------------------- Scene: the words on top of it */
+.care-inner {
+    position: relative;
+    z-index: 4;
+    padding: clamp(28px, 6vh, 60px) 20px 0 20px;
+}
+
+.care-copy {
+    /* the room between the sidebar and the bubble above Petak (it starts in the middle of the scene) */
+    --care-room: calc(50vw - 16px - var(--care-offset) - 44px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    max-width: min(540px, var(--care-room));
+    margin-left: calc(var(--care-offset) + 24px);
+}
+
+.care-eyebrow {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--care-fg);
+}
+
+.care-title {
+    margin: 0;
+    font: 800 clamp(2.4rem, calc(var(--care-room) / 4.9), 4.6rem) / 0.95 var(--care-display);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+}
+
+.care-sum {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 6px 0 0;
+}
+
+.care-sum b {
+    font: 800 2.4rem/1 var(--care-display);
+}
+
+.care-sum span {
+    font-weight: 600;
+}
+
+.care-mini {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 16px;
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.care-mini span {
+    white-space: nowrap;
+}
+
+.care-mini b {
+    font-weight: 800;
+}
+
+.care-bubble {
+    position: absolute;
+    z-index: 5;
+    left: 50%;
+    bottom: calc(var(--fh) + 4px);
+    transform: translateX(-2%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: min(330px, calc(100% - 32px));
+    padding: 12px 16px 13px;
+    border-radius: 20px 20px 20px 6px;
+    background: #fff;
+    box-shadow: 0 14px 30px -14px rgba(23, 48, 31, 0.5);
+}
+
+.care-bubble::after {
+    content: "";
+    position: absolute;
+    left: 22px;
+    bottom: -9px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    transform: rotate(45deg) skew(10deg, 10deg);
+    border-radius: 0 0 4px 0;
+}
+
+.care-bubble p {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-wrap: pretty;
+}
+
+.care-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+}
+
+.care-pill.is-rain {
+    background: var(--care-rain);
+    color: #fff;
+}
+
+.care-pill.is-soft {
+    background: var(--care-rain-bg);
+    color: var(--care-rain);
+}
+
+.care-pill.is-ok {
+    background: var(--care-brand-soft);
+    color: var(--care-brand-strong);
+}
+
+.care-pill.is-heat {
+    background: var(--care-warn-bg);
+    color: var(--care-warn);
+}
+
+.care-pill.is-proud {
+    background: var(--care-brand-strong);
+    color: #fff;
+}
+
+.care-weather-error {
+    color: var(--care-late);
+    font-size: 0.85rem;
+}
+
+.care-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--care-brand-strong);
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- The sheet under the scene */
+.care-sheet {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    overflow-x: clip;
+    background: linear-gradient(180deg, var(--care-sheet-top) 0%, var(--care-sheet-top) 30%, var(--care-sheet-bot) 100%);
+}
+
+.care-sheet-in {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    --care-section-gap: 30px;
+    gap: var(--care-section-gap);
+    width: 100%;
+    max-width: calc(920px + var(--care-offset) + 48px);
+    margin: 0 auto;
+    padding: 30px 20px 0 calc(var(--care-offset) + 24px);
+}
+
+/* ---------------------------------------------------------------- Calendar: date, controls, week */
+.care-cal {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.care-daterow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.care-datehead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+}
+
+.care-date {
+    margin: 0;
+    font: 800 1.7rem/1.1 var(--care-display);
+    letter-spacing: -0.005em;
+}
+
+.care-jump {
+    margin: 0;
+}
+
+.care-ctl {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.care-ib {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1.5px solid var(--care-line-strong);
+    border-radius: 50%;
+    background: #fffdf6;
+    color: var(--care-fg);
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.care-ib:hover {
+    border-color: var(--care-fg);
+    color: var(--care-fg);
+    transform: translateY(-1px);
+}
+
+.care-ib svg {
+    width: 1.25em;
+    height: 1.25em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.care-lnk {
+    margin: 0 6px;
+    padding: 6px 4px 2px;
+    border-bottom: 2px solid var(--care-mango);
+    color: var(--care-brand-strong);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.care-lnk:hover {
+    color: var(--care-brand-strong);
+}
+
+.care-lnk.is-current {
+    border-bottom-color: transparent;
+    color: var(--care-muted);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.care-pickwrap {
+    position: relative;
+    display: inline-block;
+}
+
+/* the real date field sits invisibly over the button; the button opens its picker */
+.care-pickwrap input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.care-week {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--care-line);
+}
+
+.care-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-height: 116px;
+    padding: 10px 2px;
+    border-radius: 20px;
+    color: inherit;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.15s;
+}
+
+.care-day:hover {
+    background: rgba(47, 191, 92, 0.1);
+    color: inherit;
+}
+
+.care-day-name {
+    color: var(--care-muted);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.care-day-num {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    font: 800 1.5rem/1 var(--care-display);
+}
+
+.care-day.is-today .care-day-num::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 2px;
+    width: 22px;
+    height: 4px;
+    margin-left: -11px;
+    border-radius: 3px;
+    background: var(--care-mango);
+}
+
+.care-day-w {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    min-height: 18px;
+    color: var(--care-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.care-day-w svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.care-day-w > span {
+    font-weight: 600;
+}
+
+.care-day-w.is-heavy {
+    color: var(--care-rain);
+}
+
+.care-dots {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 10px;
+    margin-top: auto;
+}
+
+.care-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--care-brand);
+}
+
+.care-dot.is-pending {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.8px var(--care-muted);
+}
+
+.care-dot.is-late {
+    background: var(--care-late);
+}
+
+.care-dots small {
+    color: var(--care-muted);
+    font-size: 0.66rem;
+    font-weight: 700;
+}
+
+.care-day.is-selected {
+    background: var(--care-brand-strong);
+    color: #fff;
+    box-shadow: 0 5px 0 var(--care-brand-edge);
+    transform: translateY(-3px);
+}
+
+.care-day.is-selected .care-day-name,
+.care-day.is-selected .care-day-w {
+    color: #d6f2dc;
+}
+
+.care-day.is-selected .care-day-w.is-heavy {
+    color: #fff;
+}
+
+.care-day.is-selected .care-dot {
+    background: #fff;
+}
+
+.care-day.is-selected .care-dot.is-pending {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.8px #fff;
+}
+
+.care-day.is-selected .care-dot.is-late {
+    background: #ffb4a6;
+}
+
+.care-day.is-selected .care-dots small {
+    color: #d6f2dc;
+}
+
+/* ---------------------------------------------------------------- Garden: the plant grows with the finished tasks */
+.care-garden {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.care-garden .care-btn {
+    flex: none;
+}
+
+.care-gp {
+    width: 96px;
+    height: auto;
+    flex: none;
+    overflow: visible;
+}
+
+.care-gp .care-st {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    transform: scale(0);
+    transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.care-gp .care-seed {
+    transition: opacity 0.4s;
+}
+
+.care-gp[data-s="1"] .care-st1,
+.care-gp[data-s="2"] .care-st2,
+.care-gp[data-s="3"] .care-st3 {
+    transform: translate(0, 0) scale(1);
+}
+
+.care-gp:not([data-s="0"]) .care-seed {
+    opacity: 0;
+}
+
+.care-g-txt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.care-g-txt h3 {
+    margin: 0;
+    font: 800 1.4rem/1.1 var(--care-display);
+}
+
+.care-g-txt p {
+    margin: 0;
+    color: var(--care-muted);
+    font-weight: 500;
+}
+
+.care-bar {
+    max-width: 340px;
+    height: 8px;
+    margin-top: 8px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: rgba(185, 164, 106, 0.3);
+}
+
+.care-bar i {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: 99px;
+    background: var(--care-brand);
+    transition: width 0.6s cubic-bezier(0.3, 1.2, 0.5, 1);
+}
+
+.care-garden.is-empty .care-bar {
+    display: none;
+}
+
+/* ---------------------------------------------------------------- Pots: one per plant */
+.care-pots {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.care-pots-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+}
+
+.care-pots-head h3 {
+    margin: 0;
+    font: 800 1.45rem/1.1 var(--care-display);
+}
+
+.care-note {
+    margin: 0;
+    color: var(--care-muted);
+    font-size: 0.8rem;
+}
+
+.care-pot-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.care-pot-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    padding: 12px 8px 10px;
+    border: 1.5px solid var(--care-line);
+    border-radius: 22px;
+    background: rgba(255, 253, 246, 0.75);
+    color: var(--care-fg);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.care-pot-btn:hover,
+.care-pot-btn:focus-visible {
+    border-color: var(--care-brand);
+    transform: translateY(-2px);
+}
+
+.care-pot-svg {
+    width: 64px;
+    height: 76px;
+}
+
+.pot-body {
+    fill: rgba(74, 166, 207, 0.08);
+    stroke: rgba(23, 48, 31, 0.5);
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.pot-rim {
+    fill: #a2481a;
+}
+
+.pot-wave {
+    fill: var(--care-water);
+}
+
+/* The water is one shape slid up and down: --water is 1 right after watering and 0 when it is time */
+.pot-water {
+    transform: translateY(calc((1 - var(--water, 0)) * 46px));
+    transition: transform 0.6s cubic-bezier(0.34, 1.2, 0.5, 1);
+}
+
+.care-pot.is-filling .pot-wave {
+    animation: care-wave 0.55s linear 2;
+}
+
+@keyframes care-wave {
+    to { transform: translateX(-32px); }
+}
+
+.care-pot.is-empty .pot-body {
+    stroke-dasharray: 4 3;
+}
+
+.care-pot-name {
+    max-width: 100%;
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.care-pot-label {
+    color: var(--care-muted);
+    font-size: 0.78rem;
+}
+
+.care-pot.is-due .care-pot-btn {
+    border-color: var(--care-mango);
+    background: rgba(255, 157, 46, 0.14);
+    animation: care-pulse 1.8s ease-out 1;
+}
+
+.care-pot.is-due .pot-body {
+    stroke: var(--care-mango);
+}
+
+.care-pot.is-due .care-pot-label {
+    color: var(--care-warn);
+    font-weight: 700;
+}
+
+@keyframes care-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 157, 46, 0.55); }
+    70% { box-shadow: 0 0 0 12px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.care-pot-dots {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.care-pot-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--care-muted);
+    font-size: 0.68rem;
+    font-weight: 600;
+}
+
+.care-pot-dot i {
+    width: 8px;
+    height: 8px;
+    border: 1.5px solid var(--care-muted);
+    border-radius: 50%;
+}
+
+.care-pot-dot.is-on i {
+    border-color: var(--care-brand);
+    background: var(--care-brand);
+}
+
+/* ---------------------------------------------------------------- Tasks: plain rows on the ground */
+.care-lists {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+}
+
+.care-grp h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font: 800 1.45rem/1.1 var(--care-display);
+}
+
+.care-grp h3::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--care-soil);
+    opacity: 0.35;
+    order: 2;
+}
+
+.care-grp h3 .care-sprig {
+    width: 22px;
+    height: 22px;
+    margin-left: -4px;
+    fill: none;
+    stroke: var(--care-brand-strong);
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    order: 3;
+}
+
+.care-h-ico {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.care-cnt {
+    padding: 1px 9px;
+    border-radius: 99px;
+    background: rgba(185, 164, 106, 0.3);
+    font: 800 0.76rem var(--care-body);
+    font-variant-numeric: tabular-nums;
+    order: 1;
+}
+
+.care-grp-late h3 {
+    color: var(--care-late);
+}
+
+.care-grp-late h3::after {
+    background: var(--care-late);
+    opacity: 0.35;
+}
+
+.care-grp-late .care-cnt {
+    background: var(--care-late-bg);
+    color: var(--care-late);
+}
+
+.care-fold {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--care-muted);
+    font: 800 1.45rem/1.1 var(--care-display);
+    text-align: left;
+    cursor: pointer;
+}
+
+.care-fold::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: var(--care-soil);
+    opacity: 0.25;
+    order: 2;
+}
+
+.care-fold svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.2s;
+}
+
+.care-fold[aria-expanded="false"] svg {
+    transform: rotate(-90deg);
+}
+
+.care-list,
+.care-skipped-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.care-task {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 2px 14px;
+    padding: 16px 2px;
+    border-bottom: 1px solid var(--care-line);
+}
+
+.care-task:last-child {
+    border-bottom: 0;
+}
+
+.care-check {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    margin-top: 9px;
+    padding: 0;
+    border: 2.5px solid var(--care-line-strong);
+    border-radius: 50%;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.3, 1.7, 0.5, 1);
+}
+
+.care-check:hover {
+    border-color: var(--care-brand-strong);
+    transform: scale(1.06);
+}
+
+.care-check svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+}
+
+.care-check[aria-checked="true"] {
+    border-color: var(--care-brand-strong);
+    background: var(--care-brand-strong);
+    transform: scale(1.08);
+}
+
+.care-check[aria-checked="true"] svg {
+    opacity: 1;
+}
+
+.care-tb {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.care-tb svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.care-tb.is-watering { background: #d9ecf4; color: #1f6f99; }
+.care-tb.is-fertilizing { background: #dff2e2; color: #167a38; }
+.care-tb.is-pruning { background: #fde5cb; color: #9a4a12; }
+.care-tb.is-repotting { background: #f6e1cf; color: #a2481a; }
+.care-tb.is-harvesting { background: #fff0c2; color: #8a5a00; }
+.care-tb.is-inspection { background: #d9f0f1; color: #14707a; }
+
+.care-task-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding-top: 2px;
+}
+
+.care-task-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+}
+
+.care-task-name {
+    font: 800 1.3rem/1.15 var(--care-display);
+}
+
+.care-task-place {
+    margin-left: 8px;
+    color: var(--care-muted);
+    font: 700 0.8rem var(--care-body);
+    letter-spacing: 0.01em;
+}
+
+.care-task-meta {
+    color: var(--care-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.care-task-meta > span:not(:last-child)::after {
+    content: "\00a0\00b7  ";
+}
+
+.care-late {
+    color: var(--care-late);
+    font-weight: 700;
+}
+
+.care-tag {
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--care-rain-bg);
+    color: var(--care-rain);
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.care-task-notes,
+.care-task-reason {
+    color: var(--care-muted);
+    font-size: 0.85rem;
+}
+
+.care-task-reason {
+    font-style: italic;
+}
+
+.care-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.care-hint svg {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.care-hint.is-rain {
+    color: #14607f;
+}
+
+.care-hint.is-warn {
+    color: var(--care-warn);
+}
+
+.care-task-actions {
+    display: flex;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.care-act {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--care-muted);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.care-act svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.care-act:hover {
+    background: rgba(185, 164, 106, 0.22);
+    color: var(--care-fg);
+}
+
+.care-act-danger:hover {
+    color: var(--care-late);
+}
+
+.care-task.is-done {
+    opacity: 0.62;
+}
+
+.care-task.is-done .care-task-name {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+}
+
+.care-skip,
+.care-restore {
+    padding: 6px 14px;
+    border: 1.5px solid var(--care-line-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--care-muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.care-skip:hover,
+.care-restore:hover {
+    background: rgba(185, 164, 106, 0.22);
+    color: var(--care-fg);
+}
+
+.care-skipped-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.care-skipped-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 14px;
+    border-radius: 16px;
+    background: rgba(255, 253, 246, 0.7);
+    font-weight: 600;
+}
+
+.care-skipped-list small {
+    color: var(--care-muted);
+    font-weight: 500;
+}
+
+/* a task row found through its pot */
+.care-task.is-highlight {
+    animation: care-highlight 1.6s ease-out 1;
+}
+
+@keyframes care-highlight {
+    0% { box-shadow: 0 0 0 0 rgba(47, 191, 92, 0.6); }
+    30% { box-shadow: 0 0 0 6px rgba(47, 191, 92, 0.35); }
+    100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+/* An empty day: one soft card with the next step, so the page never ends in a bare sentence */
+.care-empty {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border: 2px dashed var(--care-line-strong);
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.55);
+    color: var(--care-muted);
+}
+
+/* Petak: four faces, one shown at a time */
+.care-empty-pet {
+    flex: none;
+    display: block;
+    width: 112px;
+    height: 110px;
+    margin: -18px 0 -20px;
+}
+
+.care-empty-pet .care-face {
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.care-empty[data-mood="cheer"] .care-face[data-k="cheer"],
+.care-empty[data-mood="happy"] .care-face[data-k="happy"],
+.care-empty[data-mood="curious"] .care-face[data-k="curious"],
+.care-empty[data-mood="proud"] .care-face[data-k="proud"] {
+    display: block;
+    animation: care-breathe 3.8s ease-in-out infinite;
+    transform-origin: 50% 92%;
+}
+
+.care-empty .care-face .care-p-sprout,
+.care-start .care-face .care-p-sprout {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: care-sway 3.2s ease-in-out infinite;
+}
+
+.care-empty .care-face .care-p-eyes,
+.care-start .care-face .care-p-eyes {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: care-blink 4.8s infinite;
+}
+
+.care-empty-txt {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.care-empty b {
+    color: var(--care-fg);
+    font: 800 1.25rem/1.15 var(--care-display);
+}
+
+.care-empty p {
+    max-width: 52ch;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.care-empty .care-btn {
+    flex: none;
+}
+
+/* the same button lives in the empty card, so the garden row lets go of its own meanwhile */
+.care-garden.is-empty .care-add {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    .care-empty {
+        flex-wrap: wrap;
+        padding: 16px;
+    }
+
+    .care-empty-txt {
+        flex-basis: calc(100% - 128px);
+    }
+
+    .care-empty .care-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* No plants yet: no box, it sits on the sheet like the other sections; one tight group, the button right under the words */
+.care-start {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 20px;
+    row-gap: 8px;
+    align-items: center;
+    color: var(--care-muted);
+}
+
+.care-start > :not(.care-start-pet) {
+    grid-column: 2;
+}
+
+.care-start-pet {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    display: block;
+    width: 132px;
+    height: 130px;
+    margin: -8px 0 -8px -8px;
+}
+
+.care-start-pet .care-face {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    animation: care-breathe 3.8s ease-in-out infinite;
+    transform-origin: 50% 92%;
+}
+
+.care-start h2 {
+    margin: 0;
+    color: var(--care-fg);
+    font: 800 1.45rem/1.1 var(--care-display);
+}
+
+.care-start p {
+    max-width: 46ch;
+    margin: 0;
+}
+
+.care-start .care-btn {
+    justify-self: start;
+    margin-top: 8px;
+}
+
+/* the footer follows the same step as everything else instead of adding its own */
+.care-sheet-in.is-onboarding .care-foot {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* narrow screens: Petak on top, the button as wide as the column */
+@media (max-width: 575.98px) {
+    .care-start {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .care-start > :not(.care-start-pet),
+    .care-start-pet {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
+    .care-start .care-btn {
+        justify-self: stretch;
+        justify-content: center;
+    }
+}
+
+/* ---------------------------------------------------------------- Footer: a tip and the small print */
+.care-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: auto;
+    padding: 36px 0 28px;
+}
+
+.care-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    max-width: 60ch;
+    margin: 0;
+    font-weight: 600;
+}
+
+.care-tip svg {
+    width: 1.25em;
+    height: 1.25em;
+    margin-top: 3px;
+    fill: none;
+    stroke: var(--care-brand-strong);
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.care-tip b {
+    font-family: var(--care-display);
+    font-weight: 800;
+}
+
+.care-foot-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px 22px;
+    padding-top: 14px;
+    border-top: 1px solid var(--care-line);
+    color: var(--care-muted);
+    font-size: 0.86rem;
+}
+
+/* ---------------------------------------------------------------- Message with undo */
+.care-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    z-index: 1060;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    padding: 10px 12px 10px 18px;
+    border-radius: 99px;
+    background: var(--care-fg);
+    color: #fff;
+    font-size: 0.92rem;
+    font-weight: 600;
+    box-shadow: 0 14px 30px -12px rgba(23, 48, 31, 0.6);
+    opacity: 0;
+    transform: translate(-50%, 20px);
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.care-toast.is-on {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+}
+
+.care-toast button {
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- Add / edit / delete popups and the plain form page */
+.care-modal .modal-content {
+    border: 0;
+    border-radius: 28px;
+    background: #fffdf6;
+    box-shadow: 0 30px 60px -24px rgba(23, 48, 31, 0.6);
+}
+
+.care-modal .modal-header {
+    padding: 22px 24px 0;
+    border: 0;
+}
+
+.care-modal .modal-title {
+    font: 800 1.7rem/1.1 var(--care-display);
+}
+
+.care-modal .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 24px;
+}
+
+.care-modal .modal-footer {
+    gap: 10px;
+    padding: 4px 24px 24px;
+    border: 0;
+}
+
+.care-modal .modal-footer > * {
+    margin: 0;
+}
+
+.care-modal-loading {
+    color: var(--care-muted);
+    text-align: center;
+}
+
+.care-form-wrap {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.care-back {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: var(--care-muted);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.care-back:hover {
+    color: var(--care-brand-strong);
+}
+
+.care-card {
+    padding: 24px;
+    border-radius: 28px;
+    background: #fffdf6;
+    box-shadow: 0 30px 60px -30px rgba(23, 48, 31, 0.5);
+}
+
+.care-form-title {
+    margin: 0 0 14px;
+    font: 800 1.7rem/1.1 var(--care-display);
+}
+
+.care-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.care-modal .care-form {
+    gap: 0;
+}
+
+.care-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.care-field label {
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.care-field input:not([type="checkbox"]),
+.care-field select,
+.care-field textarea {
+    width: 100%;
+    padding: 0 14px;
+    border: 1.5px solid #9c8e5e;
+    border-radius: 16px;
+    background: #fffdf6;
+    color: var(--care-fg);
+    font: 500 1rem var(--care-body);
+}
+
+.care-field input:not([type="checkbox"]),
+.care-field select {
+    height: 52px;
+}
+
+.care-field textarea {
+    padding: 12px 14px;
+}
+
+.care-field input:focus,
+.care-field select:focus,
+.care-field textarea:focus {
+    border-color: var(--care-brand-strong);
+    outline: 3px solid rgba(47, 191, 92, 0.35);
+}
+
+.care-field.has-error input,
+.care-field.has-error select {
+    border-color: var(--care-late);
+}
+
+.care-help {
+    color: var(--care-muted);
+    font-size: 0.82rem;
+}
+
+.care-field-error {
+    color: var(--care-late);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.care-form-alert {
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: var(--care-late-bg);
+    color: var(--care-late);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.care-form-alert a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.care-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+/* ---------------------------------------------------------------- Medium screens: the words and the bubble stack */
+@media (max-width: 1100px) {
+    .care-copy {
+        --care-room: 470px;
+    }
+
+    .care-scene {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        padding-bottom: calc(var(--fh) + 12px);
+    }
+
+    .care-bubble {
+        position: relative;
+        left: auto;
+        bottom: auto;
+        transform: none;
+        margin: 20px 20px 0 calc(var(--care-offset) + 24px);
+    }
+
+    .care-sun {
+        left: 76%;
+    }
+}
+
+/* ---------------------------------------------------------------- Phones: the top bar of the app replaces the sidebar */
+@media (max-width: 767.98px) {
+    .care-inner {
+        padding-top: 26px;
+    }
+
+    .care-copy {
+        max-width: none;
+        margin-left: 0;
+    }
+
+    .care-sum b {
+        font-size: 2.1rem;
+    }
+
+    .care-bubble {
+        margin: 20px auto 0;
+        width: min(330px, calc(100% - 32px));
+    }
+
+    .care-bubble::after {
+        left: 50%;
+        margin-left: -9px;
+    }
+
+    .care-sheet-in {
+        --care-section-gap: 26px;
+        padding: 24px 16px 0;
+    }
+
+    .care-date {
+        font-size: 1.4rem;
+    }
+
+    .care-week {
+        gap: 3px;
+    }
+
+    .care-day {
+        min-height: 108px;
+        padding: 9px 1px;
+        border-radius: 16px;
+    }
+
+    .care-day-num {
+        width: 32px;
+        height: 32px;
+        font-size: 1.25rem;
+    }
+
+    .care-day.is-today .care-day-num::after {
+        bottom: 0;
+        width: 18px;
+        margin-left: -9px;
+    }
+
+    .care-day-w {
+        flex-direction: column;
+        gap: 1px;
+        min-height: 30px;
+        justify-content: flex-start;
+        font-size: 0.6rem;
+        line-height: 1.15;
+        text-align: center;
+    }
+
+    .care-day-w svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .care-day-w > span {
+        display: none;
+    }
+
+    .care-task {
+        grid-template-columns: auto auto minmax(0, 1fr);
+        gap: 4px 10px;
+        padding: 14px 0;
+    }
+
+    .care-task .care-tb {
+        width: 42px;
+        height: 42px;
+    }
+
+    .care-task .care-check {
+        width: 30px;
+        height: 30px;
+        margin-top: 6px;
+    }
+
+    .care-task-actions {
+        grid-column: 3;
+        grid-row: 2;
+        justify-self: end;
+        margin-top: 0;
+    }
+
+    .care-task-name {
+        font-size: 1.18rem;
+    }
+
+    .care-garden {
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .care-garden .care-btn {
+        flex: 1 1 100%;
+    }
+
+    .care-gp {
+        width: 78px;
+    }
+
+    .care-pot-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .care-pot-btn {
+        padding: 10px 4px 8px;
+        border-radius: 18px;
+    }
+
+    .care-pot-svg {
+        width: 46px;
+        height: 55px;
+    }
+
+    .care-pot-label {
+        font-size: 0.7rem;
+        text-align: center;
+    }
+}
+
+/* ---------------------------------------------------------------- Reduced motion: nothing moves */
+@media (prefers-reduced-motion: reduce) {
+    .care-page *,
+    .care-page *::before,
+    .care-page *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .care-rainfx line {
+        opacity: 0.6;
+    }
+
+    .care-floor .care-pg {
+        transform: none;
+    }
+}
