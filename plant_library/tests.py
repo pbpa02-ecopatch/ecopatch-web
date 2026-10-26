@@ -84,6 +84,8 @@ class PlantCRUDTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Kemangi')
         self.assertContains(response, 'Ocimum basilicum')
+        # moderate watering and outdoor: the Smart Care interval is shown
+        self.assertContains(response, 'Smart Care menyarankan menyiram sekitar tiap 2 hari')
 
     def test_create_access_control(self):
         create_url = reverse('plant_library:plant_create')
@@ -311,3 +313,54 @@ class KeywordSearchIntegrationTests(TestCase):
         # Pakis Haji lolos easy tapi namanya tidak mengandung 'bayam',
         # Bayam Merah mengandung 'bayam' tapi difficulty=hard → 0 hasil
         self.assertContains(res, "Tidak ada tanaman ditemukan")
+
+
+class WateringIntervalTests(TestCase):
+    """Plant.watering_interval_days: the days between two waterings that Smart Care schedules by."""
+
+    def plant(self, watering, **kwargs):
+        values = dict(
+            name='Uji', category=Plant.Category.VEGETABLES, sunlight=Plant.Sunlight.FULL, watering=watering,
+            difficulty=Plant.Difficulty.EASY, indoor_outdoor=Plant.Placement.OUTDOOR,
+            space_requirement=Plant.SpaceRequirement.BALCONY,
+        )
+        values.update(kwargs)
+        return Plant(**values)
+
+    def test_base_days_follow_how_often_the_plant_wants_water(self):
+        self.assertEqual(self.plant(Plant.Watering.HIGH).watering_interval_days, 1)
+        self.assertEqual(self.plant(Plant.Watering.MODERATE).watering_interval_days, 2)
+        self.assertEqual(self.plant(Plant.Watering.LOW).watering_interval_days, 4)
+
+    def test_an_indoor_plant_dries_slower(self):
+        indoor = self.plant(Plant.Watering.MODERATE, indoor_outdoor=Plant.Placement.INDOOR)
+        self.assertEqual(indoor.watering_interval_days, 3)
+
+    def test_an_indoor_low_light_plant_dries_slower_even_when_placement_is_both(self):
+        plant = self.plant(Plant.Watering.MODERATE, category=Plant.Category.INDOOR_LOW_LIGHT,
+                           indoor_outdoor=Plant.Placement.BOTH)
+        self.assertEqual(plant.watering_interval_days, 3)
+
+    def test_indoor_and_low_light_count_once_together(self):
+        plant = self.plant(Plant.Watering.MODERATE, category=Plant.Category.INDOOR_LOW_LIGHT,
+                           indoor_outdoor=Plant.Placement.INDOOR)
+        self.assertEqual(plant.watering_interval_days, 3)
+
+    def test_shade_adds_a_day(self):
+        shade = self.plant(Plant.Watering.LOW, sunlight=Plant.Sunlight.SHADE)
+        self.assertEqual(shade.watering_interval_days, 5)
+
+    def test_never_longer_than_six_days(self):
+        plant = self.plant(Plant.Watering.LOW, sunlight=Plant.Sunlight.SHADE,
+                           indoor_outdoor=Plant.Placement.INDOOR)
+        self.assertEqual(plant.watering_interval_days, 6)
+
+    def test_the_seed_plants_spread_from_daily_to_every_six_days(self):
+        from django.core.management import call_command
+        call_command('loaddata', 'initial_plants', verbosity=0)
+        days = {plant.name: plant.watering_interval_days for plant in Plant.objects.all()}
+        self.assertEqual(days['Bayam Hijau'], 1)
+        self.assertEqual(days['Cabai Rawit Merah'], 2)
+        self.assertEqual(days['Rosemary'], 4)
+        self.assertEqual(days['Lidah Mertua (Sansevieria)'], 6)
+        self.assertTrue(all(1 <= value <= 6 for value in days.values()))
