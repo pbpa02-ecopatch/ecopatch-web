@@ -1655,22 +1655,6 @@ body.has-sidebar.care-body {
     font-size: 0.86rem;
 }
 
-.care-foot-row nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 18px;
-}
-
-.care-foot-row a {
-    color: var(--care-fg);
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.care-foot-row a:hover {
-    text-decoration: underline;
-}
-
 /* ---------------------------------------------------------------- Message with undo */
 .care-toast {
     position: fixed;
