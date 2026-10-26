@@ -14,7 +14,7 @@
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item">
-                    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none">Rak Jurnal</a>
+                    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none">Koleksi Jurnal</a>
                 </li>
                 {% if journal.plant_name %}
                     <li class="breadcrumb-item">
@@ -102,7 +102,7 @@
                 </form>
                 <a href="{% url 'garden_journal:list' %}" class="btn btn-link text-muted ms-auto d-inline-flex align-items-center text-decoration-none">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-                    Kembali ke Rak
+                    Kembali ke Koleksi Jurnal
                 </a>
             </div>
         </div>
