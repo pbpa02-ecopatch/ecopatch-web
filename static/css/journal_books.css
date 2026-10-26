@@ -2307,13 +2307,14 @@
 .onboarding-steps-card {
     background: #ffffff;
     border-radius: 24px;
-    border: 1px solid #ebe5d8;
-    box-shadow: 0 16px 40px rgba(34, 48, 31, 0.08);
-    padding: 2.8rem 2.2rem 2.2rem 2.2rem;
+    border: 1.5px solid #ecd8ab;
+    box-shadow: 0 14px 34px rgba(34, 48, 31, 0.07);
+    padding: 2.2rem 2.4rem 2rem 2.4rem;
     position: relative;
-    max-width: 860px;
-    margin: 3.5rem auto 2.5rem auto;
+    max-width: 960px;
+    margin: 1.25rem auto 2.5rem auto;
 }
+
 
 .onboarding-mascot-anchor {
     position: absolute;
@@ -2704,5 +2705,640 @@
     background: #187434;
     transform: translateY(-1px);
 }
+
+/* =========================================================
+   FULL-WIDTH BOTANICAL NOTEBOOK HERO (SMART CARE COHESION)
+   ========================================================= */
+
+:root {
+    --journal-offset: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2);
+}
+
+body.has-sidebar.journal-body {
+    padding-left: 0 !important;
+    background: #faefd5;
+}
+
+.journal-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Full-width notebook paper hero banner (runs edge-to-edge across screen) */
+.journal-hero-banner-full {
+    width: 100%;
+    position: relative;
+    background-color: #fbf9f1;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 31px,
+        rgba(168, 188, 158, 0.22) 31px,
+        rgba(168, 188, 158, 0.22) 32px
+    );
+    border-bottom: 2px solid #ecd8ab;
+    padding: clamp(32px, 5vh, 48px) 24px clamp(28px, 4vh, 42px) calc(var(--journal-offset) + 32px);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+@media (max-width: 991.98px) {
+    .journal-hero-banner-full {
+        padding: 24px 20px 24px 20px;
+    }
+}
+
+/* Left content container with permanent, non-overlapping earthy kraft rule line */
+.journal-hero-content-left {
+    position: relative;
+    padding-left: 28px;
+    border-left: 2.5px solid #d8caa7; /* Warna membumi kraft notebook rule line */
+}
+
+@media (max-width: 767.98px) {
+    .journal-hero-content-left {
+        padding-left: 16px;
+        border-left-width: 2px;
+    }
+}
+
+
+.journal-hero-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.journal-sheet-body {
+    background: linear-gradient(180deg, #fdf7e8 0%, #faefd5 100%);
+    padding-left: var(--journal-offset);
+    flex: 1 0 auto;
+}
+
+@media (max-width: 991.98px) {
+    .journal-sheet-body {
+        padding-left: 0;
+    }
+}
+
+/* Minimal Clean Footer (Matching Reference) */
+.journal-foot {
+    border-top: 1.5px solid rgba(182, 154, 99, 0.3);
+    padding: 24px 0 36px;
+    margin-top: 48px;
+}
+
+.journal-foot-row {
+    font-size: 0.88rem;
+    color: #64755f;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+    line-height: 1.5;
+}
+
+
+/* Typography adhering strictly to Design System */
+.journal-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #eaf5ea;
+    color: #1f9142;
+    border: 1px solid #c2e2c5;
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+}
+
+.journal-hero-title {
+    font-family: var(--font-display, 'Baloo 2', sans-serif);
+    font-size: clamp(2.3rem, 4.2vw, 3.4rem);
+    font-weight: 800;
+    color: var(--ink, #22301f);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+}
+
+.journal-hero-lead {
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+    font-size: 1.05rem;
+    color: var(--ink-muted, #59684f);
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+/* Stats Pill Chips (Matching Example) */
+.journal-stats-pills {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.stat-pill-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 1.5px solid #dfc79b;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(34, 48, 31, 0.05);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #22301f;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-pill-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(34, 48, 31, 0.08);
+}
+
+.stat-pill-icon {
+    flex-shrink: 0;
+}
+
+.stat-pill-chip strong {
+    font-weight: 800;
+    color: #1f9142;
+    font-size: 0.95rem;
+}
+
+/* 7 Hari Terakhir Calendar Strip */
+.journal-week-calendar-wrap {
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.journal-week-label {
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #3e523a;
+}
+
+.journal-week-strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.journal-day-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+}
+
+.journal-day-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.76rem;
+    font-weight: 800;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.journal-day-circle.is-empty {
+    border: 1.5px dashed #9cb598;
+    background: transparent;
+    color: transparent;
+}
+
+.journal-day-circle.has-entry {
+    background: #1f9142;
+    border: 1.5px solid #1f9142;
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(31, 145, 66, 0.28);
+}
+
+.journal-day-col.is-today .journal-day-circle {
+    outline: 2.5px solid #1f9142;
+    outline-offset: 2.5px;
+}
+
+.journal-day-name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #556b4f;
+    line-height: 1;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+}
+
+.today-indicator-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #1f9142;
+}
+
+/* Calendar Legend (UI/UX) */
+.journal-calendar-legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 0.76rem;
+    color: #6a7c64;
+    font-weight: 600;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+}
+
+.legend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-circle {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 800;
+}
+
+.legend-circle.has-entry {
+    background: #1f9142;
+    color: #ffffff;
+}
+
+.legend-circle.is-empty {
+    border: 1.5px dashed #9cb598;
+    background: transparent;
+}
+
+.legend-circle.is-today-dot {
+    border: 2px solid #1f9142;
+    background: #e8f5e9;
+}
+
+/* Primary Hero CTA Button */
+.journal-main-cta {
+    padding: 11px 28px !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(31, 145, 66, 0.25) !important;
+    transition: all 0.25s ease !important;
+}
+
+.journal-main-cta:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 18px rgba(31, 145, 66, 0.35) !important;
+}
+
+/* =========================================================
+   SPEECH BUBBLE DIALOG POP-UP & ENLARGED PETAK MASCOT
+   ========================================================= */
+
+.journal-dialog-scene {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 350px;
+    position: relative;
+}
+
+.journal-bubble {
+    position: relative;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 20px 20px 20px 6px;
+    padding: 14px 18px 15px;
+    box-shadow: 0 12px 28px -10px rgba(34, 48, 31, 0.22), 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(220, 205, 170, 0.55);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    z-index: 5;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.journal-bubble:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px -10px rgba(34, 48, 31, 0.28);
+}
+
+/* Bubble Tail pointing down towards Petak */
+.journal-bubble::after {
+    content: "";
+    position: absolute;
+    left: 48px;
+    bottom: -8px;
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border-right: 1px solid rgba(220, 205, 170, 0.55);
+    border-bottom: 1px solid rgba(220, 205, 170, 0.55);
+    transform: rotate(45deg);
+    border-radius: 0 0 4px 0;
+}
+
+.journal-bubble-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+}
+
+.journal-bubble-pill.is-ok {
+    background: #e2f4e5;
+    color: #167a38;
+}
+
+.journal-bubble-pill.is-warn {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.journal-bubble-pill.is-tip {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+
+.journal-bubble-text {
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+    font-size: 0.94rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: #22301f;
+}
+
+.journal-bubble-link {
+    color: #167a38;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.journal-bubble-link:hover {
+    color: #0f5a28;
+}
+
+/* Mascot Petak Mencatat (Prominent, Interactive & Lively) */
+.journal-mascot-petak-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    z-index: 2;
+    margin-top: 6px;
+}
+
+.journal-mascot-petak-img {
+    width: clamp(165px, 14vw, 205px);
+    height: auto;
+    filter: drop-shadow(0 14px 24px rgba(45, 65, 30, 0.22));
+    animation: petakMascotFloat 4.2s ease-in-out infinite;
+    cursor: pointer;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
+}
+
+.journal-mascot-petak-img:hover {
+    transform: translateY(-12px) scale(1.08) rotate(3deg);
+    filter: drop-shadow(0 20px 32px rgba(31, 145, 66, 0.32));
+}
+
+.journal-mascot-petak-img:active {
+    transform: translateY(-4px) scale(1.02);
+}
+
+@keyframes petakMascotFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    30% {
+        transform: translateY(-9px) rotate(-1.5deg);
+    }
+    68% {
+        transform: translateY(-4px) rotate(1.2deg);
+    }
+}
+
+
+/* =========================================================
+   SHELF & BOOK ENHANCEMENTS
+   ========================================================= */
+
+/* Spiral Bound Holes on Book Item Spine */
+.book-spiral-spine {
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    bottom: 8px;
+    width: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 12;
+    pointer-events: none;
+}
+
+.book-spiral-hole {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3c4939;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+/* "+ Buku baru" dashed green action card */
+.book-cover-add-wrap {
+    position: relative;
+    width: 170px;
+    height: 235px;
+    border-radius: 6px 14px 14px 6px;
+    border: 2px dashed #2e7d32;
+    background: #f4faf4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(46, 125, 50, 0.08);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+}
+
+.book-item-add:hover .book-cover-add-wrap {
+    background: #eaf5ea;
+    border-color: #1f9142;
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 26px rgba(46, 125, 50, 0.18);
+}
+
+.book-cover-add-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #2e7d32;
+}
+
+.book-add-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(46, 125, 50, 0.18);
+    transition: transform 0.2s ease;
+}
+
+.book-item-add:hover .book-add-icon {
+    transform: scale(1.1);
+}
+
+.book-add-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+/* =========================================================
+   CUSTOM SCROLLABLE DROPDOWNS (EcoPatch & Nama Tanaman)
+   ========================================================= */
+
+.journal-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.journal-select-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 16px;
+    background: #ffffff;
+    border: 1.5px solid #dcd7ca;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #22301f;
+    text-align: left;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    cursor: pointer;
+}
+
+.journal-select-btn::after {
+    display: none !important; /* Hilangkan default bootstrap caret triangle */
+}
+
+.journal-select-btn:hover {
+    border-color: #1f9142;
+    background: #fdfffd;
+}
+
+.journal-select-btn:focus,
+.journal-select-btn.show {
+    border-color: #1f9142;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.16);
+    outline: none;
+}
+
+.journal-select-btn.show .journal-select-chevron {
+    transform: rotate(180deg);
+}
+
+.journal-select-chevron {
+    color: #59684f;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+/* Scrollable container with max-height and custom scrollbar */
+.journal-select-menu {
+    width: 100%;
+    max-height: 220px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    padding: 6px;
+    border: 1.5px solid #ecd8ab;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(34, 48, 31, 0.12);
+    margin-top: 6px;
+    z-index: 1050;
+    scrollbar-width: thin;
+    scrollbar-color: #9ecc9f #f7f9f7;
+}
+
+.journal-select-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.journal-select-menu::-webkit-scrollbar-track {
+    background: #f7f9f7;
+    border-radius: 8px;
+}
+
+.journal-select-menu::-webkit-scrollbar-thumb {
+    background: #a4d3a6;
+    border-radius: 8px;
+}
+
+.journal-select-menu::-webkit-scrollbar-thumb:hover {
+    background: #1f9142;
+}
+
+.journal-select-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #22301f;
+    font-size: 0.92rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.journal-select-item:hover,
+.journal-select-item:focus {
+    background: #eef7f0;
+    color: #15652f;
+}
+
+.journal-select-item.active {
+    background: #cbf5d6;
+    color: #0d4a20;
+    font-weight: 700;
+}
+
+
+
+
 
 
