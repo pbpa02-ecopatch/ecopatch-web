@@ -50,8 +50,13 @@ class BioForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['city', 'bio']
-        labels = {'city': 'Kota tempat tinggal', 'bio': 'Deskripsi'}
-        help_texts = {'city': 'Dipakai untuk menampilkan cuaca di Smart Care.'}
+        labels = {
+            'city': 'Kota tempat tinggal',
+            'bio': 'Deskripsi',
+        }
+        help_texts = {
+            'city': 'Dipakai untuk cuaca di Smart Care dan otomatis terisi di listing Seed Exchange.',
+        }
         widgets = {
             'bio': forms.Textarea(attrs={
                 'rows': 4,
