@@ -1457,16 +1457,20 @@ body.has-sidebar.plant-body {
 }
 
 /* ---------------------------------------------------------------- Recommend */
-.plant-selector {
+.plant-patch-bar {
     display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 12px 16px;
-    padding: 16px 18px;
-    border: 1.5px solid var(--pl-line);
-    border-radius: 22px;
-    background: #fffdf6;
-    box-shadow: 0 14px 30px -22px rgba(23, 48, 31, 0.35);
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.plant-patch-label {
+    flex: none;
+    color: var(--pl-muted);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
 }
 
 .plant-field {
@@ -1499,21 +1503,18 @@ body.has-sidebar.plant-body {
 /* The EcoPatch picker borrows the catalog filter pill and menu, then adds a
    green dot so it reads as the active garden instead of a form field. */
 .plant-patch-filter {
-    align-self: flex-start;
-    width: auto;
-    max-width: 100%;
+    min-width: 0;
 }
 
 .plant-patch-filter .plant-filter-btn {
-    gap: 10px;
-    min-width: 268px;
+    gap: 8px;
     max-width: 100%;
-    height: 44px;
-    padding: 0 16px;
+    height: 40px;
+    padding: 0 14px;
     justify-content: flex-start;
     background: #fff;
     color: var(--pl-fg);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 800;
 }
 
@@ -1530,13 +1531,14 @@ body.has-sidebar.plant-body {
 }
 
 .plant-patch-name {
-    max-width: 100%;
+    flex: 0 1 auto;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.plant-menu--wide {
+.plant-menu.plant-menu--wide {
     min-width: 268px;
     width: 100%;
 }
@@ -2042,32 +2044,25 @@ body.has-sidebar.plant-body {
         aspect-ratio: 4 / 3;
     }
 
-    .plant-selector {
-        flex-direction: column;
-        align-items: stretch;
+    .plant-patch-bar {
+        gap: 8px;
     }
 
-    /* In a column the generic 260px flex-basis would become height. */
-    .plant-selector .plant-field {
-        flex: 0 0 auto;
-    }
-
-    .plant-selector .plant-btn {
-        width: 100%;
+    .plant-patch-label {
+        font-size: 0.72rem;
     }
 
     .plant-patch-filter {
-        width: 100%;
-        align-self: stretch;
+        flex: 0 1 auto;
     }
 
     .plant-patch-filter .plant-filter-btn {
-        width: 100%;
-        min-width: 0;
+        width: auto;
     }
 
-    .plant-menu--wide {
-        min-width: 0;
+    .plant-menu.plant-menu--wide {
+        width: auto;
+        min-width: 240px;
     }
 
     .plant-form-card {
