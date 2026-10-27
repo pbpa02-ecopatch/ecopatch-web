@@ -25,9 +25,8 @@
                     {% if listing.image %}
                     <img src="{{ listing.image.url }}" alt="{{ listing.title }}" loading="lazy" decoding="async">
                     {% else %}
-                    <img class="seed-detail-media-pet" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" width="160" height="160" loading="lazy" decoding="async">
+                    <img class="seed-detail-media-pet" src="{% static 'seed_exchange/tukar-bibit.svg' %}" alt="" width="160" height="156" loading="lazy" decoding="async">
                     {% endif %}
-                    <span class="seed-detail-sticker seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
                 </figure>
 
                 <div class="seed-detail-owner">
@@ -59,11 +58,15 @@
                         <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
                         <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
                     </svg>
-                    Listing warga <b>&middot; {{ listing.get_item_type_display }}</b>
+                    Listing warga
                 </p>
                 <div class="seed-detail-head">
                     <h1 class="seed-detail-title">{{ listing.title }}</h1>
                     <span class="seed-status seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
+                </div>
+                <div class="seed-badges seed-detail-badges">
+                    <span class="seed-pill seed-pill--type">{{ listing.get_item_type_display }}</span>
+                    <span class="seed-pill seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
                 </div>
                 <section class="seed-note{% if not listing.description %} seed-note--empty{% endif %}" aria-label="Catatan dari pemilik">
                     <p class="seed-note-kicker">

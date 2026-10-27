@@ -62,7 +62,7 @@
        aria-selected="{% if active_tab == 'mine' %}true{% else %}false{% endif %}"
        aria-controls="panel-mine">
         <span class="seed-tab-plot">
-            <img class="seed-tab-mascot" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" width="96" height="96" loading="lazy" decoding="async">
+            <img class="seed-tab-mascot" src="{% static 'seed_exchange/tukar-bibit.svg' %}" alt="" width="96" height="96" loading="lazy" decoding="async">
         </span>
         <span class="seed-tab-copy">
             <span class="seed-tab-line">
@@ -147,7 +147,7 @@
     {% else %}
         <div class="seed-grid">
             <div class="seed-empty">
-                <img class="seed-empty-mascot" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" aria-hidden="true" width="160" height="160">
+                <img class="seed-empty-mascot" src="{% static 'seed_exchange/tukar-bibit.svg' %}" alt="" aria-hidden="true" width="160" height="160">
                 <p class="seed-empty-title"><strong>Belum ada listing yang cocok.</strong></p>
                 <p class="seed-empty-desc">Bagikan bibit atau tanaman berlebihmu, atau ubah filter di atas.</p>
                 <a href="{% url 'seed_exchange:create' %}" class="btn-seed-primary btn-seed-sm">+ Buat Listing</a>
@@ -176,7 +176,7 @@
     {% else %}
         <div class="seed-grid">
             <div class="seed-empty">
-                <img class="seed-empty-mascot" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" aria-hidden="true" width="160" height="160">
+                <img class="seed-empty-mascot" src="{% static 'seed_exchange/tukar-bibit.svg' %}" alt="" aria-hidden="true" width="160" height="160">
                 <p class="seed-empty-title"><strong>Belum ada booking yang cocok.</strong></p>
                 <p class="seed-empty-desc">Jelajahi listing orang lain dan booking yang menarik, atau ubah filter di atas.</p>
                 <a href="{% url 'seed_exchange:list' %}?tab=browse{% if tab_qs %}&{{ tab_qs }}{% endif %}" class="btn-seed-primary btn-seed-sm">Jelajahi Listing</a>
