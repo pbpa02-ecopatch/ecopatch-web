@@ -18,19 +18,17 @@
             Kembali ke Plant Library
         </a>
 
-        <header class="plant-hero">
-            <div class="plant-hero-copy">
+        <header class="plant-head">
+            <div class="plant-head-copy">
                 <p class="plant-eyebrow">
-                    <svg viewBox="0 0 22 22" aria-hidden="true">
-                        <rect x="1" y="1" width="9" height="9" rx="3" fill="#35c065"/>
-                        <rect x="12" y="1" width="9" height="9" rx="3" fill="#5ccf82"/>
-                        <rect x="1" y="12" width="9" height="9" rx="3" fill="#1f9142"/>
-                        <rect x="12" y="12" width="9" height="9" rx="3" fill="#ff9d2e"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 3v3M12 18v3M4.6 7.6 6.7 9.7M17.3 14.3l2.1 2.1M3 12h3M18 12h3M4.6 16.4l2.1-2.1M17.3 9.7l2.1-2.1"/>
+                        <circle cx="12" cy="12" r="3.2"/>
                     </svg>
-                    Rekomendasi
+                    Untuk kebunmu
                 </p>
-                <h1 class="plant-title">Tanaman yang <span class="plant-hl">cocok</span> untuk kebunmu</h1>
-                <p class="plant-sub">Kami mencocokkan cahaya dan ruang di EcoPatch-mu dengan isi katalog. Pilih kebun dulu, lalu lihat tanamannya.</p>
+                <h1 class="plant-title">Rekomendasi Tanaman</h1>
+                <p class="plant-sub">Kami mencocokkan cahaya dan ruang di EcoPatch-mu dengan isi katalog. Pilih kebun, hasilnya langsung menyesuaikan.</p>
             </div>
         </header>
 
@@ -45,20 +43,19 @@
             <form class="plant-selector" method="get" action="{% url 'plant_library:plant_recommend' %}">
                 <div class="plant-field">
                     <label class="plant-field-label" for="patch-selector">Pilih EcoPatch kamu</label>
-                    <select name="patch" id="patch-selector" class="plant-select" onchange="this.form.submit()">
-                        {% for patch in patch_options %}
-                            <option value="{{ patch.pk }}" {% if selected_patch.pk == patch.pk %}selected{% endif %}>
-                                {{ patch.name }} ({{ patch.space_label }}{% if patch.sun_label %}, {{ patch.sun_label }}{% endif %})
-                            </option>
-                        {% endfor %}
-                    </select>
+                    <div class="plant-select-wrap">
+                        <select name="patch" id="patch-selector" class="plant-select" onchange="this.form.requestSubmit()">
+                            {% for patch in patch_options %}
+                                <option value="{{ patch.pk }}" {% if selected_patch.pk == patch.pk %}selected{% endif %}>
+                                    {{ patch.name }} ({{ patch.space_label }}{% if patch.sun_label %}, {{ patch.sun_label }}{% endif %})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-                <button type="submit" class="plant-btn plant-btn--primary">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M5 12h13"/><path d="m12 5 6 7-6 7"/>
-                    </svg>
-                    Tampilkan
-                </button>
+                <noscript>
+                    <button type="submit" class="plant-btn plant-btn--primary">Tampilkan</button>
+                </noscript>
             </form>
 
             {% if selected_patch %}
@@ -107,7 +104,7 @@
                 {% if recommended_plants %}
                     <div class="plant-grid">
                         {% for plant in recommended_plants %}
-                            {% include "plant_library/partials/card.html" with plant=plant match_label="Cocok untuk kebunmu" %}
+                            {% include "plant_library/partials/card.html" with plant=plant %}
                         {% endfor %}
                     </div>
                 {% else %}

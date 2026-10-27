@@ -1,21 +1,13 @@
 {% load static %}
 <article class="plant-card" style="--plant-i: {{ forloop.counter0|default:0 }}">
-    <div class="plant-card-media">
-        {% if match_label %}<span class="plant-card-match">{{ match_label }}</span>{% endif %}
+    <div class="plant-card-media{% if not plant.image_url %} plant-card-media--empty{% endif %}">
+        {% if plant.is_match %}<span class="plant-card-match">Cocok untuk kebunmu</span>{% endif %}
         {% if plant.image_url %}
             <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy" decoding="async"
-                 onerror="this.style.display='none'; this.nextElementSibling.hidden=false;">
-            <svg hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 21v-9.5"/>
-                <path d="M12 12.5C12 8.6 9 5.5 4 5.5c0 4.9 3 8 8 7Z"/>
-                <path d="M12 14.5c0-3.9 3-7 8-7 0 4.9-3 8-8 7Z"/>
-            </svg>
+                 onerror="this.onerror=null; this.src='{% static 'plant_library/img/plant-placeholder.svg' %}'; this.classList.add('plant-card-ph');">
         {% else %}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 21v-9.5"/>
-                <path d="M12 12.5C12 8.6 9 5.5 4 5.5c0 4.9 3 8 8 7Z"/>
-                <path d="M12 14.5c0-3.9 3-7 8-7 0 4.9-3 8-8 7Z"/>
-            </svg>
+            <img class="plant-card-ph" src="{% static 'plant_library/img/plant-placeholder.svg' %}"
+                 alt="Ilustrasi {{ plant.name }}" loading="lazy" decoding="async">
         {% endif %}
     </div>
 
@@ -63,14 +55,7 @@
         <p class="plant-card-desc">{{ plant.description|default:"Belum ada keterangan untuk tanaman ini."|truncatewords:18 }}</p>
 
         <div class="plant-card-foot">
-            <span class="plant-card-space">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 21v-8"/>
-                    <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
-                    <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
-                </svg>
-                <span>{{ plant.get_space_requirement_display }}</span>
-            </span>
+            <span class="plant-card-cta">Lihat tanaman</span>
 
             {% if user.is_staff %}
             <span class="plant-card-tools">

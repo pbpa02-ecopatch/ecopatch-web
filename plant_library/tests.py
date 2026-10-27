@@ -87,6 +87,18 @@ class PlantCRUDTests(TestCase):
         # moderate watering and outdoor: the Smart Care interval is shown
         self.assertContains(response, 'Smart Care menyarankan menyiram sekitar tiap 2 hari')
 
+    def test_plant_detail_shows_the_matching_ecopatch_name(self):
+        patch = EcoPatch.objects.create(
+            owner=self.regular_user,
+            name='Balkon Kosan',
+            space_type=EcoPatch.SpaceType.BALCONY,
+            sunlight=EcoPatch.Sunlight.FULL,
+            city='Depok',
+        )
+        self.client.login(username='regular_user', password='password123')
+        response = self.client.get(reverse('plant_library:plant_detail', args=[self.plant.pk]))
+        self.assertContains(response, f'Cocok untuk {patch.name}')
+
     def test_create_access_control(self):
         create_url = reverse('plant_library:plant_create')
 
@@ -262,6 +274,12 @@ class ParseQueryKeywordsTests(TestCase):
         self.assertEqual(filters.get("difficulty"), "easy")
         self.assertEqual(remaining, "")
 
+    def test_keyword_trailing_punctuation_is_ignored(self):
+        """'mudah/' tetap terbaca sebagai filter mudah, bukan nama tanaman."""
+        filters, remaining = parse_query_keywords("mudah/")
+        self.assertEqual(filters.get("difficulty"), "easy")
+        self.assertEqual(remaining, "")
+
 
 @override_settings(ROOT_URLCONF=__name__)
 class KeywordSearchIntegrationTests(TestCase):
@@ -302,6 +320,14 @@ class KeywordSearchIntegrationTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, "Bayam Merah")
         self.assertNotContains(res, "Pakis Haji")
+
+    def test_view_keyword_with_trailing_slash_still_filters(self):
+        """'mudah/' tidak boleh dianggap nama tanaman; filter mudah tetap jalan."""
+        url = reverse("plant_library:plant_list") + "?q=mudah%2F"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertNotContains(res, "Bayam Merah")
 
     def test_view_mixed_easy_bayam(self):
         """'mudah bayam' → filter difficulty=easy DAN nama mengandung 'bayam'.

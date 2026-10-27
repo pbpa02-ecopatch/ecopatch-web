@@ -80,6 +80,30 @@ def build_chip_groups(params):
     return groups
 
 
+def matching_plants(patch):
+    """Tanaman yang cocok dengan satu EcoPatch.
+
+    Dipakai bersama oleh halaman Rekomendasi dan penanda "Cocok untuk kebunmu"
+    di katalog, supaya keduanya tidak pernah berbeda aturan.
+    """
+    plants = Plant.objects.all()
+
+    # Sinar matahari harus sama dengan kebun (kalau kebun mendefinisikannya).
+    if patch.sunlight:
+        plants = plants.filter(sunlight=patch.sunlight)
+
+    # Ruang harus pas, atau tanaman memang bisa di mana saja.
+    plants = plants.filter(space_requirement__in=[patch.space_type, 'any'])
+
+    # Indoor hanya untuk tanaman indoor/both; sebaliknya untuk kebun luar.
+    if patch.space_type == 'indoor':
+        plants = plants.filter(indoor_outdoor__in=['indoor', 'both'])
+    else:
+        plants = plants.filter(indoor_outdoor__in=['outdoor', 'both'])
+
+    return plants
+
+
 def parse_query_keywords(raw_query):
     """Petakan kata kunci natural ke filter Django, kembalikan sisa teks.
 
@@ -88,7 +112,8 @@ def parse_query_keywords(raw_query):
         - filters_dict: dict {field: value} yang berhasil dipetakan
         - remaining_text: teks yang tersisa setelah frasa & stop-word dibuang
     """
-    text = raw_query.lower().strip()
+    text = re.sub(r'[^\w\s-]', ' ', raw_query.lower())
+    text = re.sub(r'\s+', ' ', text).strip()
     filters = {}
 
     # Deteksi setiap frasa dari yang terpanjang; hapus dari teks setelah cocok
@@ -184,6 +209,17 @@ def plant_list(request):
         if not request.GET.get(field):
             derived_labels.append(label_maps.get(field, {}).get(value, value))
 
+    # Penanda "Cocok untuk kebunmu" hanya relevan kalau user punya EcoPatch.
+    # Satu tanaman cukup cocok dengan salah satu kebun miliknya.
+    match_ids = set()
+    if request.user.is_authenticated:
+        for patch in EcoPatch.objects.filter(owner=request.user):
+            match_ids.update(matching_plants(patch).values_list('pk', flat=True))
+    if match_ids:
+        plants = list(plants)
+        for plant in plants:
+            plant.is_match = plant.pk in match_ids
+
     context = {
         'plants': plants,
         'query': query,
@@ -208,7 +244,19 @@ def plant_list(request):
 def plant_detail(request, pk):
     """Menampilkan rincian detail 1 tanaman."""
     plant = get_object_or_404(Plant, pk=pk)
-    return render(request, 'plant_library/plant_detail.html', {'plant': plant})
+
+    # Kebun mana saja yang cocok dengan tanaman ini. Detail memakai nama
+    # kebunnya supaya user tahu harus menanamnya di mana.
+    matching_patches = []
+    if request.user.is_authenticated:
+        for patch in EcoPatch.objects.filter(owner=request.user):
+            if matching_plants(patch).filter(pk=plant.pk).exists():
+                matching_patches.append(patch)
+
+    return render(request, 'plant_library/plant_detail.html', {
+        'plant': plant,
+        'matching_patches': matching_patches,
+    })
 
 
 @login_required
@@ -248,24 +296,7 @@ def plant_recommend(request):
         selected_patch = user_patches.first()
 
     # Logika filter rekomendasi murni Django (tanpa ML/AI)
-    recommended_plants = Plant.objects.all()
-
-    # 1. Sinar matahari: plant.sunlight == patch.sunlight (jika patch.sunlight ada)
-    if selected_patch.sunlight:
-        recommended_plants = recommended_plants.filter(sunlight=selected_patch.sunlight)
-
-    # 2. Kebutuhan ruang: sama dengan patch.space_type atau 'any'
-    recommended_plants = recommended_plants.filter(
-        space_requirement__in=[selected_patch.space_type, 'any']
-    )
-
-    # 3. Penempatan (indoor/outdoor):
-    # jika patch.space_type == 'indoor' -> 'indoor' atau 'both'
-    # selain itu -> 'outdoor' atau 'both'
-    if selected_patch.space_type == 'indoor':
-        recommended_plants = recommended_plants.filter(indoor_outdoor__in=['indoor', 'both'])
-    else:
-        recommended_plants = recommended_plants.filter(indoor_outdoor__in=['outdoor', 'both'])
+    recommended_plants = matching_plants(selected_patch)
 
     # Format alasan kecocokan
     space_label = space_labels.get(selected_patch.space_type, selected_patch.get_space_type_display())

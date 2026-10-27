@@ -12,18 +12,9 @@
 <main class="plant-main flex-grow-1">
 <div class="plant-page">
     <div class="plant-inner">
-        <header class="plant-hero">
-            <div class="plant-hero-copy">
-                <p class="plant-eyebrow">
-                    <svg viewBox="0 0 22 22" aria-hidden="true">
-                        <rect x="1" y="1" width="9" height="9" rx="3" fill="#35c065"/>
-                        <rect x="12" y="1" width="9" height="9" rx="3" fill="#5ccf82"/>
-                        <rect x="1" y="12" width="9" height="9" rx="3" fill="#1f9142"/>
-                        <rect x="12" y="12" width="9" height="9" rx="3" fill="#ff9d2e"/>
-                    </svg>
-                    Plant Library
-                </p>
-                <h1 class="plant-title">Ayo temukan tanaman yang <span class="plant-hl">cocok</span> untuk kamu</h1>
+        <header class="plant-head">
+            <div class="plant-head-copy">
+                <h1 class="plant-title">Plant Library</h1>
                 <p class="plant-sub">Cari tanaman yang pas dengan cahaya dan ruangmu. Semua yang ada di sini boleh dibuka tanpa akun.</p>
 
                 <div class="plant-head-actions">
@@ -48,7 +39,11 @@
             </div>
         </header>
 
-        <form class="plant-finder" method="get" action="{% url 'plant_library:plant_list' %}" role="search">
+        <form class="plant-finder" method="get" action="{% url 'plant_library:plant_list' %}" role="search"
+              hx-get="{% url 'plant_library:plant_list' %}"
+              hx-target="#plant-results" hx-select="#plant-results" hx-swap="outerHTML"
+              hx-push-url="true"
+              hx-trigger="submit, keyup changed delay:400ms from:.plant-search-input, search from:.plant-search-input, change from:.plant-select">
             <img class="plant-finder-pet" src="{% static 'my_ecopatch/petak.svg' %}" alt="" aria-hidden="true" width="126" height="123" loading="lazy" decoding="async">
 
             <div class="plant-finder-card">
@@ -95,64 +90,105 @@
                     </div>
 
                     <div class="plant-select-row">
-                        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
                         {% if selected_sunlight %}<input type="hidden" name="sunlight" value="{{ selected_sunlight }}">{% endif %}
                         {% if selected_difficulty %}<input type="hidden" name="difficulty" value="{{ selected_difficulty }}">{% endif %}
                         {% if selected_indoor_outdoor %}<input type="hidden" name="indoor_outdoor" value="{{ selected_indoor_outdoor }}">{% endif %}
 
-                        <label class="visually-hidden" for="plant-category">Kategori tanaman</label>
-                        <select id="plant-category" name="category" class="plant-select">
-                            <option value="">Semua kategori</option>
-                            {% for value, label in categories %}
-                                <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="plant-select-wrap">
+                            <label class="visually-hidden" for="plant-category">Kategori tanaman</label>
+                            <select id="plant-category" name="category" class="plant-select">
+                                <option value="">Semua kategori</option>
+                                {% for value, label in categories %}
+                                    <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                        <label class="visually-hidden" for="plant-space">Kebutuhan ruang</label>
-                        <select id="plant-space" name="space_requirement" class="plant-select">
-                            <option value="">Semua ruang</option>
-                            {% for value, label in space_choices %}
-                                <option value="{{ value }}" {% if selected_space_requirement == value %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="plant-select-wrap">
+                            <label class="visually-hidden" for="plant-space">Kebutuhan ruang</label>
+                            <select id="plant-space" name="space_requirement" class="plant-select">
+                                <option value="">Semua ruang</option>
+                                {% for value, label in space_choices %}
+                                    <option value="{{ value }}" {% if selected_space_requirement == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
         </form>
 
-        <div class="plant-results">
-            <p class="plant-results-count">
-                Menampilkan <strong>{{ plants|length }}</strong> tanaman
-                {% if query %}<span class="plant-results-read">&middot; &ldquo;{{ query }}&rdquo;</span>{% endif %}
-                {% if derived_labels %}
-                    <span class="plant-results-read">Dibaca sebagai: {{ derived_labels|join:", " }}</span>
-                {% endif %}
-            </p>
-            {% if has_active_filters %}
-                <a href="{% url 'plant_library:plant_list' %}" class="plant-results-reset">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
-                    </svg>
-                    Reset filter
-                </a>
-            {% endif %}
+        <div class="plant-suggest-row" aria-label="Rekomendasi pencarian cepat">
+            <span class="plant-suggest-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+                    <circle cx="12" cy="12" r="3.4"/>
+                </svg>
+                Coba cepat
+            </span>
+            <button type="button" class="plant-suggest" data-plant-suggest="tanaman yang mudah dirawat">Mudah dirawat</button>
+            <button type="button" class="plant-suggest" data-plant-suggest="tanaman teduh untuk indoor">Teduh &amp; indoor</button>
+            <button type="button" class="plant-suggest" data-plant-suggest="cahaya penuh">Cahaya penuh</button>
+            <button type="button" class="plant-suggest" data-plant-suggest="perawatan sedang">Perawatan sedang</button>
         </div>
 
-        {% if plants %}
-            <div class="plant-grid">
-                {% for plant in plants %}
-                    {% include "plant_library/partials/card.html" with plant=plant %}
-                {% endfor %}
+        <div id="plant-results" class="plant-results-block" aria-live="polite">
+            <div class="plant-results">
+                <p class="plant-results-count">
+                    Menampilkan <strong>{{ plants|length }}</strong> tanaman
+                    {% if query %}<span class="plant-results-read">&middot; &ldquo;{{ query }}&rdquo;</span>{% endif %}
+                    {% if derived_labels %}
+                        <span class="plant-results-read">Dibaca sebagai: {{ derived_labels|join:", " }}</span>
+                    {% endif %}
+                </p>
+                {% if has_active_filters %}
+                    <a href="{% url 'plant_library:plant_list' %}" class="plant-results-reset">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
+                        </svg>
+                        Reset filter
+                    </a>
+                {% endif %}
             </div>
-        {% else %}
-            <div class="plant-empty">
-                <img class="plant-empty-mascot" src="{% static 'my_ecopatch/petak.svg' %}" alt="" aria-hidden="true" width="132" height="129" loading="lazy">
-                <h2 class="plant-empty-title">Tidak ada tanaman ditemukan</h2>
-                <p class="plant-empty-desc">Coba kurangi filter atau ganti kata kuncinya. Kalau masih kosong, lihat semua tanaman dulu, ya.</p>
-                <a href="{% url 'plant_library:plant_list' %}" class="plant-btn plant-btn--primary">Lihat semua tanaman</a>
-            </div>
-        {% endif %}
+
+            {% if plants %}
+                <div class="plant-grid">
+                    {% for plant in plants %}
+                        {% include "plant_library/partials/card.html" with plant=plant %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="plant-empty">
+                    <img class="plant-empty-mascot" src="{% static 'my_ecopatch/petak.svg' %}" alt="" aria-hidden="true" width="132" height="129" loading="lazy">
+                    <h2 class="plant-empty-title">Tidak ada tanaman ditemukan</h2>
+                    <p class="plant-empty-desc">Coba kurangi filter atau ganti kata kuncinya. Kalau masih kosong, lihat semua tanaman dulu, ya.</p>
+                    <a href="{% url 'plant_library:plant_list' %}" class="plant-btn plant-btn--primary">Lihat semua tanaman</a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 </main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    var input = document.getElementById('plant-q');
+    var form = input ? input.form : null;
+    if (!input || !form) return;
+
+    document.querySelectorAll('[data-plant-suggest]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            input.value = button.getAttribute('data-plant-suggest');
+            if (window.htmx) {
+                input.dispatchEvent(new Event('search', { bubbles: true }));
+            } else {
+                form.requestSubmit();
+            }
+            input.focus();
+        });
+    });
+})();
+</script>
 {% endblock %}

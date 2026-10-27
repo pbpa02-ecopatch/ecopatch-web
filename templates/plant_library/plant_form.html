@@ -18,113 +18,133 @@
             {% if is_edit %}Kembali ke {{ plant.name }}{% else %}Kembali ke Plant Library{% endif %}
         </a>
 
+        <header class="plant-head">
+            <div class="plant-head-copy">
+                <p class="plant-eyebrow">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 21v-8"/>
+                        <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                        <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                        <path d="M5 21h14"/>
+                    </svg>
+                    Plant Library &middot; {% if is_edit %}ubah tanaman{% else %}tanaman baru{% endif %}
+                </p>
+                <h1 class="plant-title">{% if is_edit %}Ubah {{ plant.name }}{% else %}Tambah Tanaman{% endif %}</h1>
+                <p class="plant-sub">Lengkapi spesifikasi dan panduan perawatan supaya tanaman ini gampang ditemukan dan dirawat.</p>
+                <p class="plant-form-legend"><span class="plant-required" aria-hidden="true">*</span> wajib diisi</p>
+            </div>
+            <div class="plant-head-art" aria-hidden="true">
+                <img src="{% static 'my_ecopatch/petak.svg' %}" alt="" width="150" height="147" loading="lazy" decoding="async">
+            </div>
+        </header>
+
         <div class="plant-form-card">
-            <h1 class="plant-form-title">{% if is_edit %}Ubah {{ plant.name }}{% else %}Tambah tanaman baru{% endif %}</h1>
-            <p class="plant-form-sub">Lengkapi spesifikasi dan panduan perawatan untuk katalog Plant Library.</p>
+            <p class="plant-form-note">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 21v-8"/>
+                    <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                    <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                </svg>
+                <span>Data ini tampil di katalog publik dan dipakai sebagai acuan jadwal Smart Care pengguna.</span>
+            </p>
 
-            {% if form.errors %}
-                <div class="plant-form-errors" role="alert">
-                    <strong>Mohon periksa input berikut:</strong>
-                    <ul>
-                        {% for field, errors in form.errors.items %}
-                            {% for error in errors %}
-                                <li>{{ field|capfirst }}: {{ error }}</li>
-                            {% endfor %}
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-
-            <form method="post" novalidate>
+            <form method="post" class="plant-form">
                 {% csrf_token %}
 
-                <div class="plant-form-grid">
-                    <div class="plant-field">
-                        <label class="plant-field-label" for="{{ form.name.id_for_label }}">
-                            Nama tanaman <span aria-hidden="true">*</span>
-                        </label>
-                        {{ form.name }}
+                {% if form.errors %}
+                    <div class="plant-form-errors" role="alert">
+                        <strong>Mohon periksa input berikut:</strong>
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ field|capfirst }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
                     </div>
+                {% endif %}
 
-                    <div class="plant-field">
-                        <label class="plant-field-label" for="{{ form.scientific_name.id_for_label }}">
-                            Nama ilmiah (Latin)
-                        </label>
-                        {{ form.scientific_name }}
-                    </div>
+                <h2 class="plant-form-section">Identitas tanaman</h2>
 
-                    <div class="plant-field">
-                        <label class="plant-field-label" for="{{ form.category.id_for_label }}">
-                            Kategori tanaman <span aria-hidden="true">*</span>
-                        </label>
-                        {{ form.category }}
-                    </div>
+                <div class="plant-field">
+                    <label class="plant-label" for="{{ form.name.id_for_label }}">
+                        Nama tanaman <span class="plant-required" aria-hidden="true">*</span>
+                    </label>
+                    {{ form.name }}
+                    {% for error in form.name.errors %}<p class="plant-form-error">{{ error }}</p>{% endfor %}
+                </div>
 
-                    <div class="plant-field">
-                        <label class="plant-field-label" for="{{ form.difficulty.id_for_label }}">
-                            Tingkat kesulitan <span aria-hidden="true">*</span>
-                        </label>
-                        {{ form.difficulty }}
-                    </div>
+                <div class="plant-field">
+                    <label class="plant-label" for="{{ form.scientific_name.id_for_label }}">
+                        Nama ilmiah (Latin)
+                        <span class="plant-optional-tag">(opsional)</span>
+                    </label>
+                    {{ form.scientific_name }}
+                    {% for error in form.scientific_name.errors %}<p class="plant-form-error">{{ error }}</p>{% endfor %}
+                </div>
 
-                    <div class="plant-field">
-                        <label class="plant-field-label" for="{{ form.sunlight.id_for_label }}">
-                            Kebutuhan sinar matahari <span aria-hidden="true">*</span>
-                        </label>
-                        {{ form.sunlight }}
-                    </div>
+                {% include "plant_library/partials/select_field.html" with field=form.category %}
+                {% include "plant_library/partials/select_field.html" with field=form.difficulty %}
 
-                    <div class="plant-field">
-                        <label class="plant-field-label" for="{{ form.watering.id_for_label }}">
-                            Frekuensi penyiraman <span aria-hidden="true">*</span>
-                        </label>
-                        {{ form.watering }}
-                    </div>
+                <h2 class="plant-form-section">Kebutuhan tumbuh</h2>
 
-                    <div class="plant-field">
-                        <label class="plant-field-label" for="{{ form.indoor_outdoor.id_for_label }}">
-                            Penempatan ruang <span aria-hidden="true">*</span>
-                        </label>
-                        {{ form.indoor_outdoor }}
-                    </div>
+                {% include "plant_library/partials/select_field.html" with field=form.sunlight %}
+                {% include "plant_library/partials/select_field.html" with field=form.watering %}
+                {% include "plant_library/partials/select_field.html" with field=form.indoor_outdoor %}
+                {% include "plant_library/partials/select_field.html" with field=form.space_requirement %}
 
-                    <div class="plant-field">
-                        <label class="plant-field-label" for="{{ form.space_requirement.id_for_label }}">
-                            Kebutuhan ruang / wadah <span aria-hidden="true">*</span>
-                        </label>
-                        {{ form.space_requirement }}
-                    </div>
+                <h2 class="plant-form-section">Catatan &amp; foto</h2>
 
-                    <div class="plant-field plant-field--wide">
-                        <label class="plant-field-label" for="{{ form.image_url.id_for_label }}">
-                            URL gambar tanaman (opsional)
-                        </label>
-                        {{ form.image_url }}
-                        <p class="plant-form-hint">Tempel tautan langsung ke gambar JPG, PNG, atau WebP.</p>
-                    </div>
+                <div class="plant-field plant-field--wide">
+                    <label class="plant-label" for="{{ form.image_url.id_for_label }}">
+                        URL gambar tanaman
+                        <span class="plant-optional-tag">(opsional)</span>
+                    </label>
+                    {{ form.image_url }}
+                    <p class="plant-form-hint">Tempel tautan langsung ke gambar JPG, PNG, atau WebP. Kosongkan saja kalau belum ada foto.</p>
+                    {% for error in form.image_url.errors %}<p class="plant-form-error">{{ error }}</p>{% endfor %}
+                </div>
 
-                    <div class="plant-field plant-field--wide">
-                        <label class="plant-field-label" for="{{ form.description.id_for_label }}">
-                            Deskripsi &amp; panduan perawatan
-                        </label>
-                        {{ form.description }}
-                    </div>
+                <div class="plant-field plant-field--wide">
+                    <label class="plant-label" for="{{ form.description.id_for_label }}">
+                        Deskripsi &amp; panduan perawatan
+                        <span class="plant-optional-tag">(opsional)</span>
+                    </label>
+                    {{ form.description }}
+                    {% for error in form.description.errors %}<p class="plant-form-error">{{ error }}</p>{% endfor %}
                 </div>
 
                 <div class="plant-form-actions">
+                    <a href="{% if is_edit %}{% url 'plant_library:plant_detail' plant.pk %}{% else %}{% url 'plant_library:plant_list' %}{% endif %}" class="plant-btn plant-btn--ghost">
+                        Batal
+                    </a>
                     <button type="submit" class="plant-btn plant-btn--primary">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M20 6 9 17l-5-5"/>
                         </svg>
                         {% if is_edit %}Simpan perubahan{% else %}Tambah tanaman{% endif %}
                     </button>
-                    <a href="{% if is_edit %}{% url 'plant_library:plant_detail' plant.pk %}{% else %}{% url 'plant_library:plant_list' %}{% endif %}" class="plant-btn plant-btn--ghost">
-                        Batal
-                    </a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 </main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.querySelectorAll('[data-plant-select]').forEach(function (root) {
+    var input = root.querySelector('input[type="hidden"]');
+    var label = root.querySelector('[data-plant-label]');
+    root.querySelectorAll('[data-plant-option]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            input.value = btn.getAttribute('data-value');
+            label.textContent = btn.textContent.trim();
+            root.querySelectorAll('[data-plant-option]').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+        });
+    });
+});
+</script>
 {% endblock %}

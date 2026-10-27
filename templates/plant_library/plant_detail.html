@@ -23,46 +23,15 @@
                 <figure class="plant-detail-media">
                     {% if plant.image_url %}
                         <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy" decoding="async"
-                             onerror="this.style.display='none'; this.nextElementSibling.hidden=false;">
-                        <svg hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M12 21v-9.5"/>
-                            <path d="M12 12.5C12 8.6 9 5.5 4 5.5c0 4.9 3 8 8 7Z"/>
-                            <path d="M12 14.5c0-3.9 3-7 8-7 0 4.9-3 8-8 7Z"/>
-                        </svg>
+                             onerror="this.onerror=null; this.src='{% static 'plant_library/img/plant-placeholder.svg' %}'; this.classList.add('plant-card-ph');">
                     {% else %}
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M12 21v-9.5"/>
-                            <path d="M12 12.5C12 8.6 9 5.5 4 5.5c0 4.9 3 8 8 7Z"/>
-                            <path d="M12 14.5c0-3.9 3-7 8-7 0 4.9-3 8-8 7Z"/>
-                        </svg>
+                        <img class="plant-card-ph" src="{% static 'plant_library/img/plant-placeholder.svg' %}"
+                             alt="Ilustrasi {{ plant.name }}" loading="lazy" decoding="async">
                     {% endif %}
                 </figure>
-
-                <div class="plant-tip">
-                    <p class="plant-tip-kicker">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M12 21v-8"/>
-                            <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
-                            <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
-                        </svg>
-                        Tips EcoPatch
-                    </p>
-                    <p>
-                        Cocok untuk ruang <strong>{{ plant.get_space_requirement_display }}</strong> dengan
-                        <strong>{{ plant.get_sunlight_display|lower }}</strong>. Taruh di tempat yang sesuai, lalu atur
-                        jadwal rawatnya di Smart Care supaya tidak lupa.
-                    </p>
-                </div>
             </div>
 
             <div class="plant-detail-body">
-                <p class="plant-kicker">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M4 5h16v14H4z"/><path d="M8 5v14"/><path d="M12 9h4M12 13h4"/>
-                    </svg>
-                    Katalog tanaman
-                </p>
-
                 <div class="plant-detail-head">
                     <h1 class="plant-detail-title">{{ plant.name }}</h1>
                     <span class="plant-status plant-status--{{ plant.difficulty }}">{{ plant.get_difficulty_display }}</span>
@@ -74,8 +43,14 @@
 
                 <div class="plant-detail-badges">
                     <span class="plant-pill plant-pill--type">{{ plant.get_category_display }}</span>
-                    <span class="plant-pill plant-pill--type">{{ plant.get_indoor_outdoor_display }}</span>
-                    <span class="plant-pill plant-pill--sky">{{ plant.get_space_requirement_display }}</span>
+                    {% for patch in matching_patches %}
+                        <span class="plant-pill plant-pill--match">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 6 9 17l-5-5"/>
+                            </svg>
+                            Cocok untuk {{ patch.name }}
+                        </span>
+                    {% endfor %}
                 </div>
 
                 <section class="plant-note{% if not plant.description %} plant-note--empty{% endif %}" aria-label="Tentang tanaman">
@@ -112,13 +87,6 @@
                     </div>
                 </dl>
 
-                <p class="plant-water-note">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M12 3s5.5 5.4 5.5 9.4A5.5 5.5 0 0 1 12 18a5.5 5.5 0 0 1-5.5-5.6C6.5 8.4 12 3 12 3Z"/>
-                    </svg>
-                    Smart Care menyarankan menyiram sekitar tiap {{ plant.watering_interval_days }} hari.
-                </p>
-
                 <div class="plant-actions">
                     {% if user.is_staff %}
                         <a href="{% url 'plant_library:plant_update' plant.pk %}" class="plant-btn plant-btn--primary">
@@ -150,6 +118,18 @@
                 {% endif %}
             </div>
         </article>
+
+        <p class="plant-tip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 21v-8"/>
+                <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+            </svg>
+            <span>
+                Smart Care menyarankan menyiram sekitar tiap {{ plant.watering_interval_days }} hari.
+                Cek dulu kelembapan tanah sebelum menyiram, lalu sesuaikan jadwalnya di Smart Care.
+            </span>
+        </p>
     </div>
 </div>
 </main>
