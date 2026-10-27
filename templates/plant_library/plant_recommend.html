@@ -40,41 +40,37 @@
                 <a href="{% url 'my_ecopatch:list' %}" class="plant-btn plant-btn--primary">Buka My EcoPatch</a>
             </div>
         {% else %}
-            <form class="plant-selector" method="get" action="{% url 'plant_library:plant_recommend' %}">
-                <div class="plant-field">
-                    <span class="plant-field-label">Pilih EcoPatch kamu</span>
-                    <div class="dropdown plant-filter plant-patch-filter">
-                        <button type="button" class="plant-filter-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Pilih EcoPatch kamu, saat ini {{ selected_patch.name }}">
-                            <span class="plant-patch-dot" aria-hidden="true"></span>
-                            <span class="plant-patch-name">{{ selected_patch.name }}</span>
-                        </button>
-                        <ul class="dropdown-menu plant-menu plant-menu--wide">
-                            {% for patch in patch_options %}
-                                <li>
-                                    <a class="dropdown-item plant-menu-item plant-menu-item--rich{% if selected_patch.pk == patch.pk %} active{% endif %}"
-                                       href="?patch={{ patch.pk }}">
-                                        <span class="plant-menu-name">{{ patch.name }}</span>
-                                        <span class="plant-menu-sub">{{ patch.space_label }}{% if patch.sun_label %} &middot; {{ patch.sun_label }}{% endif %}</span>
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+            <form class="plant-patch-bar" method="get" action="{% url 'plant_library:plant_recommend' %}">
+                <span class="plant-patch-label">Kebun aktif</span>
+                <div class="dropdown plant-filter plant-patch-filter">
+                    <button type="button" class="plant-filter-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Pilih EcoPatch kamu, saat ini {{ selected_patch.name }}">
+                        <span class="plant-patch-dot" aria-hidden="true"></span>
+                        <span class="plant-patch-name">{{ selected_patch.name }}</span>
+                    </button>
+                    <ul class="dropdown-menu plant-menu plant-menu--wide">
+                        {% for patch in patch_options %}
+                            <li>
+                                <a class="dropdown-item plant-menu-item plant-menu-item--rich{% if selected_patch.pk == patch.pk %} active{% endif %}"
+                                   href="?patch={{ patch.pk }}">
+                                    <span class="plant-menu-name">{{ patch.name }}</span>
+                                    <span class="plant-menu-sub">{{ patch.space_label }}{% if patch.sun_label %} &middot; {{ patch.sun_label }}{% endif %}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
                 <noscript>
-                    <div class="plant-field">
-                        <label class="plant-field-label" for="patch-selector">Pilih EcoPatch kamu</label>
-                        <div class="plant-select-wrap">
-                            <select name="patch" id="patch-selector" class="plant-select">
-                                {% for patch in patch_options %}
-                                    <option value="{{ patch.pk }}" {% if selected_patch.pk == patch.pk %}selected{% endif %}>
-                                        {{ patch.name }} ({{ patch.space_label }}{% if patch.sun_label %}, {{ patch.sun_label }}{% endif %})
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <button type="submit" class="plant-btn plant-btn--primary">Tampilkan</button>
+                    <label class="visually-hidden" for="patch-selector">Pilih EcoPatch kamu</label>
+                    <div class="plant-select-wrap">
+                        <select name="patch" id="patch-selector" class="plant-select">
+                            {% for patch in patch_options %}
+                                <option value="{{ patch.pk }}" {% if selected_patch.pk == patch.pk %}selected{% endif %}>
+                                    {{ patch.name }} ({{ patch.space_label }}{% if patch.sun_label %}, {{ patch.sun_label }}{% endif %})
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
+                    <button type="submit" class="plant-btn plant-btn--primary">Tampilkan</button>
                 </noscript>
             </form>
 
