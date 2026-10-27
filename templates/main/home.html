@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>EcoPatch - Small Spaces, Greener Living</title>
+<link rel="icon" type="image/svg+xml" href="{% static_v 'img/logo.svg' %}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +15,7 @@
 {% if messages %}<div class="flash" role="status">{% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}</div>{% endif %}
 <header class="nav" id="nav">
   <div class="bar">
-    <a class="logo" href="{% url 'main:home' %}"><svg class="mark" viewBox="0 0 300 300" width="30" height="30" aria-hidden="true"><rect x="0" y="0" width="144" height="144" rx="42" fill="#35c065"/><rect x="156" y="0" width="144" height="144" rx="42" fill="#5ccf82"/><rect x="0" y="156" width="144" height="144" rx="42" fill="#1f9142"/><rect x="156" y="156" width="144" height="144" rx="42" fill="#7ad99b"/><g stroke="#fff" stroke-width="22" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke"><path d="M150 252V136" fill="none" stroke="#fff" stroke-width="36"/><path d="M150 142C120 142 72 126 52 70C100 62 142 90 150 142Z" fill="#4fc874"/><path d="M150 142C180 142 228 122 250 66C200 60 158 90 150 142Z" fill="#4fc874"/><path d="M106 192C98 218 112 246 142 252C150 226 142 196 106 192Z" fill="#ff9d2e"/></g><path d="M150 252V136" fill="none" stroke="#1f9142" stroke-width="14" stroke-linecap="round"/><path d="M150 142C146 112 118 94 84 86M150 142C154 112 182 92 218 82" fill="none" stroke="#1f9142" stroke-width="9" stroke-linecap="round" opacity=".85"/></svg>EcoPatch</a>
+    <a class="logo" href="{% url 'main:home' %}"><img class="mark" src="{% static 'img/logo.svg' %}" alt="" width="30" height="30">EcoPatch</a>
     <nav class="links" aria-label="Navigasi utama">
       <a href="#plant-library">Plant Library</a>
       <a href="#fitur">Fitur</a>
