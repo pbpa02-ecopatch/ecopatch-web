@@ -83,6 +83,49 @@ class GardenUITests(TestCase):
         self.assertEqual(self.patch.city, 'Depok')
         self.assertNotContains(self.client.get(self.url('list')), 'Terrace · ')
 
+    def make_plant(self, name='Mint'):
+        return Plant.objects.create(name=name, category='herbs', sunlight='shade', watering='moderate', difficulty='easy',
+                                    indoor_outdoor='both', space_requirement='any')
+
+    def quick_add(self, patch=None, plant=None, **extra):
+        return self.client.post(self.url('plant_quick_add', (patch or self.patch).pk), {'plant': (plant or self.catalog).pk}, **extra)
+
+    def test_quick_add_puts_the_plant_in_as_a_planned_single_plant(self):
+        other_plant = self.make_plant()
+        response = self.quick_add(plant=other_plant, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['added'])
+        self.assertEqual(data['url'], self.url('detail', self.patch.pk))
+        added = PatchPlant.objects.get(patch=self.patch, plant=other_plant)
+        self.assertEqual((added.quantity, added.status), (1, 'planned'))
+
+    def test_quick_add_does_not_add_a_plant_twice(self):
+        response = self.quick_add(HTTP_X_REQUESTED_WITH='XMLHttpRequest')  # Basil is already growing in self.patch
+        self.assertFalse(response.json()['added'])
+        self.assertEqual(PatchPlant.objects.filter(patch=self.patch, plant=self.catalog).count(), 1)
+
+    def test_quick_add_without_javascript_redirects_to_the_ecopatch(self):
+        self.assertRedirects(self.quick_add(plant=self.make_plant()), self.url('detail', self.patch.pk))
+
+    def test_quick_add_only_works_on_my_own_ecopatch_and_by_post(self):
+        self.assertEqual(self.quick_add(patch=self.private).status_code, 404)
+        self.assertEqual(self.client.get(self.url('plant_quick_add', self.patch.pk)).status_code, 405)
+        self.client.logout()
+        self.assertEqual(self.quick_add().status_code, 302)
+
+    def test_quick_add_rejects_a_plant_that_is_not_a_number_or_does_not_exist(self):
+        url = self.url('plant_quick_add', self.patch.pk)
+        self.assertEqual(self.client.post(url, {'plant': 'abc'}).status_code, 400)
+        self.assertEqual(self.client.post(url, {'plant': '999999'}).status_code, 404)
+        self.assertEqual(self.client.post(url, {}).status_code, 400)
+
+    def test_every_ecopatch_card_has_a_delete_link_that_falls_back_to_the_confirmation_page(self):
+        response = self.client.get(self.url('list'))
+        self.assertContains(response, 'href="%s"' % self.url('delete', self.patch.pk))
+        self.assertContains(response, 'data-mep-delete="Balkon Hijau"')
+        self.assertContains(response, 'id="mep-delete-form"')
+
     def test_empty_and_invalid_form(self):
         self.client.force_login(self.other)
         EcoPatch.objects.filter(owner=self.other).delete()

@@ -298,3 +298,17 @@ body.mep-module{background:#fdf7e8;color:#17301f}
   .mep-band-side .mep-bed{width:112px;flex:none}
   .mep-band-actions .btn{flex:1 1 auto}
 }
+
+/* Delete an EcoPatch from the list: a small trash button on the picture, kept quiet until the card is hovered or focused
+   (always visible on touch screens, where there is no hover). */
+.mep-garden{position:relative}
+.mep-trash{position:absolute;top:10px;right:10px;z-index:2;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;
+  background:#fffdf6e6;border:1.5px solid #d8c7a3;color:#a3301f;box-shadow:0 6px 14px -8px #17301f80;text-decoration:none;transition:opacity .15s,transform .15s,background .15s}
+.mep-trash svg{width:18px;height:18px}
+.mep-trash:hover{background:#fbe1d6;transform:scale(1.06)}
+.mep-trash:focus-visible{opacity:1}
+@media (hover:hover) and (pointer:fine){
+  .mep-trash{opacity:0}
+  .mep-garden:hover .mep-trash,.mep-garden:focus-within .mep-trash{opacity:1}
+}
+@media (prefers-reduced-motion:reduce){.mep-trash{transition:none}}
