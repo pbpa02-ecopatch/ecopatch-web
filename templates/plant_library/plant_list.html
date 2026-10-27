@@ -43,8 +43,9 @@
         <form class="plant-finder" method="get" action="{% url 'plant_library:plant_list' %}" role="search"
               hx-get="{% url 'plant_library:plant_list' %}"
               hx-target="#plant-results" hx-select="#plant-results" hx-swap="outerHTML"
-              hx-push-url="true"
-              hx-trigger="submit, keyup changed delay:400ms from:.plant-search-input, search from:.plant-search-input">
+              hx-replace-url="true"
+              hx-sync="this:replace"
+              hx-trigger="submit, input changed delay:400ms from:.plant-search-input, search from:.plant-search-input">
             <img class="plant-finder-pet" src="{% static 'my_ecopatch/petak.svg' %}" alt="" aria-hidden="true" width="126" height="123" loading="lazy" decoding="async">
 
             <div class="plant-finder-card">
@@ -127,19 +128,34 @@
             </div>
         </form>
 
-        <div class="plant-suggest-row" aria-label="Rekomendasi pencarian cepat">
-            <span class="plant-suggest-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
-                    <circle cx="12" cy="12" r="3.4"/>
-                </svg>
-                Coba cepat
-            </span>
-            <button type="button" class="plant-suggest" data-plant-suggest="tanaman yang mudah dirawat">Mudah dirawat</button>
-            <button type="button" class="plant-suggest" data-plant-suggest="tanaman teduh untuk indoor">Teduh &amp; indoor</button>
-            <button type="button" class="plant-suggest" data-plant-suggest="cahaya penuh">Cahaya penuh</button>
-            <button type="button" class="plant-suggest" data-plant-suggest="perawatan sedang">Perawatan sedang</button>
-        </div>
+        <section class="plant-ask" aria-label="Bantuan mencari tanaman">
+            <div class="plant-ask-pet">
+                <img src="{% static 'my_ecopatch/petak.svg' %}" alt="" width="52" height="51" loading="lazy" decoding="async">
+                <p class="plant-ask-bubble">
+                    <strong>Bingung mulai dari mana?</strong>
+                    <span>Pilih situasi yang paling mirip, nanti aku carikan.</span>
+                </p>
+            </div>
+
+            <div class="plant-ask-questions">
+                <button type="button" class="plant-ask-q" data-plant-suggest="tanaman yang mudah dirawat">
+                    <span class="plant-ask-q-icon" aria-hidden="true">?</span>
+                    Aku baru mulai berkebun
+                </button>
+                <button type="button" class="plant-ask-q" data-plant-suggest="tanaman teduh untuk indoor">
+                    <span class="plant-ask-q-icon" aria-hidden="true">?</span>
+                    Ruanganku minim cahaya
+                </button>
+                <button type="button" class="plant-ask-q" data-plant-suggest="cahaya penuh">
+                    <span class="plant-ask-q-icon" aria-hidden="true">?</span>
+                    Balkonku kena matahari penuh
+                </button>
+                <button type="button" class="plant-ask-q" data-plant-suggest="perawatan sedang">
+                    <span class="plant-ask-q-icon" aria-hidden="true">?</span>
+                    Aku mau perawatan yang santai
+                </button>
+            </div>
+        </section>
 
         <div id="plant-results" class="plant-results-block" aria-live="polite">
             <div class="plant-results">
@@ -184,21 +200,51 @@
 {% block extra_scripts %}
 <script>
 (function () {
-    var input = document.getElementById('plant-q');
-    var form = input ? input.form : null;
-    if (!input || !form) return;
+    function getInput() {
+        return document.getElementById('plant-q');
+    }
 
-    document.querySelectorAll('[data-plant-suggest]').forEach(function (button) {
-        button.addEventListener('click', function () {
-            input.value = button.getAttribute('data-plant-suggest');
-            if (window.htmx) {
-                input.dispatchEvent(new Event('search', { bubbles: true }));
-            } else {
-                form.requestSubmit();
-            }
-            input.focus();
+    function syncSuggestState() {
+        var input = getInput();
+        if (!input) return;
+        var value = input.value.trim();
+        Array.prototype.forEach.call(document.querySelectorAll('[data-plant-suggest]'), function (button) {
+            var active = button.getAttribute('data-plant-suggest') === value;
+            button.classList.toggle('is-active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
+    }
+
+    // Delegated so the helper keeps working after htmx replaces the filter body.
+    document.addEventListener('click', function (event) {
+        var target = event.target;
+        if (!target || !target.closest) return;
+        var button = target.closest('[data-plant-suggest]');
+        if (!button) return;
+        var input = getInput();
+        var form = input ? input.form : null;
+        if (!input || !form) return;
+
+        input.value = button.getAttribute('data-plant-suggest');
+        syncSuggestState();
+        if (window.htmx) {
+            input.dispatchEvent(new Event('search', { bubbles: true }));
+        } else {
+            form.requestSubmit();
+        }
+        input.focus();
     });
+
+    document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'plant-q') syncSuggestState();
+    });
+
+    if (window.htmx) {
+        document.body.addEventListener('htmx:afterSwap', syncSuggestState);
+    }
+    syncSuggestState();
 })();
 </script>
 {% endblock %}
+
+{% block footer %}{% endblock %}
