@@ -652,30 +652,57 @@ body.has-sidebar.pf-body {
     background: var(--pf-brand-soft);
 }
 
+/* keluar dan hapus akun: dua tombol sejajar, sama tinggi, di bawah garis tipis */
+.pf-acts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--pf-line);
+}
+
 .pf-logout {
     margin: 0;
 }
 
-.pf-lo {
+.pf-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
+    height: 46px;
+    padding: 0 20px;
+    border: 1.5px solid var(--pf-field);
+    border-radius: 99px;
+    background: #fff;
+    font: 700 0.95rem var(--bs-body-font-family, sans-serif);
+    color: var(--pf-fg);
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
 }
 
-.pf-lo svg {
-    width: 20px;
-    height: 20px;
+.pf-btn svg {
+    width: 19px;
+    height: 19px;
 }
 
-.pf-danger {
-    align-self: flex-start;
-    padding: 10px 4px;
-    border-bottom-color: transparent;
+.pf-btn:hover {
+    border-color: var(--pf-fg);
+}
+
+.pf-btn:focus-visible {
+    outline: 3px solid var(--pf-mango);
+    outline-offset: 3px;
+}
+
+.pf-btn-danger {
+    border-color: rgba(163, 48, 31, 0.45);
     color: var(--pf-late);
 }
 
-.pf-danger:hover {
-    border-bottom-color: var(--pf-late);
+.pf-btn-danger:hover {
+    border-color: var(--pf-late);
+    background: #fdf1ee;
 }
 
 /* ---------------------------------------------------------------- Menu foto */
@@ -1064,6 +1091,14 @@ body.has-sidebar.pf-body {
 
     .pf-st:first-child {
         padding-left: 0;
+    }
+
+    .pf-acts > * {
+        flex: 1 1 100%;
+    }
+
+    .pf-acts .pf-btn {
+        width: 100%;
     }
 
     .pf-sec {

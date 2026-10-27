@@ -122,19 +122,21 @@
                 </section>
             </form>
 
-            {# Akun: password dan hapus akun punya formnya sendiri di dalam dialog, jadi tidak ikut tombol Simpan #}
+            {# Keamanan: password dan hapus akun punya formnya sendiri di dalam dialog, jadi tidak ikut tombol Simpan #}
             <section class="pf-sec" aria-labelledby="pf-s5">
-                <div class="pf-sh"><h2 id="pf-s5">Akun</h2><p>Masuk sebagai @{{ user.username }}.</p></div>
+                <div class="pf-sh"><h2 id="pf-s5">Keamanan</h2><p>Password dan akses akunmu. Masuk sebagai @{{ user.username }}.</p></div>
                 <div class="pf-sb pf-acct">
                     <div class="pf-fld"><span class="pf-lbl">Password</span>
                         <div class="pf-pwrow"><span aria-hidden="true">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span><button type="button" class="pf-eye" data-bs-toggle="modal" data-bs-target="#password-modal">Ganti</button></div>
                         <small>Pakai password yang hanya dipakai di EcoPatch.</small>
                     </div>
-                    <form action="{% url 'main:logout' %}" method="post" class="pf-logout">
-                        {% csrf_token %}
-                        <button type="submit" class="pf-lnk pf-lo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M15 8l4 4-4 4M19 12H9"/></svg>Keluar dari akun</button>
-                    </form>
-                    <button type="button" class="pf-lnk pf-danger" data-bs-toggle="modal" data-bs-target="#delete-modal">Hapus akun</button>
+                    <div class="pf-acts">
+                        <form action="{% url 'main:logout' %}" method="post" class="pf-logout">
+                            {% csrf_token %}
+                            <button type="submit" class="pf-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M15 8l4 4-4 4M19 12H9"/></svg>Keluar dari akun</button>
+                        </form>
+                        <button type="button" class="pf-btn pf-btn-danger" data-bs-toggle="modal" data-bs-target="#delete-modal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12M10 11v5M14 11v5"/></svg>Hapus akun</button>
+                    </div>
                 </div>
             </section>
         </div>
