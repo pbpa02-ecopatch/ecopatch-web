@@ -139,12 +139,6 @@ body.has-sidebar.seed-body {
     display: block;
     width: 100%;
     height: auto;
-    animation: seed-bob 5.5s ease-in-out infinite;
-}
-
-@keyframes seed-bob {
-    0%, 100% { transform: translateY(0) rotate(0); }
-    50% { transform: translateY(-7px) rotate(-1.5deg); }
 }
 
 /* ------------------------------------------------------- Hero scene */
@@ -397,7 +391,6 @@ body.has-sidebar.seed-body {
     width: clamp(168px, 18vw, 220px);
     height: auto;
     filter: drop-shadow(0 16px 24px rgba(23, 48, 31, 0.2));
-    animation: seed-bob 5.5s ease-in-out infinite;
 }
 
 .seed-stall {
@@ -1469,7 +1462,6 @@ button.seed-filter {
     object-fit: contain !important;
     padding: 22px 22px 4px;
     filter: drop-shadow(0 10px 12px rgba(23, 48, 31, 0.14));
-    animation: seed-bob 5.5s ease-in-out infinite;
 }
 
 .seed-detail-owner {
