@@ -1,8 +1,11 @@
+from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import GardenJournalForm
@@ -51,12 +54,21 @@ def _get_plant_books(request):
         latest = p_journals.first()
         if latest:
             cover_pattern = latest.cover_pattern or "flowers"
+            _ds_badge_map = {
+                "healthy": "healthy",
+                "needs_attention": "attention",
+                "wilting": "wilting",
+                "flowering": "flowering",
+                "fruiting": "planned",
+                "ready_to_harvest": "healthy",
+            }
             books.append({
                 "plant_name": p_name,
                 "count": p_journals.count(),
                 "latest_date": latest.date,
                 "latest_condition": latest.plant_condition,
                 "condition_badge": latest.get_condition_display_badge,
+                "condition_ds_badge": _ds_badge_map.get(latest.plant_condition, "attention"),
                 "condition_display": latest.get_plant_condition_display(),
                 "cover_pattern": cover_pattern,
                 "cover_color": latest.cover_color or "",
@@ -66,11 +78,49 @@ def _get_plant_books(request):
     return books
 
 
+def _get_user_patch_plants(user):
+    """Mengambil daftar nama tanaman milik user dari My EcoPatch.
+
+    Opsi 2 (Fleksibel & Terintegrasi):
+    Mengambil semua tanaman yang ada di My EcoPatch (Planned, Planted, Growing, Harvested)
+    kecuali yang berstatus Removed. Pengguna dapat langsung menulis jurnal sejak tahap
+    perencanaan bibit tanpa terblokir.
+    """
+    from my_ecopatch.models import PatchPlant
+    patch_plants = (
+        PatchPlant.objects.filter(patch__owner=user)
+        .exclude(status=PatchPlant.Status.REMOVED)
+        .select_related("plant", "patch")
+        .order_by("patch__name", "plant__name", "plant_name")
+    )
+    seen = set()
+    plants = []
+    for pp in patch_plants:
+        p_name = pp.plant.name if pp.plant_id else pp.plant_name
+        if p_name and p_name not in seen:
+            seen.add(p_name)
+            plants.append(p_name)
+    return plants
+
+
+def _has_planned_plants(user):
+    """Mengecek apakah user memiliki tanaman yang masih berstatus Planned."""
+    from my_ecopatch.models import PatchPlant
+    return PatchPlant.objects.filter(
+        patch__owner=user, status=PatchPlant.Status.PLANNED
+    ).exists()
+
+
 @login_required
 def journal_list(request):
     """Halaman utama Garden Journal dengan tampilan buku per tanaman."""
+    from my_ecopatch.models import EcoPatch
+
     user_journals = GardenJournal.objects.filter(user=request.user)
     books = _get_plant_books(request)
+    has_ecopatch = EcoPatch.objects.filter(owner=request.user).exists()
+    user_plants = _get_user_patch_plants(request.user)
+    has_planned_plants = _has_planned_plants(request.user)
 
     ecopatch_names = (
         user_journals.exclude(ecopatch_name="")
@@ -78,10 +128,31 @@ def journal_list(request):
         .distinct()
     )
 
+    today = timezone.localdate()
+    last_7_dates = [today - timedelta(days=i) for i in range(6, -1, -1)]
+    journal_dates_set = set(
+        user_journals.filter(date__in=last_7_dates).values_list("date", flat=True)
+    )
+    id_day_names = {0: "Sen", 1: "Sel", 2: "Rab", 3: "Kam", 4: "Jum", 5: "Sab", 6: "Min"}
+    last_7_days = [
+        {
+            "date": d,
+            "day_name": id_day_names.get(d.weekday(), d.strftime("%a")),
+            "has_entry": d in journal_dates_set,
+            "is_today": d == today,
+        }
+        for d in last_7_dates
+    ]
+    days_written_count = user_journals.values("date").distinct().count()
+
     context = {
         "books": books,
         "total_journals": user_journals.count(),
+        "total_user_journals": user_journals.count(),
         "total_plants": len(books),
+        "total_user_plants": len(user_plants),
+        "days_written_count": days_written_count,
+        "last_7_days": last_7_days,
         "ecopatch_names": ecopatch_names,
         "conditions": GardenJournal.CONDITION_CHOICES,
         "selected_ecopatch_name": request.GET.get("ecopatch_name", ""),
@@ -89,6 +160,10 @@ def journal_list(request):
         "selected_condition": request.GET.get("condition", ""),
         "date_from": request.GET.get("date_from", ""),
         "date_to": request.GET.get("date_to", ""),
+        "has_ecopatch": has_ecopatch,
+        "has_user_plants": len(user_plants) > 0,
+        "has_planned_plants": has_planned_plants,
+        "user_plants": user_plants,
     }
     return render(request, "garden_journal/list.html", context)
 
@@ -96,8 +171,20 @@ def journal_list(request):
 @login_required
 def journal_filter_ajax(request):
     """Endpoint untuk HTMX live search/filter tanpa reload halaman di rak buku."""
+    user_journals = GardenJournal.objects.filter(user=request.user)
     books = _get_plant_books(request)
-    return render(request, "garden_journal/partials/book_grid.html", {"books": books})
+    user_plants = _get_user_patch_plants(request.user)
+    return render(
+        request,
+        "garden_journal/partials/book_grid.html",
+        {
+            "books": books,
+            "total_journals": user_journals.count(),
+            "total_user_journals": user_journals.count(),
+            "has_user_plants": len(user_plants) > 0,
+            "user_plants": user_plants,
+        },
+    )
 
 
 @login_required
@@ -139,6 +226,7 @@ def plant_journal_history(request, plant_name):
 
     all_entries_json = json.dumps([
         {
+            "id": j.pk,
             "pk": j.pk,
             "title": j.title,
             "notes": j.notes,
@@ -151,6 +239,7 @@ def plant_journal_history(request, plant_name):
             "badge": badge_map.get(j.plant_condition, "secondary"),
             "edit_url": f"/journal/{j.pk}/edit/",
             "delete_url": f"/journal/{j.pk}/delete/",
+            "upload_photo_url": f"/journal/{j.pk}/upload-photo/",
             "image_url": j.image.url if j.image else None,
             "created_at": j.created_at.strftime("%d %b %Y, %H:%M"),
         }
@@ -200,6 +289,7 @@ def plant_journal_history(request, plant_name):
         "selected_date": date_filter,
         "latest_condition": first_all.plant_condition if first_all else "healthy",
         "latest_badge": first_all.get_condition_display_badge if first_all else "success",
+        "latest_ds_badge": first_all.get_condition_ds_class if first_all else "badge-ds-healthy",
         "latest_condition_display": first_all.get_plant_condition_display() if first_all else "Healthy",
         "all_entries_json": all_entries_json,
         "initial_page": 0,  # Selalu buka lembar catatan terkini (index 0)
@@ -225,25 +315,79 @@ def journal_detail(request, pk):
 
 @login_required
 def journal_create(request):
-    """Menambah catatan jurnal baru."""
-    initial_plant = request.GET.get("plant_name", "")
+    """Menambah catatan jurnal baru dengan 2-step setup:
+    Step 1: Setup EcoPatch, Tanaman, dan Sampul Buku
+    Step 2: Catatan jurnal (kondisi, catatan, foto, tinggi, tanggal)
+    """
+    import json
+    from datetime import date
+    from my_ecopatch.models import EcoPatch
+
+    user_patches = EcoPatch.objects.filter(owner=request.user).prefetch_related("plants__plant")
+    has_ecopatch = user_patches.exists()
+
+    initial_plant = request.GET.get("plant_name", "").strip() or request.POST.get("plant_name", "").strip()
+    prev_journal = None
+    is_adding_to_existing_book = False
+    start_at_step_2 = False
+
+    if initial_plant:
+        prev_journal = GardenJournal.objects.filter(
+            user=request.user, plant_name__iexact=initial_plant
+        ).first()
+        if prev_journal:
+            is_adding_to_existing_book = True
+            start_at_step_2 = True
+
     if request.method == "POST":
         form = GardenJournalForm(request.POST, request.FILES)
         if form.is_valid():
             journal = form.save(commit=False)
             journal.user = request.user
             journal.save()
-            messages.success(request, f"Catatan untuk '{journal.plant_name}' berhasil ditambahkan ke lembar buku! 🌿")
+            messages.success(request, f"Catatan untuk '{journal.plant_name}' berhasil ditambahkan ke lembar buku!")
             return redirect("garden_journal:plant_history", plant_name=journal.plant_name)
+        else:
+            step1_fields = {"plant_name", "ecopatch_name", "cover_pattern"}
+            has_step1_errors = any(f in form.errors for f in step1_fields)
+            start_at_step_2 = not has_step1_errors or is_adding_to_existing_book
     else:
-        initial_data = {}
+        initial_data = {"date": date.today()}
         if initial_plant:
             initial_data["plant_name"] = initial_plant
-            prev = GardenJournal.objects.filter(user=request.user, plant_name=initial_plant).first()
-            if prev:
-                initial_data["cover_pattern"] = prev.cover_pattern
-                initial_data["ecopatch_name"] = prev.ecopatch_name
+            if prev_journal:
+                initial_data["plant_name"] = prev_journal.plant_name
+                initial_data["cover_pattern"] = prev_journal.cover_pattern
+                initial_data["cover_color"] = prev_journal.cover_color
+                initial_data["ecopatch_name"] = prev_journal.ecopatch_name
+        elif has_ecopatch:
+            first_patch = user_patches.first()
+            if first_patch:
+                initial_data["ecopatch_name"] = first_patch.name
         form = GardenJournalForm(initial=initial_data)
+
+    patch_plants_data = {}
+    for patch in user_patches:
+        plants = []
+        for pp in patch.plants.all():
+            p_name = pp.plant.name if pp.plant_id else pp.plant_name
+            if p_name and p_name not in plants:
+                plants.append(p_name)
+        patch_plants_data[patch.name] = plants
+
+    existing_books_data = {}
+    for j in GardenJournal.objects.filter(user=request.user).order_by("created_at"):
+        if j.plant_name:
+            if j.plant_name not in existing_books_data:
+                existing_books_data[j.plant_name] = {
+                    "cover_pattern": j.cover_pattern or "soft",
+                    "cover_color": j.cover_color or "",
+                    "ecopatch_name": j.ecopatch_name or "",
+                    "entry_count": 0,
+                }
+            existing_books_data[j.plant_name]["cover_pattern"] = j.cover_pattern or "soft"
+            existing_books_data[j.plant_name]["cover_color"] = j.cover_color or ""
+            existing_books_data[j.plant_name]["entry_count"] += 1
 
     return render(
         request,
@@ -252,14 +396,25 @@ def journal_create(request):
             "form": form,
             "action": "Tambah",
             "journal": None,
+            "has_ecopatch": has_ecopatch,
+            "user_patches": user_patches,
+            "patch_plants_json": json.dumps(patch_plants_data),
+            "existing_books_json": json.dumps(existing_books_data),
+            "start_at_step_2": start_at_step_2,
+            "is_adding_to_existing_book": is_adding_to_existing_book,
+            "initial_plant": initial_plant,
         },
     )
 
 
 @login_required
 def journal_edit(request, pk):
-    """Mengedit catatan jurnal yang sudah ada."""
+    """Mengedit catatan jurnal yang sudah ada. Langsung masuk ke Step 2 (Next)."""
+    import json
+    from my_ecopatch.models import EcoPatch
+
     journal = get_object_or_404(GardenJournal, pk=pk, user=request.user)
+    user_patches = EcoPatch.objects.filter(owner=request.user).prefetch_related("plants__plant")
 
     if request.method == "POST":
         form = GardenJournalForm(request.POST, request.FILES, instance=journal)
@@ -270,6 +425,15 @@ def journal_edit(request, pk):
     else:
         form = GardenJournalForm(instance=journal)
 
+    patch_plants_data = {}
+    for patch in user_patches:
+        plants = []
+        for pp in patch.plants.all():
+            p_name = pp.plant.name if pp.plant_id else pp.plant_name
+            if p_name and p_name not in plants:
+                plants.append(p_name)
+        patch_plants_data[patch.name] = plants
+
     return render(
         request,
         "garden_journal/form.html",
@@ -277,6 +441,11 @@ def journal_edit(request, pk):
             "form": form,
             "action": "Edit",
             "journal": journal,
+            "has_ecopatch": True,
+            "user_patches": user_patches,
+            "patch_plants_json": json.dumps(patch_plants_data),
+            "start_at_step_2": True,  # Edit selalu langsung buka step 2
+            "initial_plant": journal.plant_name,
         },
     )
 
@@ -293,3 +462,28 @@ def journal_delete(request, pk):
     if GardenJournal.objects.filter(user=request.user, plant_name=plant_name).exists():
         return redirect("garden_journal:plant_history", plant_name=plant_name)
     return redirect("garden_journal:list")
+
+
+@login_required
+@require_POST
+def journal_quick_upload_photo(request, pk):
+    """Upload cepat foto tanaman langsung dari lembaran buku tanpa membuka form edit."""
+    journal = get_object_or_404(GardenJournal, pk=pk, user=request.user)
+    if "image" not in request.FILES:
+        return JsonResponse({"success": False, "error": "Tidak ada file foto yang dipilih."}, status=400)
+
+    image_file = request.FILES["image"]
+    valid_content_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+    if hasattr(image_file, "content_type") and image_file.content_type not in valid_content_types:
+        return JsonResponse({"success": False, "error": "Format file harus JPG, PNG, atau WebP."}, status=400)
+
+    if image_file.size > 5 * 1024 * 1024:
+        return JsonResponse({"success": False, "error": "Ukuran foto maksimal 5 MB."}, status=400)
+
+    journal.image = image_file
+    journal.save(update_fields=["image", "updated_at"])
+    return JsonResponse({
+        "success": True,
+        "image_url": journal.image.url,
+        "message": f"Foto untuk '{journal.title}' berhasil diunggah!",
+    })

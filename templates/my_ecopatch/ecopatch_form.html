@@ -1,12 +1,13 @@
-{% extends "base.html" %}
+{% extends "my_ecopatch/base.html" %}
 {% block title %}{% if patch %}Ubah EcoPatch{% else %}Buat EcoPatch Baru{% endif %} - EcoPatch{% endblock %}
 
-{% block content %}
+{% block garden_content %}<div class="mep-content">
 <section class="patch-form-shell">
     <a class="patch-back" href="{% if patch %}{% url 'my_ecopatch:detail' patch.pk %}{% else %}{% url 'my_ecopatch:list' %}{% endif %}">&larr; Kembali</a>
     <h1 class="patch-page-title">{% if patch %}Ubah EcoPatch{% else %}Buat EcoPatch Baru{% endif %}</h1>
     <p class="patch-page-lead">Ceritakan sedikit tentang ruang berkebunmu supaya rekomendasi tanaman bisa lebih pas.</p>
 
+    <p class="patch-help">Kolom bertanda * wajib diisi. Data lainnya boleh dilengkapi nanti.</p>
     <form method="post" class="patch-form" novalidate>
         {% csrf_token %}
         {% if form.non_field_errors %}
@@ -21,8 +22,4 @@
         </div>
     </form>
 </section>
-{% endblock %}
-
-{% block extra_scripts %}
-{% include "my_ecopatch/_select_script.html" %}
-{% endblock %}
+</div>{% endblock %}

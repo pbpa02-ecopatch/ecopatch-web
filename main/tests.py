@@ -867,3 +867,45 @@ class NotFoundPageTests(TestCase):
         body = self.client.get('/tidak-ada/').content.decode()
         self.assertEqual(body.count('class="shard"'), 5)
         self.assertEqual(body.count('class="hole"'), 5)
+
+
+class MediaServingTests(TestCase):
+    """Uploads must be reachable with DEBUG off too (the test runner always runs with DEBUG off)."""
+
+    def setUp(self):
+        self.media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.media, ignore_errors=True)
+        os.makedirs(os.path.join(self.media, 'avatars'))
+        with open(os.path.join(self.media, 'avatars', 'foto.txt'), 'w') as handle:
+            handle.write('isi foto')
+        self.secret = os.path.join(os.path.dirname(self.media), 'rahasia-di-luar-media.txt')
+        with open(self.secret, 'w') as handle:
+            handle.write('jangan bocor')
+        self.addCleanup(lambda: os.path.exists(self.secret) and os.remove(self.secret))
+
+    def test_an_uploaded_file_is_served(self):
+        with override_settings(MEDIA_ROOT=self.media, DEBUG=False):
+            response = self.client.get('/media/avatars/foto.txt')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(b''.join(response.streaming_content), b'isi foto')
+
+    def test_a_missing_file_is_a_404(self):
+        with override_settings(MEDIA_ROOT=self.media, DEBUG=False):
+            self.assertEqual(self.client.get('/media/avatars/tidak-ada.png').status_code, 404)
+
+    def test_a_path_that_climbs_out_of_media_is_refused(self):
+        with override_settings(MEDIA_ROOT=self.media, DEBUG=False):
+            for path in ('/media/../rahasia-di-luar-media.txt', '/media/avatars/../../rahasia-di-luar-media.txt',
+                         '/media/%2e%2e/rahasia-di-luar-media.txt'):
+                response = self.client.get(path)
+                self.assertIn(response.status_code, (400, 404), path)  # refused either way, never the file
+                self.assertNotIn(b'jangan bocor', response.content)
+
+    def test_the_avatar_url_of_a_profile_points_into_media(self):
+        user = get_user_model().objects.create_user('foto', 'f@example.com', 'pass12345')
+        with override_settings(MEDIA_ROOT=self.media, DEBUG=False):
+            profile = Profile.objects.create(user=user)
+            profile.avatar.name = 'avatars/foto.txt'
+            profile.save()
+            self.assertTrue(profile.avatar.url.startswith('/media/'))
+            self.assertEqual(self.client.get(profile.avatar.url).status_code, 200)

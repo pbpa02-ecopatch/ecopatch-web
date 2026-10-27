@@ -1,13 +1,6 @@
-{% load patch_extras %}
 <div class="patch-field{% if field.errors %} has-error{% endif %}">
-    <label class="patch-label" for="{% if field|is_select %}{{ field.id_for_label }}_btn{% else %}{{ field.id_for_label }}{% endif %}">
-        {{ field.label }}{% if field.field.required %} <span class="patch-required" aria-hidden="true">*</span>{% endif %}
-    </label>
-    {% if field|is_select %}
-        {% include "my_ecopatch/_select_field.html" %}
-    {% else %}
-        {{ field }}
-    {% endif %}
-    {% if field.help_text %}<p class="patch-help">{{ field.help_text }}</p>{% endif %}
-    {% for error in field.errors %}<p class="patch-error">{{ error }}</p>{% endfor %}
+    <label class="patch-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="patch-required" aria-hidden="true">*</span>{% endif %}</label>
+    {{ field }}
+    {% if field.help_text %}<p class="patch-help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>{% endif %}
+    {% if field.errors %}<ul class="patch-error" id="{{ field.auto_id }}_error" role="alert">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
 </div>

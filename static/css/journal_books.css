@@ -1,4 +1,64 @@
 /* =========================================================
+   GARDEN JOURNAL — DESIGN SYSTEM TOKENS
+   ========================================================= */
+
+:root {
+    /* --- Typography --- */
+    --font-display: 'Baloo 2', sans-serif;
+    --font-body:    'Plus Jakarta Sans', sans-serif;
+
+    /* Font sizes */
+    --fs-display-xl: 32px; --lh-display-xl: 40px;
+    --fs-h1:         26px; --lh-h1:         34px;
+    --fs-h2:         20px; --lh-h2:         28px;
+    --fs-body:       15px; --lh-body:       22px;
+    --fs-caption:    13px; --lh-caption:    18px;
+    --fs-overline:   11px; --lh-overline:   14px;
+
+    /* --- Spacing --- */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+
+    /* --- Corner Radius --- */
+    --radius-sm:   10px;
+    --radius-md:   18px;
+    --radius-lg:   28px;
+    --radius-full: 999px;
+
+    /* --- Shadows --- */
+    --shadow-sm:      0 1px 2px rgba(34, 48, 31, 0.08);
+    --shadow-md:      0 6px 16px rgba(34, 48, 31, 0.08);
+    --shadow-pressed: inset 0 2px 4px rgba(34, 48, 31, 0.18);
+
+    /* --- Color Tokens --- */
+    --ink:            #22301f;
+    --ink-muted:      #59684f;
+    --border:         #e6cf95;
+    --surface-input:  #fdedc9;
+    --surface-white:  #ffffff;
+
+    /* --- Button colors --- */
+    --btn-primary-bg:   #1f9142;
+    --btn-primary-fg:   #ffffff;
+    --btn-secondary-bg: #cbf5d6;
+    --btn-secondary-fg: #155e2e;
+    --btn-ghost-border: #e6cf95;
+    --btn-ghost-fg:     #22301f;
+    --btn-danger-bg:    #8c5344;
+    --btn-danger-fg:    #ffffff;
+
+    /* --- Badge colors (Soft Botanical Earth Tones) --- */
+    --badge-healthy-bg:    #cbf5d6; --badge-healthy-fg:    #15652f;
+    --badge-attention-bg:  #fde9c9; --badge-attention-fg:  #96540c;
+    --badge-sky-bg:        #e5eff2; --badge-sky-fg:        #456b77;
+    --badge-danger-bg:     #fbf0ea; --badge-danger-fg:     #8c5344;
+    --badge-planned-bg:    #fae8be; --badge-planned-fg:    #7d5a15;
+}
+
+/* =========================================================
    GARDEN JOURNAL - 3D BOOK STYLING & PATTERNS
    ========================================================= */
 
@@ -7,41 +67,286 @@
 }
 
 .journal-title {
-    font-family: 'Baloo 2', sans-serif;
-    font-weight: 800;
-    font-size: 2.2rem;
-    color: #22301f;
-    letter-spacing: -0.5px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-display-xl);
+    line-height: var(--lh-display-xl);
+    color: var(--ink);
+    letter-spacing: -0.3px;
 }
 
 .journal-subtitle {
-    color: #59684f;
-    font-size: 0.95rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--ink-muted);
 }
 
-/* Filter pills inspired by design */
-.filter-pill-btn {
+/* =========================================================
+   GARDEN JOURNAL HERO BANNER — Animated & Botanical
+   ========================================================= */
+.journal-hero-banner {
+    background: linear-gradient(135deg, #FFFDF7 0%, #FFF4D9 100%);
+    border: 1.5px solid #ecd8ab;
+    border-radius: 28px;
+    padding: 32px 36px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(60, 45, 20, 0.05);
+}
+
+.journal-hero-decors {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.journal-decor-leaf {
+    position: absolute;
+    opacity: 0.22;
+    filter: drop-shadow(0 2px 4px rgba(31, 145, 66, 0.15));
+}
+
+.journal-decor-leaf-1 {
+    top: -10px;
+    right: 25%;
+    animation: leafFloat1 6s ease-in-out infinite alternate;
+}
+
+.journal-decor-leaf-2 {
+    bottom: -15px;
+    left: 45%;
+    animation: leafFloat2 7s ease-in-out infinite alternate;
+}
+
+.journal-decor-sparkle {
+    position: absolute;
+    color: #ff9d2e;
+    font-size: 1.1rem;
+    animation: sparkleTwinkle 3s ease-in-out infinite;
+}
+
+.journal-decor-sparkle-1 {
+    top: 18px;
+    right: 20%;
+    animation-delay: 0.5s;
+}
+
+.journal-decor-sparkle-2 {
+    bottom: 22px;
+    right: 32%;
+    animation-delay: 1.8s;
+}
+
+@keyframes leafFloat1 {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(12px) rotate(15deg); }
+}
+
+@keyframes leafFloat2 {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(-10px) rotate(-12deg); }
+}
+
+@keyframes sparkleTwinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.85); }
+    50% { opacity: 0.9; transform: scale(1.15) rotate(10deg); }
+}
+
+.journal-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 14px;
+    background: rgba(45, 125, 50, 0.09);
+    border: 1px solid rgba(45, 125, 50, 0.2);
     border-radius: 999px;
-    background: #ffffff;
-    border: 1px solid #e6cf95;
-    padding: 6px 16px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #22301f;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #246d29;
+    margin-bottom: 12px;
+}
+
+.journal-hero-title {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: clamp(1.85rem, 3.8vw, 2.45rem);
+    font-weight: 800;
+    line-height: 1.2;
+    color: #1a2b1a;
+    margin-bottom: 10px;
+}
+
+.journal-hero-title .accent-journal {
+    color: #1f9142;
+    position: relative;
+    display: inline-block;
+}
+
+.journal-hero-title .accent-journal::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 3px;
+    width: 100%;
+    height: 7px;
+    background: #ffc46a;
+    border-radius: 3px;
+    z-index: -1;
+    opacity: 0.75;
+}
+
+.journal-hero-lead {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #556b4f;
+    max-width: 560px;
+    margin-bottom: 18px;
+}
+
+.journal-hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.journal-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 0 2px 6px rgba(34, 48, 31, 0.05);
+    background: #ffffff;
+    border: 1.2px solid #ebd9b0;
+    border-radius: 999px;
+    padding: 5px 13px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #2d4529;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease;
+}
+
+.journal-chip:hover {
+    transform: translateY(-1px);
+}
+
+.journal-hero-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding-top: 10px;
+}
+
+.journal-hero-mascot-box {
+    position: relative;
+    text-align: center;
+    animation: mascotHover 4s ease-in-out infinite;
+}
+
+@keyframes mascotHover {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(1.5deg); }
+}
+
+.journal-hero-mascot-img {
+    width: 115px;
+    height: auto;
+    filter: drop-shadow(0 10px 14px rgba(45, 65, 30, 0.12));
+}
+
+.journal-mascot-speech {
+    position: absolute;
+    top: -18px;
+    right: -24px;
+    background: #ffffff;
+    border: 1.5px solid #ebd9b0;
+    border-radius: 14px;
+    padding: 5px 11px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #246d29;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    white-space: nowrap;
+    animation: speechWiggle 4s ease-in-out infinite;
+    z-index: 2;
+}
+
+@keyframes speechWiggle {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04) rotate(-1.5deg); }
+}
+
+.journal-mascot-speech::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 20px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #ffffff;
+}
+
+.journal-hero-cta {
+    margin-top: 14px;
+    box-shadow: 0 4px 14px rgba(31, 145, 66, 0.25);
+    transition: all 0.25s ease;
+}
+
+.journal-hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(31, 145, 66, 0.35);
+}
+
+@media (max-width: 767.98px) {
+    .journal-hero-banner {
+        padding: 24px 20px;
+        border-radius: 20px;
+    }
+    .journal-mascot-speech {
+        right: 0;
+        top: -14px;
+    }
+}
+
+/* =========================================================
+   FILTER PILLS — Design System
+   ========================================================= */
+.filter-pill-btn {
+    border-radius: var(--radius-full);
+    background: var(--surface-white);
+    border: 1.5px solid var(--border);
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
+    font-weight: 600;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease;
+}
+
+.filter-pill-btn:hover {
+    box-shadow: var(--shadow-md);
 }
 
 .filter-pill-select {
     border: none;
     background: transparent;
+    font-family: var(--font-body);
     font-weight: 600;
-    color: #22301f;
+    color: var(--ink);
     outline: none;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: var(--fs-caption);
 }
 
 /* Book Container Grid */
@@ -191,50 +496,48 @@
     color: #435338;
 }
 
-/* PATTERN 1: BRUSHES — Brand color blobs on warm cream */
+/* PATTERN 1: BRUSHES — Brand color blobs on warm cream (Soft Earth Mineral Sky) */
+/* PATTERN 1: BRUSHES — Kertas Serat Botani & Marmer Tanah (Earthy Pressed Parchment) */
 .pattern-brushes {
-    background-color: #faf6ec;
+    background-color: #f4ecdc;
     background-image:
-        radial-gradient(circle at 20% 30%, #1f9142 0%, #1f9142 22%, transparent 25%),
-        radial-gradient(circle at 82% 62%, #ff9d2e 0%, #ff9d2e 26%, transparent 29%),
-        radial-gradient(circle at 40% 83%, #29b6d8 0%, #29b6d8 17%, transparent 20%),
-        radial-gradient(circle at 75% 18%, #93e0a8 0%, #93e0a8 15%, transparent 18%);
+        linear-gradient(135deg, rgba(184, 115, 82, 0.22) 0%, transparent 50%),
+        linear-gradient(45deg, rgba(92, 122, 85, 0.18) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(193, 130, 75, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 80%, rgba(70, 95, 65, 0.18) 0%, transparent 45%);
     background-size: 100% 100%;
 }
 
-/* PATTERN 2: DOTS — Earthy confetti on pale sage */
+/* PATTERN 2: DOTS — Kain Linen & Serat Rami Alami (Woven Earthy Linen Texture) */
 .pattern-dots {
-    background-color: #eef7f2;
+    background-color: #f2ebd9;
     background-image:
-        radial-gradient(#fdedc9 22%, transparent 24%),
-        radial-gradient(#1f9142 10%, transparent 12%),
-        radial-gradient(#ff9d2e 8%, transparent 10%),
-        radial-gradient(#22301f 7%, transparent 9%),
-        radial-gradient(#4ecb72 9%, transparent 11%);
-    background-position: 0 0, 30px 40px, 70px 20px, 45px 80px, 90px 100px;
-    background-size: 120px 120px;
+        linear-gradient(90deg, rgba(140, 110, 80, 0.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(140, 110, 80, 0.08) 1px, transparent 1px),
+        linear-gradient(45deg, rgba(110, 85, 55, 0.04) 25%, transparent 25%, transparent 75%, rgba(110, 85, 55, 0.04) 75%),
+        linear-gradient(-45deg, rgba(110, 85, 55, 0.04) 25%, transparent 25%, transparent 75%, rgba(110, 85, 55, 0.04) 75%);
+    background-size: 8px 8px, 8px 8px, 16px 16px, 16px 16px;
 }
 
-/* PATTERN 3: FLOWERS — Botanical dots in brand palette on pale mint */
+/* PATTERN 3: FLOWERS — Daun Herbal & Kertas Daur Ulang Alami (Warm Sage Earthy Texture) */
 .pattern-flowers {
-    background-color: #edf8f2;
+    background-color: #e6ede3;
     background-image:
-        radial-gradient(circle at 50% 50%, #ff9d2e 13%, transparent 15%),
-        radial-gradient(circle at 20% 20%, #1f9142 11%, transparent 13%),
-        radial-gradient(circle at 80% 80%, #22301f 10%, transparent 12%),
-        radial-gradient(circle at 80% 25%, #29b6d8 9%, transparent 11%),
-        radial-gradient(circle at 25% 75%, #d7f4e0 11%, transparent 13%);
-    background-size: 80px 80px;
+        radial-gradient(ellipse at 15% 15%, rgba(92, 122, 85, 0.22) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(140, 110, 80, 0.20) 0%, transparent 55%),
+        linear-gradient(125deg, rgba(74, 103, 65, 0.12) 0%, transparent 35%, rgba(184, 135, 90, 0.14) 70%, transparent 100%),
+        repeating-linear-gradient(45deg, transparent, transparent 14px, rgba(92, 122, 85, 0.04) 14px, rgba(92, 122, 85, 0.04) 15px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 20px 20px;
 }
 
-/* PATTERN 4: SEEDS — Earthy teardrops on warm sage */
+/* PATTERN 4: SEEDS — Kanvas Sage & Serat Daun Herbal (Sage Green Earth Weave) */
 .pattern-seeds {
-    background-color: #d0e8d8;
+    background-color: #dce7db;
     background-image:
-        radial-gradient(ellipse at 50% 40%, #fdedc9 26%, #b8d8c0 30%, transparent 34%),
-        radial-gradient(ellipse at 50% 40%, #22301f 9%, transparent 12%);
-    background-position: 0 0, 25px 35px;
-    background-size: 50px 65px;
+        linear-gradient(90deg, rgba(67, 83, 56, 0.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(67, 83, 56, 0.08) 1px, transparent 1px),
+        radial-gradient(circle at 50% 50%, rgba(92, 122, 85, 0.12) 0%, transparent 60%);
+    background-size: 12px 12px, 12px 12px, 100% 100%;
 }
 
 /* PATTERN 5: SOFT — Vintage journal ruled lines on warm cream */
@@ -253,71 +556,86 @@
         );
 }
 
-/* PATTERN 6: LEAVES — Design system greens foliage */
+/* PATTERN 6: LEAVES — Design system foliage wash */
 .pattern-leaves {
     background-color: #e5f5eb;
     background-image:
-        radial-gradient(ellipse 26px 14px at 30% 25%, #22301f 0%, #22301f 85%, transparent 88%),
-        radial-gradient(ellipse 22px 12px at 75% 70%, #1f9142 0%, #1f9142 85%, transparent 88%),
-        radial-gradient(ellipse 18px 10px at 80% 25%, #4ecb72 0%, #4ecb72 85%, transparent 88%),
-        radial-gradient(ellipse 20px 11px at 25% 75%, #93e0a8 0%, #93e0a8 85%, transparent 88%),
-        radial-gradient(circle 5px at 50% 50%, #ff9d2e 0%, #ff9d2e 85%, transparent 88%);
-    background-size: 80px 80px;
+        radial-gradient(ellipse at 25% 25%, rgba(31, 145, 66, 0.18) 0%, transparent 50%),
+        radial-gradient(ellipse at 75% 75%, rgba(78, 203, 114, 0.18) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(34, 48, 31, 0.08) 0%, transparent 60%);
+    background-size: 100% 100%;
 }
-
 
 /* PATTERN 7: BARK — Kayu coklat hangat, serat pohon */
 .pattern-bark {
     background-color: #d4a96a;
     background-image:
-        radial-gradient(ellipse at 25% 28%, #6b4226 0%, #6b4226 20%, transparent 23%),
-        radial-gradient(ellipse at 72% 68%, #8b5e3c 0%, #8b5e3c 24%, transparent 27%),
-        radial-gradient(ellipse at 78% 18%, #a0784c 0%, #a0784c 14%, transparent 17%),
-        radial-gradient(ellipse at 22% 78%, #c4956a 0%, #c4956a 18%, transparent 21%),
-        radial-gradient(circle at 50% 50%, rgba(107, 66, 38, 0.2) 0%, transparent 65%);
-    background-size: 100% 100%;
+        linear-gradient(135deg, rgba(107, 66, 38, 0.22) 0%, transparent 50%),
+        radial-gradient(ellipse at 75% 30%, rgba(139, 94, 60, 0.25) 0%, transparent 55%),
+        radial-gradient(ellipse at 25% 75%, rgba(160, 120, 76, 0.20) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, transparent, transparent 12px, rgba(107, 66, 38, 0.05) 12px, rgba(107, 66, 38, 0.05) 14px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 14px;
 }
 
-/* PATTERN 8: TERRA — Tanah liat terracotta hangat */
+/* PATTERN 8: TERRA — Tanah liat terracotta hangat bergradien alami */
 .pattern-terra {
-    background-color: #e8c4a0;
+    background-color: #ebdcd0;
     background-image:
-        radial-gradient(circle at 50% 50%, #c17b5a 13%, transparent 15%),
-        radial-gradient(circle at 20% 20%, #8b3a2a 11%, transparent 13%),
-        radial-gradient(circle at 80% 80%, #d4835a 12%, transparent 14%),
-        radial-gradient(circle at 78% 22%, #fdedc9 10%, transparent 12%),
-        radial-gradient(circle at 22% 78%, #a0522d 10%, transparent 12%);
-    background-size: 75px 75px;
+        linear-gradient(135deg, rgba(160, 82, 45, 0.20) 0%, transparent 60%),
+        radial-gradient(ellipse at 75% 25%, rgba(193, 123, 90, 0.22) 0%, transparent 50%),
+        radial-gradient(ellipse at 25% 75%, rgba(139, 94, 60, 0.18) 0%, transparent 50%);
+    background-size: 100% 100%;
 }
 
 /* PATTERN 9: MOSS — Lumut hijau bumi muted */
 .pattern-moss {
     background-color: #c8d8b8;
     background-image:
-        radial-gradient(ellipse 24px 13px at 28% 28%, #3d5c35 0%, #3d5c35 85%, transparent 88%),
-        radial-gradient(ellipse 20px 10px at 72% 65%, #4a6741 0%, #4a6741 85%, transparent 88%),
-        radial-gradient(ellipse 16px 9px at 76% 22%, #6b8f5e 0%, #6b8f5e 85%, transparent 88%),
-        radial-gradient(ellipse 18px 10px at 24% 72%, #8aad7a 0%, #8aad7a 85%, transparent 88%),
-        radial-gradient(circle 5px at 50% 50%, #d4a96a 0%, #d4a96a 85%, transparent 88%);
-    background-size: 75px 75px;
+        radial-gradient(ellipse at 30% 30%, rgba(61, 92, 53, 0.22) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 70%, rgba(107, 143, 94, 0.22) 0%, transparent 55%),
+        linear-gradient(45deg, rgba(74, 103, 65, 0.12) 0%, transparent 60%);
+    background-size: 100% 100%;
 }
 
-/* PATTERN 10: CLAY — Tanah pasir keemasan earthy */
+/* PATTERN 10: CLAY — Kertas pasir keemasan earthy wash */
 .pattern-clay {
     background-color: #f0dfc8;
     background-image:
-        radial-gradient(#c17b5a 20%, transparent 22%),
-        radial-gradient(#8b5e3c 9%, transparent 11%),
-        radial-gradient(#d4a96a 7%, transparent 9%),
-        radial-gradient(#6b4226 7%, transparent 9%),
-        radial-gradient(#e8c4a0 9%, transparent 11%);
-    background-position: 0 0, 28px 38px, 65px 18px, 42px 76px, 88px 95px;
-    background-size: 110px 110px;
+        linear-gradient(135deg, rgba(193, 123, 90, 0.20) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 20%, rgba(139, 94, 60, 0.18) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 80%, rgba(212, 169, 106, 0.25) 0%, transparent 50%);
+    background-size: 100% 100%;
 }
 
 /* PATTERN 11: SOLID (Plain color — background-color set via JS from data-cover-color) */
 .pattern-solid {
     background-color: #4ecb72; /* fallback, overridden by JS */
+}
+
+/* PATTERN 12: PEBBLES — Bulat-bulat botanikal hangat di atas krem lembut */
+.pattern-pebbles {
+    background-color: #f5f0e8;
+    background-image:
+        radial-gradient(circle at 50% 50%, #1f9142 13%, transparent 15%),
+        radial-gradient(circle at 20% 20%, #d4a96a 11%, transparent 13%),
+        radial-gradient(circle at 80% 80%, #4ecb72 12%, transparent 14%),
+        radial-gradient(circle at 78% 22%, #8b5e3c 9%, transparent 11%),
+        radial-gradient(circle at 22% 78%, #ff9d2e 10%, transparent 12%),
+        radial-gradient(circle at 50% 80%, #3d5c35 8%, transparent 10%),
+        radial-gradient(circle at 80% 50%, #c8d8b8 10%, transparent 12%),
+        radial-gradient(circle at 20% 50%, #d0e8d8 9%, transparent 11%);
+    background-size: 70px 70px;
+}
+
+/* PATTERN 13: POLKADOT — Motif polkadot warna bumi hangat dan estetik tanpa biru */
+.pattern-polkadot,
+.pattern-amber {
+    background-color: #faf4e6;
+    background-image:
+        radial-gradient(circle, #c26d42 16%, transparent 18%),
+        radial-gradient(circle, #527853 16%, transparent 18%);
+    background-position: 0 0, 16px 16px;
+    background-size: 32px 32px;
 }
 
 
@@ -497,32 +815,33 @@
 .open-book {
     display: flex;
     background: #fbf6ec;
-    border-radius: 20px;
-    box-shadow:
-        0 15px 35px rgba(34, 48, 31, 0.12),
-        0 3px 10px rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md), 0 15px 35px rgba(34, 48, 31, 0.1);
     position: relative;
     overflow: hidden;
     min-height: 520px;
-    border: 1px solid #ebd9b5;
+    border: 1.5px solid var(--border);
+    align-items: stretch;
 }
 
 /* Left Page (Halaman Kiri) */
 .book-page-left {
-    flex: 1;
+    flex: 1 1 50%;
+    width: 50%;
     background: #faf5ea;
-    padding: 3rem 2.5rem;
+    padding: 2.5rem 2.8rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
-    box-shadow: inset -15px 0 25px -15px rgba(0, 0, 0, 0.1);
+    box-shadow: inset -15px 0 25px -15px rgba(0, 0, 0, 0.08);
     border-right: 1px solid #e8dbbe;
+    box-sizing: border-box;
 }
 
 /* Center Book Spine (Punggung Tengah Buku) */
 .book-spine-center {
-    width: 24px;
+    width: 20px;
     background: linear-gradient(
         to right,
         rgba(0, 0, 0, 0.08) 0%,
@@ -536,18 +855,29 @@
         inset -1px 0 3px rgba(0,0,0,0.15);
     position: relative;
     z-index: 5;
+    flex-shrink: 0;
 }
 
 /* Right Page (Halaman Kanan) */
 .book-page-right {
-    flex: 1.15;
+    flex: 1 1 50%;
+    width: 50%;
     background: #fffdf9;
-    padding: 2.8rem 2.8rem;
+    padding: 2.5rem 2.8rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
-    box-shadow: inset 15px 0 25px -15px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 15px 0 25px -15px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+}
+
+#page-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1 1 auto;
 }
 
 /* Plant Profile on Left Page */
@@ -558,20 +888,24 @@
 }
 
 .plant-left-title {
-    font-family: 'Baloo 2', sans-serif;
-    font-weight: 800;
-    font-size: 2.2rem;
-    color: #22301f;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-display-xl);
+    line-height: var(--lh-display-xl);
+    color: var(--ink);
     margin-bottom: 0.8rem;
-    line-height: 1.15;
 }
 
 .book-tag-pill {
-    display: inline-block;
-    padding: 4px 14px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) 14px;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
+    font-weight: 600;
+    /* Colors come from Bootstrap badge variants or DS custom below */
 }
 
 /* Entry Content on Right Page */
@@ -583,24 +917,27 @@
 }
 
 .entry-right-meta {
-    font-size: 0.85rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
     font-weight: 600;
-    color: #59684f;
+    color: var(--ink-muted);
 }
 
 .entry-right-title {
-    font-family: 'Baloo 2', sans-serif;
-    font-weight: 800;
-    font-size: 1.65rem;
-    color: #22301f;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    color: var(--ink);
     margin-bottom: 0.8rem;
-    line-height: 1.25;
 }
 
 .entry-right-notes {
-    font-size: 1.02rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
     color: #3b4737;
-    line-height: 1.6;
     margin-bottom: 1.5rem;
     font-style: italic;
 }
@@ -696,39 +1033,13 @@
     align-items: center;
     justify-content: space-between;
     padding-top: 1rem;
-    border-top: 1px solid #efe4cb;
-    font-size: 0.8rem;
-    color: #8c7b5a;
-}
-
-/* =========================================================
-   TOGGLE VIEW BUTTONS (Buku ↔ Riwayat)
-   ========================================================= */
-
-.view-toggle-btn {
-    border-radius: 999px;
-    background: #ffffff;
-    border: 1.5px solid #e6cf95;
-    padding: 6px 18px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #59684f;
-    cursor: pointer;
-    transition: all 0.18s ease;
-    box-shadow: 0 2px 6px rgba(34, 48, 31, 0.05);
-}
-
-.view-toggle-btn:hover {
-    background: #f5edd8;
-    border-color: #c8a84b;
-    color: #22301f;
-}
-
-.view-toggle-btn.active {
-    background: #1f9142;
-    border-color: #1f9142;
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(31, 145, 66, 0.3);
+    border-top: 1.5px solid #e8dbbe;
+    font-size: 0.82rem;
+    color: #796b4f;
+    min-height: 48px;
+    margin-top: auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .view-panel {
@@ -856,52 +1167,56 @@
 
 /* ---- Stat Cards ---- */
 .stat-card {
-    background: #ffffff;
-    border: 1px solid #efe4cb;
-    border-radius: 14px;
-    padding: 14px 18px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    background: var(--surface-white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) 18px;
+    box-shadow: var(--shadow-md);
     height: 100%;
 }
 
 .stat-card-label {
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-family: var(--font-body);
+    font-size: var(--fs-overline);
+    line-height: var(--lh-overline);
+    font-weight: 700;
     color: #8c7b5a;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 4px;
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-1);
 }
 
 .stat-card-value {
-    font-size: 1.7rem;
-    font-weight: 800;
-    color: #22301f;
-    line-height: 1.1;
-    font-family: 'Baloo 2', sans-serif;
+    font-family: var(--font-display);
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    font-weight: 700;
+    color: var(--ink);
 }
 
 .stat-card-unit {
-    font-size: 1rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
     font-weight: 600;
-    color: #59684f;
+    color: var(--ink-muted);
 }
 
 /* ---- Chart Card ---- */
 .history-chart-card {
-    background: #ffffff;
-    border: 1px solid #efe4cb;
-    border-radius: 14px;
-    padding: 18px 20px 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    background: var(--surface-white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) 20px 14px;
+    box-shadow: var(--shadow-md);
 }
 
 .history-chart-title {
-    font-size: 0.82rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-overline);
     font-weight: 700;
-    color: #59684f;
+    color: var(--ink-muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     margin-bottom: 10px;
 }
 
@@ -1004,17 +1319,17 @@
 .history-entry-card {
     display: flex;
     gap: 0;
-    background: #ffffff;
-    border: 1px solid #efe4cb;
-    border-radius: 12px;
+    background: var(--surface-white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
     overflow: hidden;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    box-shadow: var(--shadow-sm);
     transition: box-shadow 0.2s ease, transform 0.15s ease;
 }
 
 .history-entry-card:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.09);
-    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 .history-entry-left {
@@ -1044,48 +1359,55 @@
 }
 
 .history-entry-title {
+    font-family: var(--font-body);
     font-weight: 700;
-    font-size: 0.98rem;
-    color: #22301f;
-    margin-bottom: 4px;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--ink);
+    margin-bottom: var(--space-1);
 }
 
 .history-entry-notes {
-    font-size: 0.88rem;
-    color: #59684f;
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
+    color: var(--ink-muted);
     margin-bottom: 0;
-    line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-/* ---- View Toggle Buttons (📖 Buku / 📋 Riwayat) ---- */
 .view-toggle-btn {
-    border: 1px solid #e6cf95;
-    background: #ffffff;
-    border-radius: 999px;
-    padding: 6px 18px;
-    font-size: 0.85rem;
+    border: 1.5px solid var(--border);
+    background: var(--surface-white);
+    border-radius: var(--radius-full);
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
     font-weight: 600;
-    color: #59684f;
+    color: var(--ink-muted);
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+    box-shadow: var(--shadow-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
 }
 
 .view-toggle-btn:hover:not(.active) {
-    background: #fdfaf3;
-    border-color: #1f9142;
-    color: #1f9142;
+    background: var(--surface-input);
+    border-color: var(--btn-primary-bg);
+    color: var(--btn-primary-bg);
 }
 
 .view-toggle-btn.active {
-    background: #1f9142;
-    border-color: #1f9142;
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(31, 145, 66, 0.25);
+    background: var(--btn-primary-bg);
+    border-color: var(--btn-primary-bg);
+    color: var(--btn-primary-fg);
+    box-shadow: var(--shadow-md);
 }
 
 /* =========================================================
@@ -1094,10 +1416,10 @@
 
 /* Compact Card on the Form */
 .cover-compact-card {
-    background: #ffffff;
-    border: 1px solid #e2e8e0;
-    border-radius: 16px;
-    padding: 14px 18px;
+    background: var(--surface-white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1106,8 +1428,8 @@
 }
 
 .cover-compact-card:hover {
-    border-color: #cbd5e1;
-    box-shadow: 0 4px 12px rgba(34, 48, 31, 0.05);
+    border-color: #c8a84b;
+    box-shadow: var(--shadow-md);
 }
 
 .book-mini-thumb {
@@ -1344,20 +1666,6 @@
     box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.35), 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.btn-apply-cover {
-    background: #22c55e;
-    color: #ffffff;
-    border: none;
-    font-weight: 700;
-    transition: background 0.18s, transform 0.18s;
-}
-
-.btn-apply-cover:hover {
-    background: #16a34a;
-    color: #ffffff;
-    transform: translateY(-1px);
-}
-
 /* =========================================================
    KONDISI TANAMAN GRID CARDS & PHOTO UPLOAD BOX
    ========================================================= */
@@ -1376,60 +1684,63 @@
 }
 
 .condition-card {
-    background: #fcfdfc;
+    background: var(--surface-white);
     border: 1.5px solid #e8ede7;
-    border-radius: 14px;
-    padding: 14px 10px;
+    border-radius: var(--radius-sm);
+    padding: var(--space-4) 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: var(--space-2);
     cursor: pointer;
     transition: all 0.18s ease;
     user-select: none;
     text-align: center;
+    box-shadow: var(--shadow-sm);
 }
 
 .condition-card:hover {
     border-color: #93e0a8;
     background: #f4fbf6;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .condition-card.active {
     background: #eaf7ee;
-    border-color: #1f9142;
-    box-shadow: 0 0 0 1px #1f9142, 0 3px 8px rgba(31, 145, 66, 0.15);
+    border-color: var(--btn-primary-bg);
+    box-shadow: 0 0 0 2px rgba(31, 145, 66, 0.2), var(--shadow-md);
 }
 
 .condition-card-icon {
-    font-size: 1.35rem;
     line-height: 1;
 }
 
 .condition-card-label {
-    font-size: 0.84rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
     font-weight: 600;
     color: #435338;
 }
 
 .condition-card.active .condition-card-label {
-    color: #1f9142;
+    color: var(--btn-primary-bg);
     font-weight: 700;
 }
 
 /* Photo Upload Box */
 .photo-upload-box {
-    border: 2px dashed #cfdbcd;
-    background: #fafcfa;
-    border-radius: 16px;
+    border: 2px dashed var(--border);
+    background: #fdfbf5;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: border-color 0.2s, background-color 0.2s;
 }
 
 .photo-upload-box:hover {
-    border-color: #1f9142;
+    border-color: var(--btn-primary-bg);
     background: #f2f9f4;
 }
 
@@ -1452,5 +1763,1582 @@
     object-fit: contain;
     border-radius: 10px;
 }
+
+/* =========================================================
+   2-STEP JOURNAL FORM WIZARD
+   ========================================================= */
+
+.wizard-steps-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--surface-white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-full);
+    max-width: 520px;
+    margin: 0 auto 1.75rem auto;
+    box-shadow: var(--shadow-sm);
+}
+
+.wizard-step-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: default;
+    color: #798a72;
+    transition: all 0.25s ease;
+}
+
+.wizard-step-item.clickable {
+    cursor: pointer;
+}
+
+.wizard-step-item .step-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e2ede2;
+    color: #556b4f;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.wizard-step-item .step-label {
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
+    font-weight: 600;
+}
+
+.wizard-step-item.active {
+    color: #1f9142;
+}
+
+.wizard-step-item.active .step-circle {
+    background: #1f9142;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(31, 145, 66, 0.3);
+}
+
+.wizard-step-item.completed {
+    color: #14401f;
+}
+
+.wizard-step-item.completed .step-circle {
+    background: #28a745;
+    color: #ffffff;
+}
+
+.wizard-step-line {
+    flex: 1;
+    max-width: 48px;
+    height: 2px;
+    background: #d4e3d4;
+    border-radius: 2px;
+}
+
+/* Setup Summary Bar in Step 2 */
+.setup-summary-bar {
+    background: var(--btn-secondary-bg);
+    border: 1.5px solid #cce8d2;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.setup-summary-thumb {
+    width: 32px;
+    height: 44px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    flex-shrink: 0;
+}
+
+/* Quick Plant Chips in Step 1 */
+.plant-chips-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+}
+
+.plant-quick-chip {
+    background: var(--badge-healthy-bg);
+    border: 1px solid #c2e2c8;
+    color: var(--badge-healthy-fg);
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.chip-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--btn-primary-bg);
+    margin-right: 6px;
+}
+
+.plant-quick-chip:hover {
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-fg);
+    border-color: var(--btn-primary-bg);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* =========================================================
+   DS — FORM CONTROLS (Input, Select, Textarea)
+   ========================================================= */
+
+.journal-page .form-control,
+.journal-page .form-select,
+.card .form-control,
+.card .form-select {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    background-color: var(--surface-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.journal-page .form-control:focus,
+.journal-page .form-select:focus,
+.card .form-control:focus,
+.card .form-select:focus {
+    border-color: var(--btn-primary-bg);
+    box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.15);
+    background-color: var(--surface-input);
+    color: var(--ink);
+}
+
+.journal-page .form-label,
+.card .form-label {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.journal-page .form-text,
+.card .form-text {
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+}
+
+/* =========================================================
+   DS — BUTTON OVERRIDES FOR JOURNAL PAGES
+   ========================================================= */
+
+.btn-ganti-sampul {
+    background: var(--surface-white);
+    color: var(--ink);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 6px 18px;
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    transition: all 0.18s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-ganti-sampul:hover {
+    background: #f5edd8;
+    border-color: #c8a84b;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-apply-cover {
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-fg);
+    border: none;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 600;
+    transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+}
+
+.btn-apply-cover:hover {
+    background: #167534;
+    color: var(--btn-primary-fg);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(31, 145, 66, 0.3);
+}
+
+/* =========================================================
+   DS — CUSTOM BADGE PILL COLORS (override Bootstrap subtles)
+   ========================================================= */
+
+.badge-ds-healthy {
+    background: var(--badge-healthy-bg) !important;
+    color: var(--badge-healthy-fg) !important;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+}
+
+.badge-ds-attention {
+    background: var(--badge-attention-bg) !important;
+    color: var(--badge-attention-fg) !important;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+}
+
+.badge-ds-wilting, .badge-ds-danger {
+    background: var(--badge-danger-bg) !important;
+    color: var(--badge-danger-fg) !important;
+    border: 1px solid #ebd7cb !important;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+}
+
+.badge-ds-flowering, .badge-ds-sky {
+    background: var(--badge-sky-bg) !important;
+    color: var(--badge-sky-fg) !important;
+    border: 1px solid #d0e2e7 !important;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+}
+
+.badge-ds-planned {
+    background: var(--badge-planned-bg) !important;
+    color: var(--badge-planned-fg) !important;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+}
+
+/* =========================================================
+   DS — BUTTON COMPONENT STYLES (Design System Specifications)
+   ========================================================= */
+
+.btn-ds-primary,
+.journal-module .btn-success,
+.view-panel .btn-success,
+.journal-page-header .btn-success {
+    background: var(--btn-primary-bg) !important;
+    color: var(--btn-primary-fg) !important;
+    border: none !important;
+    border-radius: var(--radius-full) !important;
+    padding: var(--space-2) var(--space-6) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-caption) !important;
+    font-weight: 700 !important;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-ds-primary:hover,
+.journal-module .btn-success:hover,
+.view-panel .btn-success:hover,
+.journal-page-header .btn-success:hover {
+    background: #177334 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-ds-secondary {
+    background: var(--btn-secondary-bg) !important;
+    color: var(--btn-secondary-fg) !important;
+    border: none !important;
+    border-radius: var(--radius-full) !important;
+    padding: var(--space-2) var(--space-6) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-caption) !important;
+    font-weight: 700 !important;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-ds-secondary:hover {
+    background: #b5ecc3 !important;
+    color: #0f4621 !important;
+    transform: translateY(-1px);
+}
+
+.btn-ds-ghost {
+    background: var(--surface-white) !important;
+    color: var(--btn-ghost-fg) !important;
+    border: 1.5px solid var(--btn-ghost-border) !important;
+    border-radius: var(--radius-full) !important;
+    padding: var(--space-2) var(--space-6) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-caption) !important;
+    font-weight: 600 !important;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-ds-ghost:hover {
+    background: var(--surface-input) !important;
+    border-color: #d8be7c !important;
+    color: var(--ink) !important;
+}
+
+.btn-ds-danger,
+.btn-ds-delete {
+    background: #fcf6f2 !important;
+    color: #8c5344 !important;
+    border: 1.5px solid #ecd8ce !important;
+    border-radius: var(--radius-full) !important;
+    padding: var(--space-2) var(--space-6) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-caption) !important;
+    font-weight: 600 !important;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-ds-danger:hover,
+.btn-ds-delete:hover {
+    background: #f5e4db !important;
+    color: #723c30 !important;
+    border-color: #dfbfb2 !important;
+    transform: translateY(-1px);
+}
+
+/* Override bootstrap subtle badges to warm earth tones in journal */
+.journal-module .bg-danger-subtle,
+.view-panel .bg-danger-subtle,
+.open-book-wrapper .bg-danger-subtle,
+.book-page-left .bg-danger-subtle,
+.book-page-right .bg-danger-subtle,
+#left-condition-badge.bg-danger-subtle {
+    background-color: #fbf0ea !important;
+    border-color: #ebd7cb !important;
+}
+.journal-module .text-danger,
+.view-panel .text-danger,
+.open-book-wrapper .text-danger,
+.book-page-left .text-danger,
+.book-page-right .text-danger,
+#left-condition-badge.text-danger {
+    color: #8c5344 !important;
+}
+.journal-module .border-danger-subtle,
+.view-panel .border-danger-subtle,
+.open-book-wrapper .border-danger-subtle,
+#left-condition-badge.border-danger-subtle {
+    border-color: #ebd7cb !important;
+}
+.journal-module .bg-primary-subtle,
+.view-panel .bg-primary-subtle,
+.open-book-wrapper .bg-primary-subtle,
+.book-page-left .bg-primary-subtle,
+.book-page-right .bg-primary-subtle {
+    background-color: #eaf1f4 !important;
+    border-color: #d2e3e8 !important;
+}
+.journal-module .text-primary,
+.view-panel .text-primary,
+.open-book-wrapper .text-primary,
+.book-page-left .text-primary,
+.book-page-right .text-primary {
+    color: #3f6874 !important;
+}
+
+/* DS — Card Component Style */
+.card-ds {
+    background: var(--surface-white);
+    border: 1.5px solid var(--border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-md) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-ds:hover {
+    box-shadow: 0 10px 24px rgba(34, 48, 31, 0.12) !important;
+}
+
+/* DS — Standardized Small Buttons (Edit, Hapus, etc.) */
+.btn-sm.btn-ds-primary,
+.btn-sm.btn-ds-secondary,
+.btn-sm.btn-ds-ghost,
+.btn-sm.btn-ds-danger {
+    padding: 6px 16px !important;
+    font-size: 0.8rem !important;
+    line-height: 1.2 !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    border-radius: var(--radius-full) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 600 !important;
+    box-sizing: border-box !important;
+}
+
+/* =========================================================
+   COMPACT BOOK SPREAD STYLES (Mockup Refinement)
+   ========================================================= */
+
+.summary-mini-card {
+    background: #ffffff;
+    border: 1.5px solid #efe4cb;
+    border-radius: 10px;
+    padding: 8px 6px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(34, 48, 31, 0.04);
+}
+
+.summary-mini-card .stat-num {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.45rem;
+    line-height: 1.1;
+    color: var(--ink);
+}
+
+.summary-mini-card .stat-desc {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    margin-top: 2px;
+}
+
+.book-toc-list {
+    max-height: 125px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #dfcfab transparent;
+    padding-right: 2px;
+}
+
+.book-toc-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.book-toc-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.book-toc-list::-webkit-scrollbar-thumb {
+    background-color: #dfcfab;
+    border-radius: 999px;
+}
+
+.book-toc-item {
+    border: 1.5px solid transparent;
+    border-radius: 8px;
+    padding: 6px 10px;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    background: rgba(255, 255, 255, 0.65);
+}
+
+.book-toc-item:hover {
+    background: rgba(70, 104, 66, 0.06);
+    border-color: rgba(70, 104, 66, 0.25);
+}
+
+.book-toc-item.active {
+    background: #ffffff;
+    border-color: #387638;
+    box-shadow: 0 2px 6px rgba(56, 118, 56, 0.12);
+}
+
+.photo-compact-slot {
+    border: 1.5px dashed #dfcfab;
+    border-radius: 12px;
+    background: #faf5ea;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 12px;
+}
+
+.photo-compact-slot:hover {
+    border-color: #387638;
+    background: #f4eee0;
+}
+
+/* =========================================================
+   ONBOARDING 3-LANGKAH (EMPTY STATE RAK BUKU)
+   ========================================================= */
+.onboarding-steps-card {
+    background: #ffffff;
+    border-radius: 24px;
+    border: 1.5px solid #ecd8ab;
+    box-shadow: 0 14px 34px rgba(34, 48, 31, 0.07);
+    padding: 2.2rem 2.4rem 2rem 2.4rem;
+    position: relative;
+    max-width: 960px;
+    margin: 1.25rem auto 2.5rem auto;
+}
+
+
+.onboarding-mascot-anchor {
+    position: absolute;
+    top: -46px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    z-index: 5;
+}
+
+.onboarding-mascot-img {
+    width: 60px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(34, 48, 31, 0.15));
+}
+
+.onboarding-speech-bubble {
+    background: #eef8ee;
+    color: #27672b;
+    border: 1px solid #d4e7d0;
+    border-radius: 12px;
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    box-shadow: 0 3px 8px rgba(34, 48, 31, 0.06);
+    white-space: nowrap;
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.onboarding-speech-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 14px;
+    border-width: 6px 6px 0;
+    border-style: solid;
+    border-color: #eef8ee transparent;
+    display: block;
+    width: 0;
+}
+
+.onboarding-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #1e331c;
+    letter-spacing: -0.3px;
+}
+
+.onboarding-subtitle {
+    color: #63705f;
+    font-size: 0.92rem;
+}
+
+.onboarding-time-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #f7f5ed;
+    color: #55624e;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.onboarding-steps-row {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 2rem 0 1.5rem 0;
+}
+
+.onboarding-step-card {
+    flex: 1 1 0;
+    background: #fbfbf9;
+    border: 1.5px solid #ebe6dc;
+    border-radius: 18px;
+    padding: 1.5rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.onboarding-step-card.active {
+    border: 2px solid #2e7d32;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(46, 125, 50, 0.12);
+}
+
+.onboarding-step-pill {
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2e7d32;
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+
+.onboarding-step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-size: 0.78rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.onboarding-step-num.done {
+    background: #2e7d32;
+    color: #ffffff;
+}
+
+.onboarding-step-icon-wrap {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #edf7ed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.onboarding-step-title {
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: #1e331c;
+    margin-bottom: 6px;
+}
+
+.onboarding-step-desc {
+    font-size: 0.78rem;
+    color: #63705f;
+    line-height: 1.42;
+    margin-bottom: 10px;
+}
+
+.onboarding-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a9b7a4;
+    font-size: 1.3rem;
+    user-select: none;
+}
+
+@media (max-width: 768px) {
+    .onboarding-steps-row {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .onboarding-arrow {
+        transform: rotate(90deg);
+        margin: -8px 0;
+    }
+}
+
+/* =========================================================
+   COVER PICKER MODAL & SEGMENTED PILL TABS (DESIGN SYSTEM)
+   ========================================================= */
+.modal-book-preview-wrap {
+    width: 120px;
+    height: 165px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 600px;
+}
+
+.modal-book-preview {
+    width: 110px;
+    height: 155px;
+    border-radius: 6px 14px 14px 6px;
+    position: relative;
+    box-shadow: 0 10px 24px rgba(34, 48, 31, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08);
+    border-left: 6px solid rgba(255, 255, 255, 0.45);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 16px;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.modal-book-preview:hover {
+    transform: rotateY(-8deg) scale(1.02);
+}
+
+.modal-book-title-tag {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(230, 207, 149, 0.8);
+    border-radius: 999px;
+    padding: 3px 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #22301f;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Tabs: Design system pill segmented control */
+.modal-cover-tabs {
+    background: #f1ede3;
+    border: 1.5px solid #e2d2b5;
+    border-radius: 999px;
+    padding: 4px;
+    display: flex;
+    gap: 4px;
+    width: 100%;
+}
+
+.modal-cover-tab {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 7px 16px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #556b4f;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-align: center;
+    outline: none;
+}
+
+.modal-cover-tab:hover {
+    color: #22301f;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.modal-cover-tab.active {
+    background: #1f9142;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(31, 145, 66, 0.28);
+}
+
+/* Pattern Grid */
+.modal-pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 4px 2px;
+}
+
+.modal-pattern-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.modal-pattern-item:hover {
+    transform: translateY(-2px);
+}
+
+.modal-pattern-card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 6px 10px 10px 6px;
+    position: relative;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent;
+    border-left: 4px solid rgba(255, 255, 255, 0.4);
+    transition: all 0.2s ease;
+}
+
+.modal-pattern-item.selected .modal-pattern-card {
+    border-color: #1f9142;
+    box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.28);
+    transform: scale(1.02);
+}
+
+.modal-check-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #1f9142;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.modal-pattern-item.selected .modal-check-badge {
+    display: flex;
+}
+
+.modal-pattern-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #556b4f;
+    margin-top: 6px;
+    text-align: center;
+}
+
+.modal-pattern-item.selected .modal-pattern-label {
+    color: #1f9142;
+    font-weight: 700;
+}
+
+/* Swatches for Solid Color Tab */
+.modal-swatch-section-title {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #798a72;
+    margin-bottom: 8px;
+    margin-top: 10px;
+}
+
+.modal-swatch-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.modal-swatch-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    outline: none;
+}
+
+.modal-swatch-circle:hover {
+    transform: scale(1.15);
+}
+
+.modal-swatch-circle.selected {
+    border-color: #1f9142;
+    box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.35);
+    transform: scale(1.08);
+}
+
+.modal-rainbow-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px dashed #9aa895;
+    background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.modal-rainbow-btn:hover {
+    transform: scale(1.1);
+}
+
+.modal-rainbow-btn.selected {
+    border: 2.5px solid #1f9142;
+    box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.35);
+}
+
+.btn-apply-cover {
+    background: #1f9142;
+    border: none;
+    font-weight: 700;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-apply-cover:hover {
+    background: #187434;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   FULL-WIDTH BOTANICAL NOTEBOOK HERO (SMART CARE COHESION)
+   ========================================================= */
+
+:root {
+    --journal-offset: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2);
+}
+
+body.has-sidebar.journal-body {
+    padding-left: 0 !important;
+    background: #faefd5;
+}
+
+.journal-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Full-width notebook paper hero banner (runs edge-to-edge across screen) */
+.journal-hero-banner-full {
+    width: 100%;
+    position: relative;
+    background-color: #fbf9f1;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 31px,
+        rgba(168, 188, 158, 0.22) 31px,
+        rgba(168, 188, 158, 0.22) 32px
+    );
+    border-bottom: 2px solid #ecd8ab;
+    padding: clamp(32px, 5vh, 48px) 24px clamp(28px, 4vh, 42px) calc(var(--journal-offset) + 32px);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+@media (max-width: 991.98px) {
+    .journal-hero-banner-full {
+        padding: 24px 20px 24px 20px;
+    }
+}
+
+/* Left content container with permanent, non-overlapping earthy kraft rule line */
+.journal-hero-content-left {
+    position: relative;
+    padding-left: 28px;
+    border-left: 2.5px solid #d8caa7; /* Warna membumi kraft notebook rule line */
+}
+
+@media (max-width: 767.98px) {
+    .journal-hero-content-left {
+        padding-left: 16px;
+        border-left-width: 2px;
+    }
+}
+
+
+.journal-hero-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.journal-sheet-body {
+    background: linear-gradient(180deg, #fdf7e8 0%, #faefd5 100%);
+    padding-left: var(--journal-offset);
+    flex: 1 0 auto;
+}
+
+@media (max-width: 991.98px) {
+    .journal-sheet-body {
+        padding-left: 0;
+    }
+}
+
+/* Minimal Clean Footer (Matching Reference) */
+.journal-foot {
+    border-top: 1.5px solid rgba(182, 154, 99, 0.3);
+    padding: 24px 0 36px;
+    margin-top: 48px;
+}
+
+.journal-foot-row {
+    font-size: 0.88rem;
+    color: #64755f;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+    line-height: 1.5;
+}
+
+
+/* Typography adhering strictly to Design System */
+.journal-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #eaf5ea;
+    color: #1f9142;
+    border: 1px solid #c2e2c5;
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+}
+
+.journal-hero-title {
+    font-family: var(--font-display, 'Baloo 2', sans-serif);
+    font-size: clamp(2.3rem, 4.2vw, 3.4rem);
+    font-weight: 800;
+    color: var(--ink, #22301f);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+}
+
+.journal-hero-lead {
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+    font-size: 1.05rem;
+    color: var(--ink-muted, #59684f);
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+/* Stats Pill Chips (Matching Example) */
+.journal-stats-pills {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.stat-pill-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 1.5px solid #dfc79b;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(34, 48, 31, 0.05);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #22301f;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-pill-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(34, 48, 31, 0.08);
+}
+
+.stat-pill-icon {
+    flex-shrink: 0;
+}
+
+.stat-pill-chip strong {
+    font-weight: 800;
+    color: #1f9142;
+    font-size: 0.95rem;
+}
+
+/* 7 Hari Terakhir Calendar Strip */
+.journal-week-calendar-wrap {
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.journal-week-label {
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #3e523a;
+}
+
+.journal-week-strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.journal-day-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+}
+
+.journal-day-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.76rem;
+    font-weight: 800;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.journal-day-circle.is-empty {
+    border: 1.5px dashed #9cb598;
+    background: transparent;
+    color: transparent;
+}
+
+.journal-day-circle.has-entry {
+    background: #1f9142;
+    border: 1.5px solid #1f9142;
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(31, 145, 66, 0.28);
+}
+
+.journal-day-col.is-today .journal-day-circle {
+    outline: 2.5px solid #1f9142;
+    outline-offset: 2.5px;
+}
+
+.journal-day-name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #556b4f;
+    line-height: 1;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+}
+
+.today-indicator-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #1f9142;
+}
+
+/* Calendar Legend (UI/UX) */
+.journal-calendar-legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 0.76rem;
+    color: #6a7c64;
+    font-weight: 600;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+}
+
+.legend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-circle {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 800;
+}
+
+.legend-circle.has-entry {
+    background: #1f9142;
+    color: #ffffff;
+}
+
+.legend-circle.is-empty {
+    border: 1.5px dashed #9cb598;
+    background: transparent;
+}
+
+.legend-circle.is-today-dot {
+    border: 2px solid #1f9142;
+    background: #e8f5e9;
+}
+
+/* Primary Hero CTA Button */
+.journal-main-cta {
+    padding: 11px 28px !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(31, 145, 66, 0.25) !important;
+    transition: all 0.25s ease !important;
+}
+
+.journal-main-cta:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 18px rgba(31, 145, 66, 0.35) !important;
+}
+
+/* =========================================================
+   SPEECH BUBBLE DIALOG POP-UP & ENLARGED PETAK MASCOT
+   ========================================================= */
+
+.journal-dialog-scene {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 350px;
+    position: relative;
+}
+
+.journal-bubble {
+    position: relative;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 20px 20px 20px 6px;
+    padding: 14px 18px 15px;
+    box-shadow: 0 12px 28px -10px rgba(34, 48, 31, 0.22), 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(220, 205, 170, 0.55);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    z-index: 5;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.journal-bubble:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px -10px rgba(34, 48, 31, 0.28);
+}
+
+/* Bubble Tail pointing down towards Petak */
+.journal-bubble::after {
+    content: "";
+    position: absolute;
+    left: 48px;
+    bottom: -8px;
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border-right: 1px solid rgba(220, 205, 170, 0.55);
+    border-bottom: 1px solid rgba(220, 205, 170, 0.55);
+    transform: rotate(45deg);
+    border-radius: 0 0 4px 0;
+}
+
+.journal-bubble-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+}
+
+.journal-bubble-pill.is-ok {
+    background: #e2f4e5;
+    color: #167a38;
+}
+
+.journal-bubble-pill.is-warn {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.journal-bubble-pill.is-tip {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+
+.journal-bubble-text {
+    font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+    font-size: 0.94rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: #22301f;
+}
+
+.journal-bubble-link {
+    color: #167a38;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.journal-bubble-link:hover {
+    color: #0f5a28;
+}
+
+/* Mascot Petak Mencatat (Prominent, Interactive & Lively) */
+.journal-mascot-petak-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    z-index: 2;
+    margin-top: 6px;
+}
+
+.journal-mascot-petak-img {
+    width: clamp(165px, 14vw, 205px);
+    height: auto;
+    filter: drop-shadow(0 14px 24px rgba(45, 65, 30, 0.22));
+    animation: petakMascotFloat 4.2s ease-in-out infinite;
+    cursor: pointer;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
+}
+
+.journal-mascot-petak-img:hover {
+    transform: translateY(-12px) scale(1.08) rotate(3deg);
+    filter: drop-shadow(0 20px 32px rgba(31, 145, 66, 0.32));
+}
+
+.journal-mascot-petak-img:active {
+    transform: translateY(-4px) scale(1.02);
+}
+
+@keyframes petakMascotFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    30% {
+        transform: translateY(-9px) rotate(-1.5deg);
+    }
+    68% {
+        transform: translateY(-4px) rotate(1.2deg);
+    }
+}
+
+
+/* =========================================================
+   SHELF & BOOK ENHANCEMENTS
+   ========================================================= */
+
+/* Spiral Bound Holes on Book Item Spine */
+.book-spiral-spine {
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    bottom: 8px;
+    width: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 12;
+    pointer-events: none;
+}
+
+.book-spiral-hole {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3c4939;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+/* "+ Buku baru" dashed green action card */
+.book-cover-add-wrap {
+    position: relative;
+    width: 170px;
+    height: 235px;
+    border-radius: 6px 14px 14px 6px;
+    border: 2px dashed #2e7d32;
+    background: #f4faf4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(46, 125, 50, 0.08);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+}
+
+.book-item-add:hover .book-cover-add-wrap {
+    background: #eaf5ea;
+    border-color: #1f9142;
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 26px rgba(46, 125, 50, 0.18);
+}
+
+.book-cover-add-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #2e7d32;
+}
+
+.book-add-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(46, 125, 50, 0.18);
+    transition: transform 0.2s ease;
+}
+
+.book-item-add:hover .book-add-icon {
+    transform: scale(1.1);
+}
+
+.book-add-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+/* =========================================================
+   CUSTOM SCROLLABLE DROPDOWNS (EcoPatch & Nama Tanaman)
+   ========================================================= */
+
+.journal-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.journal-select-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 16px;
+    background: #ffffff;
+    border: 1.5px solid #dcd7ca;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #22301f;
+    text-align: left;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    cursor: pointer;
+}
+
+.journal-select-btn::after {
+    display: none !important; /* Hilangkan default bootstrap caret triangle */
+}
+
+.journal-select-btn:hover {
+    border-color: #1f9142;
+    background: #fdfffd;
+}
+
+.journal-select-btn:focus,
+.journal-select-btn.show {
+    border-color: #1f9142;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.16);
+    outline: none;
+}
+
+.journal-select-btn.show .journal-select-chevron {
+    transform: rotate(180deg);
+}
+
+.journal-select-chevron {
+    color: #59684f;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+/* Scrollable container with max-height and custom scrollbar */
+.journal-select-menu {
+    width: 100%;
+    max-height: 220px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    padding: 6px;
+    border: 1.5px solid #ecd8ab;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(34, 48, 31, 0.12);
+    margin-top: 6px;
+    z-index: 1050;
+    scrollbar-width: thin;
+    scrollbar-color: #9ecc9f #f7f9f7;
+}
+
+.journal-select-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.journal-select-menu::-webkit-scrollbar-track {
+    background: #f7f9f7;
+    border-radius: 8px;
+}
+
+.journal-select-menu::-webkit-scrollbar-thumb {
+    background: #a4d3a6;
+    border-radius: 8px;
+}
+
+.journal-select-menu::-webkit-scrollbar-thumb:hover {
+    background: #1f9142;
+}
+
+.journal-select-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #22301f;
+    font-size: 0.92rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.journal-select-item:hover,
+.journal-select-item:focus {
+    background: #eef7f0;
+    color: #15652f;
+}
+
+.journal-select-item.active {
+    background: #cbf5d6;
+    color: #0d4a20;
+    font-weight: 700;
+}
+
+
+
+
 
 

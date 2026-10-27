@@ -1,0 +1,7 @@
+{% extends "my_ecopatch/base.html" %}
+{% block title %}Hapus tanaman - EcoPatch{% endblock %}
+{% block garden_content %}<div class="mep-content"><section class="patch-form-shell">
+<h1 class="patch-page-title">Hapus tanaman?</h1>
+<p>Hapus <strong>{% firstof plant.plant.name plant.plant_name %}</strong> ({{ plant.quantity }} tanaman) dari {{ plant.patch.name }}? Tindakan ini tidak bisa dibatalkan.</p>
+<form method="post" class="patch-form-actions">{% csrf_token %}<button class="btn btn-success patch-btn-danger" type="submit">Ya, hapus tanaman</button><a class="btn btn-outline-success" href="{% url 'my_ecopatch:detail' plant.patch_id %}">Batal</a></form>
+</section></div>{% endblock %}

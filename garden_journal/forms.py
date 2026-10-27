@@ -22,12 +22,14 @@ class GardenJournalForm(ModelForm):
         labels = {
             "plant_name": "Nama Tanaman",
             "ecopatch_name": "Nama EcoPatch",
+            "plant_height": "Ukuran / Tinggi Tanaman (cm)",
             "image": "Foto Tanaman (Opsional)",
             "cover_pattern": "Pilihan Sampul Buku (Cover Pattern)",
         }
         help_texts = {
             "plant_name": "Isi nama tanaman yang dicatat (misal: Monstera, Tomat Ceri, Cabai Rawit).",
             "ecopatch_name": "Isi nama kebunmu (contoh: Balkon Timur, Kebun Depan).",
+            "plant_height": "Tinggi batang, panjang sulur, atau bentang tanaman dalam cm.",
             "image": "Upload foto perkembangan tanaman hari ini (JPG/PNG).",
             "cover_pattern": "Pilih motif cover buku jurnal untuk tanaman ini.",
         }
@@ -55,5 +57,5 @@ class GardenJournalForm(ModelForm):
     def clean_plant_height(self):
         height = self.cleaned_data.get("plant_height")
         if height is not None and height < 0:
-            raise forms.ValidationError("Tinggi tanaman tidak boleh negatif.")
+            raise forms.ValidationError("Ukuran tanaman tidak boleh negatif.")
         return height
