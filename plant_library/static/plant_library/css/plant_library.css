@@ -565,20 +565,17 @@ body.has-sidebar.plant-body {
 }
 
 /* ---------------------------------------------------------------- Quick asks
-   A tiny FAQ chat with Petak instead of another row of chips. Each question is
-   a chat bubble that drops a natural-language query into the search field. */
+   A small FAQ chat with Petak. Flat cream bubbles keep it inside the same
+   visual language as the search card and the filter pills. */
 .plant-ask {
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
     align-items: center;
     gap: 14px 22px;
     padding: 16px 20px;
     border: 1.5px solid var(--pl-line);
     border-radius: 24px;
-    background:
-        radial-gradient(85% 130% at 0% 0%, rgba(226, 244, 229, 0.9), rgba(255, 253, 246, 0) 62%),
-        #fffdf6;
-    box-shadow: 0 16px 32px -30px rgba(23, 48, 31, 0.55);
+    background: #fffdf6;
 }
 
 .plant-ask-pet {
@@ -593,7 +590,6 @@ body.has-sidebar.plant-body {
     height: 46px;
     flex: none;
     object-fit: contain;
-    filter: drop-shadow(0 6px 8px rgba(23, 48, 31, 0.14));
 }
 
 .plant-ask-bubble {
@@ -601,7 +597,7 @@ body.has-sidebar.plant-body {
     margin: 0;
     padding: 9px 14px;
     border-radius: 16px 16px 16px 5px;
-    background: #f2e7ca;
+    background: var(--pl-brand-soft);
     color: var(--pl-fg);
     line-height: 1.35;
 }
@@ -614,7 +610,7 @@ body.has-sidebar.plant-body {
     width: 10px;
     height: 10px;
     border-radius: 2px;
-    background: #f2e7ca;
+    background: var(--pl-brand-soft);
     transform: rotate(45deg);
 }
 
@@ -639,39 +635,41 @@ body.has-sidebar.plant-body {
 .plant-ask-q {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px 8px 9px;
-    border: 1.5px solid rgba(182, 154, 99, 0.34);
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 13px;
+    border: 0;
     border-radius: 16px 16px 16px 5px;
-    background: #fff;
+    background: #f2e7ca;
     color: var(--pl-fg);
-    font: 700 0.79rem/1.3 var(--pl-body);
+    font: 700 0.8rem/1.35 var(--pl-body);
     text-align: left;
     cursor: pointer;
-    transition: transform 0.18s, border-color 0.18s, background 0.18s, box-shadow 0.18s;
+    transition: background 0.18s, transform 0.18s, color 0.18s;
 }
 
-.plant-ask-q-icon {
-    display: grid;
-    place-items: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--pl-mango-soft);
-    color: var(--pl-mango-ink);
-    font: 800 0.72rem/1 var(--pl-body);
+.plant-ask-q svg {
+    width: 15px;
+    height: 15px;
     flex: none;
-    transition: background 0.18s, color 0.18s;
+    color: var(--pl-muted);
+    opacity: 0.7;
+    transition: transform 0.18s, opacity 0.18s;
 }
 
 .plant-ask-q:hover {
-    border-color: var(--pl-brand);
-    background: #f4fbf5;
-    transform: translateX(3px);
+    background: #eaddbd;
+    transform: translateX(4px);
+}
+
+.plant-ask-q:hover svg {
+    opacity: 1;
+    transform: translateX(2px);
 }
 
 .plant-ask-q:active {
-    transform: translateX(3px) scale(0.99);
+    transform: translateX(4px) scale(0.99);
 }
 
 .plant-ask-q:focus-visible {
@@ -680,14 +678,13 @@ body.has-sidebar.plant-body {
 }
 
 .plant-ask-q.is-active {
-    border-color: var(--pl-brand-strong);
     background: var(--pl-brand-soft);
-    box-shadow: inset 0 0 0 1px rgba(22, 122, 56, 0.18);
+    color: var(--pl-brand-strong);
 }
 
-.plant-ask-q.is-active .plant-ask-q-icon {
-    background: var(--pl-brand-strong);
-    color: #fff;
+.plant-ask-q.is-active svg {
+    color: var(--pl-brand-strong);
+    opacity: 1;
 }
 
 /* ---------------------------------------------------------------- Results bar */
@@ -1156,122 +1153,21 @@ body.has-sidebar.plant-body {
 
 /* ---------------------------------------------------------------- Detail */
 .plant-detail {
-    position: relative;
-    overflow: hidden;
     display: grid;
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
     gap: 26px 30px;
-    padding: 24px;
+    padding: 22px;
     border: 1.5px solid var(--pl-line);
-    border-radius: 30px;
-    background: linear-gradient(150deg, #fffdf6 0%, #fffdf6 58%, rgba(253, 247, 232, 0.9) 100%);
-    box-shadow: 0 24px 50px -32px rgba(23, 48, 31, 0.55);
-}
-
-.plant-detail::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(60% 50% at 100% 0%, rgba(47, 191, 92, 0.1), rgba(47, 191, 92, 0) 70%),
-        radial-gradient(50% 45% at 0% 100%, rgba(255, 157, 46, 0.09), rgba(255, 157, 46, 0) 70%);
-    pointer-events: none;
-}
-
-.plant-detail::after {
-    content: '';
-    position: absolute;
-    right: -92px;
-    bottom: -118px;
-    width: 260px;
-    height: 260px;
-    border: 26px solid rgba(47, 191, 92, 0.07);
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.plant-detail > * {
-    position: relative;
-    z-index: 1;
+    border-radius: 28px;
+    background: #fffdf6;
+    box-shadow: 0 20px 44px -30px rgba(23, 48, 31, 0.5);
 }
 
 .plant-detail-side {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     min-width: 0;
-}
-
-.plant-care-stats {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-}
-
-.plant-care-stat {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    min-width: 0;
-    padding: 9px 10px;
-    border: 1px solid var(--pl-line);
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.86);
-}
-
-.plant-care-icon {
-    display: grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
-    flex: none;
-    background: var(--pl-brand-soft);
-    color: var(--pl-brand-strong);
-}
-
-.plant-care-icon svg {
-    width: 17px;
-    height: 17px;
-}
-
-.plant-care-stat[data-tone='sun'] .plant-care-icon {
-    background: var(--pl-mango-soft);
-    color: var(--pl-mango-ink);
-}
-
-.plant-care-stat[data-tone='water'] .plant-care-icon {
-    background: var(--pl-sky-soft);
-    color: var(--pl-sky-ink);
-}
-
-.plant-care-stat[data-tone='space'] .plant-care-icon {
-    background: rgba(182, 154, 99, 0.18);
-    color: var(--pl-line-strong);
-}
-
-.plant-care-copy {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    line-height: 1.2;
-}
-
-.plant-care-label {
-    color: var(--pl-muted);
-    font-size: 0.6rem;
-    font-weight: 800;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-}
-
-.plant-care-stat strong {
-    color: var(--pl-fg);
-    font-size: 0.79rem;
-    font-weight: 800;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .plant-detail-media {
@@ -1283,10 +1179,9 @@ body.has-sidebar.plant-body {
     aspect-ratio: 4 / 3;
     margin: 0;
     overflow: hidden;
+    border: 1px solid var(--pl-line);
     border-radius: 18px;
-    background:
-        radial-gradient(120% 90% at 50% 0%, #ffffff 0%, rgba(255, 255, 255, 0) 58%),
-        linear-gradient(150deg, #e6f4e0 0%, #fdf3dd 100%);
+    background: #eef4e6;
 }
 
 .plant-detail-media img {
@@ -1304,63 +1199,6 @@ body.has-sidebar.plant-body {
     filter: drop-shadow(0 14px 20px rgba(23, 48, 31, 0.16));
 }
 
-.plant-media-chip {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 99px;
-    background: rgba(255, 253, 246, 0.94);
-    box-shadow: 0 8px 18px -12px rgba(23, 48, 31, 0.5);
-    color: var(--pl-fg);
-    font: 800 0.72rem/1 var(--pl-body);
-    backdrop-filter: blur(6px);
-}
-
-.plant-media-chip-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--pl-brand);
-}
-
-.plant-media-match {
-    position: absolute;
-    left: 12px;
-    bottom: 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    max-width: calc(100% - 24px);
-    padding: 7px 12px;
-    border-radius: 99px;
-    background: rgba(22, 122, 56, 0.94);
-    color: #fff;
-    font: 700 0.73rem/1.1 var(--pl-body);
-    box-shadow: 0 12px 24px -16px rgba(15, 90, 40, 0.8);
-}
-
-.plant-media-match svg {
-    width: 14px;
-    height: 14px;
-}
-
-.plant-media-match span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.plant-media-match-more {
-    padding: 2px 7px;
-    border-radius: 99px;
-    background: rgba(255, 255, 255, 0.22);
-    font-weight: 800;
-}
-
 /* On wide screens the photo grows so the left column lines up with the details. */
 @media (min-width: 981px) {
     .plant-detail-media {
@@ -1370,70 +1208,46 @@ body.has-sidebar.plant-body {
     }
 }
 
-/* One Smart Care note under the card, styled like a friendly care receipt. */
-.plant-tip-card {
+/* One tip under the card, like the note under a Seed Exchange listing. */
+.plant-tip {
     display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 18px;
-    border: 1.5px solid rgba(47, 191, 92, 0.3);
-    border-radius: 22px;
-    background:
-        radial-gradient(90% 120% at 0% 0%, rgba(226, 244, 229, 0.95), rgba(255, 253, 246, 0.85) 70%),
-        #fffdf6;
-    box-shadow: 0 16px 30px -26px rgba(23, 48, 31, 0.5);
-}
-
-.plant-tip-icon {
-    display: grid;
-    place-items: center;
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    background: var(--pl-brand-soft);
-    color: var(--pl-brand-strong);
-    flex: none;
-}
-
-.plant-tip-icon svg {
-    width: 22px;
-    height: 22px;
-}
-
-.plant-tip-copy {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-.plant-tip-kicker {
-    margin: 0 0 2px;
-    color: var(--pl-brand-strong);
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-}
-
-.plant-tip-text {
+    align-items: flex-start;
+    gap: 10px;
     margin: 0;
+    padding: 12px 16px;
+    border: 1.5px dashed var(--pl-line);
+    border-radius: 16px;
+    background: #fdf7e8;
     color: var(--pl-muted);
     font-size: 0.88rem;
     line-height: 1.55;
 }
 
-.plant-tip-cta {
+.plant-tip svg {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
     flex: none;
+    fill: none;
+    stroke: var(--pl-brand-strong);
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.plant-tip b {
+    color: var(--pl-fg);
 }
 
 .plant-detail-body {
     min-width: 0;
 }
 
-.plant-detail-eyebrow {
+.plant-detail-kicker {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin: 0 0 4px;
+    margin: 0 0 6px;
     color: var(--pl-muted);
     font-size: 0.7rem;
     font-weight: 800;
@@ -1441,12 +1255,10 @@ body.has-sidebar.plant-body {
     text-transform: uppercase;
 }
 
-.plant-detail-eyebrow-mark {
-    width: 8px;
-    height: 8px;
-    border-radius: 3px;
-    background: var(--pl-mango);
-    transform: rotate(45deg);
+.plant-detail-kicker svg {
+    width: 15px;
+    height: 15px;
+    color: var(--pl-brand-strong);
 }
 
 .plant-detail-head {
@@ -1588,12 +1400,37 @@ body.has-sidebar.plant-body {
 }
 
 .plant-meta dt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin: 0;
     color: var(--pl-muted);
     font-size: 0.68rem;
     font-weight: 800;
     letter-spacing: 0.09em;
     text-transform: uppercase;
+}
+
+.plant-meta-icon {
+    width: 14px;
+    height: 14px;
+    flex: none;
+}
+
+.plant-meta[data-tone='sun'] .plant-meta-icon {
+    color: var(--pl-mango-ink);
+}
+
+.plant-meta[data-tone='water'] .plant-meta-icon {
+    color: var(--pl-sky-ink);
+}
+
+.plant-meta[data-tone='place'] .plant-meta-icon {
+    color: var(--pl-brand-strong);
+}
+
+.plant-meta[data-tone='space'] .plant-meta-icon {
+    color: var(--pl-line-strong);
 }
 
 .plant-meta dd {
@@ -2172,15 +2009,6 @@ body.has-sidebar.plant-body {
         padding: 14px 16px;
         border-radius: 20px;
     }
-
-    .plant-tip-card {
-        flex-wrap: wrap;
-    }
-
-    .plant-tip-cta {
-        width: 100%;
-        justify-content: center;
-    }
 }
 
 @media (max-width: 560px) {
@@ -2189,7 +2017,7 @@ body.has-sidebar.plant-body {
     }
 
     .plant-ask-q {
-        padding: 9px 12px 9px 9px;
+        padding: 10px 13px;
     }
 }
 
@@ -2197,10 +2025,6 @@ body.has-sidebar.plant-body {
     .plant-chip svg {
         width: 14px;
         height: 14px;
-    }
-
-    .plant-care-stats {
-        grid-template-columns: 1fr;
     }
 }
 
