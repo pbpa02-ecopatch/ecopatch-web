@@ -153,7 +153,10 @@ body.mep-module{background:#fdf7e8;color:#17301f}
   body.has-sidebar.mep-module{padding-left:0}
   .mep-module{--mep-offset:calc(var(--side-width) + var(--side-gap) * 2)}
 }
-.mep-module .site-footer{padding-left:calc(var(--mep-offset,0px) + 20px)}
+/* The footer continues the page: same colour as where the page gradient ends, and the line sits in the same column as the content */
+.mep-module .site-footer{padding:0;background:#faefd5;text-align:left}
+.mep-module .site-footer-copy{max-width:calc(1120px + var(--mep-offset,0px));margin:0 auto;
+  padding:18px clamp(20px,4vw,56px) 28px calc(var(--mep-offset,0px) + clamp(20px,4vw,56px))}
 .mep-hero{position:relative;isolation:isolate;overflow:hidden;min-height:clamp(390px,46vh,480px);border-bottom:3px solid #d8c48d;
   background:radial-gradient(70% 90% at 76% 78%,#fff0c8a6 0%,transparent 62%),linear-gradient(180deg,#fff4dc 0%,#eef8e2 46%,#dff2d4 100%)}
 .mep-hero-art{position:absolute;inset:0;z-index:0;pointer-events:none}
@@ -297,6 +300,57 @@ body.mep-module{background:#fdf7e8;color:#17301f}
   .mep-band-side{flex-direction:row;width:auto;justify-content:space-between;gap:16px;align-items:center}
   .mep-band-side .mep-bed{width:112px;flex:none}
   .mep-band-actions .btn{flex:1 1 auto}
+}
+
+/* Scenic My EcoPatch header, inspired by the garden reference. */
+.mep-module .mep-hero {
+  min-height: 440px;
+  padding-top: 80px;
+  padding-bottom: 100px;
+  background: #eef4dc;
+  border-bottom: 2px solid #ccbf8e;
+  align-items: flex-start;
+}
+.mep-module .mep-hero::before {
+  background: url("garden-header.svg") center bottom / cover no-repeat;
+  pointer-events: none;
+}
+.mep-module .mep-hero-copy { position: relative; z-index: 1; max-width: 600px; padding-right: 16px; }
+.mep-module .mep-hero .mep-eyebrow { margin-bottom: 20px; }
+.mep-module .mep-hero h1 { font-size: clamp(2.8rem, 4.5vw, 4.5rem); margin-bottom: 24px; }
+.mep-module .mep-hero-copy > p:not(.mep-eyebrow) { max-width: 40ch; }
+.mep-module .mep-stats { gap: 10px; margin-top: 26px; max-width: none; }
+.mep-module .mep-stats li { background: #fffdf0df; border-radius: 999px; padding: 8px 15px; color: #4c6853; }
+.mep-module .mep-stats strong { color: #167a38; margin-right: 3px; }
+.mep-module .mep-mascot { position: absolute; z-index: 1; right: 5%; bottom: -6px; width: 270px; margin: 0; }
+.mep-module .mep-mascot img { width: 250px; height: auto; }
+.mep-module .mep-speech { display: block; position: absolute; bottom: 312px; right: -6px; width: 310px; padding: 14px 18px; border: 1px solid #e0d7b7; border-radius: 24px 24px 7px 24px; box-shadow: 0 12px 28px #17301f12; }
+.mep-module .mep-speech::after { content: ""; position: absolute; bottom: -7px; right: 40px; width: 13px; height: 13px; transform: rotate(45deg); background: #fffef7; border-right: 1px solid #e0d7b7; border-bottom: 1px solid #e0d7b7; }
+@media(min-width:768px) {
+  .mep-module.has-sidebar .mep-hero { padding-left: calc(var(--mep-sidebar-offset) + clamp(24px, 6vw, 100px)); }
+}
+@media(min-width:768px) and (max-width:1200px) {
+  .mep-module .mep-hero { min-height: 420px; padding-top: 56px; padding-bottom: 90px; }
+  .mep-module .mep-hero-copy { max-width: calc(100% - 175px); }
+  .mep-module .mep-hero h1 { font-size: clamp(2.3rem, 4.5vw, 3.3rem); }
+  .mep-module .mep-mascot { width: 170px; right: 2%; }
+  .mep-module .mep-mascot img { width: 170px; }
+  .mep-module .mep-speech { display: none; }
+  .mep-module .mep-stats li { padding: 7px 11px; font-size: .8rem; }
+}
+@media(max-width:767.98px) {
+  .mep-module .mep-hero { min-height: 460px; padding: 32px 20px 180px; }
+  .mep-module .mep-hero::before { background-size: auto 100%; background-position: 75% bottom; }
+  .mep-module .mep-hero-copy { max-width: 100%; padding-right: 0; }
+  .mep-module .mep-hero .mep-eyebrow { margin-bottom: 14px; font-size: .65rem; }
+  .mep-module .mep-hero h1 { font-size: clamp(2.4rem, 8vw, 3.2rem); margin-bottom: 16px; }
+  .mep-module .mep-hero-copy > p:not(.mep-eyebrow) { font-size: .95rem; }
+  .mep-module .mep-stats { gap: 7px; margin-top: 18px; }
+  .mep-module .mep-stats li { padding: 7px 10px; font-size: .75rem; }
+  .mep-module .mep-stats strong { font-size: 1rem; }
+  .mep-module .mep-mascot { width: 165px; right: 24px; bottom: -4px; }
+  .mep-module .mep-mascot img { width: 165px; }
+  .mep-module .mep-speech { display: none; }
 }
 
 /* Delete an EcoPatch from the list: a small trash button on the picture, kept quiet until the card is hovered or focused

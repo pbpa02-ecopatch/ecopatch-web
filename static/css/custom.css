@@ -1645,8 +1645,8 @@ h1, h2, h3, .navbar-brand {
    A rounded card that floats over the page with a gap on every side. Top: logo. Middle: the menu in groups.
    Bottom: the profile row (opens a small menu with Profil Saya and Keluar), then the collapse button. Expanded it shows labels; collapsed
    (html.sidebar-collapsed) it is a narrow pill of icons with short dividers between the groups.
-   The menu icons are CSS masks picked by the order of the <li>s in header.html (1 Plant Library, 2 My EcoPatch,
-   3 Smart Care, 4 Garden Journal, 5 Seed Exchange); if that order changes, update the nth-child rules below.
+   The menu icons are inline SVGs in header.html (.nav-ico); the group headings still go by the order of the <li>s
+   (1 Plant Library, 2 My EcoPatch, 3 Smart Care, 4 Garden Journal, 5 Seed Exchange).
    Small screens keep the top bar. */
 .sidebar-head {
     display: contents;
@@ -1773,15 +1773,27 @@ h1, h2, h3, .navbar-brand {
         transition: background-color 0.15s ease, color 0.15s ease;
     }
 
-    .site-navbar--side .navbar-nav.nav-auth .nav-link::before {
-        content: "";
+    /* the menu icons: drawn in the page's ink with green, blue and amber touches; on the green "you are here" pill
+       the line turns white and the touches turn warm cream */
+    .site-navbar--side .navbar-nav.nav-auth .nav-link .nav-ico {
+        display: block;
         flex: 0 0 auto;
-        width: 22px;
-        height: 22px;
-        background-color: currentColor;
-        -webkit-mask: var(--nav-icon) center / contain no-repeat;
-        mask: var(--nav-icon) center / contain no-repeat;
+        width: 26px;
+        height: 26px;
+        --ico-leaf: #1f9142;
+        --ico-water: #2a9bc9;
+        --ico-mark: #e0910a;
     }
+
+    .site-navbar--side .navbar-nav.nav-auth .nav-link.active .nav-ico {
+        --ico-leaf: #ffe7a8;
+        --ico-water: #c4ebfb;
+        --ico-mark: #ffc857;
+    }
+
+    .nav-ico .ico-leaf { fill: var(--ico-leaf); stroke: none; }
+    .nav-ico .ico-water { fill: var(--ico-water); stroke: none; }
+    .nav-ico .ico-mark { fill: var(--ico-mark); stroke: none; }
 
     .site-navbar.site-navbar--side .navbar-nav.nav-auth .nav-link:hover:not(.active) {
         background: var(--side-hover);
@@ -1799,25 +1811,10 @@ h1, h2, h3, .navbar-brand {
         box-shadow: 0 3px 0 var(--side-active-edge), 0 8px 14px rgba(21, 122, 60, 0.28);
     }
 
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1) .nav-link {
-        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M2%204h6a4%204%200%200%201%204%204v13a3%203%200%200%200-3-3H2z%27/%3E%3Cpath%20d=%27M22%204h-6a4%204%200%200%200-4%204v13a3%203%200%200%201%203-3h7z%27/%3E%3C/svg%3E");
-    }
 
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(2) .nav-link {
-        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Crect%20x=%273%27%20y=%273%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%2714%27%20y=%273%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%273%27%20y=%2714%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3Crect%20x=%2714%27%20y=%2714%27%20width=%277%27%20height=%277%27%20rx=%272%27/%3E%3C/svg%3E");
-    }
 
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(3) .nav-link {
-        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M12%203s6%206.2%206%2010.5A6%206%200%200%201%206%2013.5C6%209.2%2012%203%2012%203z%27/%3E%3C/svg%3E");
-    }
 
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(4) .nav-link {
-        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M5%203h12a2%202%200%200%201%202%202v16H7a2%202%200%200%201-2-2z%27/%3E%3Cpath%20d=%27M9%203v18M12%208h4M12%2012h4%27/%3E%3C/svg%3E");
-    }
 
-    .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(5) .nav-link {
-        --nav-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M7%207h13l-3-3M17%2017H4l3%203%27/%3E%3C/svg%3E");
-    }
 
     /* group headings (shown only while expanded) */
     .site-navbar--side .navbar-nav.nav-auth .nav-item:nth-child(1) { --nav-group: "Kebun"; }
