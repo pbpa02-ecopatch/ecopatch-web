@@ -257,6 +257,25 @@ body.has-sidebar.seed-body {
     opacity: 0.92;
 }
 
+/* Each flag flutters from its string, slightly out of phase. */
+.seed-bunting > path:nth-of-type(n + 2) {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+    animation: seed-flag-flutter 4.6s ease-in-out infinite;
+}
+
+.seed-bunting > path:nth-of-type(2) { animation-delay: -0.35s; }
+.seed-bunting > path:nth-of-type(3) { animation-delay: -1.1s; }
+.seed-bunting > path:nth-of-type(4) { animation-delay: -1.85s; }
+.seed-bunting > path:nth-of-type(5) { animation-delay: -2.6s; }
+.seed-bunting > path:nth-of-type(6) { animation-delay: -3.35s; }
+.seed-bunting > path:nth-of-type(7) { animation-delay: -4.1s; }
+
+@keyframes seed-flag-flutter {
+    0%, 100% { rotate: -2.6deg; }
+    50% { rotate: 2.8deg; }
+}
+
 .seed-hills {
     position: absolute;
     left: -2%;
