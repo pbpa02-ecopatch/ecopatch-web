@@ -216,8 +216,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script id="all-entries-data" type="application/json">{{ all_entries_json|safe }}</script>
-<script id="chart-data" type="application/json">{{ chart_data|safe }}</script>
+{{ all_entries|json_script:"all-entries-data" }}
+{{ chart_data|json_script:"chart-data" }}
 <div id="page-config"
      data-plant-name="{{ plant_name|escape }}"
      data-create-url="{% url 'garden_journal:create' %}?plant_name={{ plant_name|urlencode }}"
@@ -248,11 +248,11 @@ let currentGrouping = 'week';
 let heightChartInstance = null;
 
 /* -------- Helpers -------- */
+// Titles and notes are typed by people and end up in text AND in quoted attributes (title="...", alt="..."),
+// so the quotes have to be escaped too: textContent -> innerHTML alone leaves " and ' untouched.
 function escHtml(str) {
     if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+    return String(str).replace(/[&<>"']/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[ch]));
 }
 
 function formatShortDate(dateIso) {
@@ -946,7 +946,7 @@ function showToast(message, type = 'success') {
     toastEl.setAttribute('role', 'status');
     toastEl.setAttribute('aria-live', 'polite');
     toastEl.innerHTML = `
-        <div class="site-toast-body">${message}</div>
+        <div class="site-toast-body">${escHtml(message)}</div>
         <button type="button" class="btn-close site-toast-close" data-bs-dismiss="toast" aria-label="Tutup"></button>
     `;
     container.appendChild(toastEl);
