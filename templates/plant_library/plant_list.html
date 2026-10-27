@@ -39,11 +39,12 @@
             </div>
         </header>
 
+        <div id="plant-library-body">
         <form class="plant-finder" method="get" action="{% url 'plant_library:plant_list' %}" role="search"
               hx-get="{% url 'plant_library:plant_list' %}"
               hx-target="#plant-results" hx-select="#plant-results" hx-swap="outerHTML"
               hx-push-url="true"
-              hx-trigger="submit, keyup changed delay:400ms from:.plant-search-input, search from:.plant-search-input, change from:.plant-select">
+              hx-trigger="submit, keyup changed delay:400ms from:.plant-search-input, search from:.plant-search-input">
             <img class="plant-finder-pet" src="{% static 'my_ecopatch/petak.svg' %}" alt="" aria-hidden="true" width="126" height="123" loading="lazy" decoding="async">
 
             <div class="plant-finder-card">
@@ -93,26 +94,34 @@
                         {% if selected_sunlight %}<input type="hidden" name="sunlight" value="{{ selected_sunlight }}">{% endif %}
                         {% if selected_difficulty %}<input type="hidden" name="difficulty" value="{{ selected_difficulty }}">{% endif %}
                         {% if selected_indoor_outdoor %}<input type="hidden" name="indoor_outdoor" value="{{ selected_indoor_outdoor }}">{% endif %}
+                        {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+                        {% if selected_space_requirement %}<input type="hidden" name="space_requirement" value="{{ selected_space_requirement }}">{% endif %}
 
-                        <div class="plant-select-wrap">
-                            <label class="visually-hidden" for="plant-category">Kategori tanaman</label>
-                            <select id="plant-category" name="category" class="plant-select">
-                                <option value="">Semua kategori</option>
-                                {% for value, label in categories %}
-                                    <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="plant-select-wrap">
-                            <label class="visually-hidden" for="plant-space">Kebutuhan ruang</label>
-                            <select id="plant-space" name="space_requirement" class="plant-select">
-                                <option value="">Semua ruang</option>
-                                {% for value, label in space_choices %}
-                                    <option value="{{ value }}" {% if selected_space_requirement == value %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                        {% for dd in dropdowns %}
+                            <div class="dropdown plant-filter">
+                                <button type="button" class="plant-filter-btn dropdown-toggle{% if dd.is_active %} is-active{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ dd.current_label }}
+                                    {% if dd.is_active %}
+                                        <span class="plant-filter-dot" aria-hidden="true"></span>
+                                    {% endif %}
+                                </button>
+                                <ul class="dropdown-menu plant-menu">
+                                    {% for item in dd.items %}
+                                        <li>
+                                            <a class="dropdown-item plant-menu-item{% if item.selected %} active{% endif %}"
+                                               href="{{ item.url }}"
+                                               hx-get="{{ item.url }}"
+                                               hx-target="#plant-library-body"
+                                               hx-select="#plant-library-body"
+                                               hx-swap="outerHTML"
+                                               hx-push-url="true">
+                                                {{ item.label }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -165,6 +174,7 @@
                     <a href="{% url 'plant_library:plant_list' %}" class="plant-btn plant-btn--primary">Lihat semua tanaman</a>
                 </div>
             {% endif %}
+        </div>
         </div>
     </div>
 </div>

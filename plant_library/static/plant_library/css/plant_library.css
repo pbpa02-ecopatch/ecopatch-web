@@ -505,6 +505,58 @@ body.has-sidebar.plant-body {
     box-shadow: 0 0 0 4px rgba(47, 191, 92, 0.18);
 }
 
+/* Filter dropdowns mirror Seed Exchange: pill button + rounded menu. */
+.plant-filter {
+    display: inline-flex;
+}
+
+.plant-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 16px;
+    border: 1.5px solid rgba(23, 48, 31, 0.16);
+    border-radius: 99px;
+    background: #fff;
+    color: var(--pl-muted);
+    font: 700 0.83rem/1 var(--pl-body);
+    cursor: pointer;
+    max-width: 100%;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s;
+}
+
+.plant-filter-btn::after {
+    margin-left: 2px;
+}
+
+.plant-filter-btn:hover,
+.plant-filter-btn[aria-expanded='true'] {
+    border-color: var(--pl-brand-strong);
+    color: var(--pl-fg);
+}
+
+.plant-filter-btn:focus-visible {
+    outline: none;
+    border-color: var(--pl-brand-strong);
+    box-shadow: 0 0 0 4px rgba(47, 191, 92, 0.18);
+}
+
+.plant-filter-btn.is-active {
+    border-color: var(--pl-brand-strong);
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+}
+
+.plant-filter-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--pl-brand-strong);
+    flex: none;
+}
+
 /* ---------------------------------------------------------------- Quick searches */
 .plant-suggest-row {
     display: flex;
@@ -1788,6 +1840,15 @@ body.has-sidebar.plant-body {
 
     .plant-select-row {
         width: 100%;
+    }
+
+    .plant-filter {
+        flex: 1 1 140px;
+    }
+
+    .plant-filter-btn {
+        width: 100%;
+        justify-content: space-between;
     }
 
     .plant-select-row .plant-select {

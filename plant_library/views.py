@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.db.models import ProtectedError, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from my_ecopatch.models import EcoPatch
 from .forms import PlantForm
@@ -78,6 +79,48 @@ def build_chip_groups(params):
             })
         groups.append({"field": field, "label": label, "chips": chips})
     return groups
+
+
+def _filter_url(params, name, value):
+    """URL daftar dengan satu filter diganti, filter lain tetap terbawa."""
+    current = {key: val for key, val in params.items() if val}
+    if value:
+        current[name] = value
+    else:
+        current.pop(name, None)
+    query_string = urlencode(current)
+    base = reverse('plant_library:plant_list')
+    return f'{base}?{query_string}' if query_string else base
+
+
+def _filter_dropdowns(params):
+    """Dropdown filter gaya Seed Exchange: label aktif + daftar tautan."""
+    config = [
+        ('category', 'Semua kategori', Plant.Category.choices),
+        ('space_requirement', 'Semua ruang', Plant.SpaceRequirement.choices),
+    ]
+    dropdowns = []
+    for name, all_label, options in config:
+        labels = dict(options)
+        current_value = params.get(name, '')
+        items = [{
+            'label': all_label,
+            'url': _filter_url(params, name, ''),
+            'selected': not current_value,
+        }]
+        for value, label in options:
+            items.append({
+                'label': label,
+                'url': _filter_url(params, name, value),
+                'selected': current_value == value,
+            })
+        dropdowns.append({
+            'name': name,
+            'current_label': labels.get(current_value, all_label),
+            'items': items,
+            'is_active': bool(current_value),
+        })
+    return dropdowns
 
 
 def matching_plants(patch):
@@ -230,6 +273,7 @@ def plant_list(request):
         'selected_space_requirement': space_requirement,
         'has_active_filters': has_active_filters,
         'filter_groups': build_chip_groups(params),
+        'dropdowns': _filter_dropdowns(params),
         'derived_labels': derived_labels,
         'active_params': params,
         'categories': Plant.Category.choices,
