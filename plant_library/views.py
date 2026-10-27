@@ -9,8 +9,9 @@ from django.contrib.auth.views import redirect_to_login
 from django.db.models import ProtectedError, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.cache import patch_vary_headers
 
-from my_ecopatch.models import EcoPatch
+from my_ecopatch.models import EcoPatch, PatchPlant
 from .forms import PlantForm
 from .models import Plant
 
@@ -126,6 +127,50 @@ def _filter_dropdowns(params):
             'is_active': bool(current_value),
         })
     return dropdowns
+
+
+# How a patch's space is called next to a plant: the same words the Plant Library uses for "ruang".
+_SPACE_LABELS = {
+    'indoor': 'Indoor', 'balcony': 'Balkon', 'terrace': 'Teras', 'rooftop': 'Atap', 'small_yard': 'Halaman kecil',
+}
+
+
+def fit_hint(plant, patch):
+    """A short, honest line about putting this plant in this EcoPatch: (tone, text).
+
+    Tones: "ok" fits, "tip" fits if placed well, "warn" is a poor fit, "muted" is already there.
+    """
+    if plant.space_requirement not in ('any', patch.space_type):
+        return 'warn', f'Butuh ruang {plant.get_space_requirement_display().lower()}'
+    if patch.sunlight and plant.sunlight != patch.sunlight:
+        needs = {'full': 'Butuh cahaya penuh', 'partial': 'Butuh cahaya sedang', 'shade': 'Lebih suka tempat teduh'}
+        return 'warn', needs.get(plant.sunlight, 'Cahaya kurang pas')
+    if plant.sunlight == 'full' and patch.space_type == 'indoor':
+        return 'tip', 'Taruh dekat jendela yang terang'
+    if plant.sunlight == 'shade' and patch.space_type != 'indoor':
+        return 'tip', 'Taruh di sudut yang teduh'
+    return 'ok', 'Cocok'
+
+
+def attach_patch_options(plants, user):
+    """Give every plant card the member's EcoPatches to add it to (one query for patches, one for what is in them)."""
+    patches = list(EcoPatch.objects.filter(owner=user).order_by('name'))
+    held = set(
+        PatchPlant.objects.filter(patch__in=patches).exclude(status=PatchPlant.Status.REMOVED)
+        .values_list('patch_id', 'plant_id')
+    )
+    for plant in plants:
+        options = []
+        for patch in patches:
+            if (patch.pk, plant.pk) in held:
+                tone, text = 'muted', 'Sudah ada di sini'
+            else:
+                tone, text = fit_hint(plant, patch)
+            place = _SPACE_LABELS.get(patch.space_type, patch.get_space_type_display())
+            options.append({'patch': patch, 'place': f'{place} \u00b7 {patch.city}' if patch.city else place, 'tone': tone, 'hint': text})
+        plant.patch_options = options
+        plant.can_add = True
+    return plants
 
 
 def matching_plants(patch):
@@ -267,6 +312,8 @@ def plant_list(request):
         plants = list(plants)
         for plant in plants:
             plant.is_match = plant.pk in match_ids
+    if request.user.is_authenticated:
+        plants = attach_patch_options(list(plants), request.user)
 
     context = {
         'plants': plants,
@@ -302,10 +349,15 @@ def plant_detail(request, pk):
             if matching_plants(patch).filter(pk=plant.pk).exists():
                 matching_patches.append(patch)
 
-    return render(request, 'plant_library/plant_detail.html', {
-        'plant': plant,
-        'matching_patches': matching_patches,
-    })
+    context = {'plant': plant, 'matching_patches': matching_patches}
+    # A card opens the same sheet in a pop-up: that asks for only the sheet (and the link still works as a page).
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        context['in_modal'] = True
+        response = render(request, 'plant_library/partials/detail_body.html', context)
+    else:
+        response = render(request, 'plant_library/plant_detail.html', context)
+    patch_vary_headers(response, ['X-Requested-With'])
+    return response
 
 
 @login_required
@@ -345,7 +397,7 @@ def plant_recommend(request):
         selected_patch = user_patches.first()
 
     # Logika filter rekomendasi murni Django (tanpa ML/AI)
-    recommended_plants = matching_plants(selected_patch)
+    recommended_plants = attach_patch_options(list(matching_plants(selected_patch)), request.user)
 
     # Format alasan kecocokan
     space_label = space_labels.get(selected_patch.space_type, selected_patch.get_space_type_display())

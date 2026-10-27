@@ -2112,3 +2112,286 @@ body.has-sidebar.plant-body {
         transform: none;
     }
 }
+
+/* ---------------------------------------------------------------- List hero
+   A mint band with a dot pattern, the title with a marker under "Library", a sprig on each side, and the search card
+   riding up over its lower edge so the pet stands in the band. Only the list page uses it. */
+.plant-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(30px, 6vh, 50px) 0 clamp(96px, 12vh, 118px);
+    background:
+        radial-gradient(circle, rgba(47, 191, 92, 0.2) 1.4px, transparent 1.7px) 0 0 / 22px 22px,
+        radial-gradient(60% 120% at 100% 20%, rgba(255, 214, 122, 0.4), transparent 70%),
+        linear-gradient(135deg, #cdeed6 0%, #e3f5dc 52%, #f1f0d3 100%);
+}
+
+.plant-hero-inner {
+    position: relative;
+    width: 100%;
+    max-width: calc(960px + var(--pl-offset) + 48px);
+    margin: 0 auto;
+    padding: 0 20px 0 calc(var(--pl-offset) + 24px);
+    text-align: center;
+}
+
+.plant-hero-copy {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    padding: 0 clamp(64px, 11vw, 130px);
+}
+
+.plant-hero .plant-sub {
+    max-width: 46ch;
+    margin: 8px auto 0;
+}
+
+.plant-hero .plant-head-actions {
+    justify-content: center;
+}
+
+.plant-title-hl {
+    position: relative;
+    z-index: 0;
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.plant-title-hl::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: -5%;
+    right: -5%;
+    bottom: 6%;
+    height: 36%;
+    border-radius: 99px;
+    background: #ffbd6b;
+    transform: rotate(-1deg);
+}
+
+.plant-sprig {
+    position: absolute;
+    top: 50%;
+    width: clamp(46px, 6vw, 72px);
+    height: auto;
+    margin-top: -48px;
+    transform-origin: 50% 100%;
+    animation: plant-sprig-sway 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.plant-sprig--l { left: calc(var(--pl-offset) + 24px + clamp(0px, 4vw, 70px)); }
+.plant-sprig--r { right: calc(20px + clamp(0px, 4vw, 70px)); transform: scaleX(-1); animation-name: plant-sprig-sway-r; animation-delay: -2.4s; }
+
+@keyframes plant-sprig-sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2.4deg); } }
+@keyframes plant-sprig-sway-r { 0%, 100% { transform: scaleX(-1) rotate(-2deg); } 50% { transform: scaleX(-1) rotate(2.4deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .plant-sprig { animation: none; }
+}
+
+/* the search card rides up over the band */
+.plant-inner--after-hero {
+    position: relative;
+    z-index: 1;
+    margin-top: clamp(-76px, -9vh, -60px);
+    padding-top: 0;
+}
+
+@media (max-width: 767px) {
+    .plant-hero-inner { padding: 0 20px; }
+    .plant-sprig--l { left: 12px; }
+    .plant-sprig--r { right: 12px; }
+}
+
+@media (max-width: 560px) {
+    .plant-hero-copy { padding: 0 8px; }
+    .plant-sprig { top: 6px; margin-top: 0; width: 40px; opacity: 0.85; }
+}
+
+/* ---------------------------------------------------------------- Add to an EcoPatch, from the card
+   The round + on the picture opens a small list of the member's EcoPatches (built in the body by quick_add.js, so
+   the card's rounded corners never cut it). Each row says how well the plant fits there. */
+.plant-add {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+}
+
+.plant-add-btn {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: #167a38;
+    color: #fff;
+    box-shadow: 0 4px 0 #0f5a28, 0 10px 18px -8px rgba(23, 48, 31, 0.55);
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.plant-card-media .plant-add-btn svg { width: 18px; height: 18px; color: #fff; opacity: 1; }
+.plant-add-btn:hover { transform: translateY(-1px); background: #0f622b; }
+.plant-add-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #0f5a28; }
+.plant-add-btn[aria-expanded="true"] { background: #0f622b; }
+.plant-add-btn:focus-visible { outline: 3px solid #ff9d2e; outline-offset: 3px; }
+
+.plant-addpop {
+    position: fixed;
+    z-index: 1080;
+    width: min(320px, calc(100vw - 16px));
+    padding: 14px 16px 8px;
+    border: 1px solid rgba(182, 154, 99, 0.45);
+    border-radius: 18px;
+    background: #fffdf6;
+    box-shadow: 0 24px 44px -18px rgba(23, 48, 31, 0.55);
+    color: #17301f;
+    font: 500 0.9rem/1.4 'Plus Jakarta Sans', system-ui, sans-serif;
+    animation: plant-addpop-in 0.16s ease-out;
+}
+
+@keyframes plant-addpop-in { from { opacity: 0; transform: translateY(-6px); } }
+
+.plant-addpop-title {
+    margin: 0 0 6px;
+    color: #4c6853;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.plant-addpop-list { list-style: none; margin: 0; padding: 0; max-height: min(300px, 48vh); overflow-y: auto; overscroll-behavior: contain; }
+.plant-addpop-list form { margin: 0; }
+
+.plant-addpop-opt {
+    display: block;
+    width: 100%;
+    padding: 9px 8px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.plant-addpop-opt:hover, .plant-addpop-opt:focus-visible { background: #e2f4e5; outline: none; }
+.plant-addpop-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.plant-addpop-row strong { font: 800 1.02rem 'Baloo 2', system-ui, sans-serif; overflow-wrap: anywhere; }
+.plant-addpop-row small { flex: none; color: #4c6853; font-size: 0.8rem; }
+.plant-addpop-hint { display: block; font-size: 0.82rem; font-weight: 700; color: #167a38; }
+.plant-addpop-opt--tip .plant-addpop-hint { color: #167a38; }
+.plant-addpop-opt--warn .plant-addpop-hint { color: #a85a10; }
+.plant-addpop-opt--muted .plant-addpop-hint { color: #7a7f6a; font-weight: 600; }
+.plant-addpop-empty { margin: 4px 0 8px; color: #4c6853; }
+
+.plant-addpop-new {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding: 12px 8px 10px;
+    border-top: 1px solid rgba(182, 154, 99, 0.4);
+    color: #167a38;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.plant-addpop-new:hover { color: #0f5a28; }
+.plant-addpop-new span { font-size: 1.2rem; line-height: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+    .plant-addpop { animation: none; }
+    .plant-add-btn { transition: none; }
+}
+
+/* ---------------------------------------------------------------- Plant sheet as a pop-up
+   Opened from a card by detail_modal.js; the sheet inside is the same one the detail page shows. On a phone it rises
+   from the bottom like a sheet. */
+.plant-card { cursor: pointer; }
+
+.plant-modal {
+    padding: 0;
+    border: 0;
+    border-radius: 28px;
+    width: min(900px, calc(100% - 24px));
+    max-height: min(92dvh, 920px);
+    background: #fffdf6;
+    color: var(--pl-fg);
+    box-shadow: 0 30px 80px -20px rgba(23, 48, 31, 0.6);
+    overflow: hidden;
+}
+
+.plant-modal::backdrop {
+    background: rgba(23, 48, 31, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.plant-modal[open] { animation: plant-modal-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+@keyframes plant-modal-in { from { opacity: 0; transform: translateY(14px) scale(0.985); } }
+
+.plant-modal-body {
+    max-height: min(92dvh, 920px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 18px;
+}
+
+.plant-modal .plant-detail {
+    padding: 4px;
+    border: 0;
+    box-shadow: none;
+}
+
+.plant-modal .plant-detail-title:focus { outline: none; }
+
+.plant-modal-x {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 6px 16px -6px rgba(23, 48, 31, 0.5);
+    color: var(--pl-fg);
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.plant-modal-x:hover { background: var(--pl-brand-soft); }
+
+.plant-modal-loading {
+    margin: 0;
+    padding: 70px 0;
+    text-align: center;
+    color: var(--pl-muted);
+    font-weight: 600;
+}
+
+@media (max-width: 700px) {
+    .plant-modal {
+        width: 100%;
+        max-width: 100%;
+        margin: auto 0 0;
+        border-radius: 24px 24px 0 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plant-modal[open] { animation: none; }
+}
