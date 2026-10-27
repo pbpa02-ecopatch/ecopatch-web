@@ -8,6 +8,7 @@
     <p class="patch-page-lead">Ceritakan sedikit tentang ruang berkebunmu supaya rekomendasi tanaman bisa lebih pas.</p>
 
     <p class="patch-help">Kolom bertanda * wajib diisi. Data lainnya boleh dilengkapi nanti.</p>
+    <p class="patch-help patch-city-note">{% if profile_city %}Kota ikut profilmu: <strong>{{ profile_city }}</strong> (dipakai Smart Care untuk cuaca). <a href="{% url 'main:profile' %}">Ubah di profil</a>{% else %}Kotamu belum diisi di profil, jadi Smart Care memakai Depok. <a href="{% url 'main:profile' %}">Isi di profil</a>{% endif %}</p>
     <form method="post" class="patch-form" novalidate>
         {% csrf_token %}
         {% if form.non_field_errors %}

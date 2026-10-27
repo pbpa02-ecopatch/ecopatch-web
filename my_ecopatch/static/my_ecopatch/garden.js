@@ -66,6 +66,24 @@
     });
   }
   enhanceSelects();
+  document.body.classList.add('mep-js');
+
+  // The add form is folded away once there are plants; every "add a plant" link opens it and moves there.
+  const addPlant = () => document.getElementById('add-plant');
+  function openAddPlant(focus) {
+    const box = addPlant();
+    if (!box) return;
+    box.open = true;
+    box.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'});
+    if (focus) (document.getElementById('id_plant-control') || box.querySelector('select, input'))?.focus({preventScroll: true});
+  }
+  document.addEventListener('click', event => {
+    const link = event.target.closest('a[href="#add-plant"]');
+    if (!link || !addPlant()) return;
+    event.preventDefault();
+    openAddPlant(true);
+  });
+  if (location.hash === '#add-plant') openAddPlant(false);
 
   // HTMX's native confirm is replaced by a themed, focus-trapped dialog.
   const dialog = document.createElement('dialog');
