@@ -290,7 +290,8 @@ def plant_journal_history(request, plant_name):
     }
     condition_label = {c[0]: c[1] for c in GardenJournal.CONDITION_CHOICES}
 
-    all_entries_json = json.dumps([
+    # Plain Python data: the template embeds it with json_script, which escapes "</script>" and friends.
+    all_entries = [
         {
             "id": j.pk,
             "pk": j.pk,
@@ -310,7 +311,7 @@ def plant_journal_history(request, plant_name):
             "created_at": j.created_at.strftime("%d %b %Y, %H:%M"),
         }
         for j in journals_query
-    ])
+    ]
 
     first_all = GardenJournal.objects.filter(user=request.user, plant_name=plant_name).order_by("-date").first()
     cover_pattern = first_all.cover_pattern if first_all else "flowers"
@@ -333,14 +334,14 @@ def plant_journal_history(request, plant_name):
             growth = round(latest_h.plant_height - oldest_h.plant_height, 1)
 
     # Chart data: height over time (ascending by date)
-    chart_data = json.dumps([
+    chart_data = [
         {
             "date": j.date.strftime("%d %b %Y"),
             "date_iso": j.date.isoformat(),
             "height": j.plant_height,
         }
         for j in entries_with_height.order_by("date")
-    ])
+    ]
 
     context = {
         "plant_name": plant_name,
@@ -357,7 +358,7 @@ def plant_journal_history(request, plant_name):
         "latest_badge": first_all.get_condition_display_badge if first_all else "success",
         "latest_ds_badge": first_all.get_condition_ds_class if first_all else "badge-ds-healthy",
         "latest_condition_display": first_all.get_plant_condition_display() if first_all else "Healthy",
-        "all_entries_json": all_entries_json,
+        "all_entries": all_entries,
         "initial_page": 0,  # Selalu buka lembar catatan terkini (index 0)
         # stats
         "latest_height": latest_height,

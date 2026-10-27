@@ -821,9 +821,16 @@ class CareViewTests(CacheClearingTestCase):
         mock_payload.assert_called_with("Bandung")
 
     @patch("smart_care.views.weather_payload", return_value={"available": True})
-    def test_the_ecopatch_city_beats_the_profile_city(self, mock_payload):
+    def test_the_profile_city_beats_the_ecopatch_city(self, mock_payload):
         make_patch_plant(self.user, patch=make_patch(self.user, city="Bandung"))
         with patch.object(User, "profile", MagicMock(city="Medan"), create=True):
+            self.client.get(reverse("smart_care:weather"))
+        mock_payload.assert_called_with("Medan")
+
+    @patch("smart_care.views.weather_payload", return_value={"available": True})
+    def test_a_profile_without_a_city_leaves_the_ecopatch_city(self, mock_payload):
+        make_patch_plant(self.user, patch=make_patch(self.user, city="Bandung"))
+        with patch.object(User, "profile", MagicMock(city=""), create=True):
             self.client.get(reverse("smart_care:weather"))
         mock_payload.assert_called_with("Bandung")
 

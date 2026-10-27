@@ -89,3 +89,13 @@ class SeedExchange(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def owner_contact(self):
+        """The owner's contact as it is on their profile right now.
+
+        The contact saved with the listing is only a copy (kept in step with the profile), so it
+        is the fallback for an owner whose profile no longer has one.
+        """
+        profile = getattr(self.user, 'profile', None)
+        return (profile.contact_text() if profile else '') or self.contact

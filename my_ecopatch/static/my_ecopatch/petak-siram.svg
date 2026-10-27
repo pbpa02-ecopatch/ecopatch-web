@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 430" role="img" aria-label="Petak sedang menyiram tanaman dengan penyiram biru">
+<style>
+    .ps-char { transform-box: fill-box; transform-origin: 50% 100%; animation: ps-bob 4.6s ease-in-out infinite; }
+    .ps-wave { transform-box: fill-box; transform-origin: 95% 97%; animation: ps-wave 2.7s ease-in-out infinite; }
+    .ps-frond { transform-box: view-box; }
+    .ps-frond--1 { transform-origin: 196px 216px; animation: ps-sway 4.4s ease-in-out infinite; animation-delay: -0.6s; }
+    .ps-frond--2 { transform-origin: 248px 216px; animation: ps-sway 4.9s ease-in-out infinite; animation-delay: -2.4s; }
+    .ps-frond--3 { transform-origin: 220px 216px; animation: ps-sway 4.1s ease-in-out infinite; animation-delay: -1.4s; }
+    .ps-eyes { transform-box: fill-box; transform-origin: 50% 50%; animation: ps-blink 5.2s infinite; }
+    .ps-can { transform-box: view-box; transform-origin: 386px 292px; animation: ps-tilt 5.2s ease-in-out infinite; }
+    .ps-drop { transform-box: fill-box; opacity: 0; animation: ps-fall 2.6s ease-in infinite; }
+    .ps-drop--2 { animation-delay: -0.5s; }
+    .ps-drop--3 { animation-delay: -1.0s; }
+    .ps-drop--4 { animation-delay: -1.5s; }
+    .ps-drop--5 { animation-delay: -2.0s; }
+    .ps-sprout { transform-box: fill-box; transform-origin: 50% 100%; animation: ps-grow 5.2s ease-in-out infinite; }
+    .ps-spark { transform-box: fill-box; transform-origin: 50% 50%; animation: ps-twinkle 3.4s ease-in-out infinite; }
+    .ps-spark--2 { animation-delay: -1.7s; }
+    @keyframes ps-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+    @keyframes ps-wave { 0%, 100% { rotate: 7deg; } 50% { rotate: -8deg; } }
+    @keyframes ps-sway { 0%, 100% { rotate: -2.6deg; } 50% { rotate: 2.6deg; } }
+    @keyframes ps-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.08); } }
+    @keyframes ps-tilt { 0%, 18%, 100% { rotate: -4deg; } 40%, 70% { rotate: 16deg; } }
+    @keyframes ps-fall { 0%, 24% { opacity: 0; translate: 0 0; } 34% { opacity: 0.95; } 100% { opacity: 0; translate: 10px 104px; } }
+    @keyframes ps-grow { 0%, 30% { scale: 0.86; } 62%, 100% { scale: 1.08; } }
+    @keyframes ps-twinkle { 0%, 100% { opacity: 0.35; scale: 0.7; } 50% { opacity: 1; scale: 1.1; } }
+    @media (prefers-reduced-motion: reduce) {
+        .ps-char, .ps-wave, .ps-frond, .ps-eyes, .ps-can, .ps-drop, .ps-sprout, .ps-spark { animation: none; }
+        .ps-drop { opacity: 0; }
+    }
+</style>
+
+<ellipse cx="220" cy="405" rx="150" ry="14" fill="#22301f" opacity="0.14"/>
+
+<g class="ps-char">
+    <!-- leaves -->
+    <g class="ps-frond ps-frond--1">
+        <path d="M198 220C196 194 190 176 184 160" stroke="#1f9142" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <g transform="translate(184 160) scale(-0.62 0.62) rotate(-24)">
+            <path d="M0 0C10-34 46-52 84-46 80-10 40 12 0 0Z" fill="#2fbf5c"/>
+            <path d="M0 0C40 12 80-10 84-46 70-20 36-6 0 0Z" fill="#1f9142" opacity="0.55"/>
+            <path d="M8-5C32-22 54-34 78-44" stroke="#bdeec7" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.85"/>
+        </g>
+    </g>
+    <g class="ps-frond ps-frond--2">
+        <path d="M244 220C246 196 252 182 258 168" stroke="#1f9142" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <g transform="translate(258 168) scale(0.66 0.66) rotate(-34)">
+            <path d="M0 0C10-34 46-52 84-46 80-10 40 12 0 0Z" fill="#2fbf5c"/>
+            <path d="M0 0C40 12 80-10 84-46 70-20 36-6 0 0Z" fill="#1f9142" opacity="0.55"/>
+            <path d="M8-5C32-22 54-34 78-44" stroke="#bdeec7" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.85"/>
+        </g>
+    </g>
+    <g class="ps-frond ps-frond--3">
+        <path d="M220 220C220 182 218 146 220 108" stroke="#1f9142" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <g transform="translate(220 108) rotate(-13)">
+            <path d="M0 0C10-34 46-52 84-46 80-10 40 12 0 0Z" fill="#2fbf5c"/>
+            <path d="M0 0C40 12 80-10 84-46 70-20 36-6 0 0Z" fill="#1f9142" opacity="0.55"/>
+            <path d="M8-5C32-22 54-34 78-44" stroke="#bdeec7" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.85"/>
+        </g>
+        <g transform="translate(220 108) scale(-1 1) rotate(-13)">
+            <path d="M0 0C10-34 46-52 84-46 80-10 40 12 0 0Z" fill="#2fbf5c"/>
+            <path d="M0 0C40 12 80-10 84-46 70-20 36-6 0 0Z" fill="#1f9142" opacity="0.55"/>
+            <path d="M8-5C32-22 54-34 78-44" stroke="#bdeec7" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.85"/>
+        </g>
+    </g>
+
+    <!-- feet -->
+    <rect x="140" y="362" width="60" height="34" rx="17" fill="#e8841a"/>
+    <rect x="240" y="362" width="60" height="34" rx="17" fill="#e8841a"/>
+
+    <!-- pot body -->
+    <rect x="88" y="236" width="264" height="144" rx="42" fill="#ff9d2e"/>
+    <path d="M92 344H348v2a42 42 0 0 1-42 42H134a42 42 0 0 1-42-42Z" fill="#e8841a" opacity="0.5"/>
+    <path d="M112 280a36 36 0 0 1 20-32" stroke="#ffd08f" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.75"/>
+    <circle cx="112" cy="268" r="3.6" fill="#cf6f10"/>
+    <circle cx="330" cy="268" r="3.6" fill="#cf6f10"/>
+    <circle cx="114" cy="360" r="3.6" fill="#cf6f10"/>
+
+    <!-- rim and soil -->
+    <rect x="66" y="196" width="308" height="54" rx="27" fill="#ffb85c"/>
+    <rect x="66" y="224" width="308" height="20" rx="10" fill="#ff9d2e" opacity="0.55"/>
+    <rect x="94" y="202" width="252" height="30" rx="15" fill="#5b3a24"/>
+    <rect x="94" y="202" width="252" height="12" rx="6" fill="#47301e"/>
+    <circle cx="132" cy="218" r="3.4" fill="#7a5233"/>
+    <circle cx="238" cy="220" r="3" fill="#7a5233"/>
+    <circle cx="286" cy="215" r="2.6" fill="#7a5233"/>
+
+    <!-- stitched leaf patch -->
+    <g transform="translate(290 342) rotate(8)">
+        <rect x="-27" y="-27" width="54" height="54" rx="14" fill="#fbf0d4"/>
+        <rect x="-27" y="-27" width="54" height="54" rx="14" fill="none" stroke="#8a6a4a" stroke-width="2" stroke-dasharray="5 4"/>
+        <path d="M-7 15C-11 2-4-9 9-13 11 2 4 12-7 15Z" fill="#2fbf5c"/>
+        <path d="M-2 10C0 2 4-4 8-8" stroke="#bdeec7" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- face -->
+    <g class="ps-eyes">
+        <ellipse cx="164" cy="282" rx="11" ry="16" fill="#22301f"/>
+        <circle cx="168" cy="274" r="4.5" fill="#fff"/>
+        <circle cx="160" cy="289" r="2" fill="#fff" opacity="0.8"/>
+        <ellipse cx="276" cy="282" rx="11" ry="16" fill="#22301f"/>
+        <circle cx="280" cy="274" r="4.5" fill="#fff"/>
+        <circle cx="272" cy="289" r="2" fill="#fff" opacity="0.8"/>
+    </g>
+    <ellipse cx="130" cy="310" rx="17" ry="10.5" fill="#ff8fa8" opacity="0.85"/>
+    <ellipse cx="310" cy="310" rx="17" ry="10.5" fill="#ff8fa8" opacity="0.85"/>
+    <path d="M196 304Q220 330 244 304Z" fill="#22301f" stroke="#22301f" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M204 315Q220 325 236 315Q220 307 204 315Z" fill="#ff8fa8"/>
+
+    <!-- waving arm -->
+    <g class="ps-wave">
+        <path d="M100 290Q60 270 54 224" stroke="#ff9d2e" stroke-width="26" fill="none" stroke-linecap="round"/>
+        <path d="M100 290Q60 270 54 224" stroke="#ffb85c" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6" transform="translate(-3 -3)"/>
+        <circle cx="54" cy="204" r="18" fill="#ff9d2e"/>
+        <circle cx="48" cy="198" r="5.5" fill="#ffb85c" opacity="0.75"/>
+    </g>
+
+    <!-- watering can, tipping forward over the plot (drawn before the hand that grips it) -->
+    <g class="ps-can">
+        <path d="M352 276C326 270 324 322 352 316" stroke="#3f7fae" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <path d="M414 304L452 272" stroke="#4f97cc" stroke-width="11" stroke-linecap="round"/>
+        <path d="M444 258l24 12-12 24-22-12Z" fill="#3f7fae"/>
+        <circle cx="458" cy="283" r="2" fill="#bfe3f7"/><circle cx="452" cy="289" r="2" fill="#bfe3f7"/><circle cx="462" cy="276" r="2" fill="#bfe3f7"/>
+        <rect x="350" y="268" width="72" height="62" rx="14" fill="#6cb4e4"/>
+        <rect x="350" y="306" width="72" height="24" rx="12" fill="#4f97cc"/>
+        <rect x="356" y="261" width="60" height="12" rx="6" fill="#8cc9ee"/>
+        <path d="M362 282a16 16 0 0 1 10-9" stroke="#d9f0fc" stroke-width="5" stroke-linecap="round" fill="none"/>
+        <path d="M386 312c-5 0-8-3-8-7 5 0 8 3 8 7Z" fill="#bdeec7" opacity="0.9"/>
+    </g>
+    <path d="M340 292Q356 298 366 308" stroke="#ff9d2e" stroke-width="26" fill="none" stroke-linecap="round"/>
+    <path d="M340 292Q356 298 366 308" stroke="#ffb85c" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6" transform="translate(-3 -4)"/>
+    <circle cx="372" cy="298" r="15" fill="#ff9d2e"/>
+    <circle cx="367" cy="293" r="4.5" fill="#ffb85c" opacity="0.75"/>
+</g>
+
+<!-- water from the rose -->
+<g fill="#8cc9ee">
+    <ellipse class="ps-drop ps-drop--1" cx="470" cy="296" rx="4" ry="6.5"/>
+    <ellipse class="ps-drop ps-drop--2" cx="480" cy="290" rx="3.4" ry="5.6"/>
+    <ellipse class="ps-drop ps-drop--3" cx="462" cy="302" rx="3.6" ry="6"/>
+    <ellipse class="ps-drop ps-drop--4" cx="486" cy="300" rx="3" ry="5"/>
+    <ellipse class="ps-drop ps-drop--5" cx="474" cy="306" rx="3.4" ry="5.6"/>
+</g>
+
+<!-- the seedling that is being watered -->
+<g class="ps-sprout">
+    <path d="M492 402V372" stroke="#2f8f4e" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+    <path d="M492 388c-11 0-18-7-18-17 10 0 18 7 18 17Z" fill="#5ccf82"/>
+    <path d="M492 380c0-11 8-19 19-19 0 11-7 19-19 19Z" fill="#2fbf5c"/>
+    <ellipse cx="492" cy="404" rx="22" ry="7" fill="#5b3a24"/>
+</g>
+
+<g fill="#ffc857">
+    <path class="ps-spark" d="M42 150l3-9 3 9 9 3-9 3-3 9-3-9-9-3Z"/>
+    <path class="ps-spark ps-spark--2" d="M410 124l2.4-7 2.4 7 7 2.4-7 2.4-2.4 7-2.4-7-7-2.4Z"/>
+</g>
+</svg>

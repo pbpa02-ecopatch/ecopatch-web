@@ -744,6 +744,17 @@
         }
     }
 
+    // EcoPatch and plant names are typed by people: they go into the page as text, never as HTML.
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[ch]));
+    }
+    function setBoldLabel(el, text) {
+        const span = document.createElement('span');
+        span.className = 'fw-semibold';
+        span.textContent = text;
+        el.replaceChildren(span);
+    }
+
     function updatePlantDropdown(selectedPatch) {
         if (!plantDropdownMenu) return;
         if (!selectedPatch && ecopatchInput) {
@@ -783,7 +794,7 @@
             const exBook = existingBooksData[p];
             let badgeHtml = '';
             if (exBook) {
-                badgeHtml = `<span class="badge rounded-pill bg-light text-muted border px-2 py-0.5" style="font-size: 10px;">Buku Ada (${exBook.entry_count} lembar)</span>`;
+                badgeHtml = `<span class="badge rounded-pill bg-light text-muted border px-2 py-0.5" style="font-size: 10px;">Buku Ada (${Number(exBook.entry_count) || 0} lembar)</span>`;
             }
             if (isSel) {
                 badgeHtml += `<span class="badge rounded-pill bg-success text-white px-2 py-0 ms-1" style="font-size: 10px;">Dipilih</span>`;
@@ -795,7 +806,7 @@
             btn.setAttribute('data-plant-val', p);
             btn.innerHTML = `
                 <span class="d-flex align-items-center gap-2">
-                    <span class="fw-semibold">${p}</span>
+                    <span class="fw-semibold">${escapeHtml(p)}</span>
                 </span>
                 <span class="d-flex align-items-center">${badgeHtml}</span>
             `;
@@ -805,7 +816,7 @@
 
         if (foundCurrent && currentVal) {
             if (plantSelectLabel) {
-                plantSelectLabel.innerHTML = '<span class="fw-semibold">' + currentVal + '</span>';
+                setBoldLabel(plantSelectLabel, currentVal);
                 plantSelectLabel.classList.remove('text-muted');
             }
         } else {
@@ -832,7 +843,7 @@
 
             if (ecopatchInput) ecopatchInput.value = patchName;
             if (ecopatchSelectLabel) {
-                ecopatchSelectLabel.innerHTML = '<span class="fw-semibold">' + (patchName || '-- Pilih EcoPatch Kamu --') + '</span>';
+                setBoldLabel(ecopatchSelectLabel, patchName || '-- Pilih EcoPatch Kamu --');
                 ecopatchSelectLabel.classList.remove('text-muted');
             }
 
@@ -853,7 +864,7 @@
 
             if (plantInput) plantInput.value = plantVal;
             if (plantSelectLabel) {
-                plantSelectLabel.innerHTML = '<span class="fw-semibold">' + plantVal + '</span>';
+                setBoldLabel(plantSelectLabel, plantVal);
                 plantSelectLabel.classList.remove('text-muted');
             }
 

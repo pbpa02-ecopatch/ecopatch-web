@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from main.models import Profile
 from plant_library.models import Plant
 from smart_care.models import CareTask
 from .models import EcoPatch, PatchPlant
@@ -53,6 +54,34 @@ class GardenUITests(TestCase):
         self.assertTrue(EcoPatch.objects.filter(pk=patch.pk).exists())
         self.assertRedirects(self.client.post(self.url('delete', patch.pk)), self.url('list'))
         self.assertFalse(EcoPatch.objects.filter(pk=patch.pk).exists())
+
+    def test_the_form_does_not_ask_for_a_city_and_shows_the_profile_one(self):
+        Profile.objects.update_or_create(user=self.owner, defaults={'city': 'Bandung'})
+        response = self.client.get(self.url('create'))
+        self.assertNotIn('city', response.context['form'].fields)
+        self.assertNotContains(response, 'name="city"')
+        self.assertContains(response, 'Kota ikut profilmu: <strong>Bandung</strong>')
+
+    def test_a_new_patch_takes_its_city_from_the_profile_not_from_the_post(self):
+        Profile.objects.update_or_create(user=self.owner, defaults={'city': 'Bandung'})
+        self.client.post(self.url('create'), {'name': 'Kebun Profil', 'space_type': 'terrace', 'city': 'Medan'})
+        self.assertEqual(EcoPatch.objects.get(name='Kebun Profil').city, 'Bandung')
+
+    def test_editing_a_patch_follows_the_current_profile_city(self):
+        Profile.objects.update_or_create(user=self.owner, defaults={'city': 'Malang'})
+        self.client.post(self.url('update', self.patch.pk), {'name': 'Balkon Hijau', 'space_type': 'balcony'})
+        self.patch.refresh_from_db()
+        self.assertEqual(self.patch.city, 'Malang')
+
+    def test_without_a_profile_city_nothing_is_invented_and_the_page_points_to_the_profile(self):
+        response = self.client.get(self.url('create'))
+        self.assertContains(response, 'Kotamu belum diisi di profil')
+        self.client.post(self.url('create'), {'name': 'Tanpa Kota', 'space_type': 'terrace'})
+        self.assertEqual(EcoPatch.objects.get(name='Tanpa Kota').city, '')
+        self.client.post(self.url('update', self.patch.pk), {'name': 'Balkon Hijau', 'space_type': 'balcony'})
+        self.patch.refresh_from_db()
+        self.assertEqual(self.patch.city, 'Depok')
+        self.assertNotContains(self.client.get(self.url('list')), 'Terrace · ')
 
     def test_empty_and_invalid_form(self):
         self.client.force_login(self.other)

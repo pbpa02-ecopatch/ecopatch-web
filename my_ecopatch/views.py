@@ -7,7 +7,9 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods, require_POST
 
-from .forms import EcoPatchForm, PatchPlantForm
+from main.models import Profile
+
+from .forms import STATUS_LABELS, EcoPatchForm, PatchPlantForm
 from .models import EcoPatch, PatchPlant
 
 STATUS_ORDER = [
@@ -20,6 +22,12 @@ STATUS_ORDER = [
 
 
 # ---------- helpers ----------
+
+def _profile_city(user):
+    """The city is only ever filled in on the profile; an EcoPatch just carries a copy of it."""
+    profile = Profile.objects.filter(user=user).first()
+    return profile.city if profile else ''
+
 
 def _attach_status_summary(patches):
     """Tempelkan `plant_total` dan `status_summary` ke setiap EcoPatch.
@@ -43,11 +51,44 @@ def _attach_status_summary(patches):
         patch.plant_total = sum(per_status.values())
         patch.plant_quantity = quantities[patch.pk]
         patch.status_summary = [
-            {'key': status.value, 'label': status.label, 'count': per_status[status.value]}
+            {'key': status.value, 'label': STATUS_LABELS.get(status.value, status.label), 'count': per_status[status.value]}
             for status in STATUS_ORDER
             if per_status.get(status.value)
         ]
     return patches
+
+
+SCENE_PLOT_LIMIT = 5
+
+
+def _scene_plots(owned):
+    """The wooden plots in the hero scene: one per EcoPatch (newest on the right, up to five).
+
+    A plot shows how far that garden has grown: harvested, growing, planted, only planned, or nothing yet.
+    A member with no EcoPatch gets a single dashed "invite" plot.
+    """
+    patches = list(owned.order_by('-created_at', '-id')[:SCENE_PLOT_LIMIT])
+    if not patches:
+        return [{'stage': 'invite'}]
+    seen = defaultdict(set)
+    for patch_id, status in PatchPlant.objects.filter(patch__in=patches).values_list('patch_id', 'status'):
+        seen[patch_id].add(status)
+    status = PatchPlant.Status
+    plots = []
+    for patch in reversed(patches):
+        have = seen[patch.pk]
+        if status.HARVESTED in have:
+            stage = 'harvest'
+        elif status.GROWING in have:
+            stage = 'grow'
+        elif status.PLANTED in have:
+            stage = 'sprout'
+        elif status.PLANNED in have:
+            stage = 'seed'
+        else:
+            stage = 'bare'
+        plots.append({'stage': stage})
+    return plots
 
 
 def _get_patch(request, pk):
@@ -59,13 +100,35 @@ def _is_htmx(request):
     return request.headers.get('HX-Request') == 'true'
 
 
+# The life of a plant in a patch, in order. "removed" sits outside it.
+LIFECYCLE = [
+    (PatchPlant.Status.PLANNED.value, 'Rencana'),
+    (PatchPlant.Status.PLANTED.value, 'Ditanam'),
+    (PatchPlant.Status.GROWING.value, 'Tumbuh'),
+    (PatchPlant.Status.HARVESTED.value, 'Panen'),
+]
+
+
 def _detail_context(patch, plant_form=None, initial=None):
     _attach_status_summary([patch])
+    plants = list(patch.plants.select_related('plant'))
+    steps = [value for value, _ in LIFECYCLE]
+    for plant in plants:
+        plant.stage_index = steps.index(plant.status) if plant.status in steps else -1
+    patch.preview_plants = plants[:9]
+    in_care = sum(1 for plant in plants if plant.status in (PatchPlant.Status.PLANTED, PatchPlant.Status.GROWING))
     return {
         'patch': patch,
-        'plants': patch.plants.select_related('plant'),
+        'plants': plants,
         'plant_form': PatchPlantForm(initial=initial) if plant_form is None else plant_form,
-        'status_choices': PatchPlant.Status.choices,
+        'status_choices': [(value, STATUS_LABELS.get(value, label)) for value, label in PatchPlant.Status.choices],
+        'lifecycle': LIFECYCLE,
+        # where the member is in "add -> set the stage -> follow it in Smart Care"
+        'flow': {
+            'added': bool(plants),
+            'staged': any(plant.stage_index > 0 for plant in plants),
+            'in_care': in_care,
+        },
     }
 
 
@@ -101,8 +164,10 @@ def ecopatch_list(request):
     totals = PatchPlant.objects.filter(patch__owner=request.user).aggregate(
         plants=Sum('quantity'), growing=Sum('quantity', filter=Q(status=PatchPlant.Status.GROWING)),
     )
+    patch_count = owned.count()
     return render(request, 'my_ecopatch/ecopatch_list.html', {
-        'patches': patches, 'patch_count': owned.count(),
+        'patches': patches, 'patch_count': patch_count,
+        'scene_plots': _scene_plots(owned), 'scene_more': max(patch_count - SCENE_PLOT_LIMIT, 0),
         'plant_count': totals['plants'] or 0, 'growing_count': totals['growing'] or 0,
         'query': query, 'selected_space': space, 'space_choices': EcoPatch.SpaceType.choices,
     })
@@ -124,12 +189,13 @@ def ecopatch_create(request):
         if form.is_valid():
             patch = form.save(commit=False)
             patch.owner = request.user
+            patch.city = _profile_city(request.user)
             patch.save()
             messages.success(request, f'EcoPatch "{patch.name}" berhasil dibuat. Sekarang tambahkan tanamanmu.')
             return redirect('my_ecopatch:detail', pk=patch.pk)
     else:
         form = EcoPatchForm()
-    return render(request, 'my_ecopatch/ecopatch_form.html', {'form': form, 'patch': None})
+    return render(request, 'my_ecopatch/ecopatch_form.html', {'form': form, 'patch': None, 'profile_city': _profile_city(request.user)})
 
 
 @login_required
@@ -138,12 +204,14 @@ def ecopatch_update(request, pk):
     if request.method == 'POST':
         form = EcoPatchForm(request.POST, instance=patch)
         if form.is_valid():
-            form.save()
+            patch = form.save(commit=False)
+            patch.city = _profile_city(request.user) or patch.city
+            patch.save()
             messages.success(request, 'Perubahan EcoPatch disimpan.')
             return redirect('my_ecopatch:detail', pk=patch.pk)
     else:
         form = EcoPatchForm(instance=patch)
-    return render(request, 'my_ecopatch/ecopatch_form.html', {'form': form, 'patch': patch})
+    return render(request, 'my_ecopatch/ecopatch_form.html', {'form': form, 'patch': patch, 'profile_city': _profile_city(request.user)})
 
 
 @login_required

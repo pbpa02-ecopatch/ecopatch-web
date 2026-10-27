@@ -1,33 +1,31 @@
 {# Panel ini di-swap seluruhnya oleh htmx (hx-target="#patch-plants"), jadi id di bawah harus tetap ada. #}
 <div id="patch-plants" class="patch-plants">
     <p class="mep-feedback" role="status">{{ plant_feedback }}</p>
-    <form id="add-plant" method="post" class="patch-form patch-plant-form" novalidate
-          action="{% url 'my_ecopatch:plant_add' patch.pk %}"
-          hx-post="{% url 'my_ecopatch:plant_add' patch.pk %}"
-          hx-target="#patch-plants" hx-swap="outerHTML">
-        {% csrf_token %}
-        <h3 class="patch-form-title">Tambah tanaman</h3><p class="patch-help">Kolom bertanda * wajib diisi. Pilih tanaman dari katalog, lalu catat jumlah dan tahap pertumbuhannya.</p>
-        <p class="patch-help patch-help-lead">
-            Belum tahu mau menanam apa?
-            <a href="{% url 'plant_library:plant_recommend' %}?patch={{ patch.pk }}">Lihat rekomendasi untuk EcoPatch ini</a>
-            atau <a href="{% url 'plant_library:plant_list' %}">jelajahi Plant Library</a>.
-        </p>
-        {% if plant_form.non_field_errors %}
-            <div class="patch-alert" role="alert">{% for error in plant_form.non_field_errors %}{{ error }}{% endfor %}</div>
-        {% endif %}
-        <div class="patch-form-grid">
-            {% for field in plant_form %}
-                {% include "my_ecopatch/_form_field.html" %}
-            {% endfor %}
-        </div>
-        <div class="patch-form-actions">
-            <button id="add-plant-submit" type="submit" class="btn btn-success">Tambah tanaman</button>
-        </div>
-    </form>
+
+    <ol class="mep-flow" aria-label="Alur mengelola tanaman">
+        <li class="mep-flow-step{% if flow.added %} is-done{% else %} is-now{% endif %}">
+            <span class="mep-flow-num" aria-hidden="true">{% if flow.added %}<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>{% else %}1{% endif %}</span>
+            <div><strong>Tambah tanaman</strong><small>Pilih dari Plant Library, lalu catat jumlahnya.</small></div>
+        </li>
+        <li class="mep-flow-step{% if flow.staged %} is-done{% elif flow.added %} is-now{% endif %}">
+            <span class="mep-flow-num" aria-hidden="true">{% if flow.staged %}<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>{% else %}2{% endif %}</span>
+            <div><strong>Atur tahap tumbuh</strong><small>Ganti status saat tanamanmu berkembang.</small></div>
+        </li>
+        <li class="mep-flow-step{% if flow.in_care %} is-done{% endif %}">
+            <span class="mep-flow-num" aria-hidden="true">{% if flow.in_care %}<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>{% else %}3{% endif %}</span>
+            <div>
+                <strong>Pantau di Smart Care</strong>
+                {% if flow.in_care %}<small>{{ flow.in_care }} tanaman sudah dirawat di sana. <a href="{% url 'smart_care:list' %}">Buka Smart Care</a></small>
+                {% else %}<small>Tanaman berstatus Sudah ditanam atau Sedang tumbuh muncul di Smart Care.</small>{% endif %}
+            </div>
+        </li>
+    </ol>
 
     <div class="patch-plants-head">
-        <h2 class="patch-section-title">Tanaman di EcoPatch ini</h2>
-        <p class="patch-card-count">{{ patch.plant_quantity }} tanaman · {{ patch.plant_total }} entri</p>
+        <div>
+            <h2 class="patch-section-title">Tanaman di EcoPatch ini</h2>
+            <p class="patch-card-count">{{ patch.plant_quantity }} tanaman &middot; {{ patch.plant_total }} entri</p>
+        </div>
         {% if patch.status_summary %}
             <ul class="patch-status-list">
                 {% for item in patch.status_summary %}
@@ -51,9 +49,20 @@
                         <span class="plant-meta">{{ plant.quantity }} tanaman{% if plant.planted_at %} &middot; mulai tanam {{ plant.planted_at|date:"j M Y" }}{% endif %}</span>
                     </div>
 
+                    {% if plant.stage_index < 0 %}
+                        <span class="mep-track-note">Sudah dicabut dari kebun</span>
+                    {% else %}
+                        <ol class="mep-track" aria-label="Tahap tumbuh">
+                            {% for key, label in lifecycle %}
+                                <li class="{% if forloop.counter0 < plant.stage_index %}is-done{% elif forloop.counter0 == plant.stage_index %}is-current{% endif %}"{% if forloop.counter0 == plant.stage_index %} aria-current="step"{% endif %}><span>{{ label }}</span></li>
+                            {% endfor %}
+                        </ol>
+                    {% endif %}
+
                     <form method="post" class="plant-status-form"
                           action="{% url 'my_ecopatch:plant_status' plant.pk %}"
                           hx-post="{% url 'my_ecopatch:plant_status' plant.pk %}"
+                          hx-trigger="change, submit"
                           hx-target="#patch-plants" hx-swap="outerHTML">
                         {% csrf_token %}
                         <label class="visually-hidden" for="status-{{ plant.pk }}">Status {% firstof plant.plant.name plant.plant_name %}</label>
@@ -72,8 +81,37 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p class="patch-empty">Belum ada tanaman. Tambahkan tanaman pertamamu melalui form di atas.</p>
+        <div class="patch-empty mep-empty-plants">
+            <p><strong>Belum ada tanaman di sini.</strong></p>
+            <p>Mulai dari form &ldquo;Tambah tanaman&rdquo; di bawah, atau
+                <a href="{% url 'plant_library:plant_recommend' %}?patch={{ patch.pk }}">lihat rekomendasi untuk EcoPatch ini</a>.</p>
+        </div>
     {% endif %}
 
-
+    <details id="add-plant" class="mep-add"{% if plant_form.errors or not plants %} open{% endif %}>
+        <summary><span class="mep-add-plus" aria-hidden="true">+</span> Tambah tanaman</summary>
+        <form id="add-plant-form" method="post" class="patch-form patch-plant-form" novalidate
+              action="{% url 'my_ecopatch:plant_add' patch.pk %}"
+              hx-post="{% url 'my_ecopatch:plant_add' patch.pk %}"
+              hx-target="#patch-plants" hx-swap="outerHTML">
+            {% csrf_token %}
+            <p class="patch-help">Kolom bertanda * wajib diisi. Pilih tanaman dari katalog, lalu catat jumlah dan tahap pertumbuhannya.</p>
+            <p class="patch-help patch-help-lead">
+                Belum tahu mau menanam apa?
+                <a href="{% url 'plant_library:plant_recommend' %}?patch={{ patch.pk }}">Lihat rekomendasi untuk EcoPatch ini</a>
+                atau <a href="{% url 'plant_library:plant_list' %}">jelajahi Plant Library</a>.
+            </p>
+            {% if plant_form.non_field_errors %}
+                <div class="patch-alert" role="alert">{% for error in plant_form.non_field_errors %}{{ error }}{% endfor %}</div>
+            {% endif %}
+            <div class="patch-form-grid">
+                {% for field in plant_form %}
+                    {% include "my_ecopatch/_form_field.html" %}
+                {% endfor %}
+            </div>
+            <div class="patch-form-actions">
+                <button id="add-plant-submit" type="submit" class="btn btn-success">Tambah tanaman</button>
+            </div>
+        </form>
+    </details>
 </div>

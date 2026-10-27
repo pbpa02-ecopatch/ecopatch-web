@@ -1,4 +1,7 @@
+import hashlib
+
 from django.conf import settings
+from django.core.cache import cache
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
@@ -15,6 +18,43 @@ from .auth_forms import EcoPasswordResetForm, RegisterForm
 
 from .forms import AvatarForm, BioForm, ChangePasswordForm, ContactForm, UserForm
 from .models import PETAK_CHOICES, Profile
+
+
+# Guessing passwords: after this many wrong tries for one username from one address the login pauses for a while.
+LOGIN_MAX_FAILURES = 5
+LOGIN_LOCK_SECONDS = 5 * 60
+
+
+def _login_key(request, username):
+    who = f"{request.META.get('REMOTE_ADDR', '')}|{username.strip().lower()}"
+    return 'login-failures:' + hashlib.sha256(who.encode()).hexdigest()
+
+
+class LoginView(auth_views.LoginView):
+    template_name = 'main/login.html'
+    redirect_authenticated_user = True
+
+    def post(self, request, *args, **kwargs):
+        if cache.get(_login_key(request, request.POST.get('username', '')), 0) >= LOGIN_MAX_FAILURES:
+            # an empty form: while locked, not even a correct password is tried
+            form = self.get_form_class()(request=request)
+            form.cleaned_data = {}
+            form.add_error(None, 'Terlalu banyak percobaan masuk. Tunggu beberapa menit, lalu coba lagi.')
+            return self.render_to_response(self.get_context_data(form=form, locked=True), status=429)
+        return super().post(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        key = _login_key(self.request, self.request.POST.get('username', ''))
+        cache.add(key, 0, LOGIN_LOCK_SECONDS)
+        try:
+            cache.incr(key)
+        except ValueError:  # the entry expired between add and incr
+            cache.set(key, 1, LOGIN_LOCK_SECONDS)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        cache.delete(_login_key(self.request, self.request.POST.get('username', '')))
+        return super().form_valid(form)
 
 
 def media(request, path):

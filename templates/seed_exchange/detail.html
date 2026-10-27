@@ -45,7 +45,7 @@
                     {% if is_owner %}
                     <div class="seed-detail-contact">
                         <span class="seed-detail-contact-label">Kontak</span>
-                        <span class="seed-detail-contact-value">{{ listing.contact|default:"-" }}</span>
+                        <span class="seed-detail-contact-value">{{ listing.owner_contact|default:"-" }}</span>
                     </div>
                     {% endif %}
                 </div>
@@ -152,7 +152,7 @@
                         <div class="seed-reserve-contact">
                             <span class="seed-contact-avatar" aria-hidden="true">{{ listing.user.username|first|upper }}</span>
                             <span class="seed-contact-name">@{{ listing.user.username }}</span>
-                            <span class="seed-contact-value">{{ listing.contact }}</span>
+                            <span class="seed-contact-value">{{ listing.owner_contact }}</span>
                             {% if listing.user.email %}
                             <a class="btn-seed-secondary btn-seed-sm" href="mailto:{{ listing.user.email }}">Hubungi via Email</a>
                             {% endif %}

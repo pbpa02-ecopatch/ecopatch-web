@@ -1,18 +1,13 @@
-
+/* Module-only theme. Shared navigation and other modules keep their own styles. */
 body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-module #mep-main{background:linear-gradient(#fdf7e8 50%,#faefd5);min-width:0}
-.mep-content{max-width:1120px;margin:auto;padding:36px clamp(20px,4vw,56px) 48px}
-.mep-hero{position:relative;isolation:isolate;background:linear-gradient(#d9f1de,#eaf7e6);min-height:310px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:42px clamp(20px,4vw,56px) 34px;overflow:hidden;border-bottom:4px solid #c5d5a9}
-.mep-hero:before{content:"";position:absolute;inset:0;z-index:-1;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect x='5' y='5' width='38' height='38' rx='11' fill='%2335c065' fill-opacity='.15'/%3E%3Crect x='53' y='5' width='38' height='38' rx='11' fill='%235ccf82' fill-opacity='.17'/%3E%3Crect x='5' y='53' width='38' height='38' rx='11' fill='%231f9142' fill-opacity='.12'/%3E%3Crect x='53' y='53' width='38' height='38' rx='11' fill='%23ff9d2e' fill-opacity='.16'/%3E%3C/svg%3E")}
-.mep-hero-copy{max-width:590px;flex:1}
+.mep-content{max-width:calc(1120px + var(--mep-offset,0px));margin:auto;padding:36px clamp(20px,4vw,56px) 48px calc(var(--mep-offset,0px) + clamp(20px,4vw,56px))}
 .mep-eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.13em;color:#496a4e;margin:0 0 12px}
 .mep-hero h1{font:800 clamp(3rem,5.2vw,4.8rem)/1 'Baloo 2',sans-serif;letter-spacing:-.03em;margin:0 0 14px}
 .mep-hero-copy>p:not(.mep-eyebrow){font-size:1.05rem;max-width:36ch}
-.mep-stats{display:flex;gap:12px 24px;flex-wrap:wrap;list-style:none;margin:24px 0 0;padding:0;font-size:.88rem}
-.mep-stats strong{font-size:1.25rem}
-.mep-mascot{width:240px;flex:none;align-self:flex-end;display:flex;align-items:center;flex-direction:column;margin-bottom:-55px}
-.mep-mascot img{max-width:100%}
-.mep-speech{background:#fffef7;border-radius:20px 20px 6px 20px;padding:14px 18px;font-size:.85rem;line-height:1.5;box-shadow:0 7px 20px #17301f12;margin:0}
+.mep-stats{display:flex;gap:10px;flex-wrap:wrap;list-style:none;margin:22px 0 0;padding:0;font-size:.88rem}
+.mep-stats li{background:#fffef7cc;border:1px solid #cfe3c4;border-radius:999px;padding:6px 16px 6px 12px;display:inline-flex;align-items:baseline;gap:6px;color:#2f4a36}
+.mep-stats strong{font-size:1.2rem;color:#167a38}
 .mep-toolbar,.mep-seed-tray{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
 .mep-module .btn{border-radius:999px;min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;padding:10px 22px;white-space:normal}
 .mep-module .btn-success{background:#167a38;border-color:#167a38;box-shadow:0 4px 0 #0f5a28}
@@ -91,8 +86,8 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-module .btn-success.patch-btn-danger{background:#a3301f;color:white;box-shadow:0 4px 0 #712417}
 .mep-feedback{margin:0 0 16px;color:#175e30;font-weight:600}.mep-feedback:empty{display:none}
 .mep-module .htmx-request{opacity:.65;pointer-events:none}
-@media(max-width:1000px){.mep-mascot{width:180px}.mep-hero h1{font-size:3rem}.mep-stats{gap:8px 14px}}
-@media(max-width:600px){.mep-content{padding:26px 20px 36px}.mep-hero{padding:30px 20px 20px;min-height:280px;gap:8px;align-items:flex-start}.mep-hero-copy{min-width:0}.mep-hero h1{font-size:2.7rem}.mep-hero-copy>p:not(.mep-eyebrow){font-size:.9rem}.mep-mascot{width:100px;position:absolute;right:8px;bottom:18px;margin:0}.mep-mascot img{width:100px;height:auto}.mep-speech{display:none}.mep-stats{max-width:calc(100% - 90px);font-size:.8rem}.mep-map{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 16px}.mep-garden h2{font-size:1.25rem}.mep-bed{border-radius:20px}.mep-bed-empty{width:auto;font-size:.75rem;padding:14px}.mep-add-bed{font-size:.85rem;border-radius:20px;padding:12px}.mep-add-bed small{font-size:.7rem}.mep-module .patch-form{padding:20px}.mep-module .patch-form-grid{grid-template-columns:1fr}.mep-filters>div{flex:1;min-width:130px}.mep-location{font-size:.75rem}.mep-module .patch-head-actions{width:100%}.mep-module .patch-page-head{gap:20px}.mep-module .plant-status-form{flex-basis:100%}}
+@media(max-width:1000px){.mep-hero h1{font-size:3rem}.mep-stats{gap:8px 14px}}
+@media(max-width:600px){.mep-content{padding:26px 20px 36px}.mep-hero h1{font-size:2.7rem}.mep-hero-copy>p:not(.mep-eyebrow){font-size:.95rem}.mep-stats{font-size:.8rem;margin-top:16px}.mep-map{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 16px}.mep-garden h2{font-size:1.25rem}.mep-bed{border-radius:20px}.mep-bed-empty{width:auto;font-size:.75rem;padding:14px}.mep-add-bed{font-size:.85rem;border-radius:20px;padding:12px}.mep-add-bed small{font-size:.7rem}.mep-module .patch-form{padding:20px}.mep-module .patch-form-grid{grid-template-columns:1fr}.mep-filters>div{flex:1;min-width:130px}.mep-location{font-size:.75rem}.mep-module .patch-head-actions{width:100%}.mep-module .patch-page-head{gap:20px}.mep-module .plant-status-form{flex-basis:100%}}
 @media(prefers-reduced-motion:reduce){.mep-module *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
 .mep-module .plant-status-form{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -102,14 +97,12 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-module .patch-error{padding-left:0;list-style:none}
 .mep-module .patch-form input[aria-invalid=true],.mep-module .patch-form select[aria-invalid=true]{border-color:#a3301f}
 .mep-module .patch-back{display:inline-block;min-height:36px}
+.mep-module .patch-city-note{display:block;width:fit-content;max-width:100%;background:#e8f5e6;border:1px solid #cfe3c4;border-radius:12px;padding:8px 14px;margin:8px 0 20px;font-size:.85rem;color:#2f4a36}
 .mep-module .patch-field+.patch-field{margin-top:16px}.mep-module .patch-form-grid .patch-field{margin-top:0}
-/* Fit shared footer inside this module's sidebar-reduced content width. */
-.mep-module .footer-grid{grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr))}
 @media(min-width:768px) and (max-width:1050px){
   .mep-map{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px}
-  .mep-mascot{width:120px}.mep-speech{display:none}
-  .mep-hero-copy{min-width:0}.mep-hero h1{font-size:2.8rem}
-  .mep-content{padding-left:24px;padding-right:24px}
+  .mep-hero h1{font-size:2.8rem}
+  .mep-content{padding-left:calc(var(--mep-offset,0px) + 24px);padding-right:24px}
   .mep-module .patch-form-grid{grid-template-columns:1fr}
 }
 @media(max-width:600px){
@@ -152,14 +145,158 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 @media(max-width:480px) { .mep-delete-dialog { padding: 24px; } .mep-dialog-actions .btn { flex: 1 1 auto; } }
 
-/* Extend only the hero background behind the desktop sidebar.
-   Compensating padding keeps the title in its original, readable position. */
-@media (min-width: 768px) {
-  .mep-module.has-sidebar .mep-hero {
-    --mep-sidebar-offset: calc(var(--side-width, 248px) + var(--side-gap, 16px) * 2);
-    margin-left: calc(0px - var(--mep-sidebar-offset));
-    padding-left: calc(var(--mep-sidebar-offset) + clamp(20px, 4vw, 56px));
-  }
+/* ---------------------------------------------------------------- Hero scene
+   A morning garden: sun rising behind the hills, clouds, a picket fence, shrubs, flowers, butterflies, and Petak
+   watering one wooden plot per EcoPatch. Full-bleed like the other modules, so the content next to the floating
+   sidebar is pushed over by --mep-offset instead of the whole page. */
+@media(min-width:768px){
+  body.has-sidebar.mep-module{padding-left:0}
+  .mep-module{--mep-offset:calc(var(--side-width) + var(--side-gap) * 2)}
+}
+.mep-module .site-footer{padding-left:calc(var(--mep-offset,0px) + 20px)}
+.mep-hero{position:relative;isolation:isolate;overflow:hidden;min-height:clamp(390px,46vh,480px);border-bottom:3px solid #d8c48d;
+  background:radial-gradient(70% 90% at 76% 78%,#fff0c8a6 0%,transparent 62%),linear-gradient(180deg,#fff4dc 0%,#eef8e2 46%,#dff2d4 100%)}
+.mep-hero-art{position:absolute;inset:0;z-index:0;pointer-events:none}
+.mep-sun{position:absolute;right:25%;bottom:33%;width:clamp(110px,13vw,170px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 50% 46%,#fff8cf 0 36%,#ffdd85 37% 58%,#ffd87361 59% 76%,#ffd87300 77%);
+  filter:drop-shadow(0 0 30px #ffcd5f8c);animation:mep-rise 9s ease-in-out infinite}
+.mep-sun:before{content:"";position:absolute;inset:-75%;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg,#ffe9a533 0 6deg,transparent 6deg 20deg);
+  -webkit-mask:radial-gradient(circle,transparent 0 24%,#000 25% 52%,transparent 70%);mask:radial-gradient(circle,transparent 0 24%,#000 25% 52%,transparent 70%);
+  animation:mep-rays 70s linear infinite}
+.mep-clouds{position:absolute;left:0;top:clamp(10px,3vh,30px);width:100%;height:clamp(110px,22vh,170px)}
+.mep-cloud{fill:#fff;opacity:.85;animation:mep-drift 38s ease-in-out infinite alternate}
+.mep-cloud--b{opacity:.7;animation-duration:52s;animation-delay:-14s}
+.mep-cloud--c{opacity:.78;animation-duration:44s;animation-delay:-26s}
+.mep-birds{position:absolute;left:34%;top:clamp(48px,11vh,96px);width:84px;animation:mep-fly 46s linear infinite}
+.mep-hills,.mep-fence,.mep-shrubs,.mep-flowers{position:absolute;left:0;width:100%;display:block}
+.mep-hills--back{bottom:0;height:62%}
+/* the fence and shrubs only run behind the stage, so they never cross the title and text */
+.mep-fence,.mep-shrubs{left:46%;width:54%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 22%);mask-image:linear-gradient(90deg,transparent,#000 22%)}
+.mep-fence{bottom:30%;height:clamp(54px,10vh,80px)}
+.mep-shrubs{bottom:27%;height:clamp(60px,11vh,100px)}
+.mep-hills--front{bottom:0;height:38%}
+.mep-flowers{bottom:2%;height:clamp(52px,9vh,84px)}
+.mep-butterfly{position:absolute;width:28px;height:auto}
+.mep-butterfly--a{left:52%;bottom:46%;animation:mep-flutter-a 17s ease-in-out infinite}
+.mep-butterfly--b{left:14%;bottom:26%;width:22px;animation:mep-flutter-b 21s ease-in-out infinite;animation-delay:-8s}
+.mep-wings{transform-box:fill-box;transform-origin:50% 50%;animation:mep-flap .5s ease-in-out infinite alternate}
+
+.mep-hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:clamp(18px,3vw,36px);
+  width:100%;max-width:calc(1120px + var(--mep-offset,0px));min-height:inherit;margin:0 auto;
+  padding:clamp(34px,5vh,54px) clamp(20px,4vw,56px) 0 calc(var(--mep-offset,0px) + clamp(20px,4vw,56px))}
+.mep-hero-copy{align-self:center;min-width:0;max-width:580px;padding-bottom:46px}
+.mep-hero-stage{position:relative;width:clamp(330px,40vw,520px);padding-bottom:4px}
+.mep-speech{position:relative;margin:0 0 8px auto;max-width:300px;padding:12px 16px;border:1px solid #b69a6366;border-radius:20px 20px 6px 20px;
+  background:#fffef7;box-shadow:0 10px 22px #17301f1f;color:#3f5744;font-size:.84rem;line-height:1.45}
+.mep-speech:after{content:"";position:absolute;right:46px;bottom:-7px;width:14px;height:14px;border-right:1px solid #b69a6366;border-bottom:1px solid #b69a6366;
+  background:#fffef7;transform:rotate(45deg)}
+.mep-ground{position:relative;height:clamp(220px,25vw,290px)}
+.mep-plots{position:absolute;left:0;bottom:8px;width:70%;display:flex;align-items:flex-end;gap:7px}
+.mep-plot{flex:1 1 0;min-width:0;max-width:94px;height:auto;display:block;filter:drop-shadow(0 8px 10px #17301f26)}
+.mep-plot:nth-child(even){transform:translateY(-9px)}
+.mep-plot-plant{transform-box:fill-box;transform-origin:50% 100%;animation:mep-sway 4.8s ease-in-out infinite;animation-delay:calc(var(--i,0) * -.9s)}
+.mep-plots-more{align-self:center;margin-left:4px;padding:2px 9px;border-radius:999px;background:#293c26;color:#fff;font-size:.75rem;font-weight:700}
+.mep-petak{position:absolute;right:-9%;bottom:-8px;width:clamp(230px,27vw,320px);height:auto;filter:drop-shadow(0 16px 24px #17301f33)}
+
+@keyframes mep-rise{0%,100%{transform:translateY(8px)}50%{transform:translateY(-6px)}}
+@keyframes mep-rays{to{transform:rotate(360deg)}}
+@keyframes mep-drift{from{transform:translateX(-36px)}to{transform:translateX(60px)}}
+@keyframes mep-fly{0%{transform:translate(-60px,6px)}50%{transform:translate(260px,-10px)}100%{transform:translate(560px,6px)}}
+@keyframes mep-flap{from{transform:scaleX(1)}to{transform:scaleX(.28)}}
+@keyframes mep-flutter-a{0%,100%{transform:translate(0,0)}25%{transform:translate(40px,-26px)}50%{transform:translate(8px,-48px)}75%{transform:translate(-34px,-18px)}}
+@keyframes mep-flutter-b{0%,100%{transform:translate(0,0)}30%{transform:translate(-26px,-30px)}60%{transform:translate(30px,-44px)}}
+@keyframes mep-sway{0%,100%{rotate:-2.2deg}50%{rotate:2.2deg}}
+@media(prefers-reduced-motion:reduce){
+  .mep-sun,.mep-sun:before,.mep-cloud,.mep-birds,.mep-butterfly,.mep-wings,.mep-plot-plant{animation:none}
+}
+@media(max-width:1000px){.mep-sun{right:6%}.mep-birds{display:none}}
+@media(min-width:768px) and (max-width:1100px){
+  .mep-hero-stage{width:clamp(270px,32vw,330px)}
+  .mep-hero h1{font-size:2.5rem}
+  .mep-ground{height:210px}
+  .mep-petak{width:240px}
+}
+@media(max-width:767px){
+  .mep-hero{min-height:0}
+  .mep-hero-inner{grid-template-columns:minmax(0,1fr);padding:30px 20px 0}
+  .mep-hero-copy{padding-bottom:18px}
+  .mep-hero-stage{width:min(100%,380px);margin:0 auto}
+  .mep-speech{margin:0 auto 8px;max-width:290px;font-size:.8rem}
+  .mep-speech:after{right:auto;left:62%}
+  .mep-ground{height:210px}
+  .mep-petak{width:230px;right:-4%}
+  .mep-sun{right:4%;bottom:44%;width:96px}
+  .mep-butterfly--a{left:70%;bottom:58%}
+}
+
+/* ---------------------------------------------------------------- Detail page
+   A calm band with the illustrated plot, then the flow (add -> set the stage -> Smart Care), the plants,
+   and the add form folded away once there is something to look at. */
+.mep-band{position:relative;isolation:isolate;border-bottom:3px solid #d8c48d;
+  background:radial-gradient(60% 120% at 92% 0%,#fff0c88c 0%,transparent 60%),linear-gradient(180deg,#d9f1de 0%,#eaf7e6 70%,#f4f6e2 100%)}
+.mep-band-inner{max-width:calc(1120px + var(--mep-offset,0px));margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(18px,3vw,40px);align-items:center;
+  padding:30px clamp(20px,4vw,56px) 30px calc(var(--mep-offset,0px) + clamp(20px,4vw,56px))}
+.mep-band-copy{min-width:0}
+.mep-band .patch-back{margin-bottom:6px}
+.mep-band .patch-page-title{margin:0 0 12px}
+.mep-facts{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0 0 12px;padding:0}
+.mep-facts li{background:#fffef7cc;border:1px solid #cfe3c4;border-radius:999px;padding:5px 14px;font-size:.86rem;font-weight:600;color:#2f4a36}
+.mep-goal{margin:0 0 16px;max-width:60ch;color:#3f5744;overflow-wrap:anywhere}
+.mep-band-actions{display:flex;flex-wrap:wrap;gap:12px}
+.mep-band-side{display:flex;flex-direction:column;align-items:center;gap:10px;width:clamp(150px,17vw,200px)}
+.mep-band-side .mep-bed{width:100%}
+.mep-band-links{margin:0;font-size:.88rem;color:#4c6853}
+.mep-band-links a{color:#175e30;font-weight:700;text-underline-offset:3px}
+.mep-band-links .mep-link-danger{color:#a3301f}
+
+.mep-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;list-style:none;margin:0 0 30px;padding:0;counter-reset:none}
+.mep-flow-step{display:flex;gap:12px;align-items:flex-start;background:#fffaf0;border:1px solid #e0d3b3;border-radius:18px;padding:14px 16px}
+.mep-flow-step strong{display:block;font-size:.95rem;color:#17301f}
+.mep-flow-step small{display:block;margin-top:2px;font-size:.8rem;line-height:1.4;color:#5d6b5f}
+.mep-flow-step small a{color:#175e30;font-weight:700}
+.mep-flow-num{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#efe6cf;color:#7b6a3f;font-weight:800;font-size:.9rem}
+.mep-flow-step.is-now{border-color:#7fbf8d;background:#f1faee}
+.mep-flow-step.is-now .mep-flow-num{background:#167a38;color:#fff}
+.mep-flow-step.is-done .mep-flow-num{background:#bdeec7;color:#175e30}
+
+.mep-module .patch-plants-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 20px;margin-bottom:6px}
+.mep-module .patch-plants-head .patch-card-count{margin:2px 0 0}
+.mep-module .plant-row{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(0,1.5fr) auto auto;gap:10px 18px;align-items:center}
+.mep-module .plant-main{min-width:0}
+.mep-track{display:flex;list-style:none;margin:0;padding:0;gap:4px}
+.mep-track li{position:relative;flex:1 1 0;min-width:0;text-align:center;font-size:.72rem;font-weight:700;color:#8a8f78;padding-top:14px}
+.mep-track li:before{content:"";position:absolute;left:0;right:0;top:4px;height:4px;border-radius:2px;background:#e4dcc2}
+.mep-track li.is-done:before{background:#9bd8a9}
+.mep-track li.is-current:before{background:#167a38}
+.mep-track li.is-current{color:#175e30}
+.mep-track li.is-done{color:#4c6853}
+.mep-track-note{font-size:.82rem;color:#8a6a4a;font-style:italic}
+.mep-js .mep-status-save{display:none}
+.mep-module .mep-select-status{width:178px}
+.mep-module .mep-select-status .patch-select-btn{white-space:nowrap}
+.mep-empty-plants{background:#fff9ed;border:1px dashed #b6a174;border-radius:20px;padding:22px 24px;margin:0 0 20px}
+.mep-empty-plants p{margin:0 0 6px}
+
+.mep-add{margin-top:26px;background:#fffaf0;border:1px solid #d8c7a3;border-radius:24px;overflow:hidden}
+.mep-add>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:16px 22px;font:800 1.15rem 'Baloo 2',sans-serif;color:#17301f}
+.mep-add>summary::-webkit-details-marker{display:none}
+.mep-add-plus{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#167a38;color:#fff;font-size:1.3rem;line-height:1;transition:transform .2s}
+.mep-add[open]>summary .mep-add-plus{transform:rotate(45deg)}
+.mep-add .patch-plant-form{border:0;border-top:1px solid #e0d3b3;border-radius:0;box-shadow:none;margin:0;padding:20px 22px 24px;background:transparent}
+.mep-add>summary:focus-visible{outline-offset:-3px}
+
+@media(max-width:900px){
+  .mep-flow{grid-template-columns:1fr}
+  .mep-module .plant-row{grid-template-columns:minmax(0,1fr) auto}
+  .mep-module .plant-main{grid-column:1/-1}
+  .mep-track{grid-column:1/-1}
+}
+@media(max-width:600px){
+  .mep-band-inner{grid-template-columns:minmax(0,1fr);padding:22px 20px 24px}
+  .mep-band-side{flex-direction:row;width:auto;justify-content:space-between;gap:16px;align-items:center}
+  .mep-band-side .mep-bed{width:112px;flex:none}
+  .mep-band-actions .btn{flex:1 1 auto}
 }
 
 /* Scenic My EcoPatch header, inspired by the garden reference. */

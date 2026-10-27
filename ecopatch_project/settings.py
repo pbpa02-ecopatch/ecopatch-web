@@ -66,6 +66,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'main.security.SecurityHeadersMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -155,6 +156,23 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ---- Security -----------------------------------------------------------------------------------------------
+# Cookies. Secure cookies need https, so they stay off while DEBUG is on (local http) and on everywhere else;
+# SECURE_COOKIES can override that in the environment. Neither cookie is read by JavaScript (the CSRF token is put
+# into the page by the template), so both can be HttpOnly. SameSite=Lax is Django's default and stays.
+SECURE_COOKIES = os.environ.get('SECURE_COOKIES', 'False' if DEBUG else 'True') == 'True'
+SESSION_COOKIE_SECURE = SECURE_COOKIES
+CSRF_COOKIE_SECURE = SECURE_COOKIES
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+
+# Behind an https reverse proxy (PWS): set BEHIND_HTTPS_PROXY=True in the environment so Django believes the
+# X-Forwarded-Proto header, then HSTS is sent too. Left off by default because trusting that header when no
+# proxy sets it would let a visitor claim "https" for themselves.
+if os.environ.get('BEHIND_HTTPS_PROXY', 'False') == 'True':
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '31536000'))
 
 # Auth redirects
 LOGIN_URL = 'main:login'
