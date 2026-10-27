@@ -49,6 +49,11 @@ body.has-sidebar.seed-body {
     -webkit-text-size-adjust: 100%;
 }
 
+/* this module's body has no sidebar padding (the sheet is full width), so the footer line keeps clear of the sidebar itself */
+body.has-sidebar:has(.seed-page) .site-footer {
+    padding-left: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2 + 20px);
+}
+
 .seed-page [hidden] {
     display: none !important;
 }

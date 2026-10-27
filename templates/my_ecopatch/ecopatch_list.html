@@ -2,19 +2,7 @@
 {% load static %}
 {% block title %}My EcoPatch - EcoPatch{% endblock %}
 {% block garden_content %}
-<header class="mep-hero">
-  <div class="mep-hero-copy">
-    <p class="mep-eyebrow">RUANG KECIL, CERITA HIJAU BESAR</p>
-    <h1>My EcoPatch</h1>
-    <p>Kelola semua kebun dan tanamanmu dalam satu tempat.</p>
-    <ul class="mep-stats" aria-label="Ringkasan semua kebun">
-      <li><strong>{{ patch_count }}</strong> EcoPatch</li>
-      <li><strong>{{ plant_count }}</strong> tanaman</li>
-      <li><strong>{{ growing_count }}</strong> sedang tumbuh</li>
-    </ul>
-  </div>
-  <div class="mep-mascot"><p class="mep-speech">{% if patch_count %}Ruang kecilmu punya banyak cerita. Yuk, lihat yang tumbuh hari ini!{% else %}Kebun pertamamu dimulai dari satu langkah kecil. Ayo buat EcoPatch!{% endif %}</p><img src="{% static 'my_ecopatch/petak.svg' %}" width="186" height="182" alt="Petak, maskot EcoPatch"></div>
-</header>
+{% include "my_ecopatch/_hero.html" %}
 <div class="mep-content">
   <div class="mep-toolbar">
     <div><p class="mep-eyebrow">KEBUN PRIBADIMU</p><h2 class="patch-section-title">Setiap ruang bisa tumbuh.</h2></div>
@@ -34,7 +22,7 @@
         {% include "my_ecopatch/_garden_bed.html" %}
         <h2>{{ patch.name }}</h2>
       </a>
-      <p class="mep-location">{{ patch.get_space_type_display }} · {{ patch.city }}</p>
+      <p class="mep-location">{{ patch.get_space_type_display }}{% if patch.city %} · {{ patch.city }}{% endif %}</p>
       <p class="mep-count">{{ patch.plant_quantity }} tanaman · {{ patch.plant_total }} entri</p>
       <ul class="patch-status-list">{% for item in patch.status_summary %}<li class="patch-pill patch-pill--{{ item.key }}">{{ item.count }} {{ item.label }}</li>{% endfor %}</ul>
     </article>

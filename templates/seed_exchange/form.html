@@ -99,10 +99,6 @@
                             {% endif %}
                         </div>
                     </div>
-                    <input type="hidden" name="city" id="id_city" value="{{ location_city }}">
-                    <input type="hidden" name="contact" id="id_contact" value="{{ location_contact }}">
-                    {% for error in form.city.errors %}<div class="seed-error seed-loc-error">{{ error }}</div>{% endfor %}
-                    {% for error in form.contact.errors %}<div class="seed-error seed-loc-error">{{ error }}</div>{% endfor %}
                     <h2 class="seed-form-section">Foto &amp; catatan</h2>
                     {% endif %}
                     {% if field.name == 'image' %}

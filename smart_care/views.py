@@ -52,8 +52,8 @@ def _profile_city(user):
 
 
 def _current_city(user):
-    """The city of the user's EcoPatch, else the profile city, else Depok. The user does not pick it here."""
-    for city in (get_user_city(user), _profile_city(user)):
+    """The profile city, else the city an older EcoPatch still carries, else Depok. The user does not pick it here."""
+    for city in (_profile_city(user), get_user_city(user)):
         if city in CITIES:
             return city
     return DEFAULT_CITY

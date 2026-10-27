@@ -39,7 +39,12 @@ _KEYWORD_MAP = [
 ]
 
 # Kata sambung / stop-word yang dibuang setelah frasa dipetakan
-_STOP_WORDS = {"yang", "dan", "tanaman", "untuk", "dirawat"}
+# Kata tanya ("tanaman apa yang cocok di ...?") ikut dibuang, supaya kalimat dari saran di landing page
+# hanya meninggalkan filter, bukan kata yang dikira nama tanaman.
+_STOP_WORDS = {
+    "yang", "dan", "tanaman", "untuk", "dirawat",
+    "apa", "apakah", "di", "ke", "dari", "dengan", "cocok", "ada", "ya", "dong", "sebaiknya", "paling",
+}
 
 # Chip cepat di kotak pencarian. Sama seperti di landing page: tiga kelompok
 # (cahaya, kesulitan, lokasi) supaya halaman ini terasa satu keluarga.

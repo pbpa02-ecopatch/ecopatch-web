@@ -56,6 +56,23 @@ class LandingPageTests(TestCase):
         self.assertEqual(response.context['plant_library_url'], '')
         self.assertContains(response, 'data-plant-library-url=""')
 
+    def test_the_finder_offers_ready_made_questions_the_plant_library_understands(self):
+        from plant_library.views import parse_query_keywords
+        html = self.client.get(reverse('main:home')).content.decode()
+        questions = re.findall(r'class="ask-chip" data-ask="([^"]+)"', html)
+        self.assertGreaterEqual(len(questions), 4)
+        for question in questions:
+            with self.subTest(question=question):
+                filters, remaining = parse_query_keywords(question)
+                # a suggestion is only worth showing if asking it really narrows the catalogue down
+                self.assertTrue(filters, question)
+                self.assertEqual(remaining, '', question)
+
+    def test_the_ready_made_questions_are_plain_text_with_nothing_to_inject(self):
+        html = self.client.get(reverse('main:home')).content.decode()
+        for question in re.findall(r'data-ask="([^"]+)"', html):
+            self.assertFalse(set(question) & set('<>"\'`'), question)
+
     def test_anchors_used_by_the_auth_pages_exist(self):
         response = self.client.get(reverse('main:home'))
         self.assertContains(response, 'id="fitur"')

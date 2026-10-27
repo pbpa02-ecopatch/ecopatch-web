@@ -8,7 +8,7 @@
 
   function $(selector, root) { return (root || document).querySelector(selector); }
   function esc(text) {
-    return String(text).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+    return String(text).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
   }
 
   var MAX_BYTES = 2 * 1024 * 1024;

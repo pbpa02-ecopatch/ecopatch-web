@@ -280,6 +280,25 @@ class ParseQueryKeywordsTests(TestCase):
         self.assertEqual(filters.get("difficulty"), "easy")
         self.assertEqual(remaining, "")
 
+    def test_a_question_leaves_only_the_filters(self):
+        """Kata tanya bukan nama tanaman: kalimat saran dari landing page hanya menghasilkan filter."""
+        cases = {
+            "Tanaman apa yang mudah dirawat di dalam ruangan?": {"difficulty": "easy", "indoor_outdoor": "indoor"},
+            "Tanaman apa yang cocok di luar ruangan dengan cahaya penuh?": {"indoor_outdoor": "outdoor", "sunlight": "full"},
+            "Tanaman apa yang teduh dan mudah dirawat?": {"sunlight": "shade", "difficulty": "easy"},
+            "Apa tanaman outdoor dengan perawatan sedang?": {"indoor_outdoor": "outdoor", "difficulty": "medium"},
+        }
+        for question, expected in cases.items():
+            with self.subTest(question=question):
+                filters, remaining = parse_query_keywords(question)
+                self.assertEqual(filters, expected)
+                self.assertEqual(remaining, "")
+
+    def test_a_real_plant_name_in_a_question_is_still_searched(self):
+        filters, remaining = parse_query_keywords("Apa bayam cocok di luar ruangan?")
+        self.assertEqual(filters, {"indoor_outdoor": "outdoor"})
+        self.assertEqual(remaining, "bayam")
+
 
 @override_settings(ROOT_URLCONF=__name__)
 class KeywordSearchIntegrationTests(TestCase):
