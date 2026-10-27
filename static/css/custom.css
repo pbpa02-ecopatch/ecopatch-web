@@ -1714,69 +1714,7 @@ h1, h2, h3, .navbar-brand {
         padding: 16px;
     }
 }
-/* ================= Profile page ================= */
-.profile-page {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
-    max-width: 960px;
-    margin: 8px auto 32px;
-}
 
-.profile-card,
-.profile-edit {
-    border: 1px solid var(--border);
-    border-radius: 32px;
-    background: var(--surface-200);
-    box-shadow: 0 18px 40px rgba(34, 48, 31, 0.12);
-}
-
-.profile-edit {
-    padding: 32px 28px;
-}
-
-.profile-side {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.profile-card {
-    overflow: hidden;
-    text-align: center;
-}
-
-.profile-banner {
-    height: 104px;
-    background:
-        radial-gradient(circle at 18% 120%, color-mix(in srgb, var(--accent-mango) 55%, transparent), transparent 55%),
-        radial-gradient(circle at 88% -10%, color-mix(in srgb, var(--accent-sky) 45%, transparent), transparent 50%),
-        linear-gradient(135deg, var(--brand-300), var(--brand-500));
-}
-
-.profile-card-body {
-    padding: 0 24px 20px;
-}
-
-.profile-avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 120px;
-    height: 120px;
-    margin: -60px auto 14px;
-    overflow: hidden;
-    border: 5px solid var(--surface-200);
-    border-radius: 50%;
-    background: var(--brand-300);
-    box-shadow: 0 8px 20px rgba(34, 48, 31, 0.2);
-    color: var(--brand-600);
-    font-family: 'Baloo 2', sans-serif;
-    font-size: 3.2rem;
-    font-weight: 800;
-}
-
-.profile-avatar img,
 .navbar-avatar img,
 .profile-menu-avatar img {
     width: 100%;
@@ -1789,118 +1727,19 @@ h1, h2, h3, .navbar-brand {
     overflow: hidden;
 }
 
-.profile-name {
-    margin: 0;
-    color: var(--ink);
-    font-size: 1.6rem;
-    line-height: 1.15;
-    overflow-wrap: anywhere;
-}
-
-.profile-handle {
-    margin: 2px 0 12px;
-    color: var(--ink-muted);
-    font-weight: 600;
-}
-
-.profile-badge {
-    display: inline-block;
-    margin-bottom: 14px;
-    padding: 5px 12px;
-    border-radius: 999px;
-    background: var(--brand-300);
-    color: var(--brand-600);
-    font-size: 12.5px;
-    font-weight: 700;
-}
-
-.profile-bio {
-    margin: 0;
-    color: var(--ink);
-    font-size: 14.5px;
-    line-height: 1.6;
-    overflow-wrap: anywhere;
-}
-
-.profile-bio--empty {
-    color: var(--ink-muted);
-    font-style: italic;
-}
-
-.profile-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    margin: 0;
-    border-top: 1px dashed var(--border);
-    background: var(--surface-100);
-}
-
-.profile-stats div {
-    display: flex;
-    flex-direction: column-reverse;
-    align-items: center;
-    padding: 14px 4px;
-}
-
-.profile-stats div + div {
-    border-left: 1px dashed var(--border);
-}
-
-.profile-stats dd {
-    margin: 0;
-    color: var(--brand-600);
-    font-family: 'Baloo 2', sans-serif;
-    font-size: 1.6rem;
-    font-weight: 800;
-    line-height: 1;
-}
-
-.profile-stats dt {
-    margin-top: 2px;
-    color: var(--ink-muted);
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.profile-email {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin: 0;
-    padding: 14px 20px 18px;
-    background: var(--surface-100);
-    color: var(--ink-muted);
-    font-size: 13.5px;
-    overflow-wrap: anywhere;
-}
-
-.profile-email .ico {
-    flex: 0 0 auto;
-    width: 16px;
-    height: 16px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.profile-edit-title {
-    margin: 0 0 20px;
-    color: var(--ink);
-    font-size: 2rem;
+/* Petak sebagai foto profil (dipilih di halaman profil) */
+.navbar-avatar svg.care-face,
+.profile-menu-avatar svg.care-face {
+    display: block;
+    width: 124%;
+    height: auto;
+    max-width: none;
+    margin-top: 8px;
 }
 
 .profile-form {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-}
-
-.profile-row {
-    display: grid;
-    grid-template-columns: 1fr;
     gap: 18px;
 }
 
@@ -1942,54 +1781,6 @@ h1, h2, h3, .navbar-brand {
     border-color: var(--brand-500);
     background: var(--surface-200);
     box-shadow: 0 0 0 4px var(--brand-300);
-}
-
-.profile-field.has-error input,
-.profile-field.has-error textarea {
-    border-color: var(--danger);
-}
-
-.profile-check {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-    color: var(--ink-muted);
-    font-size: 14px;
-}
-
-.profile-submit {
-    align-self: flex-start;
-    padding: 12px 28px;
-    font-size: 16px;
-}
-
-@media (min-width: 768px) {
-    .profile-row {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (min-width: 992px) {
-    .profile-page {
-        grid-template-columns: 300px 1fr;
-        align-items: start;
-    }
-
-    .profile-edit {
-        padding: 40px 36px;
-    }
-}
-
-.profile-divider {
-    margin: 32px 0 24px;
-    border: 0;
-    border-top: 1px dashed var(--border);
-    opacity: 1;
-}
-
-.profile-edit-title--sub {
-    font-size: 1.5rem;
 }
 
 /* ================= Toast notifications (Django messages), pojok kanan atas ================= */
@@ -2047,24 +1838,6 @@ h1, h2, h3, .navbar-brand {
     font-size: 11px;
 }
 
-.profile-security {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.profile-security .profile-edit-title {
-    margin-bottom: 2px;
-}
-
-.profile-security-text {
-    margin: 0;
-    color: var(--ink-muted);
-    font-size: 14px;
-}
-
 .profile-modal .modal-content {
     border: 1px solid var(--border);
     border-radius: 28px;
@@ -2086,261 +1859,12 @@ h1, h2, h3, .navbar-brand {
     font-size: 1.5rem;
 }
 
-/* Lebarnya mengikuti kolom card (.profile-main), bukan seluruh halaman */
-.profile-main .profile-danger-zone {
-    padding: 20px 28px;
-    border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--border));
-    border-radius: 24px;
-    background: color-mix(in srgb, var(--danger) 5%, var(--surface-200));
-}
-
-.profile-danger .profile-edit-title--sub {
-    color: color-mix(in srgb, var(--danger) 75%, var(--ink));
-}
-
-.profile-main {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    min-width: 0;
-}
-
-.profile-main .profile-edit {
-    padding: 24px 28px 28px;
-}
-
-.profile-main .profile-edit-title {
-    margin-bottom: 16px;
-}
-
-.profile-main .profile-security .profile-edit-title {
-    margin-bottom: 2px;
-}
-
-/* Foto dan nama dalam satu card */
-.profile-photo-row {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-}
-
-.profile-photo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    text-align: center;
-}
-
-.profile-photo-preview {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 104px;
-    height: 104px;
-    overflow: hidden;
-    border: 3px solid var(--brand-300);
-    border-radius: 50%;
-    background: var(--brand-300);
-    color: var(--brand-600);
-    font-family: 'Baloo 2', sans-serif;
-    font-size: 2.6rem;
-    font-weight: 800;
-}
-
-.profile-photo-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.profile-photo-btn {
-    margin: 0;
-    cursor: pointer;
-}
-
-.profile-photo-frame {
-    position: relative;
-}
-
-.profile-photo-remove {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    border: 3px solid var(--surface-200);
-    border-radius: 50%;
-    background: var(--danger);
-    box-shadow: 0 4px 10px rgba(34, 48, 31, 0.25);
-    color: #fff;
-    cursor: pointer;
-}
-
-.profile-photo-remove[hidden] {
-    display: none;
-}
-
-.profile-photo-remove:hover {
-    background: color-mix(in srgb, var(--danger) 85%, #000);
-}
-
-.profile-photo-remove:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--danger) 35%, transparent);
-    outline-offset: 2px;
-}
-
-.profile-photo-remove svg {
-    width: 14px;
-    height: 14px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 3;
-    stroke-linecap: round;
-}
-
-/* Input file asli disembunyikan; label "Pilih foto" yang jadi tombolnya */
-.profile-photo input[type="file"] {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-}
-
-.profile-photo input[type="file"]:focus-visible + .profile-check,
-.profile-photo:focus-within .profile-photo-btn {
-    outline: 3px solid var(--brand-300);
-}
-
-.profile-photo-fields {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 18px;
-    min-width: 0;
-}
-
-@media (min-width: 576px) {
-    .profile-photo-row {
-        grid-template-columns: 170px 1fr;
-        align-items: center;
-    }
-}
-
-.profile-city {
-    margin: -6px 0 12px;
-    color: var(--ink-muted);
-    font-size: 13.5px;
-}
-
-/* ---- Contact (WhatsApp, Instagram): optional, private ---- */
-.profile-contacts {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin: 0;
-    padding: 0 20px 14px;
-    list-style: none;
-}
-
-.profile-contact {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 7px 13px 7px 11px;
-    border: 1.5px solid var(--border);
-    border-radius: 999px;
-    background: var(--surface-100);
-    color: var(--ink);
-    font-size: 13.5px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.profile-contact:hover {
-    border-color: var(--brand-500);
-    background: var(--surface-200);
-    color: var(--ink);
-}
-
-.profile-contact .ico {
-    width: 17px;
-    height: 17px;
-    flex: none;
-}
-
-.profile-contact--wa .ico,
-.profile-input-icon--wa .ico {
-    color: var(--brand-600);
-}
-
-.profile-contact--ig .ico,
-.profile-input-icon--ig .ico {
-    color: var(--accent-mango);
-}
-
-.profile-note {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin: -6px 0 18px;
-    color: var(--ink-muted);
-    font-size: 13.5px;
-    line-height: 1.5;
-}
-
-.profile-note .ico {
-    width: 16px;
-    height: 16px;
-    flex: none;
-    margin-top: 2px;
-}
-
-.profile-input-icon {
-    position: relative;
-}
-
-.profile-input-icon > .ico {
-    position: absolute;
-    top: 50%;
-    left: 15px;
-    width: 19px;
-    height: 19px;
-    transform: translateY(-50%);
-    pointer-events: none;
-}
-
 .profile-form .profile-input-icon input[type="text"] {
     padding-left: 44px;
 }
 
-.profile-at {
-    position: absolute;
-    top: 50%;
-    left: 41px;
-    transform: translateY(-50%);
-    color: var(--ink-muted);
-    font-size: 15px;
-    pointer-events: none;
-}
-
 .profile-form .profile-input-icon--ig input[type="text"] {
     padding-left: 54px;
-}
-
-@media (min-width: 768px) {
-    .profile-row--2 {
-        grid-template-columns: 1fr 1fr;
-    }
 }
 
 /* ================= Floating sidebar (logged-in users, md and up) =================
@@ -2806,7 +2330,6 @@ h1, h2, h3, .navbar-brand {
         transition: none;
     }
 }
-
 
 /* my-ecopatch */
 .patch-card {

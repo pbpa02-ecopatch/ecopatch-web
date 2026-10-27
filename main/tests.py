@@ -514,19 +514,28 @@ class ProfileViewTests(TestCase):
         self.url = reverse('main:profile')
         self.client.force_login(self.user)
 
-    def post_profile(self, **overrides):
+    def form_data(self, **overrides):
+        """The whole profile form, as the page sends it (one form, one Simpan button)."""
         data = {
-            'action': 'profile',
+            'action': 'save',
             'first_name': 'Siti',
             'last_name': 'Aminah',
             'email': 'lama@example.com',
+            'city': '',
+            'bio': '',
+            'whatsapp': '',
+            'instagram': '',
+            'avatar_petak': '',
         }
         data.update(overrides)
-        return self.client.post(self.url, data)
+        return data
+
+    def post_profile(self, **overrides):
+        return self.client.post(self.url, self.form_data(**overrides))
 
     # ---- contact (WhatsApp, Instagram): optional and private
     def post_contact(self, **data):
-        return self.client.post(self.url, {'action': 'contact', **data})
+        return self.post_profile(**data)
 
     def test_contact_is_saved_in_one_tidy_format(self):
         response = self.post_contact(whatsapp='+62 812-3456-7890', instagram='@Kebunku.Id')
@@ -570,13 +579,13 @@ class ProfileViewTests(TestCase):
         profile = Profile.objects.get(user=self.user)
         self.assertEqual((profile.whatsapp, profile.instagram, profile.contact_text()), ('', '', ''))
 
-    def test_the_contact_shows_on_the_owners_profile_with_links(self):
+    def test_the_contact_shows_under_the_name_on_the_owners_profile(self):
         self.post_contact(whatsapp='0812 3456 7890', instagram='kebunku')
         response = self.client.get(self.url)
-        self.assertContains(response, 'href="https://wa.me/6281234567890"')
-        self.assertContains(response, '+62 812-3456-7890')
-        self.assertContains(response, 'href="https://instagram.com/kebunku"')
-        self.assertContains(response, 'rel="noopener noreferrer"')
+        links = response.content.decode().split('id="pf-links"', 1)[1].split('</ul>', 1)[0]
+        self.assertIn('+62 812-3456-7890', links)
+        self.assertIn('@kebunku', links)
+        self.assertIn('lama@example.com', links)
         self.assertContains(response, 'hanya kamu yang melihatnya')
 
     def test_the_saved_number_is_shown_in_the_field_in_its_readable_form_and_can_be_saved_again(self):
@@ -586,8 +595,11 @@ class ProfileViewTests(TestCase):
         self.post_contact(whatsapp='+62 812-3456-7890')  # what the field now holds goes back in unchanged
         self.assertEqual(Profile.objects.get(user=self.user).whatsapp, '6281234567890')
 
-    def test_without_contact_the_card_has_no_contact_chips(self):
-        self.assertNotContains(self.client.get(self.url), 'class="profile-contacts"')
+    def test_without_contact_only_the_email_is_listed(self):
+        links = self.client.get(self.url).content.decode().split('id="pf-links"', 1)[1].split('</ul>', 1)[0]
+        self.assertIn('lama@example.com', links)
+        self.assertNotIn('+62', links)
+        self.assertNotIn('@kebunku', links)
 
     def test_one_users_contact_never_reaches_another_users_pages(self):
         self.post_contact(whatsapp='0812 3456 7890', instagram='sawah_rahasia')
@@ -617,10 +629,12 @@ class ProfileViewTests(TestCase):
         self.assertContains(response, 'name="email" value="lama@example.com"')
         self.assertContains(response, 'lama@example.com')
 
-    def test_card_shows_stats_and_logout_button(self):
+    def test_stats_are_links_to_their_modules_and_logout_is_in_the_account_section(self):
         response = self.client.get(self.url)
-        self.assertContains(response, 'class="profile-stats"')
-        self.assertContains(response, 'class="profile-logout"')
+        self.assertContains(response, 'class="pf-stats"')
+        for name in ('my_ecopatch:list', 'garden_journal:list', 'seed_exchange:list'):
+            self.assertContains(response, f'class="pf-st" href="{reverse(name)}"')
+        self.assertContains(response, 'class="pf-logout"')
         self.assertEqual(response.context['stats'], {'patches': 0, 'journals': 0, 'listings': 0})
 
     def test_member_since_uses_indonesian_month(self):
@@ -648,10 +662,14 @@ class ProfileViewTests(TestCase):
         self.assertNotContains(response, 'site-navbar site-navbar--side')  # kelas pada <nav>, bukan selector JS
         self.assertNotContains(response, 'id="sidebar-toggle"')
 
-    def test_each_section_has_its_own_form(self):
+    def test_one_form_saves_everything_and_password_and_delete_keep_their_own(self):
         response = self.client.get(self.url)
-        for action in ('profile', 'bio'):
-            self.assertContains(response, f'name="action" value="{action}"')
+        self.assertContains(response, 'name="action" value="save"', count=1)
+        self.assertContains(response, 'name="action" value="password"', count=1)
+        self.assertContains(response, 'name="action" value="delete"', count=1)
+        self.assertContains(response, 'id="pf-savebar"')  # only shown by the script when something changed
+        for old in ('profile', 'bio', 'contact'):
+            self.assertNotContains(response, f'name="action" value="{old}"')
 
     def test_profile_updates_names_and_email(self):
         response = self.post_profile(email='baru@example.com')
@@ -661,36 +679,37 @@ class ProfileViewTests(TestCase):
         self.assertEqual(self.user.email, 'baru@example.com')
 
     def test_bio_updates_only_bio(self):
-        response = self.client.post(self.url, {'action': 'bio', 'bio': 'Suka cabai di balkon.'})
+        response = self.post_profile(bio='Suka cabai di balkon.')
         self.assertRedirects(response, self.url)
         self.assertEqual(Profile.objects.get(user=self.user).bio, 'Suka cabai di balkon.')
         self.user.refresh_from_db()
         self.assertEqual(self.user.username, 'tanam')
 
-    def test_city_saved_with_bio_and_shown_on_card(self):
-        response = self.client.post(self.url, {'action': 'bio', 'city': 'Bandung', 'bio': ''})
+    def test_city_is_saved_and_shown_under_the_name(self):
+        response = self.post_profile(city='Bandung')
         self.assertRedirects(response, self.url)
         self.assertEqual(Profile.objects.get(user=self.user).city, 'Bandung')
-        self.assertContains(self.client.get(self.url), 'class="profile-city">Bandung')
+        page = self.client.get(self.url)
+        self.assertContains(page, '<span class="pf-h">Bandung</span>')
+        self.assertContains(page, 'Smart Care akan memakai cuaca Bandung.')
 
     def test_city_outside_supported_list_rejected(self):
-        response = self.client.post(self.url, {'action': 'bio', 'city': 'Atlantis', 'bio': ''})
+        response = self.post_profile(city='Atlantis')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Profile.objects.get(user=self.user).city, '')
 
     def test_city_is_optional(self):
-        response = self.client.post(self.url, {'action': 'bio', 'city': '', 'bio': 'Halo'})
+        response = self.post_profile(city='', bio='Halo')
         self.assertRedirects(response, self.url)
 
     def test_remove_button_only_when_avatar_exists(self):
-        self.assertContains(self.client.get(self.url), 'id="avatar-remove-btn" aria-label="Hapus foto profil" hidden')
+        self.assertContains(self.client.get(self.url), 'id="avatar-remove" aria-label="Hapus foto profil" hidden')
         self.post_profile(avatar=make_image())
         self.assertNotContains(self.client.get(self.url), 'aria-label="Hapus foto profil" hidden')
 
-    def test_saving_info_keeps_bio_and_avatar(self):
-        self.client.post(self.url, {'action': 'bio', 'bio': 'Tetap ada.'})
-        self.post_profile(avatar=make_image())
-        self.post_profile()
+    def test_saving_again_without_a_new_photo_keeps_the_photo(self):
+        self.post_profile(bio='Tetap ada.', avatar=make_image())
+        self.post_profile(bio='Tetap ada.')
         profile = Profile.objects.get(user=self.user)
         self.assertEqual(profile.bio, 'Tetap ada.')
         self.assertTrue(profile.avatar)
@@ -739,6 +758,127 @@ class ProfileViewTests(TestCase):
         self.assertEqual(self.user.username, 'tanam')
         self.assertEqual(Profile.objects.get(user=self.user).bio, '')
 
+    # ---- one form, one Simpan: all or nothing
+    def test_a_wrong_field_saves_nothing_at_all(self):
+        response = self.post_profile(bio='Tidak boleh tersimpan', city='Bandung', email='bukan-email')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Format email belum benar')
+        profile = Profile.objects.get(user=self.user)
+        self.assertEqual((profile.bio, profile.city), ('', ''))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, 'lama@example.com')
+
+    def test_the_email_cannot_be_left_empty(self):
+        response = self.post_profile(email='')
+        self.assertContains(response, 'Email wajib diisi.')
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, 'lama@example.com')
+
+    def test_the_first_name_is_optional_and_the_username_shows_instead(self):
+        self.assertRedirects(self.post_profile(first_name='', last_name=''), self.url)
+        page = self.client.get(self.url)
+        self.assertContains(page, 'id="pf-name" data-fallback="tanam">tanam</p>')
+
+    def test_a_save_says_so(self):
+        response = self.client.post(self.url, self.form_data(bio='Halo'), follow=True)
+        self.assertContains(response, 'Profil disimpan.')
+
+    # ---- foto profil: unggahan atau wajah Petak, tidak keduanya
+    def test_a_petak_can_be_the_profile_picture(self):
+        self.assertRedirects(self.post_profile(avatar_petak='curious'), self.url)
+        profile = Profile.objects.get(user=self.user)
+        self.assertEqual(profile.avatar_petak, 'curious')
+        self.assertTrue(profile.has_avatar)
+        page = self.client.get(self.url)
+        self.assertContains(page, 'data-k="curious"')
+        self.assertNotContains(page, 'id="avatar-remove" aria-label="Hapus foto profil" hidden')
+
+    def test_only_the_four_known_petak_faces_are_accepted(self):
+        response = self.post_profile(avatar_petak='naga')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Profile.objects.get(user=self.user).avatar_petak, '')
+
+    def test_picking_a_petak_replaces_the_photo(self):
+        self.post_profile(avatar=make_image())
+        self.assertTrue(Profile.objects.get(user=self.user).avatar)
+        self.post_profile(avatar_petak='proud')
+        profile = Profile.objects.get(user=self.user)
+        self.assertFalse(profile.avatar)
+        self.assertEqual(profile.avatar_petak, 'proud')
+
+    def test_uploading_a_photo_replaces_the_petak(self):
+        self.post_profile(avatar_petak='happy')
+        self.post_profile(avatar_petak='happy', avatar=make_image())  # the page keeps sending the old Petak
+        profile = Profile.objects.get(user=self.user)
+        self.assertTrue(profile.avatar)
+        self.assertEqual(profile.avatar_petak, '')
+
+    def test_removing_the_picture_clears_a_petak_too(self):
+        self.post_profile(avatar_petak='cheer')
+        self.post_profile(remove_avatar='on')
+        profile = Profile.objects.get(user=self.user)
+        self.assertEqual(profile.avatar_petak, '')
+        self.assertFalse(profile.has_avatar)
+
+    def test_a_saved_petak_stays_when_the_form_is_saved_again(self):
+        self.post_profile(avatar_petak='happy')
+        self.post_profile(avatar_petak='happy', bio='Halo lagi')
+        self.assertEqual(Profile.objects.get(user=self.user).avatar_petak, 'happy')
+
+    def test_the_sidebar_shows_the_petak_picture(self):
+        self.post_profile(avatar_petak='proud')
+        sidebar = self.client.get(reverse('my_ecopatch:list')).content.decode()
+        row = sidebar.split('id="sidebar-user-toggle"', 1)[1].split('</button>', 1)[0]
+        self.assertIn('data-k="proud"', row)
+
+    # ---- meter kelengkapan dan Petak yang menyapa
+    def test_a_new_profile_is_one_step_complete_and_petak_points_to_the_next_one(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['steps_done'], 0)
+        self.assertEqual(response.context['next_step'][0], 'Foto')
+        self.assertContains(response, 'Hai! Profilmu baru 0 dari 5 terisi. Yuk lengkapi foto.')
+        self.assertContains(response, 'data-focus="avatar-btn">Tambah foto</button>')
+
+    def test_the_steps_count_what_is_filled_in(self):
+        self.user.first_name = 'Siti'
+        self.user.save()
+        profile = Profile.objects.create(user=self.user, city='Depok', bio='Halo')
+        self.assertEqual([done for _, done, _ in profile.completeness()], [False, True, True, True, False])
+        profile.whatsapp = '6281234567890'
+        profile.avatar_petak = 'happy'
+        profile.save()
+        self.assertTrue(all(done for _, done, _ in profile.completeness()))
+
+    def test_a_complete_profile_makes_petak_proud(self):
+        self.user.first_name = 'Siti'
+        self.user.save()
+        Profile.objects.create(user=self.user, city='Depok', bio='Halo', instagram='kebunku', avatar_petak='happy')
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['steps_done'], 5)
+        self.assertContains(response, 'Profilmu sudah lengkap. Mantap!')
+        self.assertContains(response, 'Profil lengkap')
+        pet = response.content.decode().split('id="pf-pet"', 1)[1].split('</span>', 1)[0]
+        self.assertIn('data-k="proud"', pet)
+
+    # ---- tampilan: footer ringan dan halaman yang berdiri di bawah sidebar
+    def test_the_footer_is_light_with_no_placeholder_links(self):
+        html = self.client.get(self.url).content.decode()
+        foot = html.split('<footer class="pf-foot">', 1)[1].split('</footer>', 1)[0]
+        self.assertIn('Small Spaces, Greener Living.', foot)
+        self.assertNotIn('href="#"', foot)
+        self.assertNotIn('<a ', foot)
+
+    def test_the_page_loads_its_own_stylesheet_and_script(self):
+        page = self.client.get(self.url)
+        self.assertContains(page, 'css/profile.css')
+        self.assertContains(page, 'js/profile.js')
+        self.assertContains(page, 'pf-body')
+
+    def test_all_four_petak_faces_are_available_to_the_photo_menu(self):
+        template = self.client.get(self.url).content.decode().split('<template id="pf-pets">', 1)[1].split('</template>', 1)[0]
+        for code in ('happy', 'cheer', 'curious', 'proud'):
+            self.assertIn(f'data-v="{code}"', template)
+
 
 class ChangePasswordTests(TestCase):
     def setUp(self):
@@ -780,6 +920,11 @@ class ChangePasswordTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password('lama-12345'))
+
+    def test_the_password_rules_are_in_indonesian(self):
+        page = self.client.get(self.url).content.decode()
+        self.assertIn('Sandi anda tidak dapat terlalu mirip', page)
+        self.assertNotIn("Your password can't be too similar", page)
 
     def test_password_form_is_inside_modal(self):
         response = self.client.get(self.url)

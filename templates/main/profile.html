@@ -1,189 +1,155 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n static asset_version %}
 {% block title %}Profil Saya - EcoPatch{% endblock %}
-{% block content %}
+{% block body_class %} pf-body{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static_v 'css/profile.css' %}">
+{% endblock %}
+
+{% block main %}
 {% firstof user.get_full_name user.username as display_name %}
-<div class="profile-page">
-    <aside class="profile-side">
-        <div class="profile-card">
-            <div class="profile-banner" aria-hidden="true"></div>
-            <div class="profile-card-body">
-                <div class="profile-avatar" id="profile-avatar-preview" data-initial="{{ display_name|first|upper }}">
-                    {% if profile.avatar %}
-                        <img src="{{ profile.avatar.url }}" alt="Foto profil {{ user.username }}">
-                    {% else %}
-                        <span aria-hidden="true">{{ display_name|first|upper }}</span>
-                    {% endif %}
+<main class="pf-main flex-grow-1">
+
+    {# ---------- Identitas: yang terlihat pertama, dan pratinjau langsung dari isian di bawahnya ---------- #}
+    <header class="pf-hero" id="pf-hero">
+        <div class="pf-inner">
+            <div class="pf-idrow">
+                <div class="pf-avw">
+                    <button type="button" class="pf-av" id="avatar-btn" aria-haspopup="menu" aria-expanded="false" aria-label="Ganti foto profil">
+                        <span class="pf-avf{% if not profile.has_avatar %} is-none{% endif %}" id="pf-avimg">
+                            {% if profile.avatar %}<img src="{{ profile.avatar.url }}" alt="">
+                            {% elif profile.avatar_petak %}{% include "smart_care/_petak_faces.html" with only=profile.avatar_petak %}
+                            {% else %}<span aria-hidden="true">{{ display_name|first|upper }}</span>{% endif %}
+                        </span>
+                        <span class="pf-cam" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2.5h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>
+                    </button>
+                    <button type="button" class="pf-xbtn" id="avatar-remove" aria-label="Hapus foto profil"{% if not profile.has_avatar %} hidden{% endif %}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>
+                    </button>
                 </div>
-                <h1 class="profile-name">{% firstof user.get_full_name user.username %}</h1>
-                <p class="profile-handle">@{{ user.username }}</p>
-                {% if profile.city %}<p class="profile-city">{{ profile.get_city_display }}</p>{% endif %}
-                <span class="profile-badge">Anggota sejak {% language 'id' %}{{ user.date_joined|date:"F Y" }}{% endlanguage %}</span>
-                {% if profile.bio %}
-                    <p class="profile-bio">{{ profile.bio|linebreaksbr }}</p>
-                {% else %}
-                    <p class="profile-bio profile-bio--empty">Belum ada deskripsi. Ceritakan sedikit tentang kebunmu!</p>
-                {% endif %}
+
+                <div class="pf-who">
+                    <h1 class="pf-eb">Profil saya</h1>
+                    <p class="pf-name" id="pf-name" data-fallback="{{ user.username }}">{{ display_name }}</p>
+                    <p class="pf-sub" id="pf-sub" data-user="@{{ user.username }}" data-since="Anggota sejak {% language 'id' %}{{ user.date_joined|date:'F Y' }}{% endlanguage %}"><span class="pf-h">@{{ user.username }}</span>{% if profile.city %}<span class="pf-h">{{ profile.get_city_display }}</span>{% endif %}<span class="pf-h">Anggota sejak {% language 'id' %}{{ user.date_joined|date:"F Y" }}{% endlanguage %}</span></p>
+                    <p class="pf-bio" id="pf-bio">{% if profile.bio %}{{ profile.bio|linebreaksbr }}{% else %}<button type="button" class="pf-lnk" data-focus="id_bio">Tambahkan deskripsi singkat</button>{% endif %}</p>
+                    <ul class="pf-links" id="pf-links" aria-label="Kontakmu"{% if not profile.whatsapp and not profile.instagram and not user.email %} hidden{% endif %}>
+                        {% if profile.whatsapp %}<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19l1.2-3.8A7.5 7.5 0 1 1 9 18z"/><path d="M9.5 9.5c.3 2 2 3.7 4 4.2l1.2-1.2-1.8-1-.8.6c-.6-.3-1.2-.9-1.5-1.5l.6-.8-1-1.8z"/></svg>{{ profile.whatsapp_display }}</li>{% endif %}
+                        {% if profile.instagram %}<li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="currentColor"/></svg>@{{ profile.instagram }}</li>{% endif %}
+                        {% if user.email %}<li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4 8l8 5.5L20 8"/></svg>{{ user.email }}</li>{% endif %}
+                    </ul>
+                    <small class="pf-err" id="pf-photo-err" role="alert"{% if not avatar_form.avatar.errors %} hidden{% endif %}>{{ avatar_form.avatar.errors|join:" " }}</small>
+                </div>
+
+                {# Petak menyapa: wajahnya dan kalimatnya mengikuti seberapa lengkap profilmu #}
+                <div class="pf-petak" id="pf-petak" role="status" aria-live="polite">
+                    <p class="pf-bubble" id="pf-bubble">{% if steps_done == 5 %}Profilmu sudah lengkap. Mantap!{% else %}Hai! Profilmu baru {{ steps_done }} dari 5 terisi. Yuk lengkapi {{ next_step.0|lower }}.{% endif %}</p>
+                    <span class="pf-pet" id="pf-pet" aria-hidden="true">{% if steps_done == 5 %}{% include "smart_care/_petak_faces.html" with only="proud" %}{% else %}{% include "smart_care/_petak_faces.html" with only="curious" %}{% endif %}</span>
+                </div>
             </div>
-            <dl class="profile-stats">
-                <div><dt>EcoPatch</dt><dd>{{ stats.patches }}</dd></div>
-                <div><dt>Jurnal</dt><dd>{{ stats.journals }}</dd></div>
-                <div><dt>Bibit</dt><dd>{{ stats.listings }}</dd></div>
-            </dl>
-            {% if profile.whatsapp or profile.instagram %}
-                <ul class="profile-contacts" aria-label="Kontakmu">
-                    {% if profile.whatsapp %}
-                        <li><a href="{{ profile.whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="profile-contact profile-contact--wa">
-                            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12Z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2L9 8.5Z"/></svg>
-                            <span>{{ profile.whatsapp_display }}</span></a></li>
+
+            <div class="pf-strip">
+                <p class="pf-comp" id="pf-comp">
+                    {% if steps_done == 5 %}
+                        <span class="pf-ok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Profil lengkap</span>
+                    {% else %}
+                        <span class="pf-sqs" aria-hidden="true">{% for label, done, target in steps %}<i class="pf-sq{% if done %} on{% endif %}"></i>{% endfor %}</span>
+                        <span>{{ steps_done }} dari 5 terisi</span>
+                        <button type="button" class="pf-lnk" data-focus="{{ next_step.2 }}">{% if next_step.0 == 'Foto' %}Tambah foto{% elif next_step.0 == 'Kontak' %}Tambah kontak{% else %}Isi {{ next_step.0|lower }}{% endif %}</button>
                     {% endif %}
-                    {% if profile.instagram %}
-                        <li><a href="{{ profile.instagram_url }}" target="_blank" rel="noopener noreferrer" class="profile-contact profile-contact--ig">
-                            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></svg>
-                            <span>@{{ profile.instagram }}</span></a></li>
-                    {% endif %}
-                </ul>
-            {% endif %}
-            {% if user.email %}
-                <p class="profile-email"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg>{{ user.email }}</p>
-            {% endif %}
+                </p>
+                <nav class="pf-stats" aria-label="Ringkasan kebunmu">
+                    <a class="pf-st" href="{% url 'my_ecopatch:list' %}" aria-label="{{ stats.patches }} EcoPatch"><b>{{ stats.patches }}</b><span>EcoPatch</span></a>
+                    <a class="pf-st" href="{% url 'garden_journal:list' %}" aria-label="{{ stats.journals }} Jurnal"><b>{{ stats.journals }}</b><span>Jurnal</span></a>
+                    <a class="pf-st" href="{% url 'seed_exchange:list' %}" aria-label="{{ stats.listings }} Bibit"><b>{{ stats.listings }}</b><span>Bibit</span></a>
+                </nav>
+            </div>
         </div>
+    </header>
 
-        <form action="{% url 'main:logout' %}" method="post" class="profile-logout">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-danger w-100">Keluar</button>
-        </form>
-    </aside>
-
-    <div class="profile-main">
-        <section class="profile-edit" aria-labelledby="sec-info">
-            <h2 class="profile-edit-title profile-edit-title--sub" id="sec-info">Foto dan nama</h2>
-            <form method="post" enctype="multipart/form-data" class="profile-form" novalidate>
+    {# ---------- Isian: judul bagian di kiri, kolomnya di kanan, satu tombol Simpan ---------- #}
+    <div class="pf-sheet">
+        <div class="pf-page">
+            <form id="pf-form" method="post" enctype="multipart/form-data" novalidate autocomplete="off">
                 {% csrf_token %}
-                <input type="hidden" name="action" value="profile">
-                {% if user_form.non_field_errors %}
-                    <div class="auth-alert" role="alert">
-                        {% for error in user_form.non_field_errors %}{{ error }} {% endfor %}
-                    </div>
-                {% endif %}
+                <input type="hidden" name="action" value="save">
+                {{ avatar_form.avatar }}{{ avatar_form.avatar_petak }}
+                <input type="checkbox" name="remove_avatar" id="id_remove_avatar" hidden>
 
-                <div class="profile-photo-row">
-                    <div class="profile-photo">
-                        <div class="profile-photo-frame">
-                            <div class="profile-photo-preview" id="avatar-edit-preview" data-initial="{{ display_name|first|upper }}">
-                                {% if profile.avatar %}
-                                    <img src="{{ profile.avatar.url }}" alt="">
-                                {% else %}
-                                    <span aria-hidden="true">{{ display_name|first|upper }}</span>
-                                {% endif %}
-                            </div>
-                            <button type="button" class="profile-photo-remove" id="avatar-remove-btn" aria-label="Hapus foto profil"{% if not profile.avatar %} hidden{% endif %}>
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-                            </button>
+                <section class="pf-sec" aria-labelledby="pf-s1">
+                    <div class="pf-sh"><h2 id="pf-s1">Nama</h2><p>Ini nama yang tampil di profilmu.</p></div>
+                    <div class="pf-sb">
+                        <div class="pf-two">
+                            <div class="pf-fld{% if user_form.first_name.errors %} has-error{% endif %}"><label for="{{ user_form.first_name.id_for_label }}">Nama depan</label>{{ user_form.first_name }}{% if user_form.first_name.errors %}<small class="pf-err">{{ user_form.first_name.errors|join:" " }}</small>{% endif %}</div>
+                            <div class="pf-fld{% if user_form.last_name.errors %} has-error{% endif %}"><label for="{{ user_form.last_name.id_for_label }}">Nama belakang</label>{{ user_form.last_name }}{% if user_form.last_name.errors %}<small class="pf-err">{{ user_form.last_name.errors|join:" " }}</small>{% endif %}</div>
                         </div>
-                        <label class="btn btn-outline-success btn-sm profile-photo-btn" for="{{ avatar_form.avatar.id_for_label }}" id="avatar-pick-label">{% if profile.avatar %}Ganti foto{% else %}Pilih foto{% endif %}</label>
-                        {{ avatar_form.avatar }}
-                        <span class="d-none">{{ avatar_form.remove_avatar }}</span>
-                        <div class="auth-help">JPG, PNG, atau WebP. Maksimal 2 MB.</div>
-                        {% if avatar_form.avatar.errors %}<div class="auth-error">{{ avatar_form.avatar.errors|join:" " }}</div>{% endif %}
                     </div>
+                </section>
 
-                    <div class="profile-photo-fields">
-                        {% include "main/_profile_field.html" with field=user_form.first_name %}
-                        {% include "main/_profile_field.html" with field=user_form.last_name %}
-                    </div>
-                </div>
-
-                {% include "main/_profile_field.html" with field=user_form.email %}
-                <button type="submit" class="btn btn-success profile-submit">Simpan</button>
-            </form>
-        </section>
-
-        <section class="profile-edit" aria-labelledby="sec-bio">
-            <h2 class="profile-edit-title profile-edit-title--sub" id="sec-bio">Tentang kamu</h2>
-            <form method="post" class="profile-form" novalidate>
-                {% csrf_token %}
-                <input type="hidden" name="action" value="bio">
-                <div class="profile-field{% if bio_form.city.errors %} has-error{% endif %}">
-                    <label class="auth-label" for="{{ bio_form.city.id_for_label }}">{{ bio_form.city.label }}</label>
-                    {{ bio_form.city }}
-                    {% if bio_form.city.errors %}
-                        <div class="auth-error">{{ bio_form.city.errors|join:" " }}</div>
-                    {% else %}
-                        <div class="auth-help">{{ bio_form.city.help_text }}</div>
-                    {% endif %}
-                </div>
-                <div class="profile-field{% if bio_form.bio.errors %} has-error{% endif %}">
-                    <label class="auth-label" for="{{ bio_form.bio.id_for_label }}">{{ bio_form.bio.label }}</label>
-                    {{ bio_form.bio }}
-                    <div class="auth-help"><span id="bio-count">{{ bio_form.bio.value|default_if_none:""|length }}</span>/300 karakter</div>
-                    {% if bio_form.bio.errors %}<div class="auth-error">{{ bio_form.bio.errors|join:" " }}</div>{% endif %}
-                </div>
-                <button type="submit" class="btn btn-success profile-submit">Simpan</button>
-            </form>
-        </section>
-
-        <section class="profile-edit" aria-labelledby="sec-contact">
-            <h2 class="profile-edit-title profile-edit-title--sub" id="sec-contact">Kontak</h2>
-            <p class="profile-note">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-                Opsional, dan hanya kamu yang melihatnya. Dipakai untuk mengisi kolom Kontak saat membuat listing di Seed Exchange.
-            </p>
-            <form method="post" class="profile-form" novalidate>
-                {% csrf_token %}
-                <input type="hidden" name="action" value="contact">
-                <div class="profile-row profile-row--2">
-                    <div class="profile-field{% if contact_form.whatsapp.errors %} has-error{% endif %}">
-                        <label class="auth-label" for="{{ contact_form.whatsapp.id_for_label }}">WhatsApp</label>
-                        <div class="profile-input-icon profile-input-icon--wa">
-                            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12Z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2L9 8.5Z"/></svg>
-                            {{ contact_form.whatsapp }}
+                <section class="pf-sec" aria-labelledby="pf-s2">
+                    <div class="pf-sh"><h2 id="pf-s2">Tempat tinggal</h2><p>Menentukan cuaca yang tampil di Smart Care.</p></div>
+                    <div class="pf-sb">
+                        <div class="pf-fld{% if bio_form.city.errors %} has-error{% endif %}"><label for="{{ bio_form.city.id_for_label }}">Kota</label>{{ bio_form.city }}
+                            {% if bio_form.city.errors %}<small class="pf-err">{{ bio_form.city.errors|join:" " }}</small>{% else %}<small id="pf-city-help">{% if profile.city %}Smart Care akan memakai cuaca {{ profile.get_city_display }}.{% else %}Pilih kota supaya Smart Care menampilkan cuaca yang pas.{% endif %}</small>{% endif %}
                         </div>
-                        {% if contact_form.whatsapp.errors %}
-                            <div class="auth-error">{{ contact_form.whatsapp.errors|join:" " }}</div>
-                        {% else %}
-                            <div class="auth-help">{{ contact_form.whatsapp.help_text }}</div>
-                        {% endif %}
                     </div>
-                    <div class="profile-field{% if contact_form.instagram.errors %} has-error{% endif %}">
-                        <label class="auth-label" for="{{ contact_form.instagram.id_for_label }}">Instagram</label>
-                        <div class="profile-input-icon profile-input-icon--ig">
-                            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></svg>
-                            <span class="profile-at" aria-hidden="true">@</span>
-                            {{ contact_form.instagram }}
+                </section>
+
+                <section class="pf-sec" aria-labelledby="pf-s3">
+                    <div class="pf-sh"><h2 id="pf-s3">Tentang kamu</h2><p>Satu atau dua kalimat tentang kebunmu.</p></div>
+                    <div class="pf-sb">
+                        <div class="pf-fld{% if bio_form.bio.errors %} has-error{% endif %}"><label for="{{ bio_form.bio.id_for_label }}">Deskripsi</label>{{ bio_form.bio }}
+                            {% if bio_form.bio.errors %}<small class="pf-err">{{ bio_form.bio.errors|join:" " }}</small>{% endif %}
+                            <small class="pf-cnt" id="pf-bio-count">{{ bio_form.bio.value|default_if_none:""|length }} / 300</small>
                         </div>
-                        {% if contact_form.instagram.errors %}
-                            <div class="auth-error">{{ contact_form.instagram.errors|join:" " }}</div>
-                        {% else %}
-                            <div class="auth-help">{{ contact_form.instagram.help_text }}</div>
-                        {% endif %}
                     </div>
-                </div>
-                <button type="submit" class="btn btn-success profile-submit">Simpan kontak</button>
+                </section>
+
+                <section class="pf-sec" aria-labelledby="pf-s4">
+                    <div class="pf-sh"><h2 id="pf-s4">Kontak</h2><p>Opsional, dan hanya kamu yang melihatnya. Dipakai untuk mengisi kolom Kontak saat membuat listing di Seed Exchange.</p></div>
+                    <div class="pf-sb">
+                        <div class="pf-fld{% if contact_form.whatsapp.errors %} has-error{% endif %}"><label for="{{ contact_form.whatsapp.id_for_label }}">WhatsApp</label>{{ contact_form.whatsapp }}
+                            {% if contact_form.whatsapp.errors %}<small class="pf-err">{{ contact_form.whatsapp.errors|join:" " }}</small>{% else %}<small>{{ contact_form.whatsapp.help_text }}</small>{% endif %}
+                        </div>
+                        <div class="pf-fld{% if contact_form.instagram.errors %} has-error{% endif %}"><label for="{{ contact_form.instagram.id_for_label }}">Instagram</label>
+                            <span class="pf-prefix"><span aria-hidden="true">@</span>{{ contact_form.instagram }}</span>
+                            {% if contact_form.instagram.errors %}<small class="pf-err">{{ contact_form.instagram.errors|join:" " }}</small>{% else %}<small>{{ contact_form.instagram.help_text }}</small>{% endif %}
+                        </div>
+                        <div class="pf-fld{% if user_form.email.errors %} has-error{% endif %}"><label for="{{ user_form.email.id_for_label }}">Email</label>{{ user_form.email }}
+                            {% if user_form.email.errors %}<small class="pf-err">{{ user_form.email.errors|join:" " }}</small>{% else %}<small>Dipakai untuk masuk dan mengatur ulang password.</small>{% endif %}
+                        </div>
+                    </div>
+                </section>
             </form>
-        </section>
 
-        <section class="profile-edit" aria-labelledby="sec-password">
-            <div class="profile-security">
-                <div>
-                    <h2 class="profile-edit-title profile-edit-title--sub" id="sec-password">Password</h2>
-                    <p class="profile-security-text">Ganti password akunmu secara berkala.</p>
+            {# Akun: password dan hapus akun punya formnya sendiri di dalam dialog, jadi tidak ikut tombol Simpan #}
+            <section class="pf-sec" aria-labelledby="pf-s5">
+                <div class="pf-sh"><h2 id="pf-s5">Akun</h2><p>Masuk sebagai @{{ user.username }}.</p></div>
+                <div class="pf-sb pf-acct">
+                    <div class="pf-fld"><span class="pf-lbl">Password</span>
+                        <div class="pf-pwrow"><span aria-hidden="true">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span><button type="button" class="pf-eye" data-bs-toggle="modal" data-bs-target="#password-modal">Ganti</button></div>
+                        <small>Pakai password yang hanya dipakai di EcoPatch.</small>
+                    </div>
+                    <form action="{% url 'main:logout' %}" method="post" class="pf-logout">
+                        {% csrf_token %}
+                        <button type="submit" class="pf-lnk pf-lo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M15 8l4 4-4 4M19 12H9"/></svg>Keluar dari akun</button>
+                    </form>
+                    <button type="button" class="pf-lnk pf-danger" data-bs-toggle="modal" data-bs-target="#delete-modal">Hapus akun</button>
                 </div>
-                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#password-modal">Ubah password</button>
-            </div>
-        </section>
-
-        <section class="profile-danger-zone" aria-labelledby="sec-hapus">
-            <div class="profile-security profile-danger">
-                <div>
-                    <h2 class="profile-edit-title profile-edit-title--sub" id="sec-hapus">Hapus akun</h2>
-                    <p class="profile-security-text">Akun beserta semua data kebunmu dihapus permanen.</p>
-                </div>
-                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-modal">Hapus akun</button>
-            </div>
-        </section>
+            </section>
+        </div>
     </div>
-</div>
+</main>
+
+{# Petak sebagai foto profil: empat wajah, dipilih dari menu foto #}
+<template id="pf-pets">{% for code, label in petak_choices %}<div data-v="{{ code }}" data-label="{{ label }}">{% include "smart_care/_petak_faces.html" with only=code %}</div>{% endfor %}</template>
+
+<div class="pf-veil" id="pf-veil" hidden></div>
+<div class="pf-pop" id="pf-menu" role="menu" aria-label="Foto profil" hidden></div>
+
+{# Muncul hanya saat ada perubahan yang belum disimpan #}
+<div class="pf-savebar" id="pf-savebar" role="region" aria-label="Perubahan belum disimpan"><span>Ada perubahan yang belum disimpan</span><button type="button" class="pf-sb-x" id="pf-discard">Buang</button><button type="submit" class="pf-sb-go" form="pf-form">Simpan</button></div>
+<div class="pf-toast" id="pf-toast" role="status" aria-live="polite"><span id="pf-toast-txt"></span><button type="button" id="pf-toast-btn" hidden>Urungkan</button></div>
 
 <div class="modal fade profile-modal" id="password-modal" tabindex="-1" aria-labelledby="password-modal-title" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -242,61 +208,19 @@
 </div>
 {% endblock %}
 
+{# Footer ringan seperti Smart Care: satu tip dan satu baris copyright, tanpa tautan kosong #}
+{% block footer %}
+<footer class="pf-foot">
+    <div class="pf-foot-in">
+        <p class="pf-tip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-9"/><path d="M12 12c0-3.6-2.6-5.6-6.4-5.6 0 3.6 2.6 5.6 6.4 5.6z"/><path d="M12 10c0-3.2 2.3-5.2 6-5.2 0 3.2-2.3 5.2-6 5.2z"/></svg><span><b>Tip Petak</b> &middot; Kotamu menentukan prakiraan cuaca di Smart Care, jadi pilih kota yang paling dekat dengan tanamanmu.</span></p>
+        <div class="pf-foot-row"><span>&copy; {% now "Y" %} EcoPatch &middot; Small Spaces, Greener Living.</span></div>
+    </div>
+</footer>
+{% endblock %}
+
 {% block extra_scripts %}
 {% include "main/_auth_script.html" %}
-<script>
-    // Preview foto yang baru dipilih dan hitung karakter deskripsi
-    (function () {
-        var input = document.getElementById('{{ avatar_form.avatar.id_for_label }}');
-        var removeFlag = document.getElementById('{{ avatar_form.remove_avatar.id_for_label }}');
-        var removeBtn = document.getElementById('avatar-remove-btn');
-        var pickLabel = document.getElementById('avatar-pick-label');
-        var previews = [document.getElementById('profile-avatar-preview'), document.getElementById('avatar-edit-preview')];
-
-        // url = tampilkan foto; null = kembali ke inisial
-        function showPhoto(url) {
-            previews.forEach(function (preview) {
-                if (!preview) return;
-                preview.textContent = '';
-                if (url) {
-                    var img = document.createElement('img');
-                    img.alt = '';
-                    img.src = url;
-                    preview.appendChild(img);
-                } else {
-                    var span = document.createElement('span');
-                    span.setAttribute('aria-hidden', 'true');
-                    span.textContent = preview.dataset.initial;
-                    preview.appendChild(span);
-                }
-            });
-            if (removeBtn) removeBtn.hidden = !url;
-            if (pickLabel) pickLabel.textContent = url ? 'Ganti foto' : 'Pilih foto';
-        }
-
-        if (input) {
-            input.addEventListener('change', function () {
-                var file = input.files[0];
-                if (!file) return;
-                if (removeFlag) removeFlag.checked = false;
-                showPhoto(URL.createObjectURL(file));
-            });
-        }
-        if (removeBtn) {
-            // Silang pada foto: kosongkan pilihan file dan tandai hapus; baru berlaku saat Simpan
-            removeBtn.addEventListener('click', function () {
-                if (input) input.value = '';
-                if (removeFlag) removeFlag.checked = true;
-                showPhoto(null);
-            });
-        }
-        var bio = document.getElementById('{{ bio_form.bio.id_for_label }}');
-        var count = document.getElementById('bio-count');
-        if (bio && count) {
-            bio.addEventListener('input', function () { count.textContent = bio.value.length; });
-        }
-    })();
-</script>
+<script src="{% static_v 'js/profile.js' %}" defer></script>
 {% if password_form.errors or delete_form.errors %}
 <script>
     // Buka lagi dialog yang gagal divalidasi

@@ -9,11 +9,17 @@ CITY_CHOICES = [(city, city) for city in (
 )]
 
 
+# Petak sebagai foto profil: kode = nama wajah di smart_care/_petak_faces.html (data-k)
+PETAK_CHOICES = [('happy', 'Senang'), ('cheer', 'Semangat'), ('curious', 'Penasaran'), ('proud', 'Bangga')]
+
+
 class Profile(models.Model):
     """Foto dan deskripsi tambahan untuk User bawaan Django (dibuat saat pertama kali dibutuhkan)."""
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     avatar = models.ImageField(upload_to='avatars/', blank=True)
+    # Foto dari unggahan atau salah satu wajah Petak, tidak keduanya: memilih yang satu mengosongkan yang lain
+    avatar_petak = models.CharField(max_length=10, choices=PETAK_CHOICES, blank=True)
     bio = models.TextField(max_length=300, blank=True)
     city = models.CharField(max_length=50, choices=CITY_CHOICES, blank=True)
     # Kontak opsional dan pribadi: hanya pemiliknya yang melihat. Dipakai untuk mengisi kolom Kontak di Seed Exchange.
@@ -22,6 +28,20 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'Profil {self.user}'
+
+    @property
+    def has_avatar(self):
+        return bool(self.avatar or self.avatar_petak)
+
+    def completeness(self):
+        """[(label, terisi, id kolom yang dituju)] untuk meter kelengkapan di atas profil."""
+        return [
+            ('Foto', self.has_avatar, 'avatar-btn'),
+            ('Nama', bool(self.user.first_name.strip()), 'id_first_name'),
+            ('Kota', bool(self.city), 'id_city'),
+            ('Deskripsi', bool(self.bio.strip()), 'id_bio'),
+            ('Kontak', bool(self.whatsapp or self.instagram), 'id_whatsapp'),
+        ]
 
     @property
     def whatsapp_display(self):
