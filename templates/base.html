@@ -103,6 +103,13 @@
         document.querySelectorAll('.site-toast').forEach(function (el) {
             bootstrap.Toast.getOrCreateInstance(el).show();
         });
+        // A long dropdown opens already scrolled to the chosen option, so the current choice is never out of sight
+        document.addEventListener('shown.bs.dropdown', function (event) {
+            var menu = event.target.parentElement && event.target.parentElement.querySelector('.dropdown-menu');
+            var current = menu && menu.querySelector('.active, [aria-current="true"], [aria-selected="true"]');
+            if (!current || menu.scrollHeight <= menu.clientHeight) return;
+            menu.scrollTop = current.offsetTop - (menu.clientHeight - current.offsetHeight) / 2;
+        });
     </script>
     {% block extra_scripts %}{% endblock %}
 </body>
