@@ -1,4 +1,4 @@
-/* Module-only theme. Shared navigation and other modules keep their own styles. */
+
 body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-module #mep-main{background:linear-gradient(#fdf7e8 50%,#faefd5);min-width:0}
 .mep-content{max-width:1120px;margin:auto;padding:36px clamp(20px,4vw,56px) 48px}
@@ -151,3 +151,13 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-delete-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 16px; background: #fbe1d6; color: #a3301f; font-size: 2rem; }
 .mep-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 @media(max-width:480px) { .mep-delete-dialog { padding: 24px; } .mep-dialog-actions .btn { flex: 1 1 auto; } }
+
+/* Extend only the hero background behind the desktop sidebar.
+   Compensating padding keeps the title in its original, readable position. */
+@media (min-width: 768px) {
+  .mep-module.has-sidebar .mep-hero {
+    --mep-sidebar-offset: calc(var(--side-width, 248px) + var(--side-gap, 16px) * 2);
+    margin-left: calc(0px - var(--mep-sidebar-offset));
+    padding-left: calc(var(--mep-sidebar-offset) + clamp(20px, 4vw, 56px));
+  }
+}
