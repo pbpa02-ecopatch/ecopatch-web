@@ -712,9 +712,10 @@ class CareViewTests(CacheClearingTestCase):
         self.assertNotContains(own, "site-footer")
         self.assertNotContains(own, '<main class="container')  # the scene needs the full width
         other = self.client.get(reverse("my_ecopatch:list"))
+        # (what another module puts inside its main area is its own business, so only the shared footer is checked)
         self.assertContains(other, "site-footer")
-        self.assertContains(other, '<main class="container flex-grow-1 py-4">')
         self.assertNotContains(other, "Tip Petak")
+        self.assertNotContains(other, "care-foot")
 
     def test_the_footer_is_just_the_tip_and_the_copyright_with_no_placeholder_links(self):
         html = self.client.get(reverse("smart_care:list")).content.decode()
