@@ -776,13 +776,16 @@
     world.add(mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.48, 8), rm, x + 0.78, fl + 0.25, z + 0.08));
     world.add(mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.1, 10), mat(0xff9d2e, 0.5), x + 0.84, fl + 0.58, z + 0.08));
   }
-  function propLaundry(x, fl, z, k, c, rm) {
-    [-1, 1].forEach(function (s) { world.add(mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.4, 6), rm, x + s * 1.55, fl + 0.7, z)); });
-    world.add(mesh(bx(3.1, 0.025, 0.025), rm, x, fl + 1.38, z));
-    [[-1.0, 0.34, 0.46], [-0.4, 0.3, 0.4], [0.2, 0.4, 0.5], [0.9, 0.3, 0.38]].forEach(function (q, i) {
-      var cl = mesh(bx(q[1], q[2], 0.02), mat(clothCols[Math.floor(vr(k, c, 20 + i) * 5)], 0.9), x + q[0], fl + 1.38 - q[2] / 2, z, false);
-      cl.rotation.z = (vr(k, c, 30 + i) - 0.5) * 0.12;
+  /* washing is draped over the front railing, on the side the rail planter and hanging pot are not on.
+     A line standing 0.25 from the wall read as hanging on the door, and the front half of the balcony is full of plants. */
+  function propLaundry(x, y, side, k, c) {
+    var top = y + 1.2;
+    [[0.25, 0.34, 0.46], [0.7, 0.3, 0.4], [1.15, 0.4, 0.5], [1.58, 0.3, 0.38]].forEach(function (q, i) {
+      var cx = x + side * q[0], m = mat(clothCols[Math.floor(vr(k, c, 20 + i) * 5)], 0.9);
+      var cl = mesh(bx(q[1], q[2], 0.02), m, cx, top - q[2] / 2, 1.77, false);
+      cl.rotation.z = (vr(k, c, 30 + i) - 0.5) * 0.08;
       world.add(cl);
+      world.add(mesh(bx(q[1], 0.02, 0.14), m, cx, top + 0.005, 1.7, false)); /* the part folded over the rail */
     });
   }
   function propCrates(x, fl, z) {
@@ -835,7 +838,7 @@
       var pv = vr(k, c, 8);
       if (pv < 0.2) { /* an empty-looking balcony */ }
       else if (pv < 0.45) propChair(x + otherX * 0.9 - 0.4, fl, 0.45, chairCols[Math.floor(vr(k, c, 19) * 4)], rm);
-      else if (pv < 0.65) propLaundry(x, fl, 0.25, k, c, rm);
+      else if (pv < 0.65) propLaundry(x, y, pOff < 0 ? -1 : 1, k, c);
       else if (pv < 0.85) propCrates(x + otherX * 1.0, fl, 0.45);
       else propAC(x + 0.55, y);
     });
@@ -1659,13 +1662,14 @@
     { n: 'Sirih gading', c: 'Tanaman hias', s: 'low_light', d: 'easy', l: ['indoor'], y: 0 }
   ];
   var LBL = { full_sun: 'Cahaya penuh', low_light: 'Teduh', easy: 'Mudah', medium: 'Sedang', indoor: 'Indoor', outdoor: 'Outdoor' };
-  var STOP = /^(tanaman|yang|dan|oleh|untuk|di|dari|ke|dengan|anak|buat|cari|carikan|saya|aku|ingin|mau|apa|dirawat|merawat|rawat|perawatan|ruang|ruangan|kamar|nya|atau|tapi|bisa|yg)$/;
+  var STOP = /^(tanaman|yang|dan|oleh|untuk|di|dari|ke|dengan|anak|buat|cari|carikan|saya|aku|ingin|mau|apa|apakah|dirawat|merawat|rawat|perawatan|ruang|ruangan|kamar|nya|atau|tapi|bisa|yg|cocok|ada|ya|dong|sebaiknya|paling)$/;
   /* read a sentence the way a person means it: "mudah dirawat", "anak kos", "menghasilkan" */
   function readQuery(text) {
     var s = ' ' + text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ') + ' ', hit = { want: {}, notes: [], rest: [] };
     function take(re, fn, note) { if (re.test(s)) { s = s.replace(re, ' '); fn(); if (note) hit.notes.push(note); } }
     take(/\s(menghasilkan|dipanen|panen|produktif|bisa dimakan|dimakan|konsumsi)\s/g, function () { hit.want.y = 1; }, 'bisa dipanen');
     take(/\s(mudah|gampang|pemula|tahan lupa|ga ribet|nggak ribet)\s/g, function () { hit.want.d = 'easy'; }, 'mudah dirawat');
+    take(/\s(perawatan sedang|sedang dirawat)\s/g, function () { hit.want.d = 'medium'; }, 'perawatan sedang');
     take(/\s(kos|kost|kamar|dalam ruangan|dalam rumah|indoor|apartemen)\s/g, function () { hit.want.l = 'indoor'; }, 'indoor');
     take(/\s(balkon|teras|halaman|outdoor|luar ruangan|rooftop|atap)\s/g, function () { hit.want.l = 'outdoor'; }, 'outdoor');
     take(/\s(teduh|minim cahaya|kurang cahaya|gelap|redup)\s/g, function () { hit.want.s = 'low_light'; }, 'teduh');
@@ -1693,7 +1697,7 @@
   }
   var fres = $('#fres');
   function metaOf(p) { return [LBL[p.s], LBL[p.d], p.l.map(function (x) { return LBL[x]; }).join(' / ')].join(' · '); }
-  function esc(t) { return String(t).replace(/[&<>"]/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]; }); }
+  function esc(t) { return String(t).replace(/[&<>"']/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]; }); }
   function anyInput() { return q.value.trim() || chips.some(isSel); }
   function renderResults(force) {
     if (!fres) return;
@@ -1728,6 +1732,17 @@
       return;
     }
     renderResults(true);
+  });
+
+  /* ---------- suggested questions: one tap puts a ready-made question in the box and asks it ---------- */
+  $$('.ask-chip', finder).forEach(function (b) {
+    b.addEventListener('click', function () {
+      chips.filter(isSel).forEach(function (c) { setSel(c, false); });
+      groups.forEach(function (g) { g.classList.remove('done'); });
+      q.value = b.getAttribute('data-ask') || b.textContent.trim();
+      cheer();
+      if (finder.requestSubmit) finder.requestSubmit(); else finder.dispatchEvent(new Event('submit', { cancelable: true }));
+    });
   });
 
   /* ---------- fitur: four name cards on a clothesline ---------- */
