@@ -153,7 +153,10 @@ body.mep-module{background:#fdf7e8;color:#17301f}
   body.has-sidebar.mep-module{padding-left:0}
   .mep-module{--mep-offset:calc(var(--side-width) + var(--side-gap) * 2)}
 }
-.mep-module .site-footer{padding-left:calc(var(--mep-offset,0px) + 20px)}
+/* The footer continues the page: same colour as where the page gradient ends, and the line sits in the same column as the content */
+.mep-module .site-footer{padding:0;background:#faefd5;text-align:left}
+.mep-module .site-footer-copy{max-width:calc(1120px + var(--mep-offset,0px));margin:0 auto;
+  padding:18px clamp(20px,4vw,56px) 28px calc(var(--mep-offset,0px) + clamp(20px,4vw,56px))}
 .mep-hero{position:relative;isolation:isolate;overflow:hidden;min-height:clamp(390px,46vh,480px);border-bottom:3px solid #d8c48d;
   background:radial-gradient(70% 90% at 76% 78%,#fff0c8a6 0%,transparent 62%),linear-gradient(180deg,#fff4dc 0%,#eef8e2 46%,#dff2d4 100%)}
 .mep-hero-art{position:absolute;inset:0;z-index:0;pointer-events:none}
