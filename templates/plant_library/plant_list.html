@@ -161,10 +161,6 @@
             <div class="plant-results">
                 <p class="plant-results-count">
                     Menampilkan <strong>{{ plants|length }}</strong> tanaman
-                    {% if query %}<span class="plant-results-read">&middot; &ldquo;{{ query }}&rdquo;</span>{% endif %}
-                    {% if derived_labels %}
-                        <span class="plant-results-read">Dibaca sebagai: {{ derived_labels|join:", " }}</span>
-                    {% endif %}
                 </p>
                 {% if has_active_filters %}
                     <a href="{% url 'plant_library:plant_list' %}" class="plant-results-reset">
