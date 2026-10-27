@@ -3,6 +3,25 @@ from .models import Plant
 
 
 class PlantForm(forms.ModelForm):
+    # Django's default "---------" reads like a broken dropdown; give each one a cue.
+    EMPTY_LABELS = {
+        'category': 'Pilih kategori',
+        'sunlight': 'Pilih cahaya',
+        'watering': 'Pilih frekuensi',
+        'difficulty': 'Pilih kesulitan',
+        'indoor_outdoor': 'Pilih penempatan',
+        'space_requirement': 'Pilih kebutuhan ruang',
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, label in self.EMPTY_LABELS.items():
+            field = self.fields[name]
+            choices = list(field.choices)
+            if choices and choices[0][0] == '':
+                choices[0] = ('', label)
+            field.choices = choices
+
     class Meta:
         model = Plant
         fields = [
