@@ -123,8 +123,7 @@ class GardenUITests(TestCase):
     def test_every_ecopatch_card_has_a_delete_link_that_falls_back_to_the_confirmation_page(self):
         response = self.client.get(self.url('list'))
         self.assertContains(response, 'href="%s"' % self.url('delete', self.patch.pk))
-        self.assertContains(response, 'data-mep-delete="Balkon Hijau"')
-        self.assertContains(response, 'id="mep-delete-form"')
+        self.assertContains(response, 'data-confirm-delete data-confirm-title="Hapus EcoPatch?" data-confirm-name="Balkon Hijau"')
 
     def test_empty_and_invalid_form(self):
         self.client.force_login(self.other)

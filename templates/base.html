@@ -111,6 +111,9 @@
             menu.scrollTop = current.offsetTop - (menu.clientHeight - current.offsetHeight) / 2;
         });
     </script>
+    {# Every delete pop-up posts through this form: the CSRF cookie is HttpOnly, so the token has to come from here #}
+    <form id="site-delete-form" method="post" hidden>{% csrf_token %}</form>
+    <script src="{% static_v 'js/confirm-delete.js' %}" defer></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

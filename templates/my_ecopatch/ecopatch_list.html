@@ -18,7 +18,7 @@
   <div class="mep-map">
     {% for patch in patches %}
     <article class="mep-garden">
-    <a class="mep-trash" href="{% url 'my_ecopatch:delete' patch.pk %}" data-mep-delete="{{ patch.name }}" data-delete-url="{% url 'my_ecopatch:delete' patch.pk %}"
+    <a class="mep-trash" href="{% url 'my_ecopatch:delete' patch.pk %}" data-confirm-delete data-confirm-title="Hapus EcoPatch?" data-confirm-name="{{ patch.name }}" data-confirm-note="Semua tanaman di dalamnya ikut terhapus. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus EcoPatch"
        aria-label="Hapus EcoPatch {{ patch.name }}" title="Hapus EcoPatch">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>
     </a>
@@ -36,7 +36,6 @@
     <a class="mep-add-bed" href="{% url 'my_ecopatch:create' %}"><span aria-hidden="true">+</span><strong>Buat EcoPatch Baru</strong><small>Sediakan ruang untuk tumbuh</small></a>
   </div>
   <aside class="mep-seed-tray"><div><p class="mep-eyebrow">BIBIT IDE</p><h2 class="patch-section-title">Selanjutnya, mau menanam apa?</h2><p>Temukan tanaman yang cocok, lalu tambahkan ke kebun pilihanmu.</p></div><a class="btn btn-outline-success" href="{% url 'plant_library:plant_list' %}">Jelajahi Plant Library ↗</a></aside>
-  <form id="mep-delete-form" method="post" hidden>{% csrf_token %}</form>
   <p class="patch-help">Jumlah tanaman menjumlahkan kuantitas. Entri dan label status menghitung catatan tanaman, termasuk Planned dan Removed.</p>
 </div>
 {% endblock %}

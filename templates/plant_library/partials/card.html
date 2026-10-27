@@ -94,7 +94,7 @@
                         <path d="M16.5 4.5 19.5 7.5 8 19H5v-3L16.5 4.5Z"/><path d="m14.5 6.5 3 3"/>
                     </svg>
                 </a>
-                <a href="{% url 'plant_library:plant_delete' plant.pk %}" class="plant-tool plant-tool--danger" title="Hapus {{ plant.name }}" aria-label="Hapus {{ plant.name }}">
+                <a href="{% url 'plant_library:plant_delete' plant.pk %}" class="plant-tool plant-tool--danger" data-confirm-delete data-confirm-title="Hapus tanaman dari katalog?" data-confirm-name="{{ plant.name }}" data-confirm-note="Tanaman ini hilang dari katalog untuk semua orang. Kalau masih dipakai di EcoPatch seseorang, penghapusan ditolak." data-confirm-yes="Ya, hapus tanaman" title="Hapus {{ plant.name }}" aria-label="Hapus {{ plant.name }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>
                     </svg>

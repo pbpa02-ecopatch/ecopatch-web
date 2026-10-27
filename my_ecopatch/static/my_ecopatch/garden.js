@@ -118,44 +118,6 @@
     const rect = dialog.getBoundingClientRect();
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close('cancel');
   });
-  // Delete a whole EcoPatch from the list: the same themed confirmation, then a POST to the delete address.
-  // Without <dialog> or JavaScript the link simply opens the confirmation page.
-  const patchDialog = document.createElement('dialog');
-  patchDialog.className = 'mep-delete-dialog';
-  patchDialog.setAttribute('aria-labelledby', 'mep-patch-delete-title');
-  patchDialog.setAttribute('aria-describedby', 'mep-patch-delete-copy');
-  patchDialog.innerHTML = '<form method="dialog"><span class="mep-delete-icon" aria-hidden="true">×</span><h2 id="mep-patch-delete-title">Hapus EcoPatch?</h2><p id="mep-patch-delete-copy"></p><p class="patch-help">Semua tanaman di dalamnya ikut terhapus. Tindakan ini tidak bisa dibatalkan.</p><div class="mep-dialog-actions"><button class="btn btn-outline-success" value="cancel" autofocus>Batal</button><button class="btn btn-success patch-btn-danger" value="delete">Ya, hapus EcoPatch</button></div></form>';
-  document.body.append(patchDialog);
-  let pendingPatchDelete = null;
-  let patchDeleteTrigger = null;
-  document.addEventListener('click', event => {
-    const link = event.target.closest('[data-mep-delete]');
-    if (!link || !patchDialog.showModal || !document.getElementById('mep-delete-form')) return;
-    event.preventDefault();
-    pendingPatchDelete = link.dataset.deleteUrl;
-    patchDeleteTrigger = link;
-    patchDialog.querySelector('#mep-patch-delete-copy').textContent = 'Hapus "' + link.dataset.mepDelete + '" dari kebunmu?';
-    patchDialog.returnValue = 'cancel';
-    patchDialog.showModal();
-  });
-  patchDialog.addEventListener('close', () => {
-    const url = pendingPatchDelete;
-    pendingPatchDelete = null;
-    if (patchDialog.returnValue === 'delete' && url) {
-      const form = document.getElementById('mep-delete-form');
-      form.action = url;
-      form.submit();
-    } else if (patchDeleteTrigger?.isConnected) {
-      patchDeleteTrigger.focus({preventScroll: true});
-    }
-  });
-  patchDialog.addEventListener('cancel', () => { patchDialog.returnValue = 'cancel'; });
-  patchDialog.addEventListener('click', event => {
-    if (event.target !== patchDialog) return;
-    const rect = patchDialog.getBoundingClientRect();
-    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) patchDialog.close('cancel');
-  });
-
   let focusId = null;
   const error = () => document.getElementById('mep-network');
   document.addEventListener('htmx:beforeRequest', event => {

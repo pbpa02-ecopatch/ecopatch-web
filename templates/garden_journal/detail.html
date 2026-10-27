@@ -93,7 +93,7 @@
                     Edit Catatan
                 </a>
                 <form method="post" action="{% url 'garden_journal:delete' journal.pk %}"
-                      onsubmit="return confirm('Yakin ingin menghapus catatan ini?')">
+                      onsubmit="return window.siteConfirmDelete ? true : confirm('Yakin ingin menghapus catatan ini?')" data-confirm-delete data-confirm-title="Hapus catatan?" data-confirm-name="{{ journal.title }}" data-confirm-note="Catatan ini dihapus selamanya. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus catatan">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-ds-danger">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
