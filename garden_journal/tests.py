@@ -114,6 +114,30 @@ class GardenJournalViewTests(TestCase):
         self.assertEqual(response_empty.status_code, 200)
         self.assertNotContains(response_empty, "Cabai")
 
+    def test_list_filter_preserves_search_and_offers_reset(self):
+        GardenJournal.objects.create(
+            user=self.user,
+            title="Catatan Melati",
+            date=date.today(),
+            notes="Tes catatan",
+            plant_condition="flowering",
+            plant_name="Melati",
+            ecopatch_name="Balkon",
+        )
+        self.client.login(username="azizah", password="password123")
+        response = self.client.get(
+            reverse("garden_journal:list"),
+            {"ecopatch_name": "Teras", "plant_name": "Cabai"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Buka buku Cabai")
+        self.assertNotContains(response, "Buka buku Melati")
+        self.assertContains(response, "journal-filter--active")
+        # Reset clears dropdown filters but keeps the typed search.
+        self.assertContains(response, 'href="/journal/?plant_name=Cabai"')
+        # Clearing the search keeps the dropdown filters.
+        self.assertContains(response, 'href="/journal/?ecopatch_name=Teras"')
+
     def test_plant_history_view(self):
         self.client.login(username="azizah", password="password123")
         response = self.client.get(reverse("garden_journal:plant_history", args=["Cabai"]))
