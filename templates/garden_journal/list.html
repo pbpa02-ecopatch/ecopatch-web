@@ -5,7 +5,7 @@
 {% block body_class %} journal-body{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=7.0">
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=7.1">
 {% endblock %}
 
 {% block main %}
@@ -140,63 +140,82 @@
     <!-- Lower Sheet Content: Filter & Search Bar + Book Shelf -->
     <div class="journal-sheet-body">
         <div class="container py-4">
-            <!-- Filter & Search Bar -->
-            <form id="filter-form" class="d-flex flex-wrap align-items-center gap-2 mb-4 {% if not books and not total_user_journals %}d-none{% endif %}">
-                <!-- Filter EcoPatch -->
-                <div class="filter-pill-btn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#556b4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" aria-hidden="true"><path d="M7 10h10l-1.5 9h-7z"/><path d="M12 10V4"/><path d="M8 6c0-1.1 1.8-2 4-2s4 .9 4 2"/></svg>
-                    <select name="ecopatch_name" id="id_ecopatch" class="filter-pill-select"
-                            hx-get="{% url 'garden_journal:filter_ajax' %}"
-                            hx-target="#book-shelf-container"
-                            hx-trigger="change"
-                            hx-include="#filter-form"
-                            aria-label="Filter EcoPatch">
-                        <option value="">Semua EcoPatch</option>
-                        {% for ep in ecopatch_names %}
-                            <option value="{{ ep }}" {% if selected_ecopatch_name == ep %}selected{% endif %}>
-                                {{ ep }}
-                            </option>
-                        {% endfor %}
-                    </select>
+            {% url 'garden_journal:list' as journal_list_url %}
+            {% if books or total_user_journals %}
+            <!-- Search Bar (full width, mirrors Seed Exchange) -->
+            <div class="journal-search-bar">
+                <form method="get" action="{{ journal_list_url }}"
+                      hx-get="{{ journal_list_url }}"
+                      hx-target="#journal-filters-shelf" hx-select="#journal-filters-shelf" hx-swap="outerHTML"
+                      hx-push-url="true" hx-trigger="submit" hx-include="#journal-active-params">
+                    <span class="journal-search-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <path d="m20 20-3.2-3.2"></path>
+                        </svg>
+                    </span>
+                    <input id="journal-q" class="journal-search-input" type="search" name="plant_name"
+                           value="{{ selected_plant_name }}" placeholder="Cari tanaman di rak bukumu..."
+                           aria-label="Cari tanaman"
+                           hx-get="{{ journal_list_url }}"
+                           hx-target="#journal-filters-shelf" hx-select="#journal-filters-shelf" hx-swap="outerHTML"
+                           hx-push-url="true" hx-trigger="keyup changed delay:400ms, search"
+                           hx-include="#journal-active-params">
+                    <a id="journal-search-clear" class="journal-search-clear" href="{{ search_clear_url }}"
+                       aria-label="Hapus pencarian"{% if not selected_plant_name %} hidden{% endif %}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </a>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Filters + shelf share one HTMX target so both stay in sync. -->
+            <div id="journal-filters-shelf">
+                <div id="journal-active-params" hidden>
+                    {% if selected_ecopatch_name %}<input type="hidden" name="ecopatch_name" value="{{ selected_ecopatch_name }}">{% endif %}
+                    {% if selected_condition %}<input type="hidden" name="condition" value="{{ selected_condition }}">{% endif %}
                 </div>
 
-                <!-- Filter Kondisi Tanaman -->
-                <div class="filter-pill-btn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#556b4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" aria-hidden="true"><path d="M11 20A7 7 0 0 1 4 13C4 8 8 3 13 3c0 7-3 10-2 17Z"/><path d="M8 12c3-1 6-1 9 1"/></svg>
-                    <select name="condition" id="id_condition" class="filter-pill-select"
-                            hx-get="{% url 'garden_journal:filter_ajax' %}"
-                            hx-target="#book-shelf-container"
-                            hx-trigger="change"
-                            hx-include="#filter-form"
-                            aria-label="Filter Kondisi">
-                        <option value="">Semua Kondisi</option>
-                        {% for val, label in conditions %}
-                            <option value="{{ val }}" {% if selected_condition == val %}selected{% endif %}>
-                                {{ label }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
+                {% if books or total_user_journals %}
+                <form id="journal-filter-form" class="journal-filters" method="get" action="{{ journal_list_url }}">
+                    {% for dd in filter_dropdowns %}
+                    <div class="dropdown">
+                        <button type="button" class="journal-filter dropdown-toggle{% if dd.is_active %} journal-filter--active{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if dd.is_active %}<span class="journal-filter-dot" aria-hidden="true"></span>{% endif %}
+                            {{ dd.current_label }}
+                        </button>
+                        <ul class="dropdown-menu journal-menu">
+                            {% for item in dd.items %}
+                            <li>
+                                <a class="dropdown-item journal-menu-item{% if item.selected %} active{% endif %}"
+                                   href="{{ item.url }}"
+                                   hx-get="{{ item.url }}"
+                                   hx-target="#journal-filters-shelf" hx-select="#journal-filters-shelf" hx-swap="outerHTML"
+                                   hx-push-url="true">
+                                    {{ item.label }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
 
-                <!-- Live Search Tanaman -->
-                <div class="filter-pill-btn ms-auto">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#798a72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" name="plant_name"
-                           class="border-0 bg-transparent text-dark small"
-                           style="outline: none; width: 140px;"
-                           placeholder="Cari tanaman..."
-                           value="{{ selected_plant_name }}"
-                           hx-get="{% url 'garden_journal:filter_ajax' %}"
-                           hx-target="#book-shelf-container"
-                           hx-trigger="keyup changed delay:350ms"
-                           hx-include="#filter-form"
-                           aria-label="Cari tanaman">
-                </div>
-            </form>
+                    {% if has_active_filters %}
+                    <a class="journal-filter-reset" href="{{ filters_reset_url }}"
+                       hx-get="{{ filters_reset_url }}"
+                       hx-target="#journal-filters-shelf" hx-select="#journal-filters-shelf" hx-swap="outerHTML"
+                       hx-push-url="true" aria-label="Reset filter">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        Reset
+                    </a>
+                    {% endif %}
+                </form>
+                {% endif %}
 
-            <!-- Book Shelf Container (HTMX Target) -->
-            <div id="book-shelf-container">
-                {% include "garden_journal/partials/book_grid.html" %}
+                <!-- Book Shelf Container (HTMX Target) -->
+                <div id="book-shelf-container">
+                    {% include "garden_journal/partials/book_grid.html" %}
+                </div>
             </div>
 
             <!-- Minimal Bottom Footer (Matching Example) -->
@@ -223,6 +242,32 @@
     }
     applyBookCoverColors();
     document.addEventListener('htmx:afterSwap', applyBookCoverColors);
+
+    (function () {
+        var input = document.getElementById('journal-q');
+        var clear = document.getElementById('journal-search-clear');
+        if (!input || !clear) return;
+
+        function sync() {
+            clear.hidden = input.value.trim() === '';
+        }
+
+        input.addEventListener('input', sync);
+        input.addEventListener('search', sync);
+
+        clear.addEventListener('click', function (event) {
+            input.value = '';
+            sync();
+            if (window.htmx) {
+                // Re-run the search with an empty query in place.
+                event.preventDefault();
+                input.focus();
+                input.dispatchEvent(new Event('search', { bubbles: true }));
+            }
+        });
+
+        sync();
+    })();
 </script>
 {% endblock %}
 

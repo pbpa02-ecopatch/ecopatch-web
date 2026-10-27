@@ -3342,3 +3342,221 @@ body.has-sidebar.journal-body {
 
 
 
+
+/* =========================================================
+   JOURNAL BROWSER � search bar + dropdown filters
+   Mirrors the Seed Exchange list so both shelves behave the
+   same: search on top, plain pill dropdowns underneath.
+   ========================================================= */
+.journal-search-bar {
+    margin-bottom: 14px;
+}
+
+.journal-search-bar form {
+    position: relative;
+}
+
+.journal-search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    transform: translateY(-50%);
+    color: var(--ink-muted);
+    pointer-events: none;
+}
+
+.journal-search-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.journal-search-input {
+    width: 100%;
+    height: 52px;
+    padding: 0 48px;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    background: #fffdf6;
+    color: var(--ink);
+    font: 500 1rem var(--font-body);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.journal-search-input::placeholder {
+    color: var(--ink-muted);
+    font-weight: 500;
+}
+
+.journal-search-input:focus {
+    outline: none;
+    border-color: var(--btn-primary-bg);
+    box-shadow: 0 0 0 4px rgba(31, 145, 66, 0.16);
+}
+
+.journal-search-input::-webkit-search-cancel-button,
+.journal-search-input::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.journal-search-input::-ms-clear {
+    display: none;
+}
+
+.journal-search-clear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-muted);
+    transform: translateY(-50%);
+    cursor: pointer;
+    transition: background-color 0.18s, color 0.18s, transform 0.12s;
+}
+
+.journal-search-clear svg {
+    width: 16px;
+    height: 16px;
+}
+
+.journal-search-clear:hover,
+.journal-search-clear:focus-visible {
+    background: #eaf5ea;
+    color: var(--btn-secondary-fg);
+    outline: none;
+}
+
+.journal-search-clear:active {
+    transform: translateY(-50%) scale(0.94);
+}
+
+.journal-search-clear[hidden] {
+    display: none;
+}
+
+.journal-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.journal-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 16px;
+    border: 1.5px solid rgba(182, 154, 99, 0.38);
+    border-radius: 999px;
+    background: #fffdf6;
+    color: var(--ink-muted);
+    font: 700 0.88rem/1 var(--font-body);
+    max-width: 100%;
+    transition: background-color 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.journal-filter::after {
+    margin-left: 2px;
+}
+
+.journal-filter:hover {
+    border-color: var(--btn-secondary-fg);
+    color: var(--btn-secondary-fg);
+}
+
+.journal-filter:focus {
+    outline: none;
+    border-color: var(--btn-secondary-fg);
+    box-shadow: 0 0 0 4px rgba(31, 145, 66, 0.24);
+}
+
+.journal-filter--active {
+    border-color: var(--btn-secondary-fg);
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-fg);
+}
+
+.journal-filter-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--btn-primary-bg);
+}
+
+.journal-menu {
+    min-width: 190px;
+    padding: 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    background: #fffdf6;
+    box-shadow: 0 18px 36px -18px rgba(34, 48, 31, 0.45);
+}
+
+.journal-menu-item {
+    padding: 9px 12px;
+    border-radius: 12px;
+    color: var(--ink);
+    font: 600 0.92rem/1.3 var(--font-body);
+}
+
+.journal-menu-item:hover,
+.journal-menu-item:focus-visible {
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-fg);
+}
+
+.journal-menu-item.active {
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-fg);
+    font-weight: 800;
+}
+
+.journal-filter-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 14px;
+    border: 1.5px dashed #b9a46a;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-muted);
+    font: 700 0.88rem/1 var(--font-body);
+    text-decoration: none;
+    transition: background-color 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.journal-filter-reset:hover,
+.journal-filter-reset:focus-visible {
+    border-color: var(--badge-danger-fg);
+    background: var(--badge-danger-bg);
+    color: var(--badge-danger-fg);
+    outline: none;
+}
+
+@media (max-width: 576px) {
+    .journal-search-input {
+        padding: 0 44px;
+        font-size: 0.95rem;
+    }
+
+    .journal-search-icon {
+        left: 14px;
+    }
+}

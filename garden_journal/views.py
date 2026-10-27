@@ -1,15 +1,67 @@
 from datetime import timedelta
+from urllib.parse import urlencode
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import GardenJournalForm
 from .models import GardenJournal
+
+
+def _journal_filter_url(active, **changes):
+    """Build a list URL, keeping every other active filter intact."""
+    params = {key: value for key, value in active.items() if value}
+    for key, value in changes.items():
+        if value:
+            params[key] = value
+        else:
+            params.pop(key, None)
+    query = urlencode(params)
+    base = reverse("garden_journal:list")
+    return f"{base}?{query}" if query else base
+
+
+def _journal_filter_dropdowns(active, ecopatch_names, conditions):
+    """Dropdown options in the same shape the Seed Exchange filter uses."""
+    config = [
+        ("ecopatch_name", "Semua EcoPatch", [(name, name) for name in ecopatch_names]),
+        ("condition", "Semua Kondisi", list(conditions)),
+    ]
+    dropdowns = []
+    for name, all_label, options in config:
+        labels = dict(options)
+        current = active.get(name, "")
+        items = [
+            {
+                "label": all_label,
+                "url": _journal_filter_url(active, **{name: ""}),
+                "selected": not current,
+            }
+        ]
+        for value, label in options:
+            items.append(
+                {
+                    "label": label,
+                    "url": _journal_filter_url(active, **{name: value}),
+                    "selected": current == value,
+                }
+            )
+        dropdowns.append(
+            {
+                "name": name,
+                "current_label": labels.get(current, all_label),
+                "items": items,
+                "is_active": bool(current),
+            }
+        )
+    return dropdowns
 
 
 def _get_filtered_journals(request):
@@ -122,11 +174,17 @@ def journal_list(request):
     user_plants = _get_user_patch_plants(request.user)
     has_planned_plants = _has_planned_plants(request.user)
 
-    ecopatch_names = (
+    ecopatch_names = list(
         user_journals.exclude(ecopatch_name="")
         .values_list("ecopatch_name", flat=True)
         .distinct()
+        .order_by("ecopatch_name")
     )
+    active = {
+        "ecopatch_name": request.GET.get("ecopatch_name", "").strip(),
+        "plant_name": request.GET.get("plant_name", "").strip(),
+        "condition": request.GET.get("condition", "").strip(),
+    }
 
     today = timezone.localdate()
     last_7_dates = [today - timedelta(days=i) for i in range(6, -1, -1)]
@@ -155,9 +213,17 @@ def journal_list(request):
         "last_7_days": last_7_days,
         "ecopatch_names": ecopatch_names,
         "conditions": GardenJournal.CONDITION_CHOICES,
-        "selected_ecopatch_name": request.GET.get("ecopatch_name", ""),
-        "selected_plant_name": request.GET.get("plant_name", ""),
-        "selected_condition": request.GET.get("condition", ""),
+        "filter_dropdowns": _journal_filter_dropdowns(
+            active, ecopatch_names, GardenJournal.CONDITION_CHOICES
+        ),
+        "has_active_filters": bool(active["ecopatch_name"] or active["condition"]),
+        "filters_reset_url": _journal_filter_url(
+            active, ecopatch_name="", condition=""
+        ),
+        "search_clear_url": _journal_filter_url(active, plant_name=""),
+        "selected_ecopatch_name": active["ecopatch_name"],
+        "selected_plant_name": active["plant_name"],
+        "selected_condition": active["condition"],
         "date_from": request.GET.get("date_from", ""),
         "date_to": request.GET.get("date_to", ""),
         "has_ecopatch": has_ecopatch,
