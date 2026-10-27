@@ -486,11 +486,19 @@ body.has-sidebar.seed-body {
     position: absolute;
     left: 16px;
     top: 50%;
+    display: grid;
+    place-items: center;
     width: 20px;
     height: 20px;
     transform: translateY(-50%);
     color: var(--seed-muted);
     pointer-events: none;
+}
+
+.seed-search-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .seed-search-input {
@@ -1415,7 +1423,7 @@ button.seed-filter {
     padding: 22px;
     border: 1.5px solid var(--seed-line);
     border-radius: 30px;
-    background: linear-gradient(180deg, #fffdf6 0%, #faf4e3 100%);
+    background: #fffdf6;
     box-shadow: 0 30px 60px -34px rgba(23, 48, 31, 0.45), inset 0 1px 0 #fff;
 }
 
@@ -1445,9 +1453,7 @@ button.seed-filter {
     aspect-ratio: 4 / 3;
     overflow: hidden;
     border-radius: 20px;
-    background:
-        radial-gradient(circle at 82% 8%, rgba(255, 255, 255, 0.55), transparent 52%),
-        linear-gradient(150deg, var(--seed-brand-soft), #f6e9c8);
+    background: var(--seed-brand-soft);
     box-shadow: inset 0 0 0 1px rgba(23, 48, 31, 0.08);
 }
 
