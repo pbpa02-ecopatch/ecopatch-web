@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 
 from main.models import Profile
 
@@ -177,6 +178,8 @@ def listing_list(request):
 
     context = {
         'listings': listings,
+        # all of the user's listings, filters aside: the empty Jelajahi uses it to say where theirs are
+        'own_listing_total': SeedExchange.objects.filter(user=request.user).count(),
         'my_listings': my_listings,
         'my_bookings': my_bookings,
         'active': active,
@@ -195,6 +198,17 @@ def listing_list(request):
         return render(request, 'seed_exchange/partials/tabs_content.html', context)
 
     return render(request, 'seed_exchange/list.html', context)
+
+
+def _back_to_my_listings(request):
+    """After making, editing or deleting a listing, "back to the list" means Listing Saya.
+
+    The browse tab never shows your own listings, so sending people there made a listing they had just saved
+    look as if it had vanished. Returns the URL, which the detail page's back link also reads from the session.
+    """
+    url = f"{reverse('seed_exchange:list')}?tab=mine"
+    request.session['seed_exchange_last_list'] = url
+    return url
 
 
 @login_required
@@ -238,13 +252,12 @@ def listing_detail(request, pk):
 def _location_context(profile, form):
     """Values shown by the read-only location card on the listing form.
 
-    A new listing starts with the profile's city and contact; an existing
-    listing keeps the contact it was published with. When the listing has no
-    value yet we fall back to the profile so the field can still be completed
-    without leaving the form.
+    City and contact are never typed here: they come from the profile (the
+    listing's old copy is only the fallback), so this card just shows what the
+    listing will carry and points to the profile when something is missing.
     """
-    city = form['city'].value() or profile.city or ''
-    contact = form['contact'].value() or profile.contact_text() or ''
+    city = profile.city or form.instance.city or ''
+    contact = profile.contact_text() or form.instance.contact or ''
     return {
         'location_city': city,
         'location_contact': contact,
@@ -256,7 +269,7 @@ def _location_context(profile, form):
 def listing_create(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
-        form = SeedExchangeForm(request.POST, request.FILES, create=True)
+        form = SeedExchangeForm(request.POST, request.FILES, create=True, profile=profile)
         if form.is_valid():
             listing = form.save(commit=False)
             listing.user = request.user
@@ -264,14 +277,10 @@ def listing_create(request):
             listing.status = SeedExchange.Status.AVAILABLE
             listing.save()
             messages.success(request, 'Listing berhasil dibuat.')
+            _back_to_my_listings(request)
             return redirect('seed_exchange:detail', pk=listing.pk)
     else:
-        # New listings inherit the contact the user saved on their profile
-        # (WhatsApp / Instagram); it can still be changed per listing.
-        form = SeedExchangeForm(create=True, initial={
-            'city': profile.city,
-            'contact': profile.contact_text(),
-        })
+        form = SeedExchangeForm(create=True, profile=profile)
     return render(request, 'seed_exchange/form.html', {
         'form': form,
         'rows': _form_rows(form),
@@ -286,15 +295,14 @@ def listing_update(request, pk):
     profile, _ = Profile.objects.get_or_create(user=request.user)
     listing = get_object_or_404(SeedExchange, pk=pk, user=request.user)
     if request.method == 'POST':
-        form = SeedExchangeForm(request.POST, request.FILES, instance=listing)
+        form = SeedExchangeForm(request.POST, request.FILES, instance=listing, profile=profile)
         if form.is_valid():
             form.save()
             messages.success(request, 'Listing berhasil diperbarui.')
+            _back_to_my_listings(request)
             return redirect('seed_exchange:detail', pk=listing.pk)
     else:
-        # Keep the contact this listing was published with; the profile only
-        # fills in when the listing does not have one yet.
-        form = SeedExchangeForm(instance=listing)
+        form = SeedExchangeForm(instance=listing, profile=profile)
     return render(request, 'seed_exchange/form.html', {
         'form': form,
         'rows': _form_rows(form),
@@ -311,7 +319,7 @@ def listing_delete(request, pk):
     if request.method == 'POST':
         listing.delete()
         messages.success(request, 'Listing berhasil dihapus.')
-        return redirect('seed_exchange:list')
+        return redirect(_back_to_my_listings(request))
     return render(request, 'seed_exchange/confirm_delete.html', {'listing': listing})
 
 
@@ -328,11 +336,16 @@ def listing_reserve(request, pk):
         return HttpResponseForbidden('Tidak bisa memesan listing sendiri.')
     if request.method != 'POST':
         return redirect('seed_exchange:detail', pk=pk)
-    if listing.status != SeedExchange.Status.AVAILABLE:
+    # One conditional UPDATE instead of read-then-save: when two people press "Booking" at
+    # the same moment only the first claims it, the second gets the "already taken" answer
+    # rather than silently overwriting the first requester.
+    claimed = SeedExchange.objects.filter(pk=pk, status=SeedExchange.Status.AVAILABLE).update(
+        status=SeedExchange.Status.REQUESTED,
+        reserved_by=request.user,
+        updated_at=timezone.now(),
+    )
+    if not claimed:
         return HttpResponseBadRequest('Listing sudah tidak available.')
-    listing.status = SeedExchange.Status.REQUESTED
-    listing.reserved_by = request.user
-    listing.save(update_fields=['status', 'reserved_by', 'updated_at'])
     if _is_htmx(request):
         return _render_card(request, listing)
     messages.success(request, f'Booking "{listing.title}" terkirim. Tunggu konfirmasi pemilik ya.')
@@ -412,15 +425,12 @@ def listing_cancel_reserve(request, pk):
 def _form_rows(form):
     """Form rows for template: [{field, select: {value, display, options, required}}].
 
-    City and contact are not rendered as normal fields: they live in the profile
-    and are submitted through hidden inputs inside the location card.
+    City and contact are not form fields at all: they live in the profile and
+    the location card only shows them.
     """
     select_names = {'item_type', 'transaction_type', 'status'}
-    hidden_names = {'city', 'contact'}
     rows = []
     for bound_field in form:
-        if bound_field.name in hidden_names:
-            continue
         select = None
         if bound_field.name in select_names:
             value = bound_field.value()
