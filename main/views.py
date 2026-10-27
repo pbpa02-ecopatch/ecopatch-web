@@ -13,8 +13,8 @@ from django.views.static import serve
 
 from .auth_forms import EcoPasswordResetForm, RegisterForm
 
-from .forms import AvatarForm, BioForm, ChangePasswordForm, ContactForm, DeleteAccountForm, UserForm
-from .models import Profile
+from .forms import AvatarForm, BioForm, ChangePasswordForm, ContactForm, UserForm
+from .models import PETAK_CHOICES, Profile
 
 
 def media(request, path):
@@ -64,41 +64,38 @@ def register(request):
 
 @login_required
 def profile(request):
+    # Aturan dan pesan password bawaan Django, dalam bahasa Indonesia (seperti halaman daftar)
+    with translation.override('id'):
+        return _profile(request)
+
+
+def _profile(request):
     profile_obj, _ = Profile.objects.get_or_create(user=request.user)
     user = request.user
 
-    # Tiap section punya form sendiri; field tersembunyi `action` menandai mana yang dikirim
+    # Satu form besar (foto, nama, kota, deskripsi, kontak) dengan satu tombol Simpan; field tersembunyi `action`
+    # menandai bagian mana yang dikirim. Password tetap form terpisah di dalam dialognya.
     forms_ctx = {
         'user_form': UserForm(instance=user),
         'avatar_form': AvatarForm(instance=profile_obj),
         'bio_form': BioForm(instance=profile_obj),
         'contact_form': ContactForm(instance=profile_obj),
         'password_form': ChangePasswordForm(user),
-        'delete_form': DeleteAccountForm(user),
     }
 
     if request.method == 'POST':
         action = request.POST.get('action')
-        if action == 'profile':
-            # Foto dan nama satu card, disimpan bersamaan
+        if action == 'save':
             forms_ctx['user_form'] = UserForm(request.POST, instance=user)
             forms_ctx['avatar_form'] = AvatarForm(request.POST, request.FILES, instance=profile_obj)
-            if forms_ctx['user_form'].is_valid() and forms_ctx['avatar_form'].is_valid():
-                forms_ctx['user_form'].save()
-                forms_ctx['avatar_form'].save()
-                messages.success(request, 'Profil diperbarui.')
-                return redirect('main:profile')
-        elif action == 'bio':
             forms_ctx['bio_form'] = BioForm(request.POST, instance=profile_obj)
-            if forms_ctx['bio_form'].is_valid():
-                forms_ctx['bio_form'].save()
-                messages.success(request, 'Deskripsi diperbarui.')
-                return redirect('main:profile')
-        elif action == 'contact':
             forms_ctx['contact_form'] = ContactForm(request.POST, instance=profile_obj)
-            if forms_ctx['contact_form'].is_valid():
-                forms_ctx['contact_form'].save()
-                messages.success(request, 'Kontak diperbarui.')
+            sections = [forms_ctx[name] for name in ('user_form', 'avatar_form', 'bio_form', 'contact_form')]
+            # Semuanya valid atau tidak ada yang disimpan, supaya satu kolom salah tidak menyimpan sebagian
+            if all([form.is_valid() for form in sections]):
+                for form in sections:
+                    form.save()
+                messages.success(request, 'Profil disimpan.')
                 return redirect('main:profile')
         elif action == 'password':
             forms_ctx['password_form'] = ChangePasswordForm(user, request.POST)
@@ -107,18 +104,15 @@ def profile(request):
                 update_session_auth_hash(request, user)  # tetap login setelah ganti password
                 messages.success(request, 'Password berhasil diubah.')
                 return redirect('main:profile')
-        elif action == 'delete':
-            forms_ctx['delete_form'] = DeleteAccountForm(user, request.POST)
-            if forms_ctx['delete_form'].is_valid():
-                profile_obj.avatar.delete(save=False)  # hapus file foto dari storage
-                logout(request)
-                user.delete()  # data milik user di modul lain ikut terhapus (CASCADE)
-                messages.success(request, 'Akunmu sudah dihapus. Sampai jumpa lagi!')
-                return redirect('main:home')
 
+    steps = profile_obj.completeness()
     return render(request, 'main/profile.html', {
         **forms_ctx,
         'profile': profile_obj,
+        'petak_choices': PETAK_CHOICES,
+        'steps': steps,
+        'steps_done': sum(1 for _, done, _ in steps if done),
+        'next_step': next((step for step in steps if not step[1]), None),
         # Hitungan read-only dari relasi modul lain (related_name milik masing-masing model)
         'stats': {
             'patches': request.user.eco_patches.count(),

@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordChangeForm
 
-from .models import Profile
+from .models import CITY_CHOICES, Profile
 
 MAX_AVATAR_BYTES = 2 * 1024 * 1024
 
@@ -19,16 +19,34 @@ class UserForm(forms.ModelForm):
             'last_name': 'Nama belakang',
             'email': 'Email',
         }
+        widgets = {
+            'first_name': forms.TextInput(attrs={'maxlength': 30, 'autocomplete': 'given-name'}),
+            'last_name': forms.TextInput(attrs={'maxlength': 30, 'autocomplete': 'family-name'}),
+            'email': forms.EmailInput(attrs={'autocomplete': 'email'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Email dipakai untuk reset password, jadi tidak boleh dikosongkan dari profil
+        self.fields['email'].required = True
+        self.fields['email'].error_messages['required'] = 'Email wajib diisi.'
+        self.fields['email'].error_messages['invalid'] = 'Format email belum benar. Contoh: nama@email.com'
 
 
 class AvatarForm(forms.ModelForm):
+    """Foto profil: unggahan atau salah satu wajah Petak, tidak keduanya."""
+
     remove_avatar = forms.BooleanField(required=False, label='Hapus foto profil')
 
     class Meta:
         model = Profile
-        fields = ['avatar']
+        fields = ['avatar', 'avatar_petak']
         labels = {'avatar': 'Foto profil'}
-        widgets = {'avatar': forms.FileInput(attrs={'accept': 'image/*'})}
+        widgets = {
+            # disembunyikan: yang terlihat tombol foto di atas profil, yang membuka pemilih file ini
+            'avatar': forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp', 'hidden': True}),
+            'avatar_petak': forms.HiddenInput(),
+        }
 
     def clean_avatar(self):
         avatar = self.cleaned_data.get('avatar')
@@ -38,9 +56,14 @@ class AvatarForm(forms.ModelForm):
         return avatar
 
     def save(self, commit=True):
-        profile = super().save(commit=False)
-        if self.cleaned_data.get('remove_avatar') and not self.files.get('avatar'):
+        profile = super().save(commit=False)  # avatar_petak sudah terisi dari kiriman form
+        if self.files.get('avatar'):
+            profile.avatar_petak = ''  # foto baru menggantikan Petak
+        elif self.cleaned_data.get('remove_avatar'):
             profile.avatar.delete(save=False)
+            profile.avatar_petak = ''
+        elif profile.avatar_petak and profile.avatar:
+            profile.avatar.delete(save=False)  # memilih Petak menggantikan foto
         if commit:
             profile.save()
         return profile
@@ -64,6 +87,10 @@ class BioForm(forms.ModelForm):
                 'placeholder': 'Ceritakan sedikit tentang kebunmu...',
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['city'].choices = [('', 'Pilih kota')] + list(CITY_CHOICES)
 
 
 INSTAGRAM_PATTERN = re.compile(r'^[A-Za-z0-9._]{1,30}$')
@@ -143,20 +170,3 @@ class ChangePasswordForm(PasswordChangeForm):
         self.fields['new_password1'].label = 'Password baru'
         self.fields['new_password2'].label = 'Konfirmasi password baru'
         self.fields['old_password'].widget.attrs.pop('autofocus', None)
-
-
-class DeleteAccountForm(forms.Form):
-    password = forms.CharField(
-        label='Password',
-        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password'}),
-    )
-
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.user = user
-
-    def clean_password(self):
-        password = self.cleaned_data['password']
-        if not self.user.check_password(password):
-            raise forms.ValidationError('Password salah.')
-        return password

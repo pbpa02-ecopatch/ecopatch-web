@@ -10,11 +10,11 @@
                 <div class="dropdown">
                     <a class="nav-link dropdown-toggle avatar-toggle d-flex align-items-center" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu profil">
-                        <span class="navbar-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ display_name|first|upper }}{% endif %}</span>
+                        <span class="navbar-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% elif user.profile.avatar_petak %}{% include "smart_care/_petak_faces.html" with only=user.profile.avatar_petak %}{% else %}{{ display_name|first|upper }}{% endif %}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end profile-menu">
                         <li class="profile-menu-head">
-                            <span class="profile-menu-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ display_name|first|upper }}{% endif %}</span>
+                            <span class="profile-menu-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% elif user.profile.avatar_petak %}{% include "smart_care/_petak_faces.html" with only=user.profile.avatar_petak %}{% else %}{{ display_name|first|upper }}{% endif %}</span>
                             <div class="profile-menu-id">
                                 <p class="profile-menu-name">{{ display_name }}</p>
                                 {% if user.email %}<p class="profile-menu-email">{{ user.email }}</p>{% endif %}
@@ -67,7 +67,7 @@
         {% if user.is_authenticated %}
             <div class="sidebar-user">
                 <button type="button" id="sidebar-user-toggle" title="{{ display_name }}{% if user.email %} - {{ user.email }}{% endif %}" aria-haspopup="menu" aria-expanded="false" aria-controls="sidebar-user-menu" class="sidebar-user-link{% if request.resolver_match.url_name == 'profile' %} active{% endif %}">
-                    <span class="navbar-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ display_name|first|upper }}{% endif %}</span>
+                    <span class="navbar-avatar" aria-hidden="true">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% elif user.profile.avatar_petak %}{% include "smart_care/_petak_faces.html" with only=user.profile.avatar_petak %}{% else %}{{ display_name|first|upper }}{% endif %}</span>
                     <span class="sidebar-user-id">
                         <span class="sidebar-user-name">{{ display_name }}</span>
                         <span class="sidebar-user-sub">Profil Saya</span>
