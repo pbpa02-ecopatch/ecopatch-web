@@ -2523,3 +2523,91 @@ form.patch-form-actions {
     color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
     font-weight: 600;
 }
+
+/* ================= Delete confirmation pop-up (static/js/confirm-delete.js) ================= */
+.confirm-dialog {
+    width: min(460px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    padding: 28px;
+    border: 1px solid #d8c7a3;
+    border-radius: 28px;
+    background: #fffaf0;
+    color: #17301f;
+    box-shadow: 0 24px 70px rgba(23, 48, 31, 0.25);
+    animation: confirm-in 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.confirm-dialog::backdrop {
+    background: rgba(23, 48, 31, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+@keyframes confirm-in { from { opacity: 0; transform: translateY(10px) scale(0.985); } }
+
+.confirm-dialog-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: #fbe1d6;
+    color: #a3301f;
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.confirm-dialog h2 {
+    margin: 14px 0 10px;
+    font: 800 1.7rem/1.2 'Baloo 2', sans-serif;
+}
+
+.confirm-dialog p {
+    margin: 0 0 8px;
+    overflow-wrap: anywhere;
+}
+
+.confirm-dialog-name { font-weight: 800; }
+.confirm-dialog-note { color: #4c6853; font-size: 0.92rem; }
+
+.confirm-dialog-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.confirm-btn {
+    min-height: 46px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font: 700 1rem/1.2 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+}
+
+.confirm-btn--ghost {
+    border: 1.5px solid #9b9e70;
+    background: #fffdf5;
+    color: #175e30;
+}
+
+.confirm-btn--ghost:hover { background: #e2f4e5; }
+
+.confirm-btn--danger {
+    border: 1.5px solid #a3301f;
+    background: #a3301f;
+    color: #fff;
+    box-shadow: 0 4px 0 #712417;
+}
+
+.confirm-btn--danger:hover { background: #8c281a; }
+.confirm-btn:focus-visible { outline: 3px solid #dc7d16; outline-offset: 3px; }
+
+@media (max-width: 480px) {
+    .confirm-dialog { padding: 24px; }
+    .confirm-btn { flex: 1 1 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .confirm-dialog { animation: none; }
+}

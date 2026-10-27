@@ -3,11 +3,13 @@ from collections import defaultdict
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, Sum
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods, require_POST
 
 from main.models import Profile
+from plant_library.models import Plant
 
 from .forms import STATUS_LABELS, EcoPatchForm, PatchPlantForm
 from .models import EcoPatch, PatchPlant
@@ -272,3 +274,32 @@ def patchplant_delete(request, pk):
     if not _is_htmx(request):
         return redirect('my_ecopatch:detail', pk=patch.pk)
     return _plants_response(request, patch, feedback="Tanaman berhasil dihapus.")
+
+
+@login_required
+@require_POST
+def patchplant_quick_add(request, pk):
+    """One tap from the Plant Library card: put that plant into one of my EcoPatches.
+
+    It goes in as "Rencana", one piece; the rest (amount, stage) is changed on the EcoPatch page. A plant that is
+    already there (and not removed) is not added twice. The card asks for JSON; without JavaScript the same post
+    redirects to the EcoPatch with a message.
+    """
+    patch = _get_patch(request, pk)
+    plant_id = request.POST.get('plant', '')
+    if not plant_id.isdigit():
+        return HttpResponseBadRequest('Tanaman tidak dikenal.')
+    plant = get_object_or_404(Plant, pk=int(plant_id))
+
+    already = patch.plants.filter(plant=plant).exclude(status=PatchPlant.Status.REMOVED).exists()
+    if already:
+        message = f'{plant.name} sudah ada di {patch.name}.'
+    else:
+        PatchPlant.objects.create(patch=patch, plant=plant, quantity=1, status=PatchPlant.Status.PLANNED)
+        message = f'{plant.name} ditambahkan ke {patch.name}.'
+
+    detail_url = reverse('my_ecopatch:detail', args=[patch.pk])
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'ok': True, 'added': not already, 'message': message, 'url': detail_url})
+    (messages.info if already else messages.success)(request, message)
+    return redirect(detail_url)

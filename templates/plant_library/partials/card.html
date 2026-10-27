@@ -2,6 +2,36 @@
 <article class="plant-card" style="--plant-i: {{ forloop.counter0|default:0 }}">
     <div class="plant-card-media{% if not plant.image_url %} plant-card-media--empty{% endif %}">
         {% if plant.is_match %}<span class="plant-card-match">Cocok untuk kebunmu</span>{% endif %}
+        {% if plant.can_add %}
+        <div class="plant-add">
+            <button type="button" class="plant-add-btn" data-plant-add aria-haspopup="dialog" aria-expanded="false"
+                    aria-label="Tambah {{ plant.name }} ke EcoPatch" title="Tambah ke EcoPatch">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+            <template>
+                <p class="plant-addpop-title">Tambah {{ plant.name }} ke</p>
+                {% if plant.patch_options %}
+                <ul class="plant-addpop-list">
+                    {% for opt in plant.patch_options %}
+                    <li>
+                        <form method="post" action="{% url 'my_ecopatch:plant_quick_add' opt.patch.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="plant" value="{{ plant.pk }}">
+                            <button type="submit" class="plant-addpop-opt plant-addpop-opt--{{ opt.tone }}">
+                                <span class="plant-addpop-row"><strong>{{ opt.patch.name }}</strong><small>{{ opt.place }}</small></span>
+                                <span class="plant-addpop-hint">{{ opt.hint }}</span>
+                            </button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="plant-addpop-empty">Kamu belum punya EcoPatch.</p>
+                {% endif %}
+                <a class="plant-addpop-new" href="{% url 'my_ecopatch:create' %}"><span aria-hidden="true">+</span> EcoPatch baru</a>
+            </template>
+        </div>
+        {% endif %}
         {% if plant.image_url %}
             <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy" decoding="async"
                  onerror="this.onerror=null; this.src='{% static 'plant_library/img/plant-placeholder.svg' %}'; this.classList.add('plant-card-ph');">
@@ -18,7 +48,7 @@
         </div>
 
         <h3 class="plant-card-title">
-            <a href="{% url 'plant_library:plant_detail' plant.pk %}">{{ plant.name }}</a>
+            <a href="{% url 'plant_library:plant_detail' plant.pk %}" data-plant-open>{{ plant.name }}</a>
         </h3>
 
         {% if plant.scientific_name %}
@@ -64,7 +94,7 @@
                         <path d="M16.5 4.5 19.5 7.5 8 19H5v-3L16.5 4.5Z"/><path d="m14.5 6.5 3 3"/>
                     </svg>
                 </a>
-                <a href="{% url 'plant_library:plant_delete' plant.pk %}" class="plant-tool plant-tool--danger" title="Hapus {{ plant.name }}" aria-label="Hapus {{ plant.name }}">
+                <a href="{% url 'plant_library:plant_delete' plant.pk %}" class="plant-tool plant-tool--danger" data-confirm-delete data-confirm-title="Hapus tanaman dari katalog?" data-confirm-name="{{ plant.name }}" data-confirm-note="Tanaman ini hilang dari katalog untuk semua orang. Kalau masih dipakai di EcoPatch seseorang, penghapusan ditolak." data-confirm-yes="Ya, hapus tanaman" title="Hapus {{ plant.name }}" aria-label="Hapus {{ plant.name }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>
                     </svg>

@@ -861,63 +861,7 @@ function confirmDeleteEntry(idx) {
     const entry = filteredEntries[idx];
     if (!entry) return;
 
-    // Bersihkan toast konfirmasi lama jika masih ada
-    const existing = document.getElementById('delete-confirm-toast');
-    if (existing) existing.remove();
-
-    let container = document.querySelector('.site-toasts');
-    if (!container) {
-        container = document.createElement('div');
-        container.className = 'toast-container site-toasts';
-        document.body.appendChild(container);
-    }
-
-    const toastEl = document.createElement('div');
-    toastEl.id = 'delete-confirm-toast';
-    toastEl.className = 'toast site-toast show';
-    toastEl.style.borderColor = '#ecd8ce';
-    toastEl.style.borderLeft = '5px solid #8c5344';
-    toastEl.style.background = '#fefdfb';
-    toastEl.style.display = 'flex';
-    toastEl.style.opacity = '1';
-    toastEl.setAttribute('role', 'alert');
-    toastEl.setAttribute('aria-live', 'assertive');
-
-    toastEl.innerHTML = `
-        <div class="site-toast-body w-100">
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c5344" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
-                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                </svg>
-                <strong style="color: #22301f; font-size: 0.92rem;">Hapus Catatan Jurnal?</strong>
-            </div>
-            <p class="mb-2 text-muted fw-normal" style="font-size: 0.82rem; line-height: 1.4;">
-                Kamu yakin ingin menghapus catatan <strong>"${escHtml(entry.title)}"</strong>? Tindakan ini tidak dapat dibatalkan.
-            </p>
-            <div class="d-flex justify-content-end gap-2 pt-1 border-top" style="border-color: #f1eae2 !important;">
-                <button type="button" class="btn btn-sm btn-ds-ghost py-1 px-3" id="btn-cancel-delete" style="font-size: 0.78rem; border-radius: 6px;">
-                    Batal
-                </button>
-                <button type="button" class="btn btn-sm btn-ds-delete py-1 px-3 fw-semibold" id="btn-confirm-delete" style="font-size: 0.78rem; border-radius: 6px;">
-                    Ya, Hapus
-                </button>
-            </div>
-        </div>
-        <button type="button" class="btn-close site-toast-close" aria-label="Tutup"></button>
-    `;
-
-    container.appendChild(toastEl);
-
-    const closeToast = () => {
-        toastEl.classList.remove('show');
-        setTimeout(() => toastEl.remove(), 250);
-    };
-
-    toastEl.querySelector('.site-toast-close')?.addEventListener('click', closeToast);
-    toastEl.querySelector('#btn-cancel-delete')?.addEventListener('click', closeToast);
-
-    toastEl.querySelector('#btn-confirm-delete')?.addEventListener('click', function() {
-        closeToast();
+    const postDelete = () => {
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = entry.delete_url;
@@ -928,7 +872,19 @@ function confirmDeleteEntry(idx) {
         form.appendChild(csrf);
         document.body.appendChild(form);
         form.submit();
-    });
+    };
+
+    // the site-wide delete pop-up (static/js/confirm-delete.js); the browser's own confirm() if it is not available
+    if (window.siteConfirmDelete) {
+        window.siteConfirmDelete({
+            title: 'Hapus catatan jurnal?',
+            name: entry.title,
+            note: 'Catatan ini dihapus selamanya. Tindakan ini tidak bisa dibatalkan.',
+            yes: 'Ya, hapus catatan'
+        }, postDelete);
+    } else if (confirm('Hapus catatan ini?')) {
+        postDelete();
+    }
 }
 
 /* ===============================================================
