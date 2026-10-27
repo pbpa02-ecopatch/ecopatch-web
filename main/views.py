@@ -13,7 +13,7 @@ from django.views.static import serve
 
 from .auth_forms import EcoPasswordResetForm, RegisterForm
 
-from .forms import AvatarForm, BioForm, ChangePasswordForm, ContactForm, DeleteAccountForm, UserForm
+from .forms import AvatarForm, BioForm, ChangePasswordForm, ContactForm, UserForm
 from .models import PETAK_CHOICES, Profile
 
 
@@ -74,14 +74,13 @@ def _profile(request):
     user = request.user
 
     # Satu form besar (foto, nama, kota, deskripsi, kontak) dengan satu tombol Simpan; field tersembunyi `action`
-    # menandai bagian mana yang dikirim. Password dan hapus akun tetap form terpisah di dalam dialognya.
+    # menandai bagian mana yang dikirim. Password tetap form terpisah di dalam dialognya.
     forms_ctx = {
         'user_form': UserForm(instance=user),
         'avatar_form': AvatarForm(instance=profile_obj),
         'bio_form': BioForm(instance=profile_obj),
         'contact_form': ContactForm(instance=profile_obj),
         'password_form': ChangePasswordForm(user),
-        'delete_form': DeleteAccountForm(user),
     }
 
     if request.method == 'POST':
@@ -105,14 +104,6 @@ def _profile(request):
                 update_session_auth_hash(request, user)  # tetap login setelah ganti password
                 messages.success(request, 'Password berhasil diubah.')
                 return redirect('main:profile')
-        elif action == 'delete':
-            forms_ctx['delete_form'] = DeleteAccountForm(user, request.POST)
-            if forms_ctx['delete_form'].is_valid():
-                profile_obj.avatar.delete(save=False)  # hapus file foto dari storage
-                logout(request)
-                user.delete()  # data milik user di modul lain ikut terhapus (CASCADE)
-                messages.success(request, 'Akunmu sudah dihapus. Sampai jumpa lagi!')
-                return redirect('main:home')
 
     steps = profile_obj.completeness()
     return render(request, 'main/profile.html', {

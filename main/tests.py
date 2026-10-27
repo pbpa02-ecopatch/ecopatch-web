@@ -662,11 +662,10 @@ class ProfileViewTests(TestCase):
         self.assertNotContains(response, 'site-navbar site-navbar--side')  # kelas pada <nav>, bukan selector JS
         self.assertNotContains(response, 'id="sidebar-toggle"')
 
-    def test_one_form_saves_everything_and_password_and_delete_keep_their_own(self):
+    def test_one_form_saves_everything_and_the_password_keeps_its_own(self):
         response = self.client.get(self.url)
         self.assertContains(response, 'name="action" value="save"', count=1)
         self.assertContains(response, 'name="action" value="password"', count=1)
-        self.assertContains(response, 'name="action" value="delete"', count=1)
         self.assertContains(response, 'id="pf-savebar"')  # only shown by the script when something changed
         for old in ('profile', 'bio', 'contact'):
             self.assertNotContains(response, f'name="action" value="{old}"')
@@ -949,35 +948,24 @@ class ChangePasswordTests(TestCase):
         self.assertNotContains(self.client.get(self.url), 'Pengaturan')
 
 
-@override_settings(MEDIA_ROOT=TEMP_MEDIA)
-class DeleteAccountTests(TestCase):
+class NoAccountDeletionTests(TestCase):
+    """The profile no longer offers deleting the account: no button, no dialog, and the server ignores the old action."""
+
     def setUp(self):
         self.user = get_user_model().objects.create_user('tanam', 'a@example.com', 'lama-12345')
         self.client.force_login(self.user)
         self.url = reverse('main:profile')
 
-    def test_delete_with_correct_password(self):
+    def test_the_page_has_no_delete_account_button_or_dialog(self):
+        page = self.client.get(self.url)
+        for text in ('Hapus akun', 'Hapus Akun Saya', 'delete-modal', 'name="action" value="delete"'):
+            self.assertNotContains(page, text)
+
+    def test_an_old_delete_request_changes_nothing(self):
         response = self.client.post(self.url, {'action': 'delete', 'password': 'lama-12345'})
-        self.assertRedirects(response, reverse('main:home'))
-        self.assertFalse(get_user_model().objects.filter(username='tanam').exists())
-        self.assertNotIn('_auth_user_id', self.client.session)
-
-    def test_wrong_password_keeps_account(self):
-        response = self.client.post(self.url, {'action': 'delete', 'password': 'salah'})
-        self.assertContains(response, 'Password salah.')
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(get_user_model().objects.filter(username='tanam').exists())
-        self.assertContains(response, "getElementById('delete-modal')")
-
-    def test_missing_password_keeps_account(self):
-        self.client.post(self.url, {'action': 'delete'})
-        self.assertTrue(get_user_model().objects.filter(username='tanam').exists())
-
-    def test_avatar_file_removed(self):
-        profile = Profile.objects.create(user=self.user, avatar=make_image())
-        path = profile.avatar.path
-        self.assertTrue(os.path.exists(path))
-        self.client.post(self.url, {'action': 'delete', 'password': 'lama-12345'})
-        self.assertFalse(os.path.exists(path))
+        self.assertEqual(self.client.get(self.url).status_code, 200)  # still signed in
 
 
 class NotFoundPageTests(TestCase):

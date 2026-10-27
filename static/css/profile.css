@@ -652,7 +652,7 @@ body.has-sidebar.pf-body {
     background: var(--pf-brand-soft);
 }
 
-/* keluar dan hapus akun: dua tombol sejajar, sama tinggi, di bawah garis tipis */
+/* keluar dari akun: satu tombol di bawah garis tipis */
 .pf-acts {
     display: flex;
     flex-wrap: wrap;
@@ -695,15 +695,6 @@ body.has-sidebar.pf-body {
     outline-offset: 3px;
 }
 
-.pf-btn-danger {
-    border-color: rgba(163, 48, 31, 0.45);
-    color: var(--pf-late);
-}
-
-.pf-btn-danger:hover {
-    border-color: var(--pf-late);
-    background: #fdf1ee;
-}
 
 /* ---------------------------------------------------------------- Menu foto */
 .pf-veil {
@@ -937,7 +928,7 @@ body.has-sidebar.pf-body {
     opacity: 0.75;
 }
 
-/* ---------------------------------------------------------------- Dialog password dan hapus akun */
+/* ---------------------------------------------------------------- Dialog password */
 .pf-body .profile-modal .modal-content {
     border: 0;
     border-radius: 28px;

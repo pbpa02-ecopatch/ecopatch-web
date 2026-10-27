@@ -165,20 +165,3 @@ class ChangePasswordForm(PasswordChangeForm):
         self.fields['new_password1'].label = 'Password baru'
         self.fields['new_password2'].label = 'Konfirmasi password baru'
         self.fields['old_password'].widget.attrs.pop('autofocus', None)
-
-
-class DeleteAccountForm(forms.Form):
-    password = forms.CharField(
-        label='Password',
-        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password'}),
-    )
-
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.user = user
-
-    def clean_password(self):
-        password = self.cleaned_data['password']
-        if not self.user.check_password(password):
-            raise forms.ValidationError('Password salah.')
-        return password
