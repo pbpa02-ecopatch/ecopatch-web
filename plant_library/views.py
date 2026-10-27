@@ -1,4 +1,5 @@
 from functools import wraps
+from urllib.parse import urlencode
 import re
 
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.db.models import ProtectedError, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from my_ecopatch.models import EcoPatch
 from .forms import PlantForm
@@ -39,6 +41,111 @@ _KEYWORD_MAP = [
 # Kata sambung / stop-word yang dibuang setelah frasa dipetakan
 _STOP_WORDS = {"yang", "dan", "tanaman", "untuk", "dirawat"}
 
+# Chip cepat di kotak pencarian. Sama seperti di landing page: tiga kelompok
+# (cahaya, kesulitan, lokasi) supaya halaman ini terasa satu keluarga.
+_CHIP_GROUPS = [
+    ("sunlight", "Cahaya", "sun", [("full", "Cahaya penuh"), ("shade", "Teduh")]),
+    ("difficulty", "Kesulitan", "care", [("easy", "Mudah dirawat"), ("medium", "Perawatan sedang")]),
+    ("indoor_outdoor", "Lokasi", "place", [("indoor", "Indoor"), ("outdoor", "Outdoor")]),
+]
+
+_FILTER_FIELDS = ("q", "category", "sunlight", "difficulty", "indoor_outdoor", "space_requirement")
+
+
+def _filter_params(request):
+    """Filter yang sedang aktif, hanya dari parameter yang kita kenal."""
+    return {key: request.GET.get(key, "").strip() for key in _FILTER_FIELDS if request.GET.get(key, "").strip()}
+
+
+def build_chip_groups(params):
+    """Bangun chip beserta href-nya, jadi template tidak perlu menyusun URL panjang.
+
+    Klik chip yang sedang aktif akan mematikan filternya; klik chip lain akan
+    mengganti nilai pada kelompok yang sama dan mempertahankan filter lain.
+    """
+    groups = []
+    for field, label, tone, options in _CHIP_GROUPS:
+        chips = []
+        for value, text in options:
+            active = params.get(field) == value
+            next_params = {key: val for key, val in params.items() if key != field}
+            if not active:
+                next_params[field] = value
+            chips.append({
+                "label": text,
+                "tone": tone,
+                "active": active,
+                "href": f"?{urlencode(next_params)}" if next_params else "?",
+            })
+        groups.append({"field": field, "label": label, "chips": chips})
+    return groups
+
+
+def _filter_url(params, name, value):
+    """URL daftar dengan satu filter diganti, filter lain tetap terbawa."""
+    current = {key: val for key, val in params.items() if val}
+    if value:
+        current[name] = value
+    else:
+        current.pop(name, None)
+    query_string = urlencode(current)
+    base = reverse('plant_library:plant_list')
+    return f'{base}?{query_string}' if query_string else base
+
+
+def _filter_dropdowns(params):
+    """Dropdown filter gaya Seed Exchange: label aktif + daftar tautan."""
+    config = [
+        ('category', 'Semua kategori', Plant.Category.choices),
+        ('space_requirement', 'Semua ruang', Plant.SpaceRequirement.choices),
+    ]
+    dropdowns = []
+    for name, all_label, options in config:
+        labels = dict(options)
+        current_value = params.get(name, '')
+        items = [{
+            'label': all_label,
+            'url': _filter_url(params, name, ''),
+            'selected': not current_value,
+        }]
+        for value, label in options:
+            items.append({
+                'label': label,
+                'url': _filter_url(params, name, value),
+                'selected': current_value == value,
+            })
+        dropdowns.append({
+            'name': name,
+            'current_label': labels.get(current_value, all_label),
+            'items': items,
+            'is_active': bool(current_value),
+        })
+    return dropdowns
+
+
+def matching_plants(patch):
+    """Tanaman yang cocok dengan satu EcoPatch.
+
+    Dipakai bersama oleh halaman Rekomendasi dan penanda "Cocok untuk kebunmu"
+    di katalog, supaya keduanya tidak pernah berbeda aturan.
+    """
+    plants = Plant.objects.all()
+
+    # Sinar matahari harus sama dengan kebun (kalau kebun mendefinisikannya).
+    if patch.sunlight:
+        plants = plants.filter(sunlight=patch.sunlight)
+
+    # Ruang harus pas, atau tanaman memang bisa di mana saja.
+    plants = plants.filter(space_requirement__in=[patch.space_type, 'any'])
+
+    # Indoor hanya untuk tanaman indoor/both; sebaliknya untuk kebun luar.
+    if patch.space_type == 'indoor':
+        plants = plants.filter(indoor_outdoor__in=['indoor', 'both'])
+    else:
+        plants = plants.filter(indoor_outdoor__in=['outdoor', 'both'])
+
+    return plants
+
 
 def parse_query_keywords(raw_query):
     """Petakan kata kunci natural ke filter Django, kembalikan sisa teks.
@@ -48,7 +155,8 @@ def parse_query_keywords(raw_query):
         - filters_dict: dict {field: value} yang berhasil dipetakan
         - remaining_text: teks yang tersisa setelah frasa & stop-word dibuang
     """
-    text = raw_query.lower().strip()
+    text = re.sub(r'[^\w\s-]', ' ', raw_query.lower())
+    text = re.sub(r'\s+', ' ', text).strip()
     filters = {}
 
     # Deteksi setiap frasa dari yang terpanjang; hapus dari teks setelah cocok
@@ -96,6 +204,7 @@ def plant_list(request):
     space_requirement = request.GET.get('space_requirement', '').strip()
 
     # Natural-language keyword parsing dari query teks
+    kw_filters = {}
     if query:
         kw_filters, remaining_text = parse_query_keywords(query)
 
@@ -129,6 +238,31 @@ def plant_list(request):
         query or category or sunlight or difficulty or indoor_outdoor or space_requirement
     )
 
+    params = _filter_params(request)
+
+    # Kalau filter datang dari kalimat pencarian, tampilkan apa yang kami baca
+    # supaya orang tahu kenapa hasilnya menyempit.
+    derived_labels = []
+    label_maps = {
+        'sunlight': dict(Plant.Sunlight.choices),
+        'difficulty': dict(Plant.Difficulty.choices),
+        'indoor_outdoor': dict(Plant.Placement.choices),
+    }
+    for field, value in kw_filters.items():
+        if not request.GET.get(field):
+            derived_labels.append(label_maps.get(field, {}).get(value, value))
+
+    # Penanda "Cocok untuk kebunmu" hanya relevan kalau user punya EcoPatch.
+    # Satu tanaman cukup cocok dengan salah satu kebun miliknya.
+    match_ids = set()
+    if request.user.is_authenticated:
+        for patch in EcoPatch.objects.filter(owner=request.user):
+            match_ids.update(matching_plants(patch).values_list('pk', flat=True))
+    if match_ids:
+        plants = list(plants)
+        for plant in plants:
+            plant.is_match = plant.pk in match_ids
+
     context = {
         'plants': plants,
         'query': query,
@@ -138,6 +272,10 @@ def plant_list(request):
         'selected_indoor_outdoor': indoor_outdoor,
         'selected_space_requirement': space_requirement,
         'has_active_filters': has_active_filters,
+        'filter_groups': build_chip_groups(params),
+        'dropdowns': _filter_dropdowns(params),
+        'derived_labels': derived_labels,
+        'active_params': params,
         'categories': Plant.Category.choices,
         'sunlight_choices': Plant.Sunlight.choices,
         'difficulty_choices': Plant.Difficulty.choices,
@@ -150,12 +288,39 @@ def plant_list(request):
 def plant_detail(request, pk):
     """Menampilkan rincian detail 1 tanaman."""
     plant = get_object_or_404(Plant, pk=pk)
-    return render(request, 'plant_library/plant_detail.html', {'plant': plant})
+
+    # Kebun mana saja yang cocok dengan tanaman ini. Detail memakai nama
+    # kebunnya supaya user tahu harus menanamnya di mana.
+    matching_patches = []
+    if request.user.is_authenticated:
+        for patch in EcoPatch.objects.filter(owner=request.user):
+            if matching_plants(patch).filter(pk=plant.pk).exists():
+                matching_patches.append(patch)
+
+    return render(request, 'plant_library/plant_detail.html', {
+        'plant': plant,
+        'matching_patches': matching_patches,
+    })
 
 
 @login_required
 def plant_recommend(request):
     """Memberikan rekomendasi tanaman berdasarkan kondisi EcoPatch milik user."""
+    # Label EcoPatch masih berbahasa Inggris; halaman ini memakai istilah Indonesia
+    # supaya seragam dengan kartu tanaman di bawahnya.
+    space_labels = {
+        'balcony': 'Balkon',
+        'indoor': 'Dalam ruangan',
+        'terrace': 'Teras',
+        'rooftop': 'Atap',
+        'small_yard': 'Halaman kecil',
+    }
+    sun_labels = {
+        'full': 'Cahaya penuh',
+        'partial': 'Cahaya sedang',
+        'shade': 'Teduh',
+    }
+
     user_patches = EcoPatch.objects.filter(owner=request.user)
 
     if not user_patches.exists():
@@ -175,33 +340,29 @@ def plant_recommend(request):
         selected_patch = user_patches.first()
 
     # Logika filter rekomendasi murni Django (tanpa ML/AI)
-    recommended_plants = Plant.objects.all()
-
-    # 1. Sinar matahari: plant.sunlight == patch.sunlight (jika patch.sunlight ada)
-    if selected_patch.sunlight:
-        recommended_plants = recommended_plants.filter(sunlight=selected_patch.sunlight)
-
-    # 2. Kebutuhan ruang: sama dengan patch.space_type atau 'any'
-    recommended_plants = recommended_plants.filter(
-        space_requirement__in=[selected_patch.space_type, 'any']
-    )
-
-    # 3. Penempatan (indoor/outdoor):
-    # jika patch.space_type == 'indoor' -> 'indoor' atau 'both'
-    # selain itu -> 'outdoor' atau 'both'
-    if selected_patch.space_type == 'indoor':
-        recommended_plants = recommended_plants.filter(indoor_outdoor__in=['indoor', 'both'])
-    else:
-        recommended_plants = recommended_plants.filter(indoor_outdoor__in=['outdoor', 'both'])
+    recommended_plants = matching_plants(selected_patch)
 
     # Format alasan kecocokan
-    sunlight_label = selected_patch.get_sunlight_display() if selected_patch.sunlight else 'semua intensitas sinar'
-    space_label = selected_patch.get_space_type_display()
+    space_label = space_labels.get(selected_patch.space_type, selected_patch.get_space_type_display())
+    sunlight_label = sun_labels.get(selected_patch.sunlight, 'segala intensitas sinar')
     match_reason = f"Cocok untuk area {space_label.lower()} dengan kebutuhan sinar {sunlight_label.lower()}."
+
+    patch_options = [
+        {
+            'pk': patch.pk,
+            'name': patch.name,
+            'space_label': space_labels.get(patch.space_type, patch.get_space_type_display()),
+            'sun_label': sun_labels.get(patch.sunlight) if patch.sunlight else '',
+        }
+        for patch in user_patches
+    ]
 
     context = {
         'user_patches': user_patches,
+        'patch_options': patch_options,
         'selected_patch': selected_patch,
+        'selected_space_label': space_labels.get(selected_patch.space_type, selected_patch.get_space_type_display()),
+        'selected_sun_label': sun_labels.get(selected_patch.sunlight, 'Segala sinar') if selected_patch.sunlight else 'Segala sinar',
         'recommended_plants': recommended_plants,
         'match_reason': match_reason,
     }
