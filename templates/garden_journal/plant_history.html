@@ -4,46 +4,49 @@
 {% block title %}Buku Jurnal: {{ plant_name }} — EcoPatch{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=3.2">
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=5.0">
 {% endblock %}
 
 {% block content %}
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none fw-semibold small">
-        ← Kembali ke Rak Buku Jurnal
+    <a href="{% url 'garden_journal:list' %}" class="btn btn-ds-ghost d-inline-flex align-items-center">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Kembali ke Koleksi Jurnal
     </a>
-    <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-success">
-        + Tulis Jurnal Baru
+    <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name|urlencode }}" class="btn btn-ds-primary">
+        + Tambah Catatan
     </a>
 </div>
 
-<!-- Toggle View -->
-<div class="d-flex align-items-center gap-2 mb-3">
-    <button id="btn-view-book" onclick="switchView('book')" class="view-toggle-btn active">📖 Buku</button>
-    <button id="btn-view-list" onclick="switchView('list')" class="view-toggle-btn">📋 Riwayat</button>
-    <span class="text-muted small ms-2">
-        <span id="total-count">{{ total_entries }}</span> catatan untuk <strong>{{ plant_name }}</strong>
-    </span>
+<!-- Plant Sub-Header & Filter Row -->
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+    <div>
+        <div class="text-muted small mb-1">
+            <span id="total-count" class="fw-bold text-dark">{{ total_entries }}</span> catatan untuk <strong class="text-dark">{{ plant_name }}</strong>
+        </div>
+        <form id="book-filter-form" class="d-flex flex-wrap align-items-center gap-2 m-0">
+            <div class="filter-pill-btn">
+                <select name="condition" id="filter-condition" class="filter-pill-select">
+                    <option value="">Semua Kondisi</option>
+                    {% for val, label in conditions %}
+                        {% if selected_condition == val %}
+                            <option value="{{ val }}" selected>{{ label }}</option>
+                        {% else %}
+                            <option value="{{ val }}">{{ label }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-pill-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#798a72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <input type="date" id="filter-date" name="date" class="border-0 bg-transparent text-dark small"
+                       style="outline: none;" value="{{ selected_date }}">
+            </div>
+        </form>
+    </div>
 </div>
 
-<!-- Filter Pills -->
-<form id="book-filter-form" class="d-flex flex-wrap align-items-center gap-2 mb-3">
-    <div class="filter-pill-btn">
-        <select name="condition" id="filter-condition" class="filter-pill-select">
-            <option value="">Semua Kondisi</option>
-            {% for val, label in conditions %}
-                <option value="{{ val }}" {% if selected_condition == val %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="filter-pill-btn">
-        <span class="text-muted small">📅</span>
-        <input type="date" id="filter-date" name="date" class="border-0 bg-transparent text-dark small"
-               style="outline: none;" value="{{ selected_date }}">
-    </div>
-</form>
-
-<!-- ===================== VIEW BOOK ===================== -->
+<!-- ===================== COMPACT OPEN BOOK ===================== -->
 <div id="view-book" class="view-panel">
     <div class="open-book-wrapper">
         <div class="open-book" id="open-book-el">
@@ -51,32 +54,94 @@
             <!-- HALAMAN KIRI -->
             <div class="book-page-left">
                 <div>
-                    <div class="plant-left-mascot mb-2">
-                        <img id="left-mascot-img"
-                             src="{% if latest_condition == 'wilting' %}{% static 'img/mascot/petak-layu.png' %}{% elif latest_condition == 'flowering' %}{% static 'img/mascot/petak-semangat.png' %}{% elif latest_condition == 'fruiting' or latest_condition == 'ready_to_harvest' %}{% static 'img/mascot/petak-bangga.png' %}{% elif latest_condition == 'needs_attention' %}{% static 'img/mascot/petak-penasaran.png' %}{% else %}{% static 'img/mascot/petak-senang.png' %}{% endif %}"
-                             alt="Petak" style="width: 76px; height: auto; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);">
-                    </div>
-                    <h2 class="plant-left-title">{{ plant_name }}</h2>
-                    <span id="left-condition-badge" class="badge bg-{{ latest_badge }}-subtle text-{{ latest_badge }} border border-{{ latest_badge }}-subtle book-tag-pill">
-                        {{ latest_condition_display }}
-                    </span>
-                    <div id="left-ecopatch" class="mt-3" style="display:none;">
-                        <span class="badge bg-white text-secondary border px-3 py-1" id="left-ecopatch-text"></span>
-                    </div>
-
-                    <!-- Petunjuk Urutan Buku Dinamis -->
-                    <div class="book-reading-hint mt-3 p-2 rounded" style="background: rgba(31, 145, 66, 0.08); border: 1px dashed rgba(31, 145, 66, 0.3);">
-                        <div class="d-flex align-items-start gap-2">
-                            <span style="font-size:0.95rem;">💡</span>
-                            <div style="font-size: 0.74rem; color: #224c29; line-height: 1.4;">
-                                <strong id="left-hint-title">Buku Terbuka di Catatan Terkini</strong><br>
-                                <span id="left-hint-desc">Menampilkan kondisi paling baru. Balik lembar (&rarr;) untuk melihat riwayat hari-hari sebelumnya.</span>
+                    <!-- Header Tanaman & Mascot (Natural tanpa frame lingkaran) -->
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="flex-shrink-0" id="left-mascot-wrap" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                            {% if latest_condition == 'wilting' %}
+                                <img id="left-mascot-img" src="{% static 'img/mascot/petak-layu.png' %}" alt="Petak" style="width: 48px; height: 48px; object-fit: contain; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);">
+                            {% elif latest_condition == 'flowering' %}
+                                <img id="left-mascot-img" src="{% static 'img/mascot/petak-semangat.png' %}" alt="Petak" style="width: 48px; height: 48px; object-fit: contain; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);">
+                            {% elif latest_condition == 'fruiting' or latest_condition == 'ready_to_harvest' %}
+                                <img id="left-mascot-img" src="{% static 'img/mascot/petak-bangga.png' %}" alt="Petak" style="width: 48px; height: 48px; object-fit: contain; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);">
+                            {% elif latest_condition == 'needs_attention' %}
+                                <img id="left-mascot-img" src="{% static 'img/mascot/petak-penasaran.png' %}" alt="Petak" style="width: 48px; height: 48px; object-fit: contain; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);">
+                            {% else %}
+                                <img id="left-mascot-img" src="{% static 'img/mascot/petak-senang.png' %}" alt="Petak" style="width: 48px; height: 48px; object-fit: contain; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);">
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h2 class="plant-left-title fw-bold mb-0 lh-1" style="font-family: 'Baloo 2', cursive; font-size: 1.55rem; color: #22301f;">{{ plant_name }}</h2>
+                            <div class="d-flex align-items-center flex-wrap gap-1 mt-1">
+                                <span id="left-condition-badge" class="badge {{ latest_ds_badge }} book-tag-pill py-1 px-2" style="font-size: 0.72rem;">
+                                    {{ latest_condition_display }}
+                                </span>
+                                {% if current_entry and current_entry.ecopatch_name %}
+                                <span id="left-ecopatch-badge" class="badge bg-white text-muted border py-1 px-2 d-inline-flex align-items-center" style="font-size: 0.72rem;">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-1"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <span id="left-ecopatch-text">{{ current_entry.ecopatch_name }}</span>
+                                </span>
+                                {% else %}
+                                <span id="left-ecopatch-badge" class="badge bg-white text-muted border py-1 px-2 d-none align-items-center" style="font-size: 0.72rem;">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-1"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <span id="left-ecopatch-text"></span>
+                                </span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
+
+                    <!-- RINGKASAN: 3 Mini Cards -->
+                    <div class="text-uppercase fw-bold text-muted mt-3 mb-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                        Ringkasan
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <div class="summary-mini-card">
+                                <div class="stat-num" id="left-stat-count">{{ total_entries }}</div>
+                                <div class="stat-desc">catatan</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="summary-mini-card">
+                                <div class="stat-num" id="left-stat-height">{% if latest_height %}{{ latest_height|floatformat:0 }}{% else %}—{% endif %}</div>
+                                <div class="stat-desc">cm tinggi</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="summary-mini-card">
+                                {% if growth and growth > 0 %}
+                                    <div class="stat-num text-success" id="left-stat-growth">+{{ growth|floatformat:0 }}</div>
+                                {% elif growth and growth < 0 %}
+                                    <div class="stat-num text-muted" id="left-stat-growth">{{ growth|floatformat:0 }}</div>
+                                {% elif growth %}
+                                    <div class="stat-num text-dark" id="left-stat-growth">0</div>
+                                {% else %}
+                                    <div class="stat-num text-dark" id="left-stat-growth">—</div>
+                                {% endif %}
+                                <div class="stat-desc">cm sejak awal</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grafik Tinggi/Ukuran Tanaman Embedded -->
+                    <div class="left-chart-container mb-3" style="position: relative; height: 110px;">
+                        <canvas id="leftHeightChart"></canvas>
+                    </div>
+
+                    <!-- DAFTAR ISI: Scrollable Table of Contents -->
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="text-uppercase fw-bold text-muted" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                            Daftar Isi
+                        </div>
+                    </div>
+                    <div class="book-toc-list" id="book-toc-list">
+                        <!-- Diisi otomatis oleh JavaScript -->
+                    </div>
                 </div>
-                <div class="book-bottom-footer">
-                    <span class="text-muted fst-italic">Buku Jurnal Tanaman</span>
+
+                <!-- Footer Halaman Kiri -->
+                <div class="book-bottom-footer mt-auto pt-2 border-top" style="border-color: #e8dbbe !important;">
+                    <span class="text-muted fst-italic small">Buku Jurnal Tanaman</span>
                     <span class="badge bg-white text-muted border small" id="left-total">{{ total_entries }} entri</span>
                 </div>
             </div>
@@ -96,115 +161,58 @@
                         <img src="{% static 'img/mascot/petak-mencatat.png' %}" alt="Petak" style="width: 100px; height: auto;" class="mb-2">
                         <h5 class="fw-bold mt-2">Buku Masih Kosong</h5>
                         <p class="small">Belum ada catatan untuk filter ini.</p>
-                        <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-sm btn-success">+ Tulis Lembaran Pertama</a>
+                        <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-sm btn-ds-primary">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Tulis Lembaran Pertama
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Dots Indicator & Quick Navigation -->
+        <!-- Unified Navigation Bar (Pill Controls) -->
+        <!-- Unified Navigation Bar (Single Jump Control) -->
         <div class="d-flex flex-column align-items-center mt-3">
-            <div class="d-flex align-items-center justify-content-center gap-2 mb-1 flex-wrap">
-                <button type="button" class="btn btn-sm btn-light border py-1 px-3 text-secondary fw-semibold"
-                        id="btn-jump-newest" onclick="jumpTo(0)" style="font-size: 0.76rem; border-radius: 999px;">
-                    ⏮️ Terkini (Terbaru)
-                </button>
-                <div class="page-dots-indicator my-0" id="page-dots"></div>
-                <button type="button" class="btn btn-sm btn-light border py-1 px-3 text-secondary fw-semibold"
-                        id="btn-jump-oldest" onclick="jumpTo(filteredEntries.length - 1)" style="font-size: 0.76rem; border-radius: 999px;">
-                    Hari Pertama (Awal) ⏭️
+            <div class="d-flex align-items-center justify-content-center gap-3 mb-1 flex-wrap">
+                <span class="text-muted fw-semibold small" id="bottom-page-indicator">
+                    Halaman 1 dari {{ total_entries|default:1 }}
+                </span>
+                <button type="button" class="btn btn-sm btn-ds-ghost py-1 px-3 fw-semibold d-inline-flex align-items-center"
+                        id="btn-nav-single" onclick="handleBottomSingleJump()" style="font-size: 0.8rem; border-radius: 999px;">
+                    Hari Pertama (Awal) <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="ms-1"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
                 </button>
             </div>
             <div class="text-muted small fst-italic" style="font-size:0.75rem;">
-                Lembaran buku: <strong>Terbaru (Hal. 1)</strong> ◀ ··· ▶ <strong>Terlama (Hal. Akhir)</strong>
+                Lembaran buku: <strong>Terbaru (Hal. 1)</strong> &larr; &middot;&middot;&middot; &rarr; <strong>Terlama (Hal. Akhir)</strong>. Klik pada daftar isi untuk membuka catatan.
             </div>
         </div>
     </div>
 </div>
 
-<!-- ===================== VIEW LIST ===================== -->
-<div id="view-list" class="view-panel" style="display:none;">
-
-    {% if journals %}
-    <!-- Stat Cards Row -->
-    <div class="row g-3 mb-4" id="stat-cards-row">
-        <div class="col-6 col-md-3">
-            <div class="stat-card">
-                <div class="stat-card-label">Total catatan</div>
-                <div class="stat-card-value">{{ total_entries }}</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card">
-                <div class="stat-card-label">Tinggi terakhir</div>
-                <div class="stat-card-value">
-                    {% if latest_height %}{{ latest_height|floatformat:0 }} <span class="stat-card-unit">cm</span>{% else %}<span class="text-muted fs-6">—</span>{% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card">
-                <div class="stat-card-label">Pertumbuhan</div>
-                <div class="stat-card-value {% if growth and growth > 0 %}text-success{% elif growth and growth < 0 %}text-danger{% endif %}">
-                    {% if growth %}
-                        {% if growth > 0 %}+{% endif %}{{ growth|floatformat:1 }} <span class="stat-card-unit">cm</span>
-                    {% else %}
-                        <span class="text-muted fs-6">—</span>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card">
-                <div class="stat-card-label">Kondisi terakhir</div>
-                <div class="stat-card-value">
-                    <span class="badge bg-{{ latest_badge }}-subtle text-{{ latest_badge }} border border-{{ latest_badge }}-subtle px-2 py-1" style="font-size:0.85rem;">
-                        {{ latest_condition_display }}
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Height Chart -->
-    <div class="history-chart-card mb-4" id="chart-section">
-        <div class="history-chart-title">Grafik tinggi tanaman (cm)</div>
-        <div style="position:relative; height: 160px;">
-            <canvas id="heightChart"></canvas>
-        </div>
-        <div id="chart-no-data" class="text-center text-muted small py-3" style="display:none;">
-            Belum ada data tinggi tanaman untuk ditampilkan.
-        </div>
-    </div>
-
-    <!-- Group Toggle Filter -->
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-        <div class="d-flex align-items-center flex-wrap gap-2">
-            <div class="history-group-tabs" id="group-tabs">
-                <button class="history-group-tab active" id="tab-week" onclick="switchGrouping('week')">Per minggu</button>
-                <button class="history-group-tab" id="tab-month" onclick="switchGrouping('month')">Per bulan</button>
-                <button class="history-group-tab" id="tab-all" onclick="switchGrouping('all')">Semua</button>
-            </div>
-            <button class="btn btn-sm btn-outline-secondary py-1 px-3" id="btn-toggle-all" onclick="toggleAllGroups()" style="font-size: 0.8rem; border-radius: 999px;">
-                📁 Sembunyikan Semua
-            </button>
-        </div>
-    </div>
-
-    <!-- Grouped Entries Container -->
-    <div id="grouped-entries-container"></div>
-
-    {% else %}
-    <div class="text-center py-5 text-muted">
-        <img src="{% static 'img/mascot/petak-mencatat.png' %}" alt="Petak" style="width: 110px; height: auto;" class="mb-2">
-        <p class="mt-2">Belum ada catatan untuk filter ini.</p>
-        <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name }}" class="btn btn-success">+ Tulis Catatan Pertama</a>
-    </div>
-    {% endif %}
-</div>
-
-<!-- CSRF token for delete forms in JS -->
+<!-- CSRF token for delete & upload forms in JS -->
 {% csrf_token %}
+<!-- Hidden inputs for quick photo upload -->
+<input type="file" id="quickPhotoFileInput" accept="image/jpeg,image/png,image/webp" style="display:none;">
+<input type="file" id="quickPhotoCameraInput" accept="image/*" capture="environment" style="display:none;">
+<input type="file" id="quickPhotoSelfieInput" accept="image/*" capture="user" style="display:none;">
+
+<!-- Photo source picker dropdown (appears near clicked element) -->
+<div id="photoSourcePicker" class="card shadow-sm border" style="display:none; position:fixed; z-index:9999; width:200px; border-radius:14px; overflow:hidden;">
+    <button type="button" class="btn btn-sm text-start w-100 py-2 px-3 border-0 d-flex align-items-center" id="psPick_gallery">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#435338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span class="small fw-semibold" style="color:#435338;">Galeri / File</span>
+    </button>
+    <button type="button" class="btn btn-sm text-start w-100 py-2 px-3 border-0 border-top d-flex align-items-center" id="psPick_camera">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#435338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span class="small fw-semibold" style="color:#435338;">Kamera Belakang</span>
+    </button>
+    <button type="button" class="btn btn-sm text-start w-100 py-2 px-3 border-0 border-top d-flex align-items-center" id="psPick_selfie">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#435338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><circle cx="12" cy="12" r="3"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/></svg>
+        <span class="small fw-semibold" style="color:#435338;">Selfie</span>
+    </button>
+</div>
+<!-- Toast container for interactive notifications & confirmation popups -->
+<div class="toast-container site-toasts" aria-live="polite"></div>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -239,42 +247,240 @@ let filteredEntries = [...ALL_ENTRIES];
 let currentGrouping = 'week';
 let heightChartInstance = null;
 
-/* -------- View Toggle (Buku ↔ Riwayat) -------- */
-function switchView(mode) {
-    const bookPanel = document.getElementById('view-book');
-    const listPanel = document.getElementById('view-list');
-    const btnBook   = document.getElementById('btn-view-book');
-    const btnList   = document.getElementById('btn-view-list');
-
-    if (mode === 'book') {
-        if (bookPanel) bookPanel.style.display = '';
-        if (listPanel) listPanel.style.display = 'none';
-        if (btnBook) btnBook.classList.add('active');
-        if (btnList) btnList.classList.remove('active');
-        renderPage(currentIdx);
-    } else {
-        if (bookPanel) bookPanel.style.display = 'none';
-        if (listPanel) listPanel.style.display = '';
-        if (btnBook) btnBook.classList.remove('active');
-        if (btnList) btnList.classList.add('active');
-
-        // Render Riwayat list + chart
-        setTimeout(() => {
-            initHeightChart();
-            renderGroupedEntries(currentGrouping);
-        }, 30);
-    }
-    try {
-        localStorage.setItem('journalView', mode);
-    } catch (e) {}
-}
-
-/* -------- Page Content Rendering -------- */
+/* -------- Helpers -------- */
 function escHtml(str) {
     if (!str) return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+}
+
+function formatShortDate(dateIso) {
+    if (!dateIso) return '';
+    const parts = dateIso.split('-');
+    if (parts.length !== 3) return dateIso;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const d = parseInt(parts[2], 10);
+    const m = months[parseInt(parts[1], 10) - 1] || '';
+    return `${d} ${m}`;
+}
+
+function getConditionDotColor(cond) {
+    switch (cond) {
+        case 'healthy': return '#2e7d32';
+        case 'flowering': return '#456b77';
+        case 'fruiting': return '#d97706';
+        case 'ready_to_harvest': return '#59684f';
+        case 'wilting': return '#8c5344';
+        case 'needs_attention': return '#ca8a04';
+        default: return '#466842';
+    }
+}
+
+/* -------- Left Page: Stats, Chart, & Table of Contents -------- */
+function updateLeftStats() {
+    const countEl = document.getElementById('left-stat-count');
+    const heightEl = document.getElementById('left-stat-height');
+    const growthEl = document.getElementById('left-stat-growth');
+    const totalEl = document.getElementById('left-total');
+    const headerCount = document.getElementById('total-count');
+
+    if (countEl) countEl.textContent = filteredEntries.length;
+    if (totalEl) totalEl.textContent = `${filteredEntries.length} entri`;
+    if (headerCount) headerCount.textContent = filteredEntries.length;
+
+    const entriesWithH = filteredEntries.filter(e => e.plant_height !== null && e.plant_height !== undefined && e.plant_height !== '');
+    if (entriesWithH.length > 0) {
+        const latest = entriesWithH[0];
+        const oldest = entriesWithH[entriesWithH.length - 1];
+        if (heightEl) heightEl.textContent = Math.round(latest.plant_height);
+        if (growthEl) {
+            if (entriesWithH.length > 1) {
+                const diff = (latest.plant_height - oldest.plant_height).toFixed(1);
+                const diffVal = parseFloat(diff);
+                growthEl.textContent = (diffVal > 0 ? '+' : '') + (diffVal % 1 === 0 ? parseInt(diffVal) : diffVal);
+                growthEl.className = 'stat-num ' + (diffVal > 0 ? 'text-success' : (diffVal < 0 ? 'text-muted' : 'text-dark'));
+            } else {
+                growthEl.textContent = '0';
+                growthEl.className = 'stat-num text-dark';
+            }
+        }
+    } else {
+        if (heightEl) heightEl.textContent = '—';
+        if (growthEl) {
+            growthEl.textContent = '—';
+            growthEl.className = 'stat-num text-dark';
+        }
+    }
+}
+
+function updateLeftChart() {
+    const canvas = document.getElementById('leftHeightChart');
+    if (!canvas) return;
+
+    const entriesWithHeight = filteredEntries
+        .filter(e => e.plant_height !== null && e.plant_height !== undefined && e.plant_height !== '')
+        .slice()
+        .sort((a, b) => new Date(a.date_iso) - new Date(b.date_iso));
+
+    let noData = document.getElementById('left-chart-no-data');
+
+    if (entriesWithHeight.length === 0) {
+        canvas.style.display = 'none';
+        if (!noData) {
+            noData = document.createElement('div');
+            noData.id = 'left-chart-no-data';
+            noData.className = 'text-center text-muted small py-3 fst-italic';
+            noData.style.fontSize = '0.74rem';
+            noData.textContent = 'Belum ada data tinggi/ukuran tanaman.';
+            canvas.parentNode.appendChild(noData);
+        }
+        noData.style.display = 'block';
+        return;
+    }
+
+    if (noData) noData.style.display = 'none';
+    canvas.style.display = 'block';
+
+    const labels = entriesWithHeight.map(e => formatShortDate(e.date_iso));
+    const dataPoints = entriesWithHeight.map(e => parseFloat(e.plant_height));
+
+    if (heightChartInstance) {
+        heightChartInstance.destroy();
+        heightChartInstance = null;
+    }
+
+    const ctx = canvas.getContext('2d');
+    heightChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Tinggi (cm)',
+                data: dataPoints,
+                borderColor: '#387638',
+                backgroundColor: 'rgba(56, 118, 56, 0.08)',
+                borderWidth: 2.2,
+                pointBackgroundColor: '#387638',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 1.5,
+                pointRadius: 3.5,
+                pointHoverRadius: 5.5,
+                fill: true,
+                tension: 0.25,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.parsed.y} cm`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { size: 9.5, family: "'Plus Jakarta Sans', sans-serif" },
+                        color: '#798a72',
+                        maxRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 5,
+                    },
+                    border: { display: false }
+                },
+                y: {
+                    grid: { color: 'rgba(0,0,0,0.05)', strokeDash: [3, 3] },
+                    ticks: {
+                        font: { size: 9.5, family: "'Plus Jakarta Sans', sans-serif" },
+                        color: '#798a72',
+                        callback: v => v + ' cm',
+                        maxTicksLimit: 4,
+                    },
+                    border: { display: false },
+                    beginAtZero: false,
+                }
+            }
+        }
+    });
+}
+
+function renderToc() {
+    const tocList = document.getElementById('book-toc-list');
+    if (!tocList) return;
+
+    if (filteredEntries.length === 0) {
+        tocList.innerHTML = `<div class="text-muted small fst-italic py-2 text-center" style="font-size: 0.75rem;">Tidak ada catatan.</div>`;
+        return;
+    }
+
+    tocList.innerHTML = filteredEntries.map((e, idx) => {
+        const isActive = (idx === currentIdx);
+        const dotColor = getConditionDotColor(e.plant_condition);
+        const shortDate = formatShortDate(e.date_iso);
+        return `
+            <div class="book-toc-item ${isActive ? 'active' : ''}" id="toc-item-${idx}" onclick="goToPage(${idx})" role="button" title="${escHtml(e.title)} (${e.date})">
+                <div class="d-flex align-items-center gap-2 text-truncate" style="min-width: 0;">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a09074" stroke-width="2.5" class="flex-shrink-0" style="opacity: 0.7;">
+                        <circle cx="8" cy="6" r="1.5"/><circle cx="16" cy="6" r="1.5"/>
+                        <circle cx="8" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/>
+                        <circle cx="8" cy="18" r="1.5"/><circle cx="16" cy="18" r="1.5"/>
+                    </svg>
+                    <span class="toc-date text-muted small fw-medium flex-shrink-0" style="font-size: 0.76rem;">${shortDate}</span>
+                    <span class="toc-title text-dark small fw-semibold text-truncate" style="font-size: 0.78rem;">${escHtml(e.title)}</span>
+                </div>
+                <span class="toc-dot-indicator rounded-circle flex-shrink-0 ms-2" style="width: 8px; height: 8px; background-color: ${dotColor};"></span>
+            </div>
+        `;
+    }).join('');
+
+    setTimeout(() => {
+        const activeItem = document.getElementById(`toc-item-${currentIdx}`);
+        if (activeItem) {
+            activeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+    }, 40);
+}
+
+function updateBottomControls(idx) {
+    const indicator = document.getElementById('bottom-page-indicator');
+    if (indicator) {
+        if (filteredEntries.length === 0) {
+            indicator.textContent = 'Halaman 0 dari 0';
+        } else {
+            indicator.textContent = `Halaman ${idx + 1} dari ${filteredEntries.length}`;
+        }
+    }
+
+    const btnSingle = document.getElementById('btn-nav-single');
+    if (!btnSingle) return;
+
+    if (!filteredEntries || filteredEntries.length <= 1) {
+        btnSingle.style.display = 'none';
+        return;
+    }
+    btnSingle.style.display = 'inline-flex';
+
+    if (idx === 0) {
+        btnSingle.innerHTML = `Hari Pertama (Awal) <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="ms-1"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>`;
+        btnSingle.title = 'Loncat ke lembaran catatan hari pertama';
+    } else {
+        btnSingle.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="me-1"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg> Ke Catatan Terkini`;
+        btnSingle.title = 'Kembali ke lembaran catatan paling baru';
+    }
+}
+
+function handleBottomSingleJump() {
+    if (!filteredEntries || filteredEntries.length <= 1) return;
+    if (currentIdx === 0) {
+        goToPage(filteredEntries.length - 1, 'next');
+    } else {
+        goToPage(0, 'prev');
+    }
 }
 
 function renderPage(idx) {
@@ -284,7 +490,10 @@ function renderPage(idx) {
     if (!filteredEntries || filteredEntries.length === 0) {
         if (el) el.innerHTML = '';
         if (emptyEl) emptyEl.style.display = '';
-        renderDots(-1);
+        updateLeftStats();
+        updateLeftChart();
+        renderToc();
+        updateBottomControls(-1);
         return;
     }
     if (emptyEl) emptyEl.style.display = 'none';
@@ -297,15 +506,17 @@ function renderPage(idx) {
     const e = filteredEntries[idx];
     if (!e) return;
 
-    // Update left page metadata
-    const epWrap = document.getElementById('left-ecopatch');
+    // 1. Update Left Page Header & Mascot
+    const epWrap = document.getElementById('left-ecopatch-badge');
     const epText = document.getElementById('left-ecopatch-text');
     if (epWrap && epText) {
         if (e.ecopatch_name) {
-            epText.textContent = '🪴 ' + e.ecopatch_name;
-            epWrap.style.display = '';
+            epText.textContent = e.ecopatch_name;
+            epWrap.classList.remove('d-none');
+            epWrap.classList.add('d-inline-flex');
         } else {
-            epWrap.style.display = 'none';
+            epWrap.classList.add('d-none');
+            epWrap.classList.remove('d-inline-flex');
         }
     }
 
@@ -315,7 +526,7 @@ function renderPage(idx) {
         condBadge.textContent = e.condition_display;
     }
 
-    // Update left page mascot expression based on plant condition
+    // Dynamic mascot corresponding to plant condition
     const mascotImg = document.getElementById('left-mascot-img');
     if (mascotImg && e.plant_condition && configEl) {
         const mascotMap = {
@@ -328,7 +539,7 @@ function renderPage(idx) {
         };
         const targetSrc = mascotMap[e.plant_condition] || configEl.dataset.mascotHealthy;
         if (targetSrc && !mascotImg.src.endsWith(targetSrc)) {
-            mascotImg.style.transform = 'scale(0.82)';
+            mascotImg.style.transform = 'scale(0.85)';
             setTimeout(() => {
                 mascotImg.src = targetSrc;
                 mascotImg.style.transform = 'scale(1)';
@@ -336,44 +547,30 @@ function renderPage(idx) {
         }
     }
 
+    // 2. Update Left Page Stats, Chart, TOC, and Bottom Navigation Controls
+    updateLeftStats();
+    updateLeftChart();
+    renderToc();
+    updateBottomControls(idx);
+
+    // 3. Render Right Page Content
     const isFirst = (idx === 0);
     const isLast  = (idx === filteredEntries.length - 1);
-    const metaExtras = e.plant_height
-        ? `<span class="mx-1">&middot;</span><span>📏 ${e.plant_height} cm</span>`
-        : '';
-
-    // Update petunjuk baca di halaman kiri secara dinamis
-    const hintTitle = document.getElementById('left-hint-title');
-    const hintDesc  = document.getElementById('left-hint-desc');
-    if (hintTitle && hintDesc) {
-        if (isFirst) {
-            hintTitle.textContent = 'Buku Terbuka di Catatan Terkini';
-            hintDesc.innerHTML = 'Menampilkan kondisi paling baru. Balik lembar (&rarr;) untuk melihat riwayat hari-hari sebelumnya.';
-        } else if (isLast && filteredEntries.length > 1) {
-            hintTitle.textContent = '🌱 Hari Pertama Dicatat';
-            hintDesc.innerHTML = 'Menampilkan catatan paling awal tanaman ini. Balik lembar (&larr;) untuk kembali ke catatan terkini.';
-        } else {
-            hintTitle.textContent = `📖 Lembar Riwayat #${idx + 1}`;
-            hintDesc.innerHTML = 'Balik lembar (&larr;) ke arah catatan terbaru atau (&rarr;) ke arah hari awal.';
-        }
-    }
 
     const orderBadge = isFirst
-        ? `<span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold" style="font-size:0.73rem;">✨ Catatan Terkini</span>`
+        ? `<span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold" style="font-size:0.75rem;">Catatan Terkini</span>`
         : (isLast && filteredEntries.length > 1
-            ? `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-semibold" style="font-size:0.73rem;">🌱 Hari Pertama Dicatat</span>`
-            : `<span class="badge bg-light text-muted border" style="font-size:0.72rem;">Lembar #${idx + 1}</span>`);
+            ? `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-semibold" style="font-size:0.75rem;">Hari Pertama Dicatat</span>`
+            : `<span class="badge bg-light text-muted border" style="font-size:0.73rem;">Lembar #${idx + 1}</span>`);
 
     if (el) {
         el.innerHTML = `
-            <div class="d-flex flex-column justify-content-between h-100" style="min-height: 380px;">
+            <div class="d-flex flex-column justify-content-between h-100" style="min-height: 480px;">
                 <div>
-                    <div class="entry-right-header">
-                        <div class="entry-right-meta d-flex align-items-center flex-wrap gap-2">
-                            <span>📅 ${e.date}</span>${metaExtras}
-                            ${orderBadge}
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
+                    <!-- Header: Date and navigation arrows (status ada di bawah buku) -->
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fw-semibold text-secondary" style="font-size: 0.85rem;">${e.date}</span>
+                        <div class="d-flex align-items-center gap-1">
                             <button type="button" class="page-turn-btn ${isFirst ? 'disabled' : ''}"
                                     onclick="turnPage('prev')" ${isFirst ? 'disabled' : ''}
                                     title="Halaman Sebelumnya (&larr;)">
@@ -387,78 +584,67 @@ function renderPage(idx) {
                         </div>
                     </div>
 
-                    <h3 class="entry-right-title mt-2 mb-2">${escHtml(e.title)}</h3>
+                    <!-- Title -->
+                    <h3 class="entry-right-title mt-1 mb-2" style="font-size: 1.35rem; font-weight: 700;">${escHtml(e.title)}</h3>
+
+                    <!-- Badges -->
                     <div class="d-flex flex-wrap gap-2 mb-3">
-                        <span class="badge bg-${e.badge}-subtle text-${e.badge} border border-${e.badge}-subtle">
+                        <span class="badge bg-${e.badge}-subtle text-${e.badge} border border-${e.badge}-subtle" style="font-size: 0.78rem;">
                             ${escHtml(e.condition_display)}
                         </span>
-                        ${e.plant_height ? `<span class="badge bg-white text-secondary border">📏 ${e.plant_height} cm</span>` : ''}
-                        ${e.ecopatch_name ? `<span class="badge bg-white text-secondary border">🪴 ${escHtml(e.ecopatch_name)}</span>` : ''}
+                        ${e.plant_height ? `
+                            <span class="badge bg-white text-secondary border d-inline-flex align-items-center" style="font-size: 0.78rem;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" aria-hidden="true"><rect x="2" y="6" width="20" height="10" rx="1.5"/><line x1="6" y1="6" x2="6" y2="10"/><line x1="10" y1="6" x2="10" y2="12"/><line x1="14" y1="6" x2="14" y2="10"/><line x1="18" y1="6" x2="18" y2="12"/></svg>
+                                ${e.plant_height} cm
+                            </span>
+                        ` : ''}
+                        ${e.ecopatch_name ? `<span class="badge bg-white text-secondary border" style="font-size: 0.78rem;">${escHtml(e.ecopatch_name)}</span>` : ''}
                     </div>
-                    <p class="entry-right-notes" style="white-space: pre-wrap;">${escHtml(e.notes)}</p>
 
+                    <!-- Notes -->
+                    <p class="entry-right-notes mb-3" style="white-space: pre-wrap; font-size: 0.9rem; line-height: 1.55; color: #444;">${escHtml(e.notes)}</p>
+
+                    <!-- Photo slot or polaroid -->
                     ${e.image_url ? `
                         <div class="journal-photo-polaroid mt-3">
                             <div class="journal-polaroid-frame text-center p-2 bg-white shadow-sm rounded border" style="border-color: #efe4cb !important; display: inline-block;">
-                                <img src="${e.image_url}" alt="${escHtml(e.title)}" class="journal-polaroid-img rounded" style="max-height: 150px; max-width: 100%; object-fit: cover; cursor: pointer;" onclick="window.open('${e.image_url}', '_blank')">
-                                <div class="journal-polaroid-caption text-muted small mt-1" style="font-size: 0.72rem;">📸 ${e.date} (klik untuk perbesar)</div>
+                                <img src="${e.image_url}" alt="${escHtml(e.title)}" class="journal-polaroid-img rounded" style="max-height: 160px; max-width: 100%; object-fit: cover; cursor: pointer;" onclick="window.open('${e.image_url}', '_blank')">
+                                <div class="journal-polaroid-caption text-muted small mt-1" style="font-size: 0.72rem;">Foto: ${e.date}</div>
+                                <div class="mt-1">
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none text-success small" style="font-size: 0.75rem;" onclick="triggerQuickPhotoUpload(${idx})" title="Ganti foto catatan">
+                                        Ganti foto
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ` : `
-                        <div class="photo-polaroid-slot mt-3" onclick="location.href='${e.edit_url}'" role="button" title="Klik untuk tambah foto">
-                            <span style="font-size:1.3rem;line-height:1;">📷</span>
-                            <span class="mt-1 fw-semibold small text-muted">+ Tambah Foto Tanaman</span>
-                            <span class="text-muted" style="font-size:0.7rem;">(klik untuk upload foto)</span>
+                        <div class="photo-compact-slot mt-3" onclick="triggerQuickPhotoUpload(${idx})" role="button" title="Klik untuk tambah foto">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            <span>Tambah foto untuk catatan ini</span>
                         </div>
                     `}
                 </div>
 
-                <div class="book-bottom-footer mt-4">
-                    <span class="fw-semibold text-muted">
+                <!-- Footer: Page info + Edit/Delete buttons -->
+                <div class="book-bottom-footer mt-4 pt-2 border-top d-flex align-items-center justify-content-between" style="border-color: rgba(212,197,163,0.3) !important;">
+                    <span class="fw-semibold text-muted small" style="font-size: 0.8rem;">
                         Hal. ${idx + 1} / ${filteredEntries.length} ${isFirst ? '· Terkini' : (isLast && filteredEntries.length > 1 ? '· Awal' : '')}
                     </span>
-                    <div class="d-flex gap-2">
-                        <a href="${e.edit_url}" class="btn btn-sm btn-outline-secondary py-0 px-2">✏️ Edit</a>
-                        <form method="post" action="${e.delete_url}"
-                              onsubmit="return confirm('Hapus lembaran catatan ini?')" style="display:inline;">
-                            <input type="hidden" name="csrfmiddlewaretoken" value="${CSRF_TOKEN}">
-                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">🗑️</button>
-                        </form>
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="${e.edit_url}" class="btn btn-sm btn-ds-ghost py-1 px-3 d-inline-flex align-items-center" style="font-size: 0.8rem; border-radius: 8px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            Edit
+                        </a>
+                        <button type="button" id="btn-delete-entry" class="btn btn-sm btn-ds-delete py-1 px-3 d-inline-flex align-items-center"
+                                onclick="confirmDeleteEntry(${idx})" style="font-size: 0.8rem; border-radius: 8px;" title="Hapus">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                            Hapus
+                        </button>
                     </div>
                 </div>
             </div>
         `;
     }
-
-    renderDots(idx);
-}
-
-/* -------- Dots Indicator -------- */
-function renderDots(activeIdx) {
-    const container = document.getElementById('page-dots');
-    const btnNewest = document.getElementById('btn-jump-newest');
-    const btnOldest = document.getElementById('btn-jump-oldest');
-
-    if (btnNewest) {
-        btnNewest.disabled = (activeIdx === 0);
-        btnNewest.classList.toggle('opacity-50', activeIdx === 0);
-    }
-    if (btnOldest) {
-        const atOldest = (activeIdx === filteredEntries.length - 1 || filteredEntries.length <= 1);
-        btnOldest.disabled = atOldest;
-        btnOldest.classList.toggle('opacity-50', atOldest);
-    }
-
-    if (!container) return;
-    container.innerHTML = '';
-    if (filteredEntries.length <= 1) return;
-    filteredEntries.forEach((_, i) => {
-        const dot = document.createElement('span');
-        dot.className = 'page-dot' + (i === activeIdx ? ' active' : '');
-        dot.title = i === 0 ? 'Halaman 1 (Terkini)' : (i === filteredEntries.length - 1 ? `Halaman ${i + 1} (Awal Menanam)` : `Halaman ${i + 1}`);
-        dot.onclick = () => jumpTo(i);
-        container.appendChild(dot);
-    });
 }
 
 /* -------- Page Turning & 3D Animation -------- */
@@ -477,10 +663,7 @@ function jumpTo(idx) {
 }
 
 function goToPage(targetIdx, dir) {
-    // 1. Play visual animation
     playFlip(dir);
-
-    // 2. Immediately render the destination page so it never gets stuck
     currentIdx = targetIdx;
     renderPage(currentIdx);
 }
@@ -516,10 +699,6 @@ function playFlip(dir) {
 
 /* -------- Keyboard Navigation (← and →) -------- */
 document.addEventListener('keydown', function(e) {
-    const bookPanel = document.getElementById('view-book');
-    const isBookActive = bookPanel && bookPanel.style.display !== 'none';
-    if (!isBookActive) return;
-
     const tag = (e.target && e.target.tagName) || '';
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
@@ -544,265 +723,242 @@ function applyFilters() {
         return condOk && dateOk;
     });
 
-    const countEl = document.getElementById('total-count');
-    if (countEl) countEl.textContent = filteredEntries.length;
-
     currentIdx = 0;
-    renderPage(currentIdx);
-    renderGroupedEntries(currentGrouping);
-}
+    renderPage(0);
 
-/* ================================================================
-   RIWAYAT VIEW: Chart.js + Grouped Entries (Per Minggu / Per Bulan)
-   ================================================================ */
-
-/* ---- Helpers ---- */
-function getWeekLabel(dateStr) {
-    // dateStr: "2026-09-24" ISO
-    const d = new Date(dateStr + 'T00:00:00');
-    const day = d.getDay(); // 0=Sun
-    const diffToMon = (day === 0) ? -6 : 1 - day;
-    const mon = new Date(d); mon.setDate(d.getDate() + diffToMon);
-    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
-    const fmt = dt => `${dt.getDate()} ${dt.toLocaleString('id-ID', {month:'short'})}`;
-    const yearSuffix = sun.getFullYear() !== new Date().getFullYear() ? ` ${sun.getFullYear()}` : '';
-    return `${fmt(mon)} – ${fmt(sun)} ${sun.getFullYear()}`;
-}
-
-function getMonthLabel(dateStr) {
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
-}
-
-let collapsedGroups = new Set();
-
-function getGroupKey(dateStr, mode) {
-    if (mode === 'all') return 'all';
-    const d = new Date(dateStr + 'T00:00:00');
-    if (mode === 'month') {
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if (filteredEntries.length === 0) {
+        showToast('Tidak ada catatan yang cocok dengan filter yang dipilih.', 'warning');
+    } else if (cond || dateVal) {
+        showToast(`Menampilkan ${filteredEntries.length} catatan sesuai filter.`, 'info');
     }
-    // week: ISO week key = monday date
-    const day = d.getDay();
-    const diffToMon = (day === 0) ? -6 : 1 - day;
-    const mon = new Date(d); mon.setDate(d.getDate() + diffToMon);
-    return mon.toISOString().slice(0,10);
 }
 
-function renderSingleEntryCard(e) {
-    return `
-        <div class="history-entry-card">
-            <div class="history-entry-left">
-                <div class="history-entry-color-bar bg-${e.badge}"></div>
+/* ===============================================================
+   QUICK PHOTO UPLOAD (Langsung dari lembaran buku tanpa form edit)
+   =============================================================== */
+let pendingUploadEntryId = null;
+
+function triggerQuickPhotoUpload(idx) {
+    const entry = filteredEntries[idx];
+    if (!entry) return;
+    pendingUploadEntryId = entry.id || entry.pk;
+    showPhotoSourcePicker(event);
+}
+
+function triggerQuickPhotoUploadById(target) {
+    let id = target;
+    if (target && typeof target === 'object' && target.getAttribute) {
+        id = target.getAttribute('data-entry-id');
+    }
+    pendingUploadEntryId = id ? parseInt(id, 10) : null;
+    showPhotoSourcePicker(event);
+}
+
+function showPhotoSourcePicker(evt) {
+    const picker = document.getElementById('photoSourcePicker');
+    if (!picker) return;
+    // Position near click
+    const x = Math.min((evt ? evt.clientX : 200) - 30, window.innerWidth - 220);
+    const y = Math.min((evt ? evt.clientY : 200) - 10, window.innerHeight - 160);
+    picker.style.left = x + 'px';
+    picker.style.top = y + 'px';
+    picker.style.display = 'block';
+    // Auto-hide on outside click
+    setTimeout(() => {
+        document.addEventListener('click', function hidePS(e) {
+            if (!picker.contains(e.target)) {
+                picker.style.display = 'none';
+                document.removeEventListener('click', hidePS);
+            }
+        });
+    }, 50);
+}
+
+function pickQuickFile(inputId) {
+    const picker = document.getElementById('photoSourcePicker');
+    if (picker) picker.style.display = 'none';
+    const input = document.getElementById(inputId);
+    if (input) { input.value = ''; input.click(); }
+}
+
+document.getElementById('psPick_gallery')?.addEventListener('click', (e) => { e.stopPropagation(); pickQuickFile('quickPhotoFileInput'); });
+document.getElementById('psPick_camera')?.addEventListener('click', (e) => { e.stopPropagation(); pickQuickFile('quickPhotoCameraInput'); });
+document.getElementById('psPick_selfie')?.addEventListener('click', (e) => { e.stopPropagation(); pickQuickFile('quickPhotoSelfieInput'); });
+
+const quickFileInput = document.getElementById('quickPhotoFileInput');
+const quickCameraInput = document.getElementById('quickPhotoCameraInput');
+const quickSelfieInput = document.getElementById('quickPhotoSelfieInput');
+
+function handleQuickPhotoSelected(fileInput) {
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0 || !pendingUploadEntryId) return;
+    const file = fileInput.files[0];
+    // If from camera/selfie, transfer to main gallery input for upload
+    if (fileInput !== quickFileInput && quickFileInput) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        quickFileInput.files = dt.files;
+    }
+    processQuickUpload(file);
+}
+
+async function processQuickUpload(file) {
+    const entryId = pendingUploadEntryId;
+    const entry = ALL_ENTRIES.find(e => (e.id === entryId || e.pk === entryId));
+    if (!entry) return;
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+        showToast('Format foto harus JPG, PNG, atau WebP.', 'warning');
+        return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('Ukuran foto maksimal 5 MB.', 'warning');
+        return;
+    }
+
+    const uploadUrl = entry.upload_photo_url || `/journal/${entryId}/upload-photo/`;
+    const formData = new FormData();
+    formData.append('image', file);
+
+    showToast('Mengunggah foto tanaman...', 'info');
+
+    try {
+        const res = await fetch(uploadUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': CSRF_TOKEN,
+            },
+            body: formData,
+        });
+        const data = await res.json();
+        if (data.success && data.image_url) {
+            entry.image_url = data.image_url;
+            const fEntry = filteredEntries.find(e => (e.id === entryId || e.pk === entryId));
+            if (fEntry) fEntry.image_url = data.image_url;
+
+            showToast('Foto berhasil ditambahkan ke catatan!', 'success');
+            renderPage(currentIdx);
+        } else {
+            showToast(data.error || 'Gagal mengunggah foto tanaman.', 'warning');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Gagal mengunggah foto. Pastikan koneksi lancar.', 'warning');
+    } finally {
+        pendingUploadEntryId = null;
+    }
+}
+
+// Wire change listeners for all 3 quick photo inputs
+if (quickFileInput) quickFileInput.addEventListener('change', function() { handleQuickPhotoSelected(this); });
+if (quickCameraInput) quickCameraInput.addEventListener('change', function() { handleQuickPhotoSelected(this); });
+if (quickSelfieInput) quickSelfieInput.addEventListener('change', function() { handleQuickPhotoSelected(this); });
+
+/* ===============================================================
+   INTERACTIVE DELETE CONFIRMATION TOAST
+   =============================================================== */
+function confirmDeleteEntry(idx) {
+    const entry = filteredEntries[idx];
+    if (!entry) return;
+
+    // Bersihkan toast konfirmasi lama jika masih ada
+    const existing = document.getElementById('delete-confirm-toast');
+    if (existing) existing.remove();
+
+    let container = document.querySelector('.site-toasts');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container site-toasts';
+        document.body.appendChild(container);
+    }
+
+    const toastEl = document.createElement('div');
+    toastEl.id = 'delete-confirm-toast';
+    toastEl.className = 'toast site-toast show';
+    toastEl.style.borderColor = '#ecd8ce';
+    toastEl.style.borderLeft = '5px solid #8c5344';
+    toastEl.style.background = '#fefdfb';
+    toastEl.style.display = 'flex';
+    toastEl.style.opacity = '1';
+    toastEl.setAttribute('role', 'alert');
+    toastEl.setAttribute('aria-live', 'assertive');
+
+    toastEl.innerHTML = `
+        <div class="site-toast-body w-100">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c5344" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                <strong style="color: #22301f; font-size: 0.92rem;">Hapus Catatan Jurnal?</strong>
             </div>
-            <div class="history-entry-body">
-                <div class="history-entry-badges d-flex flex-wrap gap-2 mb-1">
-                    <span class="badge bg-${e.badge}-subtle text-${e.badge} border border-${e.badge}-subtle">${escHtml(e.condition_display)}</span>
-                    ${e.ecopatch_name ? `<span class="badge bg-white text-secondary border">🪴 ${escHtml(e.ecopatch_name)}</span>` : ''}
-                    ${e.plant_height ? `<span class="badge bg-white text-secondary border">📏 ${e.plant_height} cm</span>` : ''}
-                    <span class="ms-auto text-muted small">📅 ${e.date}</span>
-                </div>
-                <div class="history-entry-title">${escHtml(e.title)}</div>
-                <div class="history-entry-notes text-secondary" style="white-space:pre-wrap;">${escHtml(e.notes)}</div>
-                ${e.image_url ? `
-                    <div class="mt-2 mb-1">
-                        <img src="${e.image_url}" alt="Foto ${escHtml(e.title)}" style="max-height: 110px; max-width: 160px; object-fit: cover; border-radius: 8px; border: 1px solid #efe4cb; cursor: pointer;" onclick="window.open('${e.image_url}', '_blank')">
-                    </div>
-                ` : ''}
-                <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top">
-                    <small class="text-muted fst-italic">Dicatat ${e.created_at}</small>
-                    <div class="d-flex gap-2">
-                        <a href="${e.edit_url}" class="btn btn-sm btn-outline-secondary py-0 px-2">✏️ Edit</a>
-                        <form method="post" action="${e.delete_url}" onsubmit="return confirm('Hapus catatan ini?')" style="display:inline;">
-                            <input type="hidden" name="csrfmiddlewaretoken" value="${CSRF_TOKEN}">
-                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">🗑️</button>
-                        </form>
-                    </div>
-                </div>
+            <p class="mb-2 text-muted fw-normal" style="font-size: 0.82rem; line-height: 1.4;">
+                Kamu yakin ingin menghapus catatan <strong>"${escHtml(entry.title)}"</strong>? Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <div class="d-flex justify-content-end gap-2 pt-1 border-top" style="border-color: #f1eae2 !important;">
+                <button type="button" class="btn btn-sm btn-ds-ghost py-1 px-3" id="btn-cancel-delete" style="font-size: 0.78rem; border-radius: 6px;">
+                    Batal
+                </button>
+                <button type="button" class="btn btn-sm btn-ds-delete py-1 px-3 fw-semibold" id="btn-confirm-delete" style="font-size: 0.78rem; border-radius: 6px;">
+                    Ya, Hapus
+                </button>
             </div>
         </div>
+        <button type="button" class="btn-close site-toast-close" aria-label="Tutup"></button>
     `;
-}
 
-function toggleGroup(key) {
-    const el = document.getElementById(`group-${key}`);
-    if (!el) return;
-    if (collapsedGroups.has(key)) {
-        collapsedGroups.delete(key);
-        el.classList.remove('collapsed');
-    } else {
-        collapsedGroups.add(key);
-        el.classList.add('collapsed');
-    }
-    updateToggleAllBtn();
-}
+    container.appendChild(toastEl);
 
-function toggleAllGroups() {
-    const allGroupEls = document.querySelectorAll('.history-group');
-    if (!allGroupEls.length) return;
-    const hasOpen = Array.from(allGroupEls).some(g => !g.classList.contains('collapsed'));
-    allGroupEls.forEach(g => {
-        const key = g.getAttribute('data-group-key');
-        if (hasOpen) {
-            g.classList.add('collapsed');
-            if (key) collapsedGroups.add(key);
-        } else {
-            g.classList.remove('collapsed');
-            if (key) collapsedGroups.delete(key);
-        }
+    const closeToast = () => {
+        toastEl.classList.remove('show');
+        setTimeout(() => toastEl.remove(), 250);
+    };
+
+    toastEl.querySelector('.site-toast-close')?.addEventListener('click', closeToast);
+    toastEl.querySelector('#btn-cancel-delete')?.addEventListener('click', closeToast);
+
+    toastEl.querySelector('#btn-confirm-delete')?.addEventListener('click', function() {
+        closeToast();
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = entry.delete_url;
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrfmiddlewaretoken';
+        csrf.value = CSRF_TOKEN;
+        form.appendChild(csrf);
+        document.body.appendChild(form);
+        form.submit();
     });
-    updateToggleAllBtn();
 }
 
-function updateToggleAllBtn() {
-    const btn = document.getElementById('btn-toggle-all');
-    if (!btn) return;
-    if (currentGrouping === 'all') {
-        btn.style.display = 'none';
-        return;
+/* ===============================================================
+   TOAST NOTIFICATION HELPER (Design System Earth Tones)
+   =============================================================== */
+function showToast(message, type = 'success') {
+    let container = document.querySelector('.site-toasts');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container site-toasts';
+        document.body.appendChild(container);
     }
-    const allGroupEls = document.querySelectorAll('.history-group');
-    if (!allGroupEls.length) {
-        btn.style.display = 'none';
-        return;
-    }
-    btn.style.display = '';
-    const hasOpen = Array.from(allGroupEls).some(g => !g.classList.contains('collapsed'));
-    btn.innerHTML = hasOpen ? '📁 Sembunyikan Semua' : '📂 Tampilkan Semua';
-}
+    const toastEl = document.createElement('div');
+    toastEl.className = `toast site-toast site-toast--${type} show`;
+    toastEl.setAttribute('role', 'status');
+    toastEl.setAttribute('aria-live', 'polite');
+    toastEl.innerHTML = `
+        <div class="site-toast-body">${message}</div>
+        <button type="button" class="btn-close site-toast-close" data-bs-dismiss="toast" aria-label="Tutup"></button>
+    `;
+    container.appendChild(toastEl);
 
-/* ---- Render grouped entries ---- */
-function renderGroupedEntries(mode) {
-    const container = document.getElementById('grouped-entries-container');
-    if (!container) return;
+    setTimeout(() => {
+        toastEl.classList.remove('show');
+        setTimeout(() => toastEl.remove(), 350);
+    }, 4000);
 
-    if (!filteredEntries || filteredEntries.length === 0) {
-        container.innerHTML = `<div class="text-center py-4 text-muted">Tidak ada catatan untuk filter ini.</div>`;
-        updateToggleAllBtn();
-        return;
-    }
-
-    if (mode === 'all') {
-        const entriesHtml = filteredEntries.map(e => renderSingleEntryCard(e)).join('');
-        container.innerHTML = `
-            <div class="d-flex flex-column gap-3 mb-4">
-                ${entriesHtml}
-            </div>
-        `;
-        updateToggleAllBtn();
-        return;
-    }
-
-    // mode: week or month
-    const groups = {};
-    const groupOrder = [];
-    filteredEntries.forEach(e => {
-        const key = getGroupKey(e.date_iso, mode);
-        if (!groups[key]) {
-            groups[key] = { label: mode === 'week' ? getWeekLabel(e.date_iso) : getMonthLabel(e.date_iso), entries: [] };
-            groupOrder.push(key);
-        }
-        groups[key].entries.push(e);
-    });
-
-    container.innerHTML = groupOrder.map(key => {
-        const g = groups[key];
-        const count = g.entries.length;
-        const isCollapsed = collapsedGroups.has(key);
-        const entriesHtml = g.entries.map(e => renderSingleEntryCard(e)).join('');
-
-        return `
-            <div class="history-group mb-4 ${isCollapsed ? 'collapsed' : ''}" id="group-${key}" data-group-key="${key}">
-                <div class="history-group-header" onclick="toggleGroup('${key}')" role="button" tabindex="0" title="Klik untuk sembunyikan/tampilkan catatan">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="history-group-chevron" id="chevron-${key}">▼</span>
-                        <span class="history-group-label">${g.label}</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="history-group-count">${count} catatan</span>
-                        <span class="text-muted small d-none d-sm-inline" style="font-size:0.75rem;">(buka/tutup)</span>
-                    </div>
-                </div>
-                <div class="history-group-entries d-flex flex-column gap-3" id="entries-${key}">
-                    ${entriesHtml}
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    updateToggleAllBtn();
-}
-
-/* ---- Toggle week/month/all ---- */
-function switchGrouping(mode) {
-    currentGrouping = mode;
-    document.getElementById('tab-week')?.classList.toggle('active', mode === 'week');
-    document.getElementById('tab-month')?.classList.toggle('active', mode === 'month');
-    document.getElementById('tab-all')?.classList.toggle('active', mode === 'all');
-    renderGroupedEntries(mode);
-    try { localStorage.setItem('journalGrouping', mode); } catch(e) {}
-}
-
-/* ---- Chart.js line chart ---- */
-function initHeightChart() {
-    const canvas = document.getElementById('heightChart');
-    const noData = document.getElementById('chart-no-data');
-    if (!canvas) return;
-
-    if (!CHART_DATA || CHART_DATA.length === 0) {
-        canvas.style.display = 'none';
-        if (noData) noData.style.display = '';
-        return;
-    }
-
-    if (heightChartInstance) { heightChartInstance.destroy(); }
-
-    const labels = CHART_DATA.map(d => d.date);
-    const heights = CHART_DATA.map(d => d.height);
-
-    heightChartInstance = new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Tinggi (cm)',
-                data: heights,
-                borderColor: '#1f9142',
-                backgroundColor: 'rgba(31, 145, 66, 0.08)',
-                borderWidth: 2.5,
-                pointBackgroundColor: '#1f9142',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                tension: 0.35,
-                fill: true,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => ` ${ctx.parsed.y} cm`,
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: { font: { size: 11 }, color: '#8c7b5a', maxRotation: 30 },
-                    grid: { display: false },
-                    border: { display: false },
-                },
-                y: {
-                    ticks: { font: { size: 11 }, color: '#8c7b5a', callback: v => v + ' cm' },
-                    grid: { color: 'rgba(0,0,0,0.05)' },
-                    border: { display: false },
-                }
-            }
-        }
+    toastEl.querySelector('.site-toast-close')?.addEventListener('click', () => {
+        toastEl.classList.remove('show');
+        setTimeout(() => toastEl.remove(), 350);
     });
 }
 
@@ -815,18 +971,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const fDate = document.getElementById('filter-date');
     if (fDate) fDate.addEventListener('change', applyFilters);
 
-    try {
-        const savedGroup = localStorage.getItem('journalGrouping') || 'week';
-        currentGrouping = savedGroup;
-        document.getElementById('tab-week')?.classList.toggle('active', savedGroup === 'week');
-        document.getElementById('tab-month')?.classList.toggle('active', savedGroup === 'month');
-        document.getElementById('tab-all')?.classList.toggle('active', savedGroup === 'all');
-
-        const savedView = localStorage.getItem('journalView') || 'book';
-        switchView(savedView);
-    } catch(e) {
-        switchView('book');
-    }
+    // Initial page load
+    const initialPage = parseInt(configEl ? configEl.dataset.initialPage : '0', 10) || 0;
+    currentIdx = (initialPage >= 0 && initialPage < filteredEntries.length) ? initialPage : 0;
+    renderPage(currentIdx);
 });
 </script>
 {% endblock %}

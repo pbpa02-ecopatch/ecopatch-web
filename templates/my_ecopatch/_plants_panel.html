@@ -1,8 +1,33 @@
 {# Panel ini di-swap seluruhnya oleh htmx (hx-target="#patch-plants"), jadi id di bawah harus tetap ada. #}
 <div id="patch-plants" class="patch-plants">
+    <p class="mep-feedback" role="status">{{ plant_feedback }}</p>
+    <form id="add-plant" method="post" class="patch-form patch-plant-form" novalidate
+          action="{% url 'my_ecopatch:plant_add' patch.pk %}"
+          hx-post="{% url 'my_ecopatch:plant_add' patch.pk %}"
+          hx-target="#patch-plants" hx-swap="outerHTML">
+        {% csrf_token %}
+        <h3 class="patch-form-title">Tambah tanaman</h3><p class="patch-help">Kolom bertanda * wajib diisi. Pilih tanaman dari katalog, lalu catat jumlah dan tahap pertumbuhannya.</p>
+        <p class="patch-help patch-help-lead">
+            Belum tahu mau menanam apa?
+            <a href="{% url 'plant_library:plant_recommend' %}?patch={{ patch.pk }}">Lihat rekomendasi untuk EcoPatch ini</a>
+            atau <a href="{% url 'plant_library:plant_list' %}">jelajahi Plant Library</a>.
+        </p>
+        {% if plant_form.non_field_errors %}
+            <div class="patch-alert" role="alert">{% for error in plant_form.non_field_errors %}{{ error }}{% endfor %}</div>
+        {% endif %}
+        <div class="patch-form-grid">
+            {% for field in plant_form %}
+                {% include "my_ecopatch/_form_field.html" %}
+            {% endfor %}
+        </div>
+        <div class="patch-form-actions">
+            <button id="add-plant-submit" type="submit" class="btn btn-success">Tambah tanaman</button>
+        </div>
+    </form>
+
     <div class="patch-plants-head">
         <h2 class="patch-section-title">Tanaman di EcoPatch ini</h2>
-        <p class="patch-card-count">{{ patch.plant_total }} tanaman</p>
+        <p class="patch-card-count">{{ patch.plant_quantity }} tanaman · {{ patch.plant_total }} entri</p>
         {% if patch.status_summary %}
             <ul class="patch-status-list">
                 {% for item in patch.status_summary %}
@@ -26,61 +51,29 @@
                         <span class="plant-meta">{{ plant.quantity }} tanaman{% if plant.planted_at %} &middot; mulai tanam {{ plant.planted_at|date:"j M Y" }}{% endif %}</span>
                     </div>
 
-                    {# Status: dropdown berisi tombol submit. Nilainya dikirim lewat name/value tombol yang diklik (htmx 1.9 dan form biasa sama-sama mendukung). #}
                     <form method="post" class="plant-status-form"
                           action="{% url 'my_ecopatch:plant_status' plant.pk %}"
                           hx-post="{% url 'my_ecopatch:plant_status' plant.pk %}"
                           hx-target="#patch-plants" hx-swap="outerHTML">
                         {% csrf_token %}
-                        <div class="dropdown">
-                            <button type="button" class="plant-status-btn patch-pill--{{ plant.status }} dropdown-toggle"
-                                    data-bs-toggle="dropdown" aria-expanded="false"
-                                    aria-label="Ubah status {% firstof plant.plant.name plant.plant_name %}">{{ plant.get_status_display }}</button>
-                            <ul class="dropdown-menu dropdown-menu-end patch-menu">
-                                {% for value, label in status_choices %}
-                                    <li><button type="submit" name="status" value="{{ value }}"
-                                                class="dropdown-item patch-menu-item{% if value == plant.status %} active{% endif %}">{{ label }}</button></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                        <label class="visually-hidden" for="status-{{ plant.pk }}">Status {% firstof plant.plant.name plant.plant_name %}</label>
+                        <select class="plant-status-select patch-pill--{{ plant.status }}" name="status" id="status-{{ plant.pk }}">
+                        {% for value,label in status_choices %}<option value="{{ value }}"{% if value == plant.status %} selected{% endif %}>{{ label }}</option>{% endfor %}
+                        </select>
+                        <button class="mep-status-save" type="submit" id="save-{{ plant.pk }}" aria-label="Simpan status {% firstof plant.plant.name plant.plant_name %}">Simpan</button>
                     </form>
-
-                    <form method="post"
-                          action="{% url 'my_ecopatch:plant_delete' plant.pk %}"
-                          hx-post="{% url 'my_ecopatch:plant_delete' plant.pk %}"
-                          hx-confirm="Hapus {% firstof plant.plant.name plant.plant_name %} dari EcoPatch ini?"
-                          hx-target="#patch-plants" hx-swap="outerHTML">
-                        {% csrf_token %}
-                        <button type="submit" class="plant-remove">Hapus</button>
-                    </form>
+                    <a class="plant-remove" href="{% url 'my_ecopatch:plant_delete' plant.pk %}"
+                       hx-post="{% url 'my_ecopatch:plant_delete' plant.pk %}"
+                       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                       hx-confirm="Hapus {% firstof plant.plant.name plant.plant_name %} dari EcoPatch ini?"
+                       hx-target="#patch-plants" hx-swap="outerHTML"
+                       aria-label="Hapus {% firstof plant.plant.name plant.plant_name %}">Hapus</a>
                 </li>
             {% endfor %}
         </ul>
     {% else %}
-        <p class="patch-empty">Belum ada tanaman. Tambahkan tanaman pertamamu di bawah.</p>
+        <p class="patch-empty">Belum ada tanaman. Tambahkan tanaman pertamamu melalui form di atas.</p>
     {% endif %}
 
-    <form method="post" class="patch-form patch-plant-form" novalidate
-          action="{% url 'my_ecopatch:plant_add' patch.pk %}"
-          hx-post="{% url 'my_ecopatch:plant_add' patch.pk %}"
-          hx-target="#patch-plants" hx-swap="outerHTML">
-        {% csrf_token %}
-        <h3 class="patch-form-title">Tambah tanaman</h3>
-        <p class="patch-help patch-help-lead">
-            Belum tahu mau menanam apa?
-            <a href="{% url 'plant_library:plant_recommend' %}?patch={{ patch.pk }}">Lihat rekomendasi untuk EcoPatch ini</a>
-            atau <a href="{% url 'plant_library:plant_list' %}">jelajahi Plant Library</a>.
-        </p>
-        {% if plant_form.non_field_errors %}
-            <div class="patch-alert" role="alert">{% for error in plant_form.non_field_errors %}{{ error }}{% endfor %}</div>
-        {% endif %}
-        <div class="patch-form-grid">
-            {% for field in plant_form %}
-                {% include "my_ecopatch/_form_field.html" %}
-            {% endfor %}
-        </div>
-        <div class="patch-form-actions">
-            <button type="submit" class="btn btn-success">Tambah tanaman</button>
-        </div>
-    </form>
+
 </div>

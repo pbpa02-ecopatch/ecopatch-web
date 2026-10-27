@@ -1,50 +1,49 @@
-{% extends "base.html" %}
+{% extends "my_ecopatch/base.html" %}
+{% load static %}
 {% block title %}My EcoPatch - EcoPatch{% endblock %}
-
-{% block content %}
-<section class="patch-page">
-    <header class="patch-page-head">
-        <div>
-            <h1 class="patch-page-title">My EcoPatch</h1>
-            <p class="patch-page-lead">Kelola semua kebun dan tanamanmu dalam satu tempat.</p>
-        </div>
-        <a href="{% url 'my_ecopatch:create' %}" class="btn btn-success patch-create-btn">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-            Buat EcoPatch Baru
-        </a>
-    </header>
-
-    {% if not patches %}
-        <p class="patch-empty">Kamu belum punya EcoPatch. Mulai dengan membuat kebun pertamamu.</p>
-    {% endif %}
-
-    <div class="patch-grid">
-        {% for patch in patches %}
-            <article class="patch-card">
-                <div class="patch-card-top">
-                    <h2 class="patch-card-title">
-                        <a href="{% url 'my_ecopatch:detail' patch.pk %}" class="patch-card-link stretched-link">{{ patch.name }}</a>
-                    </h2>
-                    <span class="patch-pill patch-pill--space">{{ patch.get_space_type_display }}</span>
-                </div>
-                <p class="patch-card-city">{{ patch.city }}</p>
-                <p class="patch-card-count">{{ patch.plant_total }} tanaman ditanam</p>
-                {% if patch.status_summary %}
-                    <ul class="patch-status-list">
-                        {% for item in patch.status_summary %}
-                            <li class="patch-pill patch-pill--{{ item.key }}">{{ item.count }} {{ item.label }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </article>
-        {% endfor %}
-
-        <a href="{% url 'my_ecopatch:create' %}" class="patch-card patch-card-add">
-            <span class="patch-add-icon" aria-hidden="true">
-                <svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-            </span>
-            <span class="patch-add-label">Buat EcoPatch Baru</span>
-        </a>
-    </div>
-</section>
+{% block garden_content %}
+<header class="mep-hero">
+  <div class="mep-hero-copy">
+    <p class="mep-eyebrow">RUANG KECIL, CERITA HIJAU BESAR</p>
+    <h1>My EcoPatch</h1>
+    <p>Kelola semua kebun dan tanamanmu dalam satu tempat.</p>
+    <ul class="mep-stats" aria-label="Ringkasan semua kebun">
+      <li><strong>{{ patch_count }}</strong> EcoPatch</li>
+      <li><strong>{{ plant_count }}</strong> tanaman</li>
+      <li><strong>{{ growing_count }}</strong> sedang tumbuh</li>
+    </ul>
+  </div>
+  <div class="mep-mascot"><p class="mep-speech">{% if patch_count %}Ruang kecilmu punya banyak cerita. Yuk, lihat yang tumbuh hari ini!{% else %}Kebun pertamamu dimulai dari satu langkah kecil. Ayo buat EcoPatch!{% endif %}</p><img src="{% static 'my_ecopatch/petak.svg' %}" width="186" height="182" alt="Petak, maskot EcoPatch"></div>
+</header>
+<div class="mep-content">
+  <div class="mep-toolbar">
+    <div><p class="mep-eyebrow">KEBUN PRIBADIMU</p><h2 class="patch-section-title">Setiap ruang bisa tumbuh.</h2></div>
+    <a href="{% url 'my_ecopatch:create' %}" class="btn btn-success">+ Buat EcoPatch Baru</a>
+  </div>
+  <form method="get" class="mep-filters" role="search" aria-label="Cari EcoPatch">
+    <div><label for="mep-q">Cari kebun</label><input type="search" name="q" id="mep-q" value="{{ query }}" placeholder="Nama kebun atau kota…"></div>
+    <div><label for="mep-space">Tipe ruang</label><select name="space" id="mep-space"><option value="">Semua ruang</option>{% for value,label in space_choices %}<option value="{{ value }}"{% if selected_space == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <button class="btn btn-outline-success" type="submit">Tampilkan</button>
+    {% if query or selected_space %}<a class="patch-back" href="{% url 'my_ecopatch:list' %}">Reset</a>{% endif %}
+  </form>
+  <p class="patch-help">{{ patches|length }} EcoPatch ditampilkan · Pilih petak untuk mengelola tanaman.</p>
+  <div class="mep-map">
+    {% for patch in patches %}
+    <article class="mep-garden">
+      <a href="{% url 'my_ecopatch:detail' patch.pk %}" class="mep-garden-link">
+        {% include "my_ecopatch/_garden_bed.html" %}
+        <h2>{{ patch.name }}</h2>
+      </a>
+      <p class="mep-location">{{ patch.get_space_type_display }} · {{ patch.city }}</p>
+      <p class="mep-count">{{ patch.plant_quantity }} tanaman · {{ patch.plant_total }} entri</p>
+      <ul class="patch-status-list">{% for item in patch.status_summary %}<li class="patch-pill patch-pill--{{ item.key }}">{{ item.count }} {{ item.label }}</li>{% endfor %}</ul>
+    </article>
+    {% empty %}
+    <div class="mep-empty"><h2>{% if patch_count %}Kebun belum ditemukan{% else %}Ruang kecil, awal yang berarti.{% endif %}</h2><p>{% if patch_count %}Coba nama atau tipe ruang lain, atau reset pencarianmu.{% else %}Balkon, teras, atau sudut kamar — semua bisa jadi tempat tumbuh. Buat EcoPatch untuk mulai mencatat tanamanmu.{% endif %}</p></div>
+    {% endfor %}
+    <a class="mep-add-bed" href="{% url 'my_ecopatch:create' %}"><span aria-hidden="true">+</span><strong>Buat EcoPatch Baru</strong><small>Sediakan ruang untuk tumbuh</small></a>
+  </div>
+  <aside class="mep-seed-tray"><div><p class="mep-eyebrow">BIBIT IDE</p><h2 class="patch-section-title">Selanjutnya, mau menanam apa?</h2><p>Temukan tanaman yang cocok, lalu tambahkan ke kebun pilihanmu.</p></div><a class="btn btn-outline-success" href="{% url 'plant_library:plant_list' %}">Jelajahi Plant Library ↗</a></aside>
+  <p class="patch-help">Jumlah tanaman menjumlahkan kuantitas. Entri dan label status menghitung catatan tanaman, termasuk Planned dan Removed.</p>
+</div>
 {% endblock %}

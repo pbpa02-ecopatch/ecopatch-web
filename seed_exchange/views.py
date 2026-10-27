@@ -7,6 +7,8 @@ from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
+from main.models import Profile
+
 from .forms import SeedExchangeForm
 from .models import SeedExchange
 
@@ -233,8 +235,26 @@ def listing_detail(request, pk):
     })
 
 
+def _location_context(profile, form):
+    """Values shown by the read-only location card on the listing form.
+
+    A new listing starts with the profile's city and contact; an existing
+    listing keeps the contact it was published with. When the listing has no
+    value yet we fall back to the profile so the field can still be completed
+    without leaving the form.
+    """
+    city = form['city'].value() or profile.city or ''
+    contact = form['contact'].value() or profile.contact_text() or ''
+    return {
+        'location_city': city,
+        'location_contact': contact,
+        'location_ready': bool(city and contact),
+    }
+
+
 @login_required
 def listing_create(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
         form = SeedExchangeForm(request.POST, request.FILES, create=True)
         if form.is_valid():
@@ -246,19 +266,24 @@ def listing_create(request):
             messages.success(request, 'Listing berhasil dibuat.')
             return redirect('seed_exchange:detail', pk=listing.pk)
     else:
-        # The contact the user saved on their profile (WhatsApp / Instagram) is filled in; they can still change it.
-        profile = getattr(request.user, 'profile', None)
-        initial = {'contact': profile.contact_text()} if profile and profile.contact_text() else None
-        form = SeedExchangeForm(create=True, initial=initial)
+        # New listings inherit the contact the user saved on their profile
+        # (WhatsApp / Instagram); it can still be changed per listing.
+        form = SeedExchangeForm(create=True, initial={
+            'city': profile.city,
+            'contact': profile.contact_text(),
+        })
     return render(request, 'seed_exchange/form.html', {
         'form': form,
         'rows': _form_rows(form),
         'mode': 'create',
+        'profile': profile,
+        **_location_context(profile, form),
     })
 
 
 @login_required
 def listing_update(request, pk):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
     listing = get_object_or_404(SeedExchange, pk=pk, user=request.user)
     if request.method == 'POST':
         form = SeedExchangeForm(request.POST, request.FILES, instance=listing)
@@ -267,12 +292,16 @@ def listing_update(request, pk):
             messages.success(request, 'Listing berhasil diperbarui.')
             return redirect('seed_exchange:detail', pk=listing.pk)
     else:
+        # Keep the contact this listing was published with; the profile only
+        # fills in when the listing does not have one yet.
         form = SeedExchangeForm(instance=listing)
     return render(request, 'seed_exchange/form.html', {
         'form': form,
         'rows': _form_rows(form),
         'mode': 'update',
         'listing': listing,
+        'profile': profile,
+        **_location_context(profile, form),
     })
 
 
@@ -381,10 +410,17 @@ def listing_cancel_reserve(request, pk):
 
 
 def _form_rows(form):
-    """Form rows for template: [{field, select: {value, display, options, required}}]."""
-    select_names = {'item_type', 'city', 'transaction_type', 'status'}
+    """Form rows for template: [{field, select: {value, display, options, required}}].
+
+    City and contact are not rendered as normal fields: they live in the profile
+    and are submitted through hidden inputs inside the location card.
+    """
+    select_names = {'item_type', 'transaction_type', 'status'}
+    hidden_names = {'city', 'contact'}
     rows = []
     for bound_field in form:
+        if bound_field.name in hidden_names:
+            continue
         select = None
         if bound_field.name in select_names:
             value = bound_field.value()
