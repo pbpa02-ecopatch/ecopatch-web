@@ -2175,17 +2175,18 @@ body.has-sidebar.plant-body {
 
 .plant-sprig {
     position: absolute;
-    top: 50%;
-    width: clamp(46px, 6vw, 72px);
+    /* level with the title and no taller than the title block, so it never reaches down to the pet on the card's edge */
+    top: 0;
+    width: clamp(40px, 4.6vw, 62px);
     height: auto;
-    margin-top: -48px;
     transform-origin: 50% 100%;
     animation: plant-sprig-sway 6s ease-in-out infinite;
     pointer-events: none;
 }
 
-.plant-sprig--l { left: calc(var(--pl-offset) + 24px + clamp(0px, 4vw, 70px)); }
-.plant-sprig--r { right: calc(20px + clamp(0px, 4vw, 70px)); transform: scaleX(-1); animation-name: plant-sprig-sway-r; animation-delay: -2.4s; }
+/* the sprigs sit in the side room of .plant-hero-copy, next to the title: far from the pet on the right edge of the card */
+.plant-sprig--l { left: 0; }
+.plant-sprig--r { right: 0; transform: scaleX(-1); animation-name: plant-sprig-sway-r; animation-delay: -2.4s; }
 
 @keyframes plant-sprig-sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2.4deg); } }
 @keyframes plant-sprig-sway-r { 0%, 100% { transform: scaleX(-1) rotate(-2deg); } 50% { transform: scaleX(-1) rotate(2.4deg); } }
@@ -2204,13 +2205,11 @@ body.has-sidebar.plant-body {
 
 @media (max-width: 767px) {
     .plant-hero-inner { padding: 0 20px; }
-    .plant-sprig--l { left: 12px; }
-    .plant-sprig--r { right: 12px; }
 }
 
 @media (max-width: 560px) {
     .plant-hero-copy { padding: 0 8px; }
-    .plant-sprig { top: 6px; margin-top: 0; width: 40px; opacity: 0.85; }
+    .plant-sprig { display: none; }
 }
 
 /* ---------------------------------------------------------------- Add to an EcoPatch, from the card
