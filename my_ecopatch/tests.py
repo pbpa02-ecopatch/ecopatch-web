@@ -165,14 +165,14 @@ class GardenUITests(TestCase):
         self.plant.refresh_from_db()
         self.assertEqual(self.plant.status, 'removed')
 
-    def test_delete_confirmation_and_care_history(self):
+    def test_delete_confirmation_and_care_tasks(self):
         task = CareTask.objects.create(user=self.owner, patch_plant=self.plant, plant_name='Basil', task_type='watering')
         response = self.client.get(self.url('plant_delete', self.plant.pk))
         self.assertContains(response, 'Hapus tanaman?')
         self.assertTrue(PatchPlant.objects.filter(pk=self.plant.pk).exists())
         self.assertContains(self.client.post(self.url('plant_delete', self.plant.pk), HTTP_HX_REQUEST='true'), 'Tanaman berhasil dihapus.')
-        task.refresh_from_db()
-        self.assertIsNone(task.patch_plant_id)
+        # Smart Care tasks follow their plant: deleting it from My EcoPatch deletes the tasks linked to it
+        self.assertFalse(CareTask.objects.filter(pk=task.pk).exists())
         self.assertFalse(PatchPlant.objects.filter(pk=self.plant.pk).exists())
 
     def test_ownership_on_every_route(self):

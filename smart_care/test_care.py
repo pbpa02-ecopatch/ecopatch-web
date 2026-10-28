@@ -33,6 +33,10 @@ from .weather import WeatherUnavailable
 FAST_HASHER = override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
 
 
+# A date a few days ahead, for the tests that post a task through the form (the form only takes dates near today)
+SOON = (timezone.localdate() + timedelta(days=5)).isoformat()
+
+
 def make_task(user, **kwargs):
     fields = {"plant_name": "Cabai", "task_type": "watering", "due_date": timezone.localdate()}
     fields.update(kwargs)
@@ -56,6 +60,11 @@ def make_patch(user, name=None, space_type="balcony", city="Depok"):
 def make_patch_plant(user, name="Cabai", patch=None, status="planted", **kwargs):
     """A plant in the user's My EcoPatch, typed by name (the old way). Pass plant= and name="" for a library plant."""
     return PatchPlant.objects.create(patch=patch or make_patch(user), plant_name=name, status=status, **kwargs)
+
+
+def plants_of(user):
+    """get_user_plants as plain (name, outdoor) pairs, for the tests that do not care about ids and places."""
+    return [(name, outdoor) for name, outdoor, *_ in get_user_plants(user)]
 
 
 def make_library_plant(name, **kwargs):
@@ -108,10 +117,18 @@ class CareTaskModelTests(TestCase):
         with self.assertRaises(ValueError):
             task.toggle()
 
-    def test_a_suggestion_cannot_be_stored_twice_for_the_same_day(self):
-        make_task(self.user, source="suggested")
+    def test_a_suggestion_cannot_be_stored_twice_for_the_same_plant_and_day(self):
+        plant = make_patch_plant(self.user)
+        make_task(self.user, source="suggested", patch_plant=plant)
         with self.assertRaises(IntegrityError), transaction.atomic():
-            make_task(self.user, source="suggested")
+            make_task(self.user, source="suggested", patch_plant=plant)
+
+    def test_the_same_plant_name_in_two_places_may_each_have_a_suggestion(self):
+        first = make_patch_plant(self.user, "Basil", patch=make_patch(self.user, "A"))
+        second = make_patch_plant(self.user, "Basil", patch=make_patch(self.user, "B"))
+        make_task(self.user, plant_name="Basil", source="suggested", patch_plant=first)
+        make_task(self.user, plant_name="Basil", source="suggested", patch_plant=second)
+        self.assertEqual(CareTask.objects.count(), 2)
 
     def test_manual_tasks_may_repeat_on_the_same_day(self):
         make_task(self.user)
@@ -159,7 +176,7 @@ class BuildSuggestionsTests(SimpleTestCase):
 
     def test_result_carries_the_fields_the_page_needs(self):
         item = build_suggestions([("Lidah mertua", False)], [], self.today)[0]
-        self.assertEqual(set(item), {"plant_name", "task_type", "is_outdoor", "reason"})
+        self.assertEqual(set(item), {"plant_name", "task_type", "is_outdoor", "patch_plant_id", "place", "reason"})
         self.assertFalse(item["is_outdoor"])
 
     def test_interval_not_yet_passed_means_no_suggestion(self):
@@ -209,6 +226,47 @@ class BuildSuggestionsTests(SimpleTestCase):
     def test_yesterday_reads_naturally(self):
         found = build_suggestions(self.plants, [self.entry("watering", "completed", 1)], self.today, intervals={"watering": 1})
         self.assertEqual(found[0]["reason"], "Terakhir disiram kemarin")
+
+
+class PotIdentityTests(SimpleTestCase):
+    """Two pots may share a plant name; the plant row id is what tells their histories apart."""
+
+    today = timezone.localdate()
+
+    def done(self, patch_plant_id, days_ago, task_type="watering", plant="Basil"):
+        day = self.today - timedelta(days=days_ago)
+        return HistoryEntry(plant, task_type, "completed", day, day, patch_plant_id)
+
+    def test_entries_only_count_for_the_pot_they_are_linked_to(self):
+        plants = [("Basil", False, 1, "Kamar"), ("Basil", True, 2, "Balkon")]
+        found = build_suggestions(plants, [self.done(1, 1)], self.today)
+        watering = [s["patch_plant_id"] for s in found if s["task_type"] == "watering"]
+        self.assertEqual(watering, [2])  # the room was watered yesterday, the balcony never
+
+    def test_a_task_for_one_pot_does_not_block_the_suggestion_of_the_other(self):
+        plants = [("Basil", False, 1, "Kamar"), ("Basil", True, 2, "Balkon")]
+        today_task = HistoryEntry("Basil", "watering", "skipped", self.today, None, 1)
+        found = build_suggestions(plants, [today_task], self.today)
+        self.assertEqual([s["patch_plant_id"] for s in found if s["task_type"] == "watering"], [2])
+
+    def test_an_unlinked_entry_counts_by_name_only_when_the_name_is_unique(self):
+        old = HistoryEntry("Basil", "watering", "completed", self.today - timedelta(days=1), self.today - timedelta(days=1))
+        alone = build_suggestions([("Basil", True, 1, "")], [old], self.today)
+        shared = build_suggestions([("Basil", False, 1, "Kamar"), ("Basil", True, 2, "Balkon")], [old], self.today)
+        self.assertEqual([s["task_type"] for s in alone], ["fertilizing", "inspection"])  # watering is covered
+        self.assertEqual(len([s for s in shared if s["task_type"] == "watering"]), 2)
+
+    def test_each_pot_has_its_own_status_and_key(self):
+        history = [self.done(1, 0)]
+        room = plant_status(("Basil", False, 1, "Kamar"), history, self.today, name_is_unique=False)
+        balcony = plant_status(("Basil", True, 2, "Balkon"), history, self.today, name_is_unique=False)
+        self.assertEqual((room["key"], room["label"], room["place"]), ("1", "Baru disiram", "Kamar"))
+        self.assertEqual((balcony["key"], balcony["label"]), ("2", "Belum dicatat"))
+
+    def test_the_watering_interval_is_found_by_id(self):
+        plant = ("Rosemary", True, 7, "")
+        status = plant_status(plant, [self.done(7, 2, plant="Rosemary")], self.today, watering_days={7: 4})
+        self.assertEqual(status["label"], "Siram 2 hari lagi")
 
 
 class PlantStatusTests(SimpleTestCase):
@@ -288,8 +346,8 @@ class PlantSourceTests(TestCase):
     def test_only_the_users_own_plants(self):
         make_patch_plant(self.user, "Cabai")
         make_patch_plant(self.other, "Tomat bob")
-        self.assertEqual(get_user_plants(self.user), [("Cabai", True)])
-        self.assertEqual(get_user_plants(self.other), [("Tomat bob", True)])
+        self.assertEqual(plants_of(self.user), [("Cabai", True)])
+        self.assertEqual(plants_of(self.other), [("Tomat bob", True)])
 
     def test_the_library_label_decides_whether_a_plant_takes_the_rain_advice(self):
         balcony, indoor_room = make_patch(self.user, "Balkon", "balcony"), make_patch(self.user, "Kamar", "indoor")
@@ -312,7 +370,7 @@ class PlantSourceTests(TestCase):
         slow = make_patch_plant(self.user, name="", plant=make_library_plant("Rosemary", watering="low"))
         old = make_patch_plant(self.user, "Tomat")
         self.assertEqual((watering_days(daily), watering_days(slow), watering_days(old)), (1, 4, 2))
-        self.assertEqual(get_user_watering_days(self.user), {"bayam": 1, "rosemary": 4, "tomat": 2})
+        self.assertEqual(get_user_watering_days(self.user), {daily.pk: 1, slow.pk: 4, old.pk: 2})
 
     def test_only_the_users_own_plants_have_watering_days(self):
         make_patch_plant(self.other, name="", plant=make_library_plant("Bayam", watering="high"))
@@ -320,43 +378,53 @@ class PlantSourceTests(TestCase):
 
     def test_tasks_alone_do_not_make_a_plant(self):
         make_task(self.user, plant_name="Cabai")
-        self.assertEqual(get_user_plants(self.user), [])
+        self.assertEqual(plants_of(self.user), [])
 
     def test_only_planted_and_growing_plants_take_part(self):
         patch_ = make_patch(self.user)
         for status in ("planned", "planted", "growing", "harvested", "removed"):
             make_patch_plant(self.user, status.capitalize(), patch=patch_, status=status)
-        self.assertEqual([name for name, _ in get_user_plants(self.user)], ["Growing", "Planted"])
+        self.assertEqual([name for name, _ in plants_of(self.user)], ["Growing", "Planted"])
 
     def test_the_name_comes_from_the_plant_library_when_linked(self):
         make_patch_plant(self.user, name="", plant=make_library_plant("Basil"))
         make_patch_plant(self.user, name="Cabai")
-        self.assertEqual(get_user_plants(self.user), [("Basil", True), ("Cabai", True)])
+        self.assertEqual(plants_of(self.user), [("Basil", True), ("Cabai", True)])
 
-    def test_a_plant_in_two_patches_is_listed_once_and_the_newest_row_decides(self):
-        make_patch_plant(self.user, "Cabai", patch=make_patch(self.user, "Balkon", "balcony"))
-        make_patch_plant(self.user, "  cabai ", patch=make_patch(self.user, "Kamar", "indoor"))
-        self.assertEqual(get_user_plants(self.user), [("cabai", False)])
+    def test_the_same_plant_in_two_places_is_two_pots_with_their_own_flag_and_place(self):
+        balcony = make_patch_plant(self.user, "Basil", patch=make_patch(self.user, "Balkon", "balcony"))
+        room = make_patch_plant(self.user, "  basil ", patch=make_patch(self.user, "Kamar", "indoor"))
+        self.assertEqual(get_user_plants(self.user), [("Basil", True, balcony.pk, "Balkon"), ("basil", False, room.pk, "Kamar")])
+
+    def test_the_place_is_only_filled_when_a_plant_name_is_shared(self):
+        make_patch_plant(self.user, "Basil", patch=make_patch(self.user, "Balkon", "balcony"))
+        make_patch_plant(self.user, "Basil", patch=make_patch(self.user, "Kamar", "indoor"))
+        make_patch_plant(self.user, "Cabai", patch=make_patch(self.user, "Teras", "terrace"))
+        places = [(name, place) for name, _, _, place in get_user_plants(self.user)]
+        self.assertEqual(places, [("Basil", "Balkon"), ("Basil", "Kamar"), ("Cabai", "")])
 
     def test_outdoor_follows_the_space_type_of_the_patch(self):
         for space_type, outdoor in (("balcony", True), ("terrace", True), ("rooftop", True), ("small_yard", True), ("indoor", False)):
             user = User.objects.create_user(f"u_{space_type}", password="pass12345")
             make_patch_plant(user, "Cabai", patch=make_patch(user, space_type=space_type))
-            self.assertEqual(get_user_plants(user), [("Cabai", outdoor)], space_type)
+            self.assertEqual(plants_of(user), [("Cabai", outdoor)], space_type)
 
     def test_a_plant_without_any_name_is_skipped(self):
         make_patch_plant(self.user, name="")
-        self.assertEqual(get_user_plants(self.user), [])
+        self.assertEqual(plants_of(self.user), [])
 
-    def test_find_patch_plant_ignores_case_spaces_and_other_users(self):
+    def test_find_patch_plant_takes_only_a_number_that_is_one_of_the_users_own_plants(self):
         mine = make_patch_plant(self.user, "Cabai Rawit")
-        make_patch_plant(self.other, "Tomat bob")
-        self.assertEqual(find_patch_plant(self.user, "  cabai   RAWIT "), mine)
-        self.assertIsNone(find_patch_plant(self.user, "Tomat bob"))
-        self.assertIsNone(find_patch_plant(self.user, ""))
+        theirs = make_patch_plant(self.other, "Tomat bob")
+        not_planted = make_patch_plant(self.user, "Bibit", status="planned")
+        nameless = make_patch_plant(self.user, name="")
+        self.assertEqual(find_patch_plant(self.user, mine.pk), mine)
+        self.assertEqual(find_patch_plant(self.user, str(mine.pk)), mine)  # a posted value arrives as text
+        for bad in (theirs.pk, not_planted.pk, nameless.pk, 999999, "", "abc", None):
+            self.assertIsNone(find_patch_plant(self.user, bad), bad)
 
     def test_user_without_plants_has_none(self):
-        self.assertEqual(get_user_plants(self.user), [])
+        self.assertEqual(plants_of(self.user), [])
 
     def test_city_is_the_one_of_the_newest_patch_with_a_plant_to_care_for(self):
         self.assertEqual(get_user_city(self.user), "")
@@ -422,9 +490,9 @@ class CareViewTests(CacheClearingTestCase):
     def test_create_assigns_logged_in_user_and_defaults(self):
         plant = make_patch_plant(self.user, "Basil")
         response = self.client.post(reverse("smart_care:create"), {
-            "patch_plant": plant.pk, "task_type": "pruning", "due_date": "2026-11-02", "notes": "",
+            "patch_plant": plant.pk, "task_type": "pruning", "due_date": SOON, "notes": "",
         })
-        self.assertRedirects(response, reverse("smart_care:list") + "?date=2026-11-02", fetch_redirect_response=False)
+        self.assertRedirects(response, reverse("smart_care:list") + f"?date={SOON}", fetch_redirect_response=False)
         task = CareTask.objects.get()
         self.assertEqual(task.user, self.user)
         self.assertEqual(task.patch_plant, plant)
@@ -442,7 +510,7 @@ class CareViewTests(CacheClearingTestCase):
         outdoor = make_patch_plant(self.user, "Cabai")
         for plant in (indoor, outdoor):
             self.client.post(reverse("smart_care:create"), {
-                "patch_plant": plant.pk, "task_type": "inspection", "due_date": "2026-11-02",
+                "patch_plant": plant.pk, "task_type": "inspection", "due_date": SOON,
             })
         self.assertEqual(dict(CareTask.objects.values_list("plant_name", "is_outdoor")), {"Lidah mertua": False, "Cabai": True})
 
@@ -458,8 +526,72 @@ class CareViewTests(CacheClearingTestCase):
         self.assertEqual(task.task_type, "pruning")
 
     # ---- the plant choice
+    def post_new_task(self, plant, due_date, **extra):
+        data = {"patch_plant": plant.pk, "task_type": "pruning", "due_date": due_date, "notes": ""}
+        data.update(extra)
+        return self.client.post(reverse("smart_care:create"), data)
+
+    def test_a_date_far_from_today_is_rejected_by_the_form(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        too_far = (timezone.localdate() + timedelta(days=366)).isoformat()
+        for value in ("9999-12-31", "0001-01-01", "1990-01-01", too_far):
+            response = self.post_new_task(plant, value)
+            self.assertEqual(response.status_code, 200, value)  # the form is shown again with its error
+            self.assertContains(response, "dalam rentang 1 tahun")
+        self.assertFalse(CareTask.objects.exists())
+
+    def test_dates_up_to_a_year_either_side_of_today_are_accepted(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        for offset in (-365, 0, 365):
+            day = (timezone.localdate() + timedelta(days=offset)).isoformat()
+            self.assertEqual(self.post_new_task(plant, day).status_code, 302, day)
+        self.assertEqual(CareTask.objects.count(), 3)
+
+    def test_an_old_task_can_still_be_edited_when_its_date_is_left_alone(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        old = make_task(self.user, patch_plant=plant, task_type="watering", due_date=timezone.localdate() - timedelta(days=500))
+        response = self.client.post(reverse("smart_care:update", args=[old.pk]), {
+            "patch_plant": plant.pk, "task_type": "pruning", "due_date": old.due_date.isoformat(), "notes": "dibetulkan",
+        })
+        self.assertEqual(response.status_code, 302)
+        old.refresh_from_db()
+        self.assertEqual((old.task_type, old.notes), ("pruning", "dibetulkan"))
+
+    def test_notes_are_limited_to_500_characters(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        self.assertEqual(self.post_new_task(plant, SOON, notes="x" * 500).status_code, 302)
+        response = self.post_new_task(plant, SOON, notes="x" * 501)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Catatan maksimal 500 karakter")
+        self.assertEqual(CareTask.objects.count(), 1)
+
+    def test_editing_a_suggestion_into_another_suggestion_is_a_form_error_not_a_server_error(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        accept = reverse("smart_care:suggestion_accept")
+        self.client.post(accept, {"patch_plant": plant.pk, "task_type": "watering"})
+        self.client.post(accept, {"patch_plant": plant.pk, "task_type": "inspection"})
+        watering = CareTask.objects.get(task_type="watering")
+        response = self.client.post(reverse("smart_care:update", args=[watering.pk]), {
+            "patch_plant": plant.pk, "task_type": "inspection", "due_date": timezone.localdate().isoformat(), "notes": "",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Saran yang sama untuk tanaman dan tanggal ini sudah ada")
+        watering.refresh_from_db()
+        self.assertEqual(watering.task_type, "watering")  # nothing changed
+
+    def test_editing_a_suggestion_without_a_clash_still_works(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        self.client.post(reverse("smart_care:suggestion_accept"), {"patch_plant": plant.pk, "task_type": "watering"})
+        watering = CareTask.objects.get(task_type="watering")
+        response = self.client.post(reverse("smart_care:update", args=[watering.pk]), {
+            "patch_plant": plant.pk, "task_type": "watering", "due_date": timezone.localdate().isoformat(), "notes": "pagi",
+        })
+        self.assertEqual(response.status_code, 302)
+        watering.refresh_from_db()
+        self.assertEqual(watering.notes, "pagi")
+
     def test_a_new_task_needs_a_plant(self):
-        response = self.client.post(reverse("smart_care:create"), {"task_type": "pruning", "due_date": "2026-11-02"})
+        response = self.client.post(reverse("smart_care:create"), {"task_type": "pruning", "due_date": SOON})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(set(response.context["form"].errors), {"patch_plant"})
         self.assertEqual(CareTask.objects.count(), 0)
@@ -467,7 +599,7 @@ class CareViewTests(CacheClearingTestCase):
     def test_another_users_plant_is_rejected_on_the_server(self):
         theirs = make_patch_plant(self.other, "Tomat bob")
         response = self.client.post(reverse("smart_care:create"), {
-            "patch_plant": theirs.pk, "task_type": "pruning", "due_date": "2026-11-02",
+            "patch_plant": theirs.pk, "task_type": "pruning", "due_date": SOON,
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn("patch_plant", response.context["form"].errors)
@@ -477,7 +609,7 @@ class CareViewTests(CacheClearingTestCase):
         for status in ("planned", "harvested", "removed"):
             plant = make_patch_plant(self.user, status.capitalize(), status=status)
             response = self.client.post(reverse("smart_care:create"), {
-                "patch_plant": plant.pk, "task_type": "pruning", "due_date": "2026-11-02",
+                "patch_plant": plant.pk, "task_type": "pruning", "due_date": SOON,
             })
             self.assertIn("patch_plant", response.context["form"].errors, status)
         self.assertEqual(CareTask.objects.count(), 0)
@@ -502,21 +634,41 @@ class CareViewTests(CacheClearingTestCase):
     def test_linking_copies_the_plants_name_onto_the_task(self):
         plant = make_patch_plant(self.user, name="", plant=make_library_plant("Basil"))
         self.client.post(reverse("smart_care:create"), {
-            "patch_plant": plant.pk, "task_type": "pruning", "due_date": "2026-11-02",
+            "patch_plant": plant.pk, "task_type": "pruning", "due_date": SOON,
         })
         Plant.objects.filter(pk=plant.plant_id).update(name="Basil thai")  # renamed in the library afterwards
         task = CareTask.objects.get()
         self.assertEqual(task.plant_name, "Basil")
 
-    def test_removing_the_plant_keeps_the_task_and_its_name(self):
+    def test_deleting_the_plant_deletes_its_tasks(self):
         plant = make_patch_plant(self.user, "Cabai")
         self.client.post(reverse("smart_care:create"), {
-            "patch_plant": plant.pk, "task_type": "pruning", "due_date": "2026-11-02",
+            "patch_plant": plant.pk, "task_type": "pruning", "due_date": SOON,
         })
+        self.assertEqual(CareTask.objects.count(), 1)
         plant.delete()
-        task = CareTask.objects.get()
-        self.assertIsNone(task.patch_plant)
-        self.assertEqual(task.plant_name, "Cabai")
+        self.assertFalse(CareTask.objects.exists())
+
+    def test_deleting_the_ecopatch_deletes_the_tasks_of_its_plants(self):
+        patch = make_patch(self.user)
+        make_task(self.user, patch_plant=make_patch_plant(self.user, "Cabai", patch=patch))
+        patch.delete()  # EcoPatch -> PatchPlant -> CareTask, all through CASCADE
+        self.assertFalse(CareTask.objects.exists())
+
+    def test_only_the_tasks_of_the_deleted_plant_are_deleted(self):
+        gone = make_patch_plant(self.user, "Cabai")
+        kept = make_patch_plant(self.user, "Basil")
+        make_task(self.user, plant_name="Cabai", patch_plant=gone)
+        make_task(self.user, plant_name="Basil", patch_plant=kept)
+        make_task(self.user, plant_name="Tanaman lama")  # made before tasks were linked to a plant: no link
+        gone.delete()
+        self.assertEqual(sorted(CareTask.objects.values_list("plant_name", flat=True)), ["Basil", "Tanaman lama"])
+
+    def test_marking_the_plant_removed_is_not_a_deletion(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        make_task(self.user, patch_plant=plant)
+        PatchPlant.objects.filter(pk=plant.pk).update(status="removed")
+        self.assertEqual(CareTask.objects.count(), 1)
 
     def test_a_task_without_a_plant_can_still_be_edited(self):
         old = make_task(self.user, plant_name="Lama")
@@ -557,10 +709,10 @@ class CareViewTests(CacheClearingTestCase):
     def test_htmx_valid_post_redirects_via_header(self):
         plant = make_patch_plant(self.user, "Basil")
         response = self.client.post(reverse("smart_care:create"), {
-            "patch_plant": plant.pk, "task_type": "pruning", "due_date": "2026-11-02",
+            "patch_plant": plant.pk, "task_type": "pruning", "due_date": SOON,
         }, HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 204)
-        self.assertIn("date=2026-11-02", response["HX-Redirect"])
+        self.assertIn(f"date={SOON}", response["HX-Redirect"])
 
     def test_htmx_invalid_post_redisplays_the_popup(self):
         response = self.client.post(reverse("smart_care:create"), {"plant_name": ""}, HTTP_HX_REQUEST="true")
@@ -889,7 +1041,7 @@ class SuggestionViewTests(CacheClearingTestCase):
         self.accept = reverse("smart_care:suggestion_accept")
         self.skip = reverse("smart_care:suggestion_skip")
         self.restore = reverse("smart_care:suggestion_restore")
-        self.watering = {"plant_name": "Cabai", "task_type": "watering"}
+        self.watering = {"patch_plant": self.cabai.pk, "task_type": "watering"}
 
     def todays(self, **filters):
         return CareTask.objects.filter(user=self.user, due_date=timezone.localdate(), **filters)
@@ -908,6 +1060,48 @@ class SuggestionViewTests(CacheClearingTestCase):
         labels = {pot["plant_name"]: pot["label"] for pot in response.context["pots"]}
         self.assertEqual(labels["Rosemary"], "Siram 2 hari lagi")
         self.assertEqual(labels["Bayam"], "Waktunya siram")
+
+    def test_the_same_plant_in_two_places_is_suggested_and_accepted_separately(self):
+        room = make_patch_plant(self.user, "Cabai", patch=make_patch(self.user, "Kamar", "indoor"))
+        response = self.client.get(reverse("smart_care:list"))
+        watering = [s for s in response.context["suggestions"] if s["task_type"] == "watering"]
+        self.assertEqual(
+            {(s["patch_plant_id"], s["place"], s["is_outdoor"]) for s in watering},
+            {(self.cabai.pk, self.cabai.patch.name, True), (room.pk, "Kamar", False)},
+        )
+        self.assertEqual(len(response.context["pots"]), 2)
+        data = self.client.post(self.accept, {"patch_plant": room.pk, "task_type": "watering"}).json()
+        task = self.todays(task_type="watering").get()
+        self.assertEqual((task.patch_plant, task.is_outdoor), (room, False))
+        self.assertEqual((data["pot"]["patch_plant_id"], data["pot"]["label"]), (room.pk, "Baru disiram"))
+        # only the room's pot was watered: the balcony one is still due
+        response = self.client.get(reverse("smart_care:list"))
+        watering = [s for s in response.context["suggestions"] if s["task_type"] == "watering"]
+        self.assertEqual([s["patch_plant_id"] for s in watering], [self.cabai.pk])
+
+    def test_each_place_keeps_its_own_history(self):
+        room = make_patch_plant(self.user, "Cabai", patch=make_patch(self.user, "Kamar", "indoor"))
+        completed_task(self.user, "Cabai", "watering", days_ago=1, patch_plant=room)
+        response = self.client.get(reverse("smart_care:list"))
+        reasons = {
+            s["patch_plant_id"]: s["reason"] for s in response.context["suggestions"] if s["task_type"] == "watering"
+        }
+        self.assertEqual(reasons, {self.cabai.pk: "Belum pernah dicatat"})  # the room was watered yesterday, the balcony never
+
+    def test_an_old_unlinked_task_is_ambiguous_when_the_name_is_shared(self):
+        make_patch_plant(self.user, "Cabai", patch=make_patch(self.user, "Kamar", "indoor"))
+        completed_task(self.user, "Cabai", "watering", days_ago=1)  # no plant row: made before tasks were linked
+        response = self.client.get(reverse("smart_care:list"))
+        watering = [s for s in response.context["suggestions"] if s["task_type"] == "watering"]
+        self.assertEqual(len(watering), 2)  # it counts for neither pot
+
+    def test_skipping_one_place_leaves_the_other_suggested(self):
+        room = make_patch_plant(self.user, "Cabai", patch=make_patch(self.user, "Kamar", "indoor"))
+        self.client.post(self.skip, {"patch_plant": room.pk, "task_type": "watering"})
+        response = self.client.get(reverse("smart_care:list"))
+        watering = [s for s in response.context["suggestions"] if s["task_type"] == "watering"]
+        self.assertEqual([s["patch_plant_id"] for s in watering], [self.cabai.pk])
+        self.assertTrue(self.client.post(self.restore, {"patch_plant": room.pk, "task_type": "watering"}).json()["restored"])
 
     def test_suggestions_appear_in_the_list_with_label_and_reason(self):
         response = self.client.get(reverse("smart_care:list"))
@@ -939,7 +1133,7 @@ class SuggestionViewTests(CacheClearingTestCase):
         data = self.client.post(self.accept, self.watering).json()
         self.assertEqual(data["pot"]["water"], 1.0)
         self.assertEqual(data["pot"]["label"], "Baru disiram")
-        inspection = self.client.post(self.accept, {"plant_name": "Cabai", "task_type": "inspection"}).json()
+        inspection = self.client.post(self.accept, {"patch_plant": self.cabai.pk, "task_type": "inspection"}).json()
         self.assertTrue(inspection["pot"]["inspection_ok"])
 
     def test_suggestions_count_towards_progress_and_the_strip(self):
@@ -1012,7 +1206,7 @@ class SuggestionViewTests(CacheClearingTestCase):
         self.client.post(self.accept, self.watering)
         make_task(self.user, plant_name="Cabai", task_type="inspection")
         self.client.post(self.restore, self.watering)
-        self.client.post(self.restore, {"plant_name": "Cabai", "task_type": "inspection"})
+        self.client.post(self.restore, {"patch_plant": self.cabai.pk, "task_type": "inspection"})
         self.assertEqual(self.todays().count(), 2)
 
     def test_toggling_an_accepted_suggestion_reopens_it(self):
@@ -1031,20 +1225,23 @@ class SuggestionViewTests(CacheClearingTestCase):
         self.assertEqual(reasons["inspection"], "Terakhir diperiksa 9 hari lalu")
 
     def test_rejects_unknown_plants_and_types(self):
+        foreign = make_patch_plant(self.other, "Tanaman asing")
         for payload in (
-            {"plant_name": "Tanaman asing", "task_type": "watering"},
-            {"plant_name": "Cabai", "task_type": "pruning"},  # manual only
-            {"plant_name": "Cabai", "task_type": "bukan-jenis"},
-            {"plant_name": "", "task_type": "watering"},
+            {"patch_plant": foreign.pk, "task_type": "watering"},  # somebody else's plant
+            {"patch_plant": self.cabai.pk, "task_type": "pruning"},  # manual only
+            {"patch_plant": self.cabai.pk, "task_type": "bukan-jenis"},
+            {"patch_plant": "", "task_type": "watering"},
+            {"patch_plant": "abc", "task_type": "watering"},
+            {"patch_plant": 999999, "task_type": "watering"},
         ):
             for url in (self.accept, self.skip, self.restore):
                 self.assertEqual(self.client.post(url, payload).status_code, 400, (url, payload))
         self.assertEqual(self.todays().count(), 0)
 
     def test_another_users_plant_cannot_be_used(self):
-        make_patch_plant(self.other, "Tomat bob")
+        theirs = make_patch_plant(self.other, "Tomat bob")
         for url in (self.accept, self.skip):
-            response = self.client.post(url, {"plant_name": "Tomat bob", "task_type": "watering"})
+            response = self.client.post(url, {"patch_plant": theirs.pk, "task_type": "watering"})
             self.assertEqual(response.status_code, 400)
         self.assertEqual(CareTask.objects.filter(user=self.other, source="suggested").count(), 0)
         self.assertEqual(self.todays().count(), 0)
@@ -1152,8 +1349,8 @@ class SuggestionViewTests(CacheClearingTestCase):
         self.assertEqual(self.client.post(self.accept, self.watering).status_code, 400)
 
     def test_accepting_for_an_indoor_plant_links_it_and_keeps_it_indoor(self):
-        make_patch_plant(self.user, "Lidah mertua", patch=make_patch(self.user, "Kamar", "indoor"))
-        self.client.post(self.accept, {"plant_name": "Lidah mertua", "task_type": "watering"})
+        lidah = make_patch_plant(self.user, "Lidah mertua", patch=make_patch(self.user, "Kamar", "indoor"))
+        self.client.post(self.accept, {"patch_plant": lidah.pk, "task_type": "watering"})
         task = self.todays().get(plant_name="Lidah mertua")
         self.assertFalse(task.is_outdoor)
         self.assertEqual(task.patch_plant.patch.name, "Kamar")
