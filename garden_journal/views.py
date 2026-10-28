@@ -353,6 +353,7 @@ def plant_journal_history(request, plant_name):
         "cover_color": cover_color,
         "conditions": GardenJournal.CONDITION_CHOICES,
         "selected_condition": condition_filter,
+        "selected_condition_label": dict(GardenJournal.CONDITION_CHOICES).get(condition_filter, ""),
         "selected_date": date_filter,
         "latest_condition": first_all.plant_condition if first_all else "healthy",
         "latest_badge": first_all.get_condition_display_badge if first_all else "success",

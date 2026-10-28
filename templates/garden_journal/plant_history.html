@@ -25,17 +25,25 @@
             <span id="total-count" class="fw-bold text-dark">{{ total_entries }}</span> catatan untuk <strong class="text-dark">{{ plant_name }}</strong>
         </div>
         <form id="book-filter-form" class="d-flex flex-wrap align-items-center gap-2 m-0">
-            <div class="filter-pill-btn">
-                <select name="condition" id="filter-condition" class="filter-pill-select">
-                    <option value="">Semua Kondisi</option>
+            <div class="dropdown">
+                <input type="hidden" name="condition" id="filter-condition" value="{{ selected_condition }}">
+                <button type="button" class="journal-filter dropdown-toggle{% if selected_condition %} journal-filter--active{% endif %}" id="conditionFilterBtn"
+                        data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
+                    <span class="journal-filter-dot" id="conditionFilterDot" aria-hidden="true"{% if not selected_condition %} hidden{% endif %}></span>
+                    <span id="conditionFilterLabel">{{ selected_condition_label|default:"Semua Kondisi" }}</span>
+                </button>
+                <ul class="dropdown-menu journal-menu" id="conditionFilterMenu" aria-labelledby="conditionFilterBtn">
+                    <li>
+                        <button type="button" class="dropdown-item journal-menu-item{% if not selected_condition %} active{% endif %}"
+                                data-condition-val="" data-condition-label="Semua Kondisi">Semua Kondisi</button>
+                    </li>
                     {% for val, label in conditions %}
-                        {% if selected_condition == val %}
-                            <option value="{{ val }}" selected>{{ label }}</option>
-                        {% else %}
-                            <option value="{{ val }}">{{ label }}</option>
-                        {% endif %}
+                    <li>
+                        <button type="button" class="dropdown-item journal-menu-item{% if selected_condition == val %} active{% endif %}"
+                                data-condition-val="{{ val }}" data-condition-label="{{ label }}">{{ label }}</button>
+                    </li>
                     {% endfor %}
-                </select>
+                </ul>
             </div>
             <div class="filter-pill-btn">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#798a72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -922,7 +930,24 @@ function showToast(message, type = 'success') {
 document.addEventListener('DOMContentLoaded', function() {
     // Setup filter change listeners
     const fCond = document.getElementById('filter-condition');
-    if (fCond) fCond.addEventListener('change', applyFilters);
+    const fCondMenu = document.getElementById('conditionFilterMenu');
+    const fCondBtn = document.getElementById('conditionFilterBtn');
+    const fCondLabel = document.getElementById('conditionFilterLabel');
+    const fCondDot = document.getElementById('conditionFilterDot');
+    if (fCondMenu) {
+        fCondMenu.addEventListener('click', function (e) {
+            const item = e.target.closest('[data-condition-val]');
+            if (!item) return;
+            const value = item.getAttribute('data-condition-val') || '';
+            const label = item.getAttribute('data-condition-label') || 'Semua Kondisi';
+            if (fCond) fCond.value = value;
+            if (fCondLabel) fCondLabel.textContent = label;
+            if (fCondDot) fCondDot.hidden = !value;
+            if (fCondBtn) fCondBtn.classList.toggle('journal-filter--active', !!value);
+            fCondMenu.querySelectorAll('[data-condition-val]').forEach(el => el.classList.toggle('active', el === item));
+            applyFilters();
+        });
+    }
 
     const fDate = document.getElementById('filter-date');
     if (fDate) fDate.addEventListener('change', applyFilters);
