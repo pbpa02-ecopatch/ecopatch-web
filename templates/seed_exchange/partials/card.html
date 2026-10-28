@@ -3,7 +3,8 @@
     {% if listing.image %}
     <div class="seed-card-media">
         <img src="{{ listing.image.url }}" alt="" loading="lazy" decoding="async"
-             onerror="this.onerror=null; this.src='{% static 'plant_library/img/plant-placeholder.svg' %}'; this.classList.add('seed-card-ph');">
+             data-placeholder="{% static 'plant_library/img/plant-placeholder.svg' %}"
+             onerror="this.onerror=null; this.src=this.dataset.placeholder; this.classList.add('seed-card-ph');">
     </div>
     {% else %}
     <div class="seed-card-media seed-card-media--empty">
