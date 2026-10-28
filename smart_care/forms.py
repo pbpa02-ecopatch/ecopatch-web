@@ -1,9 +1,17 @@
+from datetime import timedelta
+
 from django import forms
+from django.utils import timezone
 
 from my_ecopatch.models import PatchPlant
 
 from .models import CareTask
 from .plant_source import link_task, patch_plant_name, user_patch_plants
+
+# A task may be dated up to this many days before or after today. The limit keeps absurd dates (year 1 or 9999) out of
+# the database: the list page does date arithmetic around the chosen day and cannot go past the calendar's ends.
+DATE_WINDOW_DAYS = 365
+NOTES_MAX_LENGTH = 500
 
 
 class CareTaskForm(forms.ModelForm):
@@ -36,11 +44,14 @@ class CareTaskForm(forms.ModelForm):
         }
         widgets = {
             "due_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
-            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": "Opsional, misalnya: pakai pupuk kompos cair"}),
+            "notes": forms.Textarea(attrs={
+                "rows": 3, "maxlength": NOTES_MAX_LENGTH, "placeholder": "Opsional, misalnya: pakai pupuk kompos cair",
+            }),
         }
 
     def __init__(self, *args, user, **kwargs):
         super().__init__(*args, **kwargs)
+        self.user = user
         linked = self.instance.patch_plant_id
         field = self.fields["patch_plant"]
         # The plant of the task being edited stays selectable even if its status in My EcoPatch has moved on
@@ -51,6 +62,40 @@ class CareTaskForm(forms.ModelForm):
         self.has_plants = field.queryset.exists()
         # Placeholder yang jelas menggantikan "---------" bawaan Django
         self.fields["task_type"].choices = [("", "Pilih jenis tugas"), *CareTask.TaskType.choices]
+
+    def clean_due_date(self):
+        # Django memanggil clean_<nama field> setelah validasi bawaan field itu lolos. Tanggal hanya boleh dalam
+        # rentang setahun dari hari ini. Tugas lama yang tanggalnya tidak diubah tetap boleh diedit, jadi
+        # catatan atau jenisnya bisa dibetulkan tanpa dipaksa mengganti tanggal.
+        due = self.cleaned_data["due_date"]
+        if self.instance.pk and due == self.instance.due_date:
+            return due
+        today = timezone.localdate()
+        if not today - timedelta(days=DATE_WINDOW_DAYS) <= due <= today + timedelta(days=DATE_WINDOW_DAYS):
+            raise forms.ValidationError("Tanggal harus dalam rentang 1 tahun dari hari ini.")
+        return due
+
+    def clean_notes(self):
+        notes = self.cleaned_data["notes"]
+        if len(notes) > NOTES_MAX_LENGTH:
+            raise forms.ValidationError(f"Catatan maksimal {NOTES_MAX_LENGTH} karakter.")
+        return notes
+
+    def clean(self):
+        # Validasi lintas field. Tugas hasil saran dilindungi constraint unik di database (satu saran per tanaman,
+        # jenis, dan hari). Kalau diedit sampai kembar dengan saran lain, database menolaknya dengan IntegrityError,
+        # yang tampil sebagai halaman 500. Dicek lebih dulu di sini supaya user mendapat pesan di dalam formnya.
+        data = super().clean()
+        plant = data.get("patch_plant")
+        if self.errors or plant is None or self.instance.source != CareTask.Source.SUGGESTED:
+            return data
+        clash = CareTask.objects.filter(
+            user=self.user, patch_plant=plant, task_type=data["task_type"], due_date=data["due_date"],
+            source=CareTask.Source.SUGGESTED,
+        ).exclude(pk=self.instance.pk)
+        if clash.exists():
+            raise forms.ValidationError("Saran yang sama untuk tanaman dan tanggal ini sudah ada.")
+        return data
 
     def save(self, commit=True):
         # commit=False: objek dibuat tapi belum ditulis ke database, supaya snapshot tanaman bisa diisi dulu.

@@ -526,6 +526,70 @@ class CareViewTests(CacheClearingTestCase):
         self.assertEqual(task.task_type, "pruning")
 
     # ---- the plant choice
+    def post_new_task(self, plant, due_date, **extra):
+        data = {"patch_plant": plant.pk, "task_type": "pruning", "due_date": due_date, "notes": ""}
+        data.update(extra)
+        return self.client.post(reverse("smart_care:create"), data)
+
+    def test_a_date_far_from_today_is_rejected_by_the_form(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        too_far = (timezone.localdate() + timedelta(days=366)).isoformat()
+        for value in ("9999-12-31", "0001-01-01", "1990-01-01", too_far):
+            response = self.post_new_task(plant, value)
+            self.assertEqual(response.status_code, 200, value)  # the form is shown again with its error
+            self.assertContains(response, "dalam rentang 1 tahun")
+        self.assertFalse(CareTask.objects.exists())
+
+    def test_dates_up_to_a_year_either_side_of_today_are_accepted(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        for offset in (-365, 0, 365):
+            day = (timezone.localdate() + timedelta(days=offset)).isoformat()
+            self.assertEqual(self.post_new_task(plant, day).status_code, 302, day)
+        self.assertEqual(CareTask.objects.count(), 3)
+
+    def test_an_old_task_can_still_be_edited_when_its_date_is_left_alone(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        old = make_task(self.user, patch_plant=plant, task_type="watering", due_date=timezone.localdate() - timedelta(days=500))
+        response = self.client.post(reverse("smart_care:update", args=[old.pk]), {
+            "patch_plant": plant.pk, "task_type": "pruning", "due_date": old.due_date.isoformat(), "notes": "dibetulkan",
+        })
+        self.assertEqual(response.status_code, 302)
+        old.refresh_from_db()
+        self.assertEqual((old.task_type, old.notes), ("pruning", "dibetulkan"))
+
+    def test_notes_are_limited_to_500_characters(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        self.assertEqual(self.post_new_task(plant, SOON, notes="x" * 500).status_code, 302)
+        response = self.post_new_task(plant, SOON, notes="x" * 501)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Catatan maksimal 500 karakter")
+        self.assertEqual(CareTask.objects.count(), 1)
+
+    def test_editing_a_suggestion_into_another_suggestion_is_a_form_error_not_a_server_error(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        accept = reverse("smart_care:suggestion_accept")
+        self.client.post(accept, {"patch_plant": plant.pk, "task_type": "watering"})
+        self.client.post(accept, {"patch_plant": plant.pk, "task_type": "inspection"})
+        watering = CareTask.objects.get(task_type="watering")
+        response = self.client.post(reverse("smart_care:update", args=[watering.pk]), {
+            "patch_plant": plant.pk, "task_type": "inspection", "due_date": timezone.localdate().isoformat(), "notes": "",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Saran yang sama untuk tanaman dan tanggal ini sudah ada")
+        watering.refresh_from_db()
+        self.assertEqual(watering.task_type, "watering")  # nothing changed
+
+    def test_editing_a_suggestion_without_a_clash_still_works(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        self.client.post(reverse("smart_care:suggestion_accept"), {"patch_plant": plant.pk, "task_type": "watering"})
+        watering = CareTask.objects.get(task_type="watering")
+        response = self.client.post(reverse("smart_care:update", args=[watering.pk]), {
+            "patch_plant": plant.pk, "task_type": "watering", "due_date": timezone.localdate().isoformat(), "notes": "pagi",
+        })
+        self.assertEqual(response.status_code, 302)
+        watering.refresh_from_db()
+        self.assertEqual(watering.notes, "pagi")
+
     def test_a_new_task_needs_a_plant(self):
         response = self.client.post(reverse("smart_care:create"), {"task_type": "pruning", "due_date": SOON})
         self.assertEqual(response.status_code, 200)
