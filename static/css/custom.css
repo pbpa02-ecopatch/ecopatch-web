@@ -1171,6 +1171,36 @@ h1, h2, h3, .navbar-brand {
     font-weight: 600;
 }
 
+/* Menu icons need a size outside the desktop sidebar too: without this the
+   mobile menu falls back to the SVG default (300x150) and the icons blow up. */
+.site-navbar .navbar-nav.nav-auth .nav-link .nav-ico {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    --ico-leaf: #1f9142;
+    --ico-water: #2a9bc9;
+    --ico-mark: #e0910a;
+}
+
+.nav-ico .ico-leaf { fill: var(--ico-leaf); stroke: none; }
+.nav-ico .ico-water { fill: var(--ico-water); stroke: none; }
+.nav-ico .ico-mark { fill: var(--ico-mark); stroke: none; }
+
+/* Phones and tablets: the top bar opens into a vertical list, so put each
+   icon beside its label instead of letting the SVG sit on its own line. */
+@media (max-width: 767.98px) {
+    .site-navbar .navbar-nav.nav-auth .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .site-navbar .navbar-nav.nav-auth .nav-link .nav-ico {
+        width: 20px;
+        height: 20px;
+    }
+}
+
 .site-navbar .navbar-avatar {
     width: 44px;
     height: 44px;
