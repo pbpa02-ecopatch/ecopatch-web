@@ -43,6 +43,26 @@ def _search_filter(qs, q):
     )
 
 
+def _apply_filters_to_qs(qs, active):
+    """Apply the validated filters to any queryset.
+
+    Single place for the filter rules: the list queryset and the two "my"
+    sections all go through here, so a new filter cannot be added to one and
+    forgotten in the other.
+    """
+    if active.get('item_type'):
+        qs = qs.filter(item_type=active['item_type'])
+    if active.get('q'):
+        qs = _search_filter(qs, active['q'])
+    if active.get('city'):
+        qs = qs.filter(city=active['city'])
+    if active.get('transaction_type'):
+        qs = qs.filter(transaction_type=active['transaction_type'])
+    if active.get('status'):
+        qs = qs.filter(status=active['status'])
+    return qs
+
+
 def _filtered_queryset(request, active_tab='browse'):
     """Filtered queryset for list view (search, item type, city, transaction, status).
 
@@ -64,17 +84,6 @@ def _filtered_queryset(request, active_tab='browse'):
     valid_statuses = {c[0] for c in SeedExchange.Status.choices}
     valid_cities = {c[0] for c in SeedExchange.CITY_CHOICES}
 
-    if item_type in valid_item_types:
-        qs = qs.filter(item_type=item_type)
-    if q:
-        qs = _search_filter(qs, q)
-    if city in valid_cities:
-        qs = qs.filter(city=city)
-    if transaction_type in valid_transactions:
-        qs = qs.filter(transaction_type=transaction_type)
-    if status in valid_statuses:
-        qs = qs.filter(status=status)
-
     active = {
         'item_type': item_type if item_type in valid_item_types else '',
         'q': q,
@@ -82,22 +91,7 @@ def _filtered_queryset(request, active_tab='browse'):
         'transaction_type': transaction_type if transaction_type in valid_transactions else '',
         'status': status if status in valid_statuses else '',
     }
-    return qs, active
-
-
-def _apply_filters_to_qs(qs, active):
-    """Apply the same filters from _filtered_queryset to any queryset."""
-    if active.get('item_type'):
-        qs = qs.filter(item_type=active['item_type'])
-    if active.get('q'):
-        qs = _search_filter(qs, active['q'])
-    if active.get('city'):
-        qs = qs.filter(city=active['city'])
-    if active.get('transaction_type'):
-        qs = qs.filter(transaction_type=active['transaction_type'])
-    if active.get('status'):
-        qs = qs.filter(status=active['status'])
-    return qs
+    return _apply_filters_to_qs(qs, active), active
 
 
 def _is_htmx(request):
@@ -205,10 +199,6 @@ def listing_list(request):
         'tab_qs': urlencode(tab_filters),
         'q_clear_qs': urlencode(q_clear_filters),
         'dropdowns': _filter_dropdowns(active, active_tab),
-        'item_types': SeedExchange.ItemType.choices,
-        'transaction_types': SeedExchange.TransactionType.choices,
-        'statuses': SeedExchange.Status.choices,
-        'cities': SeedExchange.CITY_CHOICES,
     }
 
     # The whole tabs+filter block is swapped via HTMX.
@@ -344,11 +334,6 @@ def listing_delete(request, pk):
     return render(request, 'seed_exchange/confirm_delete.html', {'listing': listing})
 
 
-def _render_card(request, listing):
-    listing = SeedExchange.objects.select_related('user', 'reserved_by').get(pk=listing.pk)
-    return render(request, 'seed_exchange/partials/card.html', {'listing': listing})
-
-
 @login_required
 def listing_reserve(request, pk):
     """Booking: user requests listing (status -> Menunggu konfirmasi)."""
@@ -367,8 +352,6 @@ def listing_reserve(request, pk):
     )
     if not claimed:
         return HttpResponseBadRequest('Listing sudah tidak available.')
-    if _is_htmx(request):
-        return _render_card(request, listing)
     messages.success(request, f'Booking "{listing.title}" terkirim. Tunggu konfirmasi pemilik ya.')
     return redirect('seed_exchange:detail', pk=pk)
 
@@ -376,7 +359,7 @@ def listing_reserve(request, pk):
 @login_required
 def listing_accept(request, pk):
     """Owner accepts booking (Menunggu konfirmasi -> Reserved)."""
-    listing = get_object_or_404(
+    get_object_or_404(
         SeedExchange, pk=pk, user=request.user,
         status=SeedExchange.Status.REQUESTED,
     )
@@ -393,9 +376,6 @@ def listing_accept(request, pk):
     ).update(status=SeedExchange.Status.RESERVED, updated_at=timezone.now())
     if not accepted:
         return HttpResponseBadRequest('Listing ini tidak lagi menunggu konfirmasi.')
-    listing.refresh_from_db()
-    if _is_htmx(request):
-        return _render_card(request, listing)
     messages.success(request, 'Booking diterima.')
     return redirect('seed_exchange:detail', pk=pk)
 
@@ -403,7 +383,7 @@ def listing_accept(request, pk):
 @login_required
 def listing_complete(request, pk):
     """Owner marks listing done (Reserved -> Completed)."""
-    listing = get_object_or_404(SeedExchange, pk=pk, user=request.user)
+    get_object_or_404(SeedExchange, pk=pk, user=request.user)
     if request.method != 'POST':
         return redirect('seed_exchange:detail', pk=pk)
     done = SeedExchange.objects.filter(
@@ -411,9 +391,6 @@ def listing_complete(request, pk):
     ).update(status=SeedExchange.Status.COMPLETED, updated_at=timezone.now())
     if not done:
         return HttpResponseBadRequest('Hanya listing yang sudah diterima yang bisa diselesaikan.')
-    listing.refresh_from_db()
-    if _is_htmx(request):
-        return _render_card(request, listing)
     messages.success(request, 'Listing ditandai selesai.')
     return redirect('seed_exchange:detail', pk=pk)
 
@@ -426,7 +403,7 @@ def listing_reopen(request, pk):
     "Buka kembali" after a booking is accepted or completed. The requester is
     cleared, so the listing never stays reserved for someone after reopening.
     """
-    listing = get_object_or_404(SeedExchange, pk=pk, user=request.user)
+    get_object_or_404(SeedExchange, pk=pk, user=request.user)
     if request.method != 'POST':
         return redirect('seed_exchange:detail', pk=pk)
     reopened = SeedExchange.objects.filter(pk=pk, user=request.user).exclude(
@@ -438,9 +415,6 @@ def listing_reopen(request, pk):
     )
     if not reopened:
         return HttpResponseBadRequest('Listing sudah available.')
-    listing.refresh_from_db()
-    if _is_htmx(request):
-        return _render_card(request, listing)
     messages.success(request, 'Listing dibuka kembali.')
     return redirect('seed_exchange:detail', pk=pk)
 
@@ -448,7 +422,7 @@ def listing_reopen(request, pk):
 @login_required
 def listing_cancel_reserve(request, pk):
     """Requester cancels booking (only while Menunggu konfirmasi)."""
-    listing = get_object_or_404(
+    get_object_or_404(
         SeedExchange,
         pk=pk,
         reserved_by=request.user,
@@ -470,9 +444,6 @@ def listing_cancel_reserve(request, pk):
     )
     if not cancelled:
         return HttpResponseBadRequest('Booking ini sudah tidak bisa dibatalkan.')
-    listing.refresh_from_db()
-    if _is_htmx(request):
-        return _render_card(request, listing)
     messages.success(request, 'Booking dibatalkan.')
     return redirect('seed_exchange:detail', pk=pk)
 
