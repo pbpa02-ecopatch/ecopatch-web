@@ -14,6 +14,18 @@ from .forms import SeedExchangeForm
 from .models import SeedExchange
 
 VALID_TABS = ('mine', 'bookings', 'browse')
+MAX_SEARCH_LENGTH = 100
+MAX_BACK_URL_LENGTH = 2000
+
+
+def _clean_query(value, limit=MAX_SEARCH_LENGTH):
+    """Typed search text: drop control characters, trim it and cap its length.
+
+    A very long or control-character-laden query is harmless to the ORM, but it
+    bloats every filter link on the page, so it is kept short.
+    """
+    printable = ''.join(ch for ch in value if ch.isprintable())
+    return printable.strip()[:limit]
 
 
 def _current_tab(request):
@@ -36,7 +48,7 @@ def _filtered_queryset(request):
     qs = SeedExchange.objects.select_related('user').order_by('-created_at')
 
     item_type = request.GET.get('item_type', '').strip()
-    q = request.GET.get('q', '').strip()
+    q = _clean_query(request.GET.get('q', ''))
     city = request.GET.get('city', '').strip()
     transaction_type = request.GET.get('transaction_type', '').strip()
     status = request.GET.get('status', '').strip()
@@ -135,7 +147,7 @@ def listing_list(request):
     """List view with 3 sections: Listing Saya, Booking Saya, Jelajahi."""
     # Remember where the user was so the detail page can send them back to the
     # same tab/filters even after an edit redirect (which drops the query string).
-    request.session['seed_exchange_last_list'] = request.get_full_path()
+    request.session['seed_exchange_last_list'] = request.get_full_path()[:MAX_BACK_URL_LENGTH]
     qs, active = _filtered_queryset(request)
     active_tab = _current_tab(request)
     # Keep the tab inside `active` so filter URLs preserve it, but never build
@@ -216,7 +228,7 @@ def listing_detail(request, pk):
     listing = get_object_or_404(SeedExchange.objects.select_related('user', 'reserved_by'), pk=pk)
     back_url = reverse('seed_exchange:list')
     if request.GET:
-        back_url = f'{back_url}?{request.GET.urlencode()}'
+        back_url = f'{back_url}?{request.GET.urlencode()}'[:MAX_BACK_URL_LENGTH]
     else:
         last_list = request.session.get('seed_exchange_last_list', '')
         if last_list.startswith('/seed-exchange/'):

@@ -2,6 +2,8 @@ from django import forms
 
 from .models import SeedExchange
 
+MAX_DESCRIPTION_LENGTH = 2000
+
 
 class ListingImageField(forms.ImageField):
     """Image field that keeps the current photo when no new file is uploaded."""
@@ -83,6 +85,7 @@ class SeedExchangeForm(forms.ModelForm):
             'description': forms.Textarea(attrs={
                 'class': 'form-control seed-input',
                 'rows': 4,
+                'maxlength': str(MAX_DESCRIPTION_LENGTH),
                 'placeholder': 'Ceritakan kondisi bibit/tanaman, jumlah, cara ambil/tukar...',
             }),
         }  # noqa: RUF012
@@ -139,3 +142,11 @@ class SeedExchangeForm(forms.ModelForm):
         if image and hasattr(image, 'size') and image.size > 5 * 1024 * 1024:
             raise forms.ValidationError('Ukuran foto maksimal 5 MB.')
         return image
+
+    def clean_description(self):
+        description = self.cleaned_data.get('description') or ''
+        if len(description) > MAX_DESCRIPTION_LENGTH:
+            raise forms.ValidationError(
+                f'Deskripsi maksimal {MAX_DESCRIPTION_LENGTH} karakter.'
+            )
+        return description

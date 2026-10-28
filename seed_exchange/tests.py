@@ -831,6 +831,25 @@ class SeedExchangeEdgeCaseTests(TestCase):
         self.assertContains(response, 'Ukuran foto maksimal 5 MB.')
         self.assertFalse(SeedExchange.objects.filter(title='Foto besar').exists())
 
+    def test_a_description_longer_than_the_limit_is_rejected(self):
+        self.client.login(username='rheina', password='test123')
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            response = self.client.post(reverse('seed_exchange:create'), {
+                'title': 'Deskripsi panjang', 'item_type': 'seed', 'plant_name': '',
+                'transaction_type': 'giveaway', 'description': 'x' * 2001,
+                'image': make_image_upload(),
+            })
+        self.assertContains(response, 'Deskripsi maksimal 2000 karakter.')
+        self.assertFalse(SeedExchange.objects.filter(title='Deskripsi panjang').exists())
+
+    def test_search_text_is_cleaned_and_capped(self):
+        self.client.login(username='teman', password='test123')
+        response = self.client.get(
+            reverse('seed_exchange:list'), {'q': '\x00\x01  ' + 'a' * 500}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['active']['q'], 'a' * 100)
+
     def test_a_user_without_a_profile_row_can_open_every_page(self):
         Profile.objects.filter(user=self.other).delete()
         self.client.login(username='teman', password='test123')
