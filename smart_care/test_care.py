@@ -508,15 +508,35 @@ class CareViewTests(CacheClearingTestCase):
         task = CareTask.objects.get()
         self.assertEqual(task.plant_name, "Basil")
 
-    def test_removing_the_plant_keeps_the_task_and_its_name(self):
+    def test_deleting_the_plant_deletes_its_tasks(self):
         plant = make_patch_plant(self.user, "Cabai")
         self.client.post(reverse("smart_care:create"), {
             "patch_plant": plant.pk, "task_type": "pruning", "due_date": "2026-11-02",
         })
+        self.assertEqual(CareTask.objects.count(), 1)
         plant.delete()
-        task = CareTask.objects.get()
-        self.assertIsNone(task.patch_plant)
-        self.assertEqual(task.plant_name, "Cabai")
+        self.assertFalse(CareTask.objects.exists())
+
+    def test_deleting_the_ecopatch_deletes_the_tasks_of_its_plants(self):
+        patch = make_patch(self.user)
+        make_task(self.user, patch_plant=make_patch_plant(self.user, "Cabai", patch=patch))
+        patch.delete()  # EcoPatch -> PatchPlant -> CareTask, all through CASCADE
+        self.assertFalse(CareTask.objects.exists())
+
+    def test_only_the_tasks_of_the_deleted_plant_are_deleted(self):
+        gone = make_patch_plant(self.user, "Cabai")
+        kept = make_patch_plant(self.user, "Basil")
+        make_task(self.user, plant_name="Cabai", patch_plant=gone)
+        make_task(self.user, plant_name="Basil", patch_plant=kept)
+        make_task(self.user, plant_name="Tanaman lama")  # made before tasks were linked to a plant: no link
+        gone.delete()
+        self.assertEqual(sorted(CareTask.objects.values_list("plant_name", flat=True)), ["Basil", "Tanaman lama"])
+
+    def test_marking_the_plant_removed_is_not_a_deletion(self):
+        plant = make_patch_plant(self.user, "Cabai")
+        make_task(self.user, patch_plant=plant)
+        PatchPlant.objects.filter(pk=plant.pk).update(status="removed")
+        self.assertEqual(CareTask.objects.count(), 1)
 
     def test_a_task_without_a_plant_can_still_be_edited(self):
         old = make_task(self.user, plant_name="Lama")

@@ -2,7 +2,7 @@
 
 A plant takes part in care (task form, suggestions, pots) while its status in My EcoPatch is Planted or
 Growing. A task links to its plant, but copies the plant's name and the indoor/outdoor flag when it is linked,
-so the history still reads right after the plant is renamed or removed.
+so the history still reads right after the plant is renamed in the Plant Library (removing the plant deletes its tasks).
 """
 from django.db.models import Q
 
@@ -12,6 +12,12 @@ from plant_library.models import Plant
 
 from .suggestions import INTERVALS, normalize
 
+# Alur data tanaman:
+#   EcoPatch (kebun user) -> PatchPlant (tanaman di kebun itu) -> Plant (Plant Library)
+# PatchPlant memberi status dan kebun, Plant memberi nama resmi, label indoor/outdoor, dan interval siram.
+# Semua fungsi publik di bawah menerima `user` dan hanya membaca tanaman milik user itu (lewat patch__owner),
+# sehingga saran, pot, dan dropdown form tidak pernah memuat tanaman user lain.
+# Hanya tanaman berstatus Planted atau Growing yang ikut dirawat; bibit yang belum ditanam atau yang sudah dipanen tidak.
 CARE_STATUSES = (PatchPlant.Status.PLANTED, PatchPlant.Status.GROWING)
 NAME_MAX_LENGTH = 80  # CareTask.plant_name
 
@@ -48,9 +54,12 @@ def link_task(task, patch_plant):
 def user_patch_plants(user, keep=None):
     """The user's own plants that can have care tasks. `keep` is a plant that stays listed even when its
     status no longer qualifies (the plant of a task being edited). Other users' plants never appear."""
+    # Q objects digabung dengan OR: status aktif ATAU tanaman milik task yang sedang diedit.
     wanted = Q(status__in=CARE_STATUSES)
     if keep is not None:
         wanted |= Q(pk=keep)
+    # select_related mengambil plant dan patch dalam satu query. Tanpa itu, membaca nama dan flag outdoor
+    # tiap tanaman memicu query tambahan (masalah N+1).
     return (
         PatchPlant.objects.filter(patch__owner=user)
         .filter(wanted)
@@ -63,6 +72,7 @@ def _one_per_name(user):
     """One plant per name (ignoring case and extra spaces): the newest My EcoPatch row decides the spelling and
     the indoor/outdoor flag, so a plant that sits in two patches is still one pot."""
     chosen = {}
+    # Diurutkan dari pk terbesar, dan setdefault hanya menyimpan kemunculan pertama, jadi baris terbaru yang menang.
     for patch_plant in user_patch_plants(user).order_by("-pk"):
         name = patch_plant_name(patch_plant)
         if name:
