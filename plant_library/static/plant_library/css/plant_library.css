@@ -310,40 +310,6 @@ body.has-sidebar .plant-page {
     appearance: none;
 }
 
-.plant-search-send {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    flex: none;
-    border: 0;
-    border-radius: 50%;
-    background: var(--pl-brand-strong);
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1);
-}
-
-.plant-search-send svg {
-    width: 20px;
-    height: 20px;
-    transition: transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1);
-}
-
-.plant-search-send:hover {
-    background: var(--pl-brand-edge);
-    transform: scale(1.06);
-}
-
-.plant-search-send:hover svg {
-    transform: translateY(-2px);
-}
-
-.plant-search-send:active {
-    transform: scale(0.94);
-}
-
 .plant-finder-bottom {
     display: flex;
     flex-wrap: wrap;
@@ -1998,11 +1964,6 @@ body.has-sidebar .plant-page {
         min-height: 44px;
     }
 
-    .plant-search-send {
-        width: 40px;
-        height: 40px;
-    }
-
     .plant-finder-bottom {
         gap: 9px;
         padding-top: 10px;
@@ -2108,8 +2069,7 @@ body.has-sidebar .plant-page {
     .plant-card-media img,
     .plant-finder-pet,
     .plant-finder-card,
-    .plant-chip,
-    .plant-search-send {
+    .plant-chip {
         animation: none !important;
         transition: none !important;
     }
