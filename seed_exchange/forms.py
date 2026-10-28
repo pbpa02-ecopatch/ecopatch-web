@@ -20,6 +20,17 @@ class ListingImageField(forms.ImageField):
         return super().clean(data, initial)
 
 
+def resolve_location(profile, instance):
+    """City and contact the listing will carry.
+
+    The profile wins, the listing's old value is only the fallback, and the
+    result is always a string so callers can test it with `bool`.
+    """
+    city = (profile.city if profile else '') or instance.city or ''
+    contact = (profile.contact_text() if profile else '') or instance.contact or ''
+    return city, contact
+
+
 class SeedExchangeForm(forms.ModelForm):
     """Form create/update listing.
 
@@ -116,10 +127,8 @@ class SeedExchangeForm(forms.ModelForm):
         )
 
     def _location(self):
-        """City and contact the listing will carry: the profile's, with the listing's old value as the fallback."""
-        city = (self.profile.city if self.profile else '') or self.instance.city
-        contact = (self.profile.contact_text() if self.profile else '') or self.instance.contact
-        return city, contact
+        """City and contact the listing will carry, resolved in one place."""
+        return resolve_location(self.profile, self.instance)
 
     def clean(self):
         cleaned = super().clean()

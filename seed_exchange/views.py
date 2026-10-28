@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from main.models import Profile
 
-from .forms import SeedExchangeForm
+from .forms import SeedExchangeForm, resolve_location
 from .models import SeedExchange
 
 VALID_TABS = ('mine', 'bookings', 'browse')
@@ -230,25 +230,11 @@ def listing_detail(request, pk):
         if last_list.startswith('/seed-exchange/'):
             back_url = last_list
     is_owner = listing.user_id == request.user.id
-    is_requester = (
-        listing.reserved_by_id is not None
-        and listing.reserved_by_id == request.user.id
-        and listing.status == SeedExchange.Status.REQUESTED
-    )
-    is_accepted = (
-        listing.reserved_by_id is not None
-        and listing.reserved_by_id == request.user.id
-        and listing.status == SeedExchange.Status.RESERVED
-    )
-    is_completed_requester = (
-        listing.reserved_by_id is not None
-        and listing.reserved_by_id == request.user.id
-        and listing.status == SeedExchange.Status.COMPLETED
-    )
-    can_reserve = (
-        not is_owner
-        and listing.status == SeedExchange.Status.AVAILABLE
-    )
+    holds_listing = listing.reserved_by_id == request.user.id
+    is_requester = holds_listing and listing.status == SeedExchange.Status.REQUESTED
+    is_accepted = holds_listing and listing.status == SeedExchange.Status.RESERVED
+    is_completed_requester = holds_listing and listing.status == SeedExchange.Status.COMPLETED
+    can_reserve = not is_owner and listing.status == SeedExchange.Status.AVAILABLE
     return render(request, 'seed_exchange/detail.html', {
         'listing': listing,
         'back_url': back_url,
@@ -267,8 +253,7 @@ def _location_context(profile, form):
     listing's old copy is only the fallback), so this card just shows what the
     listing will carry and points to the profile when something is missing.
     """
-    city = profile.city or form.instance.city or ''
-    contact = profile.contact_text() or form.instance.contact or ''
+    city, contact = resolve_location(profile, form.instance)
     return {
         'location_city': city,
         'location_contact': contact,
