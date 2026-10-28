@@ -1036,7 +1036,7 @@ button.seed-filter {
     pointer-events: none;
 }
 
-.seed-card:hover .seed-card-media img {
+.seed-card:hover .seed-card-media img:not(.seed-card-ph) {
     transform: scale(1.06);
 }
 
@@ -1052,9 +1052,12 @@ button.seed-filter {
     background: var(--seed-brand-soft);
 }
 
-.seed-card-media--empty svg {
-    width: 40px;
-    height: 40px;
+.seed-card-media .seed-card-ph {
+    width: 70%;
+    height: auto;
+    max-height: 84%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 14px rgba(23, 48, 31, 0.14));
 }
 
 .seed-card-body {
@@ -1437,6 +1440,9 @@ button.seed-filter {
 
 .seed-detail-media {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 0;
     aspect-ratio: 4 / 3;
     overflow: hidden;
@@ -1452,9 +1458,11 @@ button.seed-filter {
     object-fit: cover;
 }
 
-.seed-detail-media-pet {
-    object-fit: contain !important;
-    padding: 22px 22px 4px;
+.seed-detail-media .seed-detail-ph {
+    width: 66%;
+    height: auto;
+    max-height: 76%;
+    object-fit: contain;
     filter: drop-shadow(0 10px 12px rgba(23, 48, 31, 0.14));
 }
 
@@ -2308,9 +2316,11 @@ select.seed-input {
     object-fit: cover;
 }
 
-.seed-modal-thumb svg {
-    width: 26px;
-    height: 26px;
+.seed-modal-thumb .seed-modal-ph {
+    width: 76%;
+    height: auto;
+    max-height: 80%;
+    object-fit: contain;
 }
 
 .seed-modal-preview-copy {

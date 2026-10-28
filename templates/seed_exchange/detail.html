@@ -25,7 +25,7 @@
                     {% if listing.image %}
                     <img src="{{ listing.image.url }}" alt="{{ listing.title }}" loading="lazy" decoding="async">
                     {% else %}
-                    <img class="seed-detail-media-pet" src="{% static 'seed_exchange/tukar-bibit.svg' %}" alt="" width="160" height="156" loading="lazy" decoding="async">
+                    <img class="seed-detail-ph" src="{% static 'plant_library/img/plant-placeholder.svg' %}" alt="Ilustrasi {{ listing.title }}" loading="lazy" decoding="async">
                     {% endif %}
                 </figure>
 
@@ -201,11 +201,7 @@
                             {% if listing.image %}
                             <img src="{{ listing.image.url }}" alt="" loading="lazy" decoding="async">
                             {% else %}
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M12 21v-9.5"/>
-                                <path d="M12 12.5C12 8.6 9 5.5 4 5.5c0 4.9 3 8 8 7Z"/>
-                                <path d="M12 14.5c0-3.9 3-7 8-7 0 4.9-3 8-8 7Z"/>
-                            </svg>
+                            <img class="seed-modal-ph" src="{% static 'plant_library/img/plant-placeholder.svg' %}" alt="" loading="lazy" decoding="async">
                             {% endif %}
                         </span>
                         <span class="seed-modal-preview-copy">
