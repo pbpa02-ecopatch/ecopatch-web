@@ -1,6 +1,7 @@
 import re
 import tempfile
 from io import BytesIO
+from unittest import mock
 from urllib.parse import quote
 
 from django.contrib.auth.models import User
@@ -581,16 +582,18 @@ class SeedExchangeFlowTests(TestCase):
         self.listing.refresh_from_db()
         self.assertEqual(self.listing.status, 'requested')
 
-    def test_reserve_via_htmx_returns_card(self):
+    def test_action_ignores_htmx_header_and_redirects(self):
+        # The detail page posts these actions as plain forms, so an HX-Request
+        # header must not turn the response into a card partial.
         self.client.login(username='teman', password='test123')
         response = self.client.post(
             reverse('seed_exchange:reserve', args=[self.listing.pk]),
             HTTP_HX_REQUEST='true',
         )
-        self.assertEqual(response.status_code, 200)
-        content = response.content.decode()
-        self.assertIn(f'seed-card-{self.listing.pk}', content)
-        self.assertIn('Menunggu konfirmasi', content)
+        self.assertRedirects(response, reverse('seed_exchange:detail', args=[self.listing.pk]))
+        self.listing.refresh_from_db()
+        self.assertEqual(self.listing.status, SeedExchange.Status.REQUESTED)
+        self.assertEqual(self.listing.reserved_by, self.other)
 
     def test_owner_cannot_reserve_own(self):
         self.client.login(username='rheina', password='test123')
@@ -613,6 +616,26 @@ class SeedExchangeFlowTests(TestCase):
         self.client.post(reverse('seed_exchange:reserve', args=[self.listing.pk]))
         self.listing.refresh_from_db()
         self.assertEqual(self.listing.status, 'requested')
+        self.assertEqual(self.listing.reserved_by, self.other)
+
+    def test_reserve_does_not_trust_a_stale_read(self):
+        # Simulates the race window: the view read the listing while it was still
+        # available, but another requester claimed it before this POST writes.
+        # The conditional UPDATE must refuse instead of overwriting the first
+        # requester with whoever read last.
+        self._request_booking()
+        make_user('ketiga', 'test123')
+        self.client.login(username='ketiga', password='test123')
+        stale = SeedExchange.objects.get(pk=self.listing.pk)
+        stale.status = SeedExchange.Status.AVAILABLE
+        stale.reserved_by = None
+        with mock.patch('seed_exchange.views.get_object_or_404', return_value=stale):
+            response = self.client.post(
+                reverse('seed_exchange:reserve', args=[self.listing.pk])
+            )
+        self.assertEqual(response.status_code, 400)
+        self.listing.refresh_from_db()
+        self.assertEqual(self.listing.status, SeedExchange.Status.REQUESTED)
         self.assertEqual(self.listing.reserved_by, self.other)
 
     def test_reserving_bumps_updated_at(self):
