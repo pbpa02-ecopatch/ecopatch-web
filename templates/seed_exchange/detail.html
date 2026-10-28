@@ -133,6 +133,8 @@
                     <p class="seed-owner-note">Dipesan oleh <strong>@{{ listing.reserved_by.username }}</strong>. Tekan <strong>Terima</strong> kalau setuju (lanjut atur serah terima via kontakmu), atau <strong>Tolak</strong> untuk membuka listing kembali.</p>
                     {% elif listing.status == 'reserved' and listing.reserved_by %}
                     <p class="seed-owner-note">Sudah diterima <strong>@{{ listing.reserved_by.username }}</strong>. Tandai <strong>Selesai</strong> setelah serah terima terjadi.</p>
+                    {% elif listing.status == 'completed' and listing.reserved_by %}
+                    <p class="seed-owner-note">Selesai dengan <strong>@{{ listing.reserved_by.username }}</strong>. Nama ini tetap tersimpan supaya kamu masih tahu siapa yang menerima listing-mu.</p>
                     {% else %}
                     <p class="seed-owner-note">Ini listing punyamu. Pastikan kontakmu benar agar peminat bisa menghubungimu.</p>
                     {% endif %}
@@ -158,6 +160,19 @@
                             {% endif %}
                         </div>
                     </div>
+                {% elif is_completed_requester %}
+                    <div class="seed-reserve-box">
+                        <p><strong>Selesai 🌱</strong></p>
+                        <p>Booking ini sudah ditandai selesai. Kontak pemilik tetap tersimpan di sini kalau kamu perlu menghubunginya lagi.</p>
+                        <div class="seed-reserve-contact">
+                            <span class="seed-contact-avatar" aria-hidden="true">{{ listing.user.username|first|upper }}</span>
+                            <span class="seed-contact-name">@{{ listing.user.username }}</span>
+                            <span class="seed-contact-value">{{ listing.owner_contact }}</span>
+                            {% if listing.user.email %}
+                            <a class="btn-seed-secondary btn-seed-sm" href="mailto:{{ listing.user.email }}">Hubungi via Email</a>
+                            {% endif %}
+                        </div>
+                    </div>
                 {% elif can_reserve %}
                     <div class="seed-actions">
                         <form method="post" action="{% url 'seed_exchange:reserve' listing.pk %}">
@@ -165,15 +180,12 @@
                             <button class="btn-seed-primary" type="submit">Booking listing ini</button>
                         </form>
                     </div>
-                {% elif user.is_authenticated and listing.status == 'requested' %}
+                {% elif listing.status == 'requested' %}
                     <p class="seed-hint">Listing ini sedang dipesan orang lain dan menunggu konfirmasi pemilik.</p>
-                {% elif user.is_authenticated and listing.status == 'reserved' %}
+                {% elif listing.status == 'reserved' %}
                     <p class="seed-hint">Listing ini sudah diterima orang lain.</p>
-                {% elif user.is_authenticated and listing.status == 'completed' %}
+                {% elif listing.status == 'completed' %}
                     <p class="seed-hint">Listing ini sudah selesai.</p>
-                {% else %}
-                    {% url 'seed_exchange:detail' listing.pk as detail_url %}
-                    {% include "seed_exchange/partials/login_callout.html" with title="Ingin booking bibit ini?" text="Masuk untuk booking listing atau membuat listing punyamu sendiri. Belum punya akun? Daftar gratis, kok." next_url=detail_url %}
                 {% endif %}
             </div>
         </article>

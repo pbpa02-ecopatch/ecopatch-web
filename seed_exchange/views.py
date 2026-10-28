@@ -43,15 +43,21 @@ def _search_filter(qs, q):
     )
 
 
-def _filtered_queryset(request):
-    """Filtered queryset for list view (search, item type, city, transaction, status)."""
+def _filtered_queryset(request, active_tab='browse'):
+    """Filtered queryset for list view (search, item type, city, transaction, status).
+
+    Status only means something in Listing Saya and Booking Saya: the Jelajahi
+    queryset drops every listing that is not available, so a status filter there
+    would only ever return the available ones (or an empty page for any other
+    choice). It is ignored on that tab instead of pretending to work.
+    """
     qs = SeedExchange.objects.select_related('user').order_by('-created_at')
 
     item_type = request.GET.get('item_type', '').strip()
     q = _clean_query(request.GET.get('q', ''))
     city = request.GET.get('city', '').strip()
     transaction_type = request.GET.get('transaction_type', '').strip()
-    status = request.GET.get('status', '').strip()
+    status = '' if active_tab == 'browse' else request.GET.get('status', '').strip()
 
     valid_item_types = {c[0] for c in SeedExchange.ItemType.choices}
     valid_transactions = {c[0] for c in SeedExchange.TransactionType.choices}
@@ -110,7 +116,7 @@ def _filter_url(current, name, value):
     return f'{base}?{qs}' if qs else base
 
 
-def _filter_dropdowns(active):
+def _filter_dropdowns(active, active_tab='browse'):
     """Build dropdown options for template: [{name, current_label, items: [{label, url, selected}]}]."""
     config = [
         ('item_type', 'Semua jenis', list(SeedExchange.ItemType.choices)),
@@ -118,6 +124,8 @@ def _filter_dropdowns(active):
         ('transaction_type', 'Semua transaksi', list(SeedExchange.TransactionType.choices)),
         ('status', 'Semua status', list(SeedExchange.Status.choices)),
     ]
+    if active_tab == 'browse':
+        config = [item for item in config if item[0] != 'status']
     dropdowns = []
     for name, all_label, options in config:
         labels = dict(options)
@@ -148,8 +156,8 @@ def listing_list(request):
     # Remember where the user was so the detail page can send them back to the
     # same tab/filters even after an edit redirect (which drops the query string).
     request.session['seed_exchange_last_list'] = request.get_full_path()[:MAX_BACK_URL_LENGTH]
-    qs, active = _filtered_queryset(request)
     active_tab = _current_tab(request)
+    qs, active = _filtered_queryset(request, active_tab)
     # Keep the tab inside `active` so filter URLs preserve it, but never build
     # tab links from it (that produced duplicate ?tab= params).
     active['tab'] = active_tab
@@ -161,25 +169,23 @@ def listing_list(request):
             SeedExchange.Status.COMPLETED,
         ]
     )
-    my_listings = []
-    my_bookings = []
 
-    if request.user.is_authenticated:
-        my_listings = list(
-            _apply_filters_to_qs(
-                SeedExchange.objects.filter(user=request.user).select_related('user'), active
-            ).order_by('-created_at')
-        )
-        my_bookings = list(
-            _apply_filters_to_qs(
-                SeedExchange.objects.filter(reserved_by=request.user)
-                .select_related('user', 'reserved_by')
-                .exclude(status=SeedExchange.Status.COMPLETED),
-                active,
-            ).order_by('-updated_at')
-        )
-        # Never show your own listings (or already booked ones) in Jelajahi.
-        browse_qs = browse_qs.exclude(user=request.user)
+    my_listings = list(
+        _apply_filters_to_qs(
+            SeedExchange.objects.filter(user=request.user).select_related('user'), active
+        ).order_by('-created_at')
+    )
+    # Completed bookings stay here as history: the requester should still be able
+    # to find the listing (and its contact) after the exchange is done.
+    my_bookings = list(
+        _apply_filters_to_qs(
+            SeedExchange.objects.filter(reserved_by=request.user)
+            .select_related('user', 'reserved_by'),
+            active,
+        ).order_by('-updated_at')
+    )
+    # Never show your own listings (or already booked ones) in Jelajahi.
+    browse_qs = browse_qs.exclude(user=request.user)
 
     listings = list(browse_qs)
 
@@ -198,14 +204,14 @@ def listing_list(request):
         'active_tab': active_tab,
         'tab_qs': urlencode(tab_filters),
         'q_clear_qs': urlencode(q_clear_filters),
-        'dropdowns': _filter_dropdowns(active),
+        'dropdowns': _filter_dropdowns(active, active_tab),
         'item_types': SeedExchange.ItemType.choices,
         'transaction_types': SeedExchange.TransactionType.choices,
         'statuses': SeedExchange.Status.choices,
         'cities': SeedExchange.CITY_CHOICES,
     }
 
-    # Both guests and members swap the whole tabs+filter block via HTMX.
+    # The whole tabs+filter block is swapped via HTMX.
     if _is_htmx(request):
         return render(request, 'seed_exchange/partials/tabs_content.html', context)
 
@@ -233,22 +239,24 @@ def listing_detail(request, pk):
         last_list = request.session.get('seed_exchange_last_list', '')
         if last_list.startswith('/seed-exchange/'):
             back_url = last_list
-    is_owner = request.user.is_authenticated and listing.user_id == request.user.id
+    is_owner = listing.user_id == request.user.id
     is_requester = (
-        request.user.is_authenticated
-        and listing.reserved_by_id is not None
+        listing.reserved_by_id is not None
         and listing.reserved_by_id == request.user.id
         and listing.status == SeedExchange.Status.REQUESTED
     )
     is_accepted = (
-        request.user.is_authenticated
-        and listing.reserved_by_id is not None
+        listing.reserved_by_id is not None
         and listing.reserved_by_id == request.user.id
         and listing.status == SeedExchange.Status.RESERVED
     )
+    is_completed_requester = (
+        listing.reserved_by_id is not None
+        and listing.reserved_by_id == request.user.id
+        and listing.status == SeedExchange.Status.COMPLETED
+    )
     can_reserve = (
-        request.user.is_authenticated
-        and not is_owner
+        not is_owner
         and listing.status == SeedExchange.Status.AVAILABLE
     )
     return render(request, 'seed_exchange/detail.html', {
@@ -257,6 +265,7 @@ def listing_detail(request, pk):
         'is_owner': is_owner,
         'is_requester': is_requester,
         'is_accepted': is_accepted,
+        'is_completed_requester': is_completed_requester,
         'can_reserve': can_reserve,
     })
 
@@ -373,8 +382,18 @@ def listing_accept(request, pk):
     )
     if request.method != 'POST':
         return redirect('seed_exchange:detail', pk=pk)
-    listing.status = SeedExchange.Status.RESERVED
-    listing.save(update_fields=['status', 'updated_at'])
+    # Conditional UPDATE for the same reason as reserve: the requester may cancel
+    # between the lookup and this write. Requiring a requester also keeps a
+    # "requested" row without one from becoming "reserved" for nobody.
+    accepted = SeedExchange.objects.filter(
+        pk=pk,
+        user=request.user,
+        status=SeedExchange.Status.REQUESTED,
+        reserved_by__isnull=False,
+    ).update(status=SeedExchange.Status.RESERVED, updated_at=timezone.now())
+    if not accepted:
+        return HttpResponseBadRequest('Listing ini tidak lagi menunggu konfirmasi.')
+    listing.refresh_from_db()
     if _is_htmx(request):
         return _render_card(request, listing)
     messages.success(request, 'Booking diterima.')
@@ -387,10 +406,12 @@ def listing_complete(request, pk):
     listing = get_object_or_404(SeedExchange, pk=pk, user=request.user)
     if request.method != 'POST':
         return redirect('seed_exchange:detail', pk=pk)
-    if listing.status != SeedExchange.Status.RESERVED:
+    done = SeedExchange.objects.filter(
+        pk=pk, user=request.user, status=SeedExchange.Status.RESERVED,
+    ).update(status=SeedExchange.Status.COMPLETED, updated_at=timezone.now())
+    if not done:
         return HttpResponseBadRequest('Hanya listing yang sudah diterima yang bisa diselesaikan.')
-    listing.status = SeedExchange.Status.COMPLETED
-    listing.save(update_fields=['status', 'updated_at'])
+    listing.refresh_from_db()
     if _is_htmx(request):
         return _render_card(request, listing)
     messages.success(request, 'Listing ditandai selesai.')
@@ -399,15 +420,25 @@ def listing_complete(request, pk):
 
 @login_required
 def listing_reopen(request, pk):
-    """Owner reopens listing (Reserved/Completed -> Available)."""
+    """Owner reopens a listing the booking buttons have moved out of Available.
+
+    This is both "Tolak" for a waiting request (requested -> available) and
+    "Buka kembali" after a booking is accepted or completed. The requester is
+    cleared, so the listing never stays reserved for someone after reopening.
+    """
     listing = get_object_or_404(SeedExchange, pk=pk, user=request.user)
     if request.method != 'POST':
         return redirect('seed_exchange:detail', pk=pk)
-    if listing.status == SeedExchange.Status.AVAILABLE:
+    reopened = SeedExchange.objects.filter(pk=pk, user=request.user).exclude(
+        status=SeedExchange.Status.AVAILABLE,
+    ).update(
+        status=SeedExchange.Status.AVAILABLE,
+        reserved_by=None,
+        updated_at=timezone.now(),
+    )
+    if not reopened:
         return HttpResponseBadRequest('Listing sudah available.')
-    listing.status = SeedExchange.Status.AVAILABLE
-    listing.reserved_by = None
-    listing.save(update_fields=['status', 'reserved_by', 'updated_at'])
+    listing.refresh_from_db()
     if _is_htmx(request):
         return _render_card(request, listing)
     messages.success(request, 'Listing dibuka kembali.')
@@ -425,9 +456,21 @@ def listing_cancel_reserve(request, pk):
     )
     if request.method != 'POST':
         return redirect('seed_exchange:detail', pk=pk)
-    listing.status = SeedExchange.Status.AVAILABLE
-    listing.reserved_by = None
-    listing.save(update_fields=['status', 'reserved_by', 'updated_at'])
+    # If the owner accepted in the meantime this writes nothing; the requester is
+    # told the booking can no longer be cancelled instead of clearing a booking
+    # the owner has already accepted.
+    cancelled = SeedExchange.objects.filter(
+        pk=pk,
+        reserved_by=request.user,
+        status=SeedExchange.Status.REQUESTED,
+    ).update(
+        status=SeedExchange.Status.AVAILABLE,
+        reserved_by=None,
+        updated_at=timezone.now(),
+    )
+    if not cancelled:
+        return HttpResponseBadRequest('Booking ini sudah tidak bisa dibatalkan.')
+    listing.refresh_from_db()
     if _is_htmx(request):
         return _render_card(request, listing)
     messages.success(request, 'Booking dibatalkan.')
