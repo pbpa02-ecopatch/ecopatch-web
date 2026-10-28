@@ -1,4 +1,4 @@
-{% load i18n %}<li class="care-task{% if task.is_completed %} is-done{% endif %}" id="task-{{ task.pk }}"
+{% load i18n %}{# Satu baris tugas. Atribut data-* (plant, type, outdoor, due, complete-url) adalah kontrak dengan smart_care.js; jangan diganti nama tanpa mengubah JS. Dirender di list.html dan oleh view suggestion_accept. #}<li class="care-task{% if task.is_completed %} is-done{% endif %}" id="task-{{ task.pk }}"
     data-plant="{{ task.plant_name }}" data-type="{{ task.task_type }}" data-outdoor="{{ task.is_outdoor|yesno:'1,0' }}"
     data-due="{{ task.due_date|date:'Y-m-d' }}" data-complete-url="{% url 'smart_care:complete' task.pk %}"{% if overdue %} data-overdue{% endif %}>
     <button type="button" class="care-check" role="checkbox" aria-checked="{{ task.is_completed|yesno:'true,false' }}"

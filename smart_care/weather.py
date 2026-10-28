@@ -72,9 +72,14 @@ def condition_label(code):
 
 def fetch_weather(city):
     """Current + daily weather for a supported city. Cached 15 minutes; failures are never cached."""
+    # Alur: validasi kota -> cek cache -> request ke Open-Meteo -> rapikan hasilnya -> simpan ke cache.
+    # Kota harus ada di CITIES. Koordinat selalu berasal dari data internal ini, tidak pernah dari input user,
+    # jadi tidak ada nilai bebas yang ikut terkirim ke API luar.
     if city not in CITIES:
         raise WeatherUnavailable(f"Kota tidak didukung: {city}")
 
+    # Satu entri cache per kota, berlaku 15 menit: semua user di kota yang sama berbagi satu request.
+    # Angka "v2" dinaikkan setiap bentuk datanya berubah, supaya cache lama yang formatnya beda tidak terbaca.
     cache_key = f"smart_care:weather:v2:{city}"
     cached = cache.get(cache_key)
     if cached is not None:
@@ -89,6 +94,9 @@ def fetch_weather(city):
         "timezone": TIMEZONES.get(city, DEFAULT_TIMEZONE),
         "forecast_days": FORECAST_DAYS,
     })
+    # timeout wajib ada: tanpa batas, API yang lambat menahan request halaman sampai habis. urlencode memastikan
+    # parameter ter-escape dengan benar. Semua jenis kegagalan (jaringan, status HTTP, JSON rusak, kunci hilang)
+    # diubah jadi WeatherUnavailable di bawah, sehingga view cukup menangani satu jenis error.
     try:
         with urlopen(f"{OPEN_METEO_URL}?{query}", timeout=TIMEOUT_SECONDS) as response:
             payload = json.load(response)
@@ -127,6 +135,8 @@ def _number(value):
 
 def is_rainy(rain_probability, rain_mm):
     """High peak chance AND enough rain in total. A missing number never counts."""
+    # Kedua syarat harus terpenuhi (AND). Peluang puncak hampir selalu tinggi di musim hujan walau yang turun
+    # hanya beberapa tetes, jadi total curah hujan (mm) dipakai sebagai penyaring.
     return _number(rain_probability) >= RAIN_LIMIT and _number(rain_mm) >= RAIN_MM_LIMIT
 
 
@@ -140,6 +150,8 @@ def recommendation(weather, when="hari ini"):
 
     `when` is how the day is called in the sentence: "hari ini" for today, "di hari itu" for another day.
     """
+    # Urutan aturan adalah urutan prioritas: hujan deras > gerimis > panas > lembap > aman.
+    # Bila lebih dari satu kondisi terpenuhi, hanya yang pertama yang menjadi headline.
     mm = weather.get("rain_mm")
     if is_rainy(weather["rain_probability"], mm):
         return {
@@ -197,6 +209,8 @@ def weather_payload(city):
     The top-level `recommendation`, `hints` and `ambient` describe today. Every entry of `daily` carries the same
     kind of answer for its own day, so the page can show any day of the week without repeating a rule.
     """
+    # Bentuk hasil: data dasar dari fetch_weather + tiga jawaban untuk hari ini (ambient, recommendation, hints)
+    # + daftar `daily` yang tiap harinya membawa jawaban sendiri. Aturannya tetap di Python; JS hanya menampilkan.
     weather = fetch_weather(city)
     daily = []
     for index, day in enumerate(weather["daily"]):

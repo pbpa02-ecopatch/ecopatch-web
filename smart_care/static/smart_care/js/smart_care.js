@@ -1,6 +1,16 @@
 /* Smart Care page: the weather scene, the week strip, the garden, AJAX completion with undo, suggestions
    (accept / skip / undo), the pots and the popups. Every rule (rainy day, headline, advice, suggestions, pot
    levels) comes from Django; this file only renders what the JSON says. */
+/* Peta alur file ini:
+     loadWeather()        GET  smart_care:weather        -> renderScene / renderWeek / renderHints
+     applyCompletion()    POST /<pk>/complete/           -> centang tugas, geser baris, perbarui pot, kebun, dan titik minggu
+     acceptSuggestion()   POST suggestions/accept/       -> baris saran diganti baris tugas hasil render server (data.html)
+     skipSuggestion()     POST suggestions/skip/         -> saran hilang, toast "Saran dilewati" dengan tombol batal
+     restoreSuggestion()  POST suggestions/restore/      -> batalkan lewati
+   Semua POST lewat post(), yang menyertakan header X-CSRFToken. Tokennya diambil dari data-csrf di #care-page karena
+   cookie CSRF berstatus HttpOnly dan tidak bisa dibaca JavaScript. URL endpoint juga dibaca dari atribut data-* halaman,
+   bukan ditulis ulang di sini, sehingga perubahan di urls.py tidak perlu menyentuh file ini.
+   Form tambah/ubah tugas tidak ada di sini: itu ditangani HTMX (hx-get / hx-post) dan modal Bootstrap di template. */
 (function () {
   'use strict';
 

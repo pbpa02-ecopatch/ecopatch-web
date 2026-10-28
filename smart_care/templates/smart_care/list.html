@@ -9,6 +9,7 @@
 {# The scene runs the full width of the screen, so this page fills "main" itself instead of "content" #}
 {% block main %}
 <main class="care-main flex-grow-1">
+{# Akar halaman. data-* di bawah adalah satu-satunya cara JS mengetahui URL endpoint, token CSRF, tanggal hari ini, dan tanggal terpilih. hx-headers membuat setiap request htmx (popup form) membawa token CSRF. #}
 <div class="care-page" id="care-page" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
      data-weather-url="{% url 'smart_care:weather' %}" data-csrf="{{ csrf_token }}"
      data-accept-url="{% url 'smart_care:suggestion_accept' %}" data-skip-url="{% url 'smart_care:suggestion_skip' %}"

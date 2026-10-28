@@ -51,12 +51,19 @@ def build_suggestions(plants, history, today, intervals=INTERVALS, never_recorde
     watering_days: optional {normalized plant name: days}; a plant listed there is watered at its own
              interval instead of intervals["watering"]. Other task types never change.
     """
+    # Alur: untuk setiap pasangan (tanaman, jenis tugas) tentukan apakah hari ini waktunya.
+    #   1. Ambil riwayat pasangan itu saja.
+    #   2. Sudah ada tugas hari ini (status apa pun, termasuk skipped)? Lewati, supaya tidak muncul dua kali.
+    #   3. Cari tanggal selesai terakhir. Skipped tidak dihitung sebagai selesai.
+    #   4. Belum pernah selesai: disarankan bila jenisnya ada di never_recorded.
+    #   5. Pernah selesai: disarankan bila selisih hari >= interval.
     watering_days = watering_days or {}
     history = list(history)
     suggestions = []
     for plant_name, is_outdoor in plants:
         key = normalize(plant_name)
         for task_type, interval in intervals.items():
+            # Interval siram bisa berbeda per tanaman (dari Plant Library). Jenis lain memakai interval bawaan.
             if task_type == "watering":
                 interval = watering_days.get(key, interval)
             same = [e for e in history if normalize(e.plant_name) == key and e.task_type == task_type]
@@ -103,6 +110,9 @@ def plant_status(plant, history, today, intervals=INTERVALS, watering_days=None)
     if days is None:
         water, label, due, never = 0.0, "Belum dicatat", False, True
     else:
+        # water = sisa interval siram: 1.0 saat baru disiram, turun linear ke 0.0 saat jatuh tempo.
+        # Contoh interval 2 hari: hari ke-0 -> 1.0, ke-1 -> 0.5, ke-2 -> 0.0. min/max menjaga nilai tetap
+        # di 0..1, jadi telat siram 5 hari tidak menghasilkan angka negatif.
         water = max(0.0, min(1.0, 1 - days / interval))
         remaining = interval - days
         never = False

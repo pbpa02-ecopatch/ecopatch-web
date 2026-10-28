@@ -25,6 +25,12 @@ from .plant_source import (
 from .suggestions import INTERVALS, HistoryEntry, build_suggestions, normalize, plant_status
 from .weather import CITIES, DEFAULT_CITY, FORECAST_DAYS, WeatherUnavailable, weather_payload
 
+# Peta views.py:
+#   halaman      -> care_task_list (render HTML penuh)
+#   CRUD         -> care_task_create / update / delete (form tampil di popup lewat HTMX)
+#   endpoint JSON-> weather, care_task_complete, suggestion_accept / skip / restore (dipanggil fetch() dari smart_care.js)
+# Prinsip yang dipakai di semua view: (1) @login_required, (2) setiap query CareTask difilter user=request.user,
+# (3) kebenaran data dihitung di sini; JS hanya menampilkan hasilnya.
 STRIP_DOTS = 3  # a day of the week strip shows up to this many dots, then "+N"
 Status = CareTask.Status
 
@@ -60,6 +66,8 @@ def _current_city(user):
 
 
 def _parse_date(value):
+    # Nilai ?date= berasal dari URL, jadi bisa berisi apa saja. fromisoformat menolak format yang salah dengan
+    # ValueError; hasilnya None dan pemanggil jatuh ke hari ini, bukan error 500.
     try:
         return date.fromisoformat(value) if value else None
     except ValueError:
@@ -74,6 +82,8 @@ def _list_url(day=None):
 # ---------------------------------------------------------------- suggestions + progress
 def _history(user, today):
     """Completed tasks (for the interval rule) plus everything dated today (so nothing is suggested twice)."""
+    # Bahan untuk suggestions.py. Q(...) | Q(...) = selesai (kapan pun) ATAU bertanggal hari ini (status apa pun).
+    # Hasilnya diubah jadi HistoryEntry agar suggestions.py tidak perlu tahu tentang model atau database.
     rows = CareTask.objects.filter(user=user).filter(Q(status=Status.COMPLETED) | Q(due_date=today))
     entries = []
     for task in rows:
@@ -104,6 +114,8 @@ def _day_state(user, day, today, plants=None, watering_days=None):
 def _progress(tasks, suggestions):
     """Completed items over all items of the day (tasks + open suggestions, skipped excluded),
     plus the growth stage of the daily plant: 0 seed, 1 sprout, 2 leaves, 3 flower."""
+    # Saran yang belum diterima ikut dihitung sebagai pekerjaan yang belum selesai, jadi 100% baru tercapai bila
+    # semua tugas dan semua saran hari itu beres. `if total` mencegah pembagian dengan nol pada hari kosong.
     total = len(tasks) + len(suggestions)
     done = sum(1 for task in tasks if task.status == Status.COMPLETED)
     percent = round(done * 100 / total) if total else 0
@@ -120,6 +132,8 @@ def _progress(tasks, suggestions):
 
 def _week_strip(user, selected, today, open_suggestions):
     """The Monday to Sunday week of the selected day. Each day has dots for its tasks: done, still to do, or late."""
+    # weekday() bernilai 0 untuk Senin, jadi mengurangkannya dari tanggal terpilih selalu jatuh di Senin minggu itu.
+    # Satu query untuk seluruh minggu (due_date__range), lalu dikelompokkan per hari di Python; tidak 7 query.
     first = selected - timedelta(days=selected.weekday())
     rows = (
         CareTask.objects.filter(user=user, due_date__range=(first, first + timedelta(days=6)))
@@ -165,6 +179,11 @@ def _skipped_suggestions(user, today):
 # ---------------------------------------------------------------- pages
 @login_required
 def care_task_list(request):
+    # Alur halaman utama:
+    #   1. Tentukan tanggal yang dilihat (?date=, bawaan hari ini) dan baca tanaman user dari My EcoPatch.
+    #   2. Ambil tugas hari itu dan, khusus hari ini, saran yang belum ada tugasnya.
+    #   3. Hitung progress, strip minggu, daftar terlewat, dan status tiap pot.
+    #   4. Render list.html. Cuaca tidak ikut di sini: halaman memuatnya terpisah lewat endpoint weather().
     today = timezone.localdate()
     selected = _parse_date(request.GET.get("date")) or today
     plants = get_user_plants(request.user)
@@ -204,6 +223,8 @@ def care_task_list(request):
 @require_GET
 def weather(request):
     """Weather + advice as JSON for the user's own city; the city cannot be chosen through the URL."""
+    # Tidak ada parameter kota di request, jadi tidak ada input user yang sampai ke Open-Meteo. Bila API gagal,
+    # balasannya 503 dengan {"available": false}; JS menampilkan keadaan "cuaca tidak tersedia" tanpa merusak halaman.
     city = _current_city(request.user)
     try:
         return JsonResponse(weather_payload(city))
@@ -216,12 +237,16 @@ def weather(request):
 
 def _form_response(request, form, **extra):
     """Popup (HTMX) gets only the modal content; a normal request gets the full page."""
+    # htmx menambahkan header HX-Request pada setiap requestnya. Dengan header itu view membalas potongan HTML untuk
+    # isi modal; tanpa header (buka URL langsung, JS mati) view membalas halaman form lengkap. Satu view, dua tampilan.
     template = "smart_care/_task_form.html" if request.headers.get("HX-Request") else "smart_care/form.html"
     return render(request, template, {"form": form, **extra})
 
 
 def _saved_response(request, day):
     """After a save: HTMX reloads the list (messages show up there), others redirect."""
+    # 204 (tanpa isi) + header HX-Redirect memerintahkan htmx memuat ulang ke URL daftar. Pesan sukses dari
+    # messages.success() tampil sebagai toast di halaman daftar, bukan di dalam popup yang sudah tertutup.
     if request.headers.get("HX-Request"):
         return HttpResponse(status=204, headers={"HX-Redirect": _list_url(day)})
     return redirect(_list_url(day))
@@ -230,8 +255,10 @@ def _saved_response(request, day):
 @login_required
 def care_task_create(request):
     if request.method == "POST":
+        # user=request.user membatasi pilihan tanaman di form ke milik user ini (lihat CareTaskForm.__init__).
         form = CareTaskForm(request.POST, user=request.user)
         if form.is_valid():
+            # Pemilik diisi di server dari sesi login. Field user tidak ada di form, jadi tidak bisa dikirim lewat POST.
             task = form.save(commit=False)
             task.user = request.user
             task.save()
@@ -260,6 +287,8 @@ def care_task_update(request, pk):
 @login_required
 @require_POST
 def care_task_delete(request, pk):
+    # @require_POST: penghapusan tidak boleh terpicu lewat GET (link, prefetch, crawler). POST juga otomatis
+    # dilindungi CSRF token oleh middleware.
     task = get_object_or_404(CareTask, pk=pk, user=request.user)
     day = task.due_date
     task.delete()
@@ -270,6 +299,8 @@ def care_task_delete(request, pk):
 # ---------------------------------------------------------------- AJAX endpoints (JSON)
 def _state_payload(user, task):
     """Shared by toggle, accept and skip, so the JS can reuse one handler for all three."""
+    # Isi balasan: status task, progress hari itu, dan keadaan terbaru pot tanamannya. Dengan satu bentuk JSON,
+    # smart_care.js cukup punya satu fungsi (applyCompletion) untuk memperbarui halaman setelah ketiga aksi itu.
     today = timezone.localdate()
     watering_days = get_user_watering_days(user)
     tasks, suggestions = _day_state(user, task.due_date, today, watering_days=watering_days)
@@ -290,6 +321,9 @@ def _state_payload(user, task):
 @require_POST
 def care_task_complete(request, pk):
     """Flip a task between pending and completed. Skipped tasks cannot be toggled."""
+    # Alur toggle: cari task milik user (404 bila bukan miliknya) -> tolak bila skipped (409 Conflict) -> balik status
+    # -> kirim keadaan terbaru. Toggle tidak idempoten (tiap panggilan membalik status), jadi smart_care.js menandai
+    # baris dengan data-busy selama request berjalan supaya klik ganda tidak membalik dua kali.
     task = get_object_or_404(CareTask, pk=pk, user=request.user)
     if task.status == Status.SKIPPED:
         return JsonResponse({"error": "Tugas ini sudah dilewati."}, status=409)
@@ -299,6 +333,9 @@ def care_task_complete(request, pk):
 
 def _valid_suggestion(request):
     """(patch_plant, task_type) when the posted pair belongs to this user and can be suggested."""
+    # Input dari tombol saran tidak dipercaya begitu saja. Jenis tugas harus ada di INTERVALS (hanya yang memang bisa
+    # disarankan), dan nama tanaman dicocokkan ke tanaman milik user lewat find_patch_plant. Nama tanaman user lain
+    # atau jenis tugas karangan menghasilkan None, lalu view membalas 400.
     task_type = request.POST.get("task_type", "")
     if task_type not in INTERVALS:
         return None
@@ -319,6 +356,9 @@ def _suggestion_task(request, status):
         if normalize(existing.plant_name) == normalize(plant_name):
             return existing, False
     # get_or_create + the partial unique constraint cover a double click racing past the check above
+    # Pertahanan berlapis: (1) loop di atas menangkap pengulangan biasa, (2) get_or_create membuat cek-lalu-buat
+    # menjadi satu langkah, (3) UniqueConstraint di database menolak duplikat bila dua request tiba bersamaan.
+    # Nilai di `defaults` hanya dipakai saat baris benar-benar baru dibuat; parameter lain menjadi kunci pencarian.
     task, created = CareTask.objects.get_or_create(
         user=request.user,
         plant_name=plant_name,
@@ -338,6 +378,8 @@ def _suggestion_task(request, status):
 @login_required
 @require_POST
 def suggestion_accept(request):
+    # Menerima saran = membuat tugas hari ini langsung berstatus completed. Saran sendiri tidak pernah disimpan;
+    # ia baru menjadi baris CareTask pada saat ini (accept) atau saat dilewati (skip).
     task, created = _suggestion_task(request, Status.COMPLETED)
     if task is None:
         return JsonResponse({"error": "Saran tidak dikenali."}, status=400)
@@ -350,6 +392,8 @@ def suggestion_accept(request):
 @login_required
 @require_POST
 def suggestion_skip(request):
+    # Dilewati disimpan sebagai baris status skipped. Baris itu yang membuat saran tidak muncul lagi hari ini
+    # (build_suggestions melewati pasangan yang sudah punya tugas bertanggal hari ini), tanpa dihitung sebagai selesai.
     task, created = _suggestion_task(request, Status.SKIPPED)
     if task is None:
         return JsonResponse({"error": "Saran tidak dikenali."}, status=400)

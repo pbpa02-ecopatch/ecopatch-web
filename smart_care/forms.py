@@ -21,6 +21,9 @@ class CareTaskForm(forms.ModelForm):
 
     class Meta:
         model = CareTask
+        # `user`, `plant_name`, `is_outdoor`, `status`, dan `source` sengaja tidak ada di sini. Pemilik diisi di view
+        # dari request.user, sedangkan nama dan flag outdoor disalin dari tanaman di save(). Dengan begitu nilai itu
+        # tidak bisa dipalsukan lewat body POST.
         fields = ["patch_plant", "task_type", "due_date", "notes"]
         labels = {
             "task_type": "Jenis tugas",
@@ -50,6 +53,8 @@ class CareTaskForm(forms.ModelForm):
         self.fields["task_type"].choices = [("", "Pilih jenis tugas"), *CareTask.TaskType.choices]
 
     def save(self, commit=True):
+        # commit=False: objek dibuat tapi belum ditulis ke database, supaya snapshot tanaman bisa diisi dulu.
+        # Dipanggil dari view create (lalu view mengisi task.user) maupun update.
         task = super().save(commit=False)
         if self.cleaned_data.get("patch_plant"):
             link_task(task, self.cleaned_data["patch_plant"])
