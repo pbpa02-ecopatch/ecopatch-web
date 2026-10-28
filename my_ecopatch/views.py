@@ -172,6 +172,7 @@ def ecopatch_list(request):
         'scene_plots': _scene_plots(owned), 'scene_more': max(patch_count - SCENE_PLOT_LIMIT, 0),
         'plant_count': totals['plants'] or 0, 'growing_count': totals['growing'] or 0,
         'query': query, 'selected_space': space, 'space_choices': EcoPatch.SpaceType.choices,
+        'selected_space_label': dict(EcoPatch.SpaceType.choices).get(space, ''),
     })
 
 

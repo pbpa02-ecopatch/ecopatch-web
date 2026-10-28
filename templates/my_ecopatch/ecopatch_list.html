@@ -8,14 +8,75 @@
     <div><p class="mep-eyebrow">KEBUN PRIBADIMU</p><h2 class="patch-section-title">Setiap ruang bisa tumbuh.</h2></div>
     <a href="{% url 'my_ecopatch:create' %}" class="btn btn-success">+ Buat EcoPatch Baru</a>
   </div>
-  <form method="get" class="mep-filters" role="search" aria-label="Cari EcoPatch">
-    <div><label for="mep-q">Cari kebun</label><input type="search" name="q" id="mep-q" value="{{ query }}" placeholder="Nama kebun atau kota…"></div>
-    <div><label for="mep-space">Tipe ruang</label><select name="space" id="mep-space"><option value="">Semua ruang</option>{% for value,label in space_choices %}<option value="{{ value }}"{% if selected_space == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
-    <button class="btn btn-outline-success" type="submit">Tampilkan</button>
-    {% if query or selected_space %}<a class="patch-back" href="{% url 'my_ecopatch:list' %}">Reset</a>{% endif %}
-  </form>
-  <p class="patch-help">{{ patches|length }} EcoPatch ditampilkan · Pilih petak untuk mengelola tanaman.</p>
-  <div class="mep-map">
+  <div class="mep-search-bar">
+    <form method="get" action="{% url 'my_ecopatch:list' %}"
+          hx-get="{% url 'my_ecopatch:list' %}"
+          hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+          hx-push-url="true" hx-trigger="submit" hx-include="#mep-active-params">
+      <span class="mep-search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.2-3.2"></path>
+        </svg>
+      </span>
+      <input id="mep-q" class="mep-search-input" type="search" name="q" value="{{ query }}"
+             placeholder="Cari nama kebun atau kota..." aria-label="Cari EcoPatch"
+             hx-get="{% url 'my_ecopatch:list' %}"
+             hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+             hx-push-url="true" hx-trigger="keyup changed delay:400ms, search"
+             hx-include="#mep-active-params">
+      <a id="mep-search-clear" class="mep-search-clear"
+         href="{% url 'my_ecopatch:list' %}{% if selected_space %}?space={{ selected_space }}{% endif %}"
+         aria-label="Hapus pencarian"{% if not query %} hidden{% endif %}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </a>
+    </form>
+  </div>
+  <div id="mep-filter-results">
+    <div id="mep-active-params" hidden>
+      {% if selected_space %}<input type="hidden" name="space" value="{{ selected_space }}">{% endif %}
+    </div>
+    <form id="mep-filter-form" class="mep-filters" method="get" action="{% url 'my_ecopatch:list' %}"
+          hx-get="{% url 'my_ecopatch:list' %}"
+          hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+          hx-push-url="true" hx-trigger="submit">
+      {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+      <div class="dropdown">
+        <button type="button" class="mep-filter dropdown-toggle{% if selected_space %} mep-filter--active{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+          {% if selected_space %}<span class="mep-filter-dot" aria-hidden="true"></span>{% endif %}
+          {{ selected_space_label|default:"Semua ruang" }}
+        </button>
+        <ul class="dropdown-menu mep-menu">
+          <li>
+            <a class="dropdown-item mep-menu-item{% if not selected_space %} active{% endif %}"
+               href="{% url 'my_ecopatch:list' %}{% if query %}?q={{ query|urlencode }}{% endif %}"
+               hx-get="{% url 'my_ecopatch:list' %}{% if query %}?q={{ query|urlencode }}{% endif %}"
+               hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+               hx-push-url="true">Semua ruang</a>
+          </li>
+          {% for value,label in space_choices %}
+          <li>
+            <a class="dropdown-item mep-menu-item{% if selected_space == value %} active{% endif %}"
+               href="{% url 'my_ecopatch:list' %}?space={{ value }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}"
+               hx-get="{% url 'my_ecopatch:list' %}?space={{ value }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}"
+               hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+               hx-push-url="true">{{ label }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% if query or selected_space %}
+      <a class="mep-filter-reset" href="{% url 'my_ecopatch:list' %}"
+         hx-get="{% url 'my_ecopatch:list' %}"
+         hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+         hx-push-url="true" aria-label="Reset filter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        Reset
+      </a>
+      {% endif %}
+    </form>
+    <p class="patch-help">{{ patches|length }} EcoPatch ditampilkan · Pilih petak untuk mengelola tanaman.</p>
+    <div class="mep-map">
     {% for patch in patches %}
     <article class="mep-garden">
     <a class="mep-trash" href="{% url 'my_ecopatch:delete' patch.pk %}" data-confirm-delete data-confirm-title="Hapus EcoPatch?" data-confirm-name="{{ patch.name }}" data-confirm-note="Semua tanaman di dalamnya ikut terhapus. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus EcoPatch"
@@ -35,7 +96,43 @@
     {% endfor %}
     <a class="mep-add-bed" href="{% url 'my_ecopatch:create' %}"><span aria-hidden="true">+</span><strong>Buat EcoPatch Baru</strong><small>Sediakan ruang untuk tumbuh</small></a>
   </div>
+  </div>
   <aside class="mep-seed-tray"><div><p class="mep-eyebrow">BIBIT IDE</p><h2 class="patch-section-title">Selanjutnya, mau menanam apa?</h2><p>Temukan tanaman yang cocok, lalu tambahkan ke kebun pilihanmu.</p></div><a class="btn btn-outline-success" href="{% url 'plant_library:plant_list' %}">Jelajahi Plant Library ↗</a></aside>
   <p class="patch-help">Jumlah tanaman menjumlahkan kuantitas. Entri dan label status menghitung catatan tanaman, termasuk Planned dan Removed.</p>
 </div>
+<script>
+(function () {
+    var input = document.getElementById('mep-q');
+    var clear = document.getElementById('mep-search-clear');
+    if (!input || !clear) return;
+
+    function sync() {
+        clear.hidden = input.value.trim() === '';
+    }
+
+    input.addEventListener('input', sync);
+    input.addEventListener('search', sync);
+
+    clear.addEventListener('click', function (event) {
+        input.value = '';
+        sync();
+        if (window.htmx) {
+            event.preventDefault();
+            input.focus();
+            input.dispatchEvent(new Event('search', { bubbles: true }));
+        }
+    });
+
+    // The reset pill lives inside the swapped results, so clear the visible
+    // search text too; the request itself already goes back to the bare list.
+    document.addEventListener('click', function (event) {
+        if (event.target.closest && event.target.closest('.mep-filter-reset')) {
+            input.value = '';
+            sync();
+        }
+    });
+
+    sync();
+})();
+</script>
 {% endblock %}
