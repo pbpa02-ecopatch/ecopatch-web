@@ -365,8 +365,9 @@
                                 {% if user_patches %}
                                     <div class="dropdown journal-select-wrapper" id="ecopatchSelectWrapper">
                                         <input type="hidden" name="ecopatch_name" id="id_ecopatch_name" value="{{ form.ecopatch_name.value|default:'' }}">
-                                        <button type="button" class="journal-select-btn dropdown-toggle w-100" id="ecopatchSelectBtn"
+                                        <button type="button" class="journal-select-btn dropdown-toggle w-100{% if form.ecopatch_name.value %} journal-select-btn--active{% endif %}" id="ecopatchSelectBtn"
                                                 data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
+                                            <span class="journal-select-dot" id="ecopatchSelectDot" aria-hidden="true"{% if not form.ecopatch_name.value %} hidden{% endif %}></span>
                                             <span id="ecopatchSelectLabel" class="journal-select-label {% if not form.ecopatch_name.value %}text-muted{% endif %}">
                                                 {% if form.ecopatch_name.value %}
                                                     {{ form.ecopatch_name.value }}
@@ -376,7 +377,7 @@
                                             </span>
                                             <svg class="journal-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                                         </button>
-                                        <ul class="dropdown-menu journal-select-menu w-100 shadow-sm" id="ecopatchDropdownMenu" aria-labelledby="ecopatchSelectBtn">
+                                        <ul class="dropdown-menu journal-select-menu w-100" id="ecopatchDropdownMenu" aria-labelledby="ecopatchSelectBtn">
                                             {% for patch in user_patches %}
                                                 <li>
                                                     <button type="button" class="dropdown-item journal-select-item {% if form.ecopatch_name.value == patch.name %}active{% endif %}"
@@ -407,8 +408,9 @@
                                     <!-- Hidden actual form field for POST & validation -->
                                     <input type="hidden" name="plant_name" id="id_plant_name" value="{{ form.plant_name.value|default:'' }}">
                                     
-                                    <button type="button" class="journal-select-btn dropdown-toggle w-100" id="plantSelectBtn"
+                                    <button type="button" class="journal-select-btn dropdown-toggle w-100{% if form.plant_name.value %} journal-select-btn--active{% endif %}" id="plantSelectBtn"
                                             data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
+                                        <span class="journal-select-dot" id="plantSelectDot" aria-hidden="true"{% if not form.plant_name.value %} hidden{% endif %}></span>
                                         <span id="plantSelectLabel" class="journal-select-label {% if not form.plant_name.value %}text-muted{% endif %}">
                                             {% if form.plant_name.value %}
                                                 {{ form.plant_name.value }}
@@ -418,7 +420,7 @@
                                         </span>
                                         <svg class="journal-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                                     </button>
-                                    <ul class="dropdown-menu journal-select-menu w-100 shadow-sm" id="plantDropdownMenu" aria-labelledby="plantSelectBtn">
+                                    <ul class="dropdown-menu journal-select-menu w-100" id="plantDropdownMenu" aria-labelledby="plantSelectBtn">
                                         <!-- Diisi secara dinamis oleh JS berdasarkan EcoPatch yang dipilih -->
                                     </ul>
                                 </div>
@@ -690,6 +692,8 @@
     const plantSelectBtn      = document.getElementById('plantSelectBtn');
     const ecopatchSelectLabel = document.getElementById('ecopatchSelectLabel');
     const plantSelectLabel    = document.getElementById('plantSelectLabel');
+    const ecopatchSelectDot   = document.getElementById('ecopatchSelectDot');
+    const plantSelectDot      = document.getElementById('plantSelectDot');
     const ecopatchDropdownMenu= document.getElementById('ecopatchDropdownMenu');
     const plantDropdownMenu   = document.getElementById('plantDropdownMenu');
 
@@ -754,6 +758,10 @@
         span.textContent = text;
         el.replaceChildren(span);
     }
+    function setSelectPillState(btn, dot, hasValue) {
+        if (btn) btn.classList.toggle('journal-select-btn--active', !!hasValue);
+        if (dot) dot.hidden = !hasValue;
+    }
 
     function updatePlantDropdown(selectedPatch) {
         if (!plantDropdownMenu) return;
@@ -782,6 +790,7 @@
                 plantSelectLabel.classList.add('text-muted');
             }
             if (plantInput) plantInput.value = '';
+            setSelectPillState(plantSelectBtn, plantSelectDot, false);
             return;
         }
 
@@ -819,6 +828,7 @@
                 setBoldLabel(plantSelectLabel, currentVal);
                 plantSelectLabel.classList.remove('text-muted');
             }
+            setSelectPillState(plantSelectBtn, plantSelectDot, true);
         } else {
             if (currentVal && !plants.includes(currentVal)) {
                 if (plantInput) plantInput.value = '';
@@ -832,6 +842,7 @@
                     plantSelectLabel.classList.add('text-muted');
                 }
             }
+            setSelectPillState(plantSelectBtn, plantSelectDot, false);
         }
     }
 
@@ -846,6 +857,7 @@
                 setBoldLabel(ecopatchSelectLabel, patchName || '-- Pilih EcoPatch Kamu --');
                 ecopatchSelectLabel.classList.remove('text-muted');
             }
+            setSelectPillState(ecopatchSelectBtn, ecopatchSelectDot, !!patchName);
 
             ecopatchDropdownMenu.querySelectorAll('[data-ecopatch-val]').forEach(item => {
                 item.classList.toggle('active', item === btn);
@@ -867,6 +879,7 @@
                 setBoldLabel(plantSelectLabel, plantVal);
                 plantSelectLabel.classList.remove('text-muted');
             }
+            setSelectPillState(plantSelectBtn, plantSelectDot, !!plantVal);
 
             plantDropdownMenu.querySelectorAll('[data-plant-val]').forEach(item => {
                 const isThis = (item === btn);

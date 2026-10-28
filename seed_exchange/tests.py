@@ -353,12 +353,26 @@ class SeedExchangeViewTests(TestCase):
         self.assertFalse(SeedExchange.objects.filter(pk=self.listing.pk).exists())
 
     def test_filter_by_city_and_status(self):
-        self.client.login(username='teman', password='test123')
+        self.client.login(username='rheina', password='test123')
         make_listing(self.owner, title='Bibit Tomat Ceri', city='Bandung', status='available')
-        url = reverse('seed_exchange:list') + '?city=Bandung&status=available'
+        make_listing(self.owner, title='Bibit Tomat Habis', city='Bandung', status='completed')
+        url = reverse('seed_exchange:list') + '?tab=mine&city=Bandung&status=available'
         response = self.client.get(url)
         self.assertContains(response, 'Bibit Tomat Ceri')
-        self.assertNotContains(response, 'Bibit Cabai Rawit')
+        self.assertNotContains(response, 'Bibit Tomat Habis')
+
+    def test_status_filter_is_ignored_on_browse(self):
+        self.client.login(username='teman', password='test123')
+        # Browse only ever contains available listings, so a status from the URL
+        # must not turn the page empty (or pretend the dropdown works there).
+        url = reverse('seed_exchange:list') + '?tab=browse&status=requested'
+        response = self.client.get(url)
+        self.assertEqual(response.context['active']['status'], '')
+        self.assertContains(response, 'Bibit Cabai Rawit')
+        self.assertNotIn('status', [dd['name'] for dd in response.context['dropdowns']])
+        # Listing Saya keeps the status filter.
+        mine = self.client.get(reverse('seed_exchange:list') + '?tab=mine')
+        self.assertIn('status', [dd['name'] for dd in mine.context['dropdowns']])
 
     def test_custom_dropdowns_render_with_labels(self):
         self.client.login(username='rheina', password='test123')
@@ -530,6 +544,15 @@ class SeedExchangeFlowTests(TestCase):
         self.assertIn('@teman', content)
         self.assertIn('Terima', content)
 
+    def test_owner_still_sees_who_received_a_completed_listing(self):
+        self._request_booking()
+        self.listing.status = 'completed'
+        self.listing.save()
+        self.client.login(username='rheina', password='test123')
+        content = self.client.get(reverse('seed_exchange:detail', args=[self.listing.pk])).content.decode()
+        self.assertIn('Selesai dengan', content)
+        self.assertIn('@teman', content)
+
     def test_reserver_can_cancel(self):
         self._request_booking()
         self.client.login(username='teman', password='test123')
@@ -619,6 +642,26 @@ class SeedExchangeFlowTests(TestCase):
         self.listing.refresh_from_db()
         self.assertEqual(self.listing.status, 'available')
         self.assertIsNone(self.listing.reserved_by)
+
+    def test_completed_booking_stays_in_my_bookings(self):
+        self.client.login(username='teman', password='test123')
+        self.client.post(reverse('seed_exchange:reserve', args=[self.listing.pk]))
+        self.client.login(username='rheina', password='test123')
+        self.client.post(reverse('seed_exchange:accept', args=[self.listing.pk]))
+        self.client.post(reverse('seed_exchange:complete', args=[self.listing.pk]))
+
+        # The requester keeps the finished exchange as history instead of the
+        # booking vanishing from Booking Saya.
+        self.client.login(username='teman', password='test123')
+        response = self.client.get(reverse('seed_exchange:list') + '?tab=bookings')
+        self.assertEqual([item.pk for item in response.context['my_bookings']], [self.listing.pk])
+        self.assertContains(response, 'Bibit Cabai Rawit')
+        self.assertContains(response, 'Completed')
+
+        # Opening the finished booking still shows the owner's contact.
+        detail = self.client.get(reverse('seed_exchange:detail', args=[self.listing.pk])).content.decode()
+        self.assertIn('Selesai', detail)
+        self.assertIn('0812-0000-0000', detail)
 
     def test_non_owner_cannot_complete(self):
         self._request_booking()
@@ -770,6 +813,16 @@ class SeedExchangeEdgeCaseTests(TestCase):
         content = self.client.get(reverse('seed_exchange:detail', args=[self.listing.pk])).content.decode()
         self.assertNotIn('812-3456-7890', content)
 
+    def test_accept_refuses_a_request_without_a_requester(self):
+        self.listing.status = SeedExchange.Status.REQUESTED
+        self.listing.reserved_by = None
+        self.listing.save()
+        self.client.login(username='rheina', password='test123')
+        response = self.client.post(reverse('seed_exchange:accept', args=[self.listing.pk]))
+        self.assertEqual(response.status_code, 400)
+        self.listing.refresh_from_db()
+        self.assertEqual(self.listing.status, SeedExchange.Status.REQUESTED)
+
     def test_detail_of_a_missing_listing_is_404(self):
         self.client.login(username='teman', password='test123')
         self.assertEqual(self.client.get(reverse('seed_exchange:detail', args=[99999])).status_code, 404)
@@ -830,6 +883,25 @@ class SeedExchangeEdgeCaseTests(TestCase):
             })
         self.assertContains(response, 'Ukuran foto maksimal 5 MB.')
         self.assertFalse(SeedExchange.objects.filter(title='Foto besar').exists())
+
+    def test_a_description_longer_than_the_limit_is_rejected(self):
+        self.client.login(username='rheina', password='test123')
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            response = self.client.post(reverse('seed_exchange:create'), {
+                'title': 'Deskripsi panjang', 'item_type': 'seed', 'plant_name': '',
+                'transaction_type': 'giveaway', 'description': 'x' * 2001,
+                'image': make_image_upload(),
+            })
+        self.assertContains(response, 'Deskripsi maksimal 2000 karakter.')
+        self.assertFalse(SeedExchange.objects.filter(title='Deskripsi panjang').exists())
+
+    def test_search_text_is_cleaned_and_capped(self):
+        self.client.login(username='teman', password='test123')
+        response = self.client.get(
+            reverse('seed_exchange:list'), {'q': '\x00\x01  ' + 'a' * 500}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['active']['q'], 'a' * 100)
 
     def test_a_user_without_a_profile_row_can_open_every_page(self):
         Profile.objects.filter(user=self.other).delete()

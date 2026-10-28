@@ -11,6 +11,11 @@ body.has-sidebar.plant-body {
     background: #faefd5;
 }
 
+/* Only a member has the floating sidebar, so only a member needs its gutter. */
+body.has-sidebar .plant-page {
+    --pl-offset: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2);
+}
+
 .plant-main {
     display: flex;
     flex: 1 0 auto;
@@ -39,8 +44,9 @@ body.has-sidebar.plant-body {
     --pl-danger-soft: #fbe0dc;
     --pl-display: 'Baloo 2', 'Trebuchet MS', system-ui, sans-serif;
     --pl-body: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-    /* the floating sidebar keeps its gutter; the sheet itself is full width */
-    --pl-offset: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2);
+    /* Signed-out visitors have no sidebar, so the sheet must not reserve its gutter.
+       (--side-width is set on <html> for every wide screen, member or not.) */
+    --pl-offset: 0px;
     display: flex;
     flex: 1 0 auto;
     flex-direction: column;
@@ -302,40 +308,6 @@ body.has-sidebar.plant-body {
 .plant-search-input::-webkit-search-decoration {
     -webkit-appearance: none;
     appearance: none;
-}
-
-.plant-search-send {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    flex: none;
-    border: 0;
-    border-radius: 50%;
-    background: var(--pl-brand-strong);
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1);
-}
-
-.plant-search-send svg {
-    width: 20px;
-    height: 20px;
-    transition: transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1);
-}
-
-.plant-search-send:hover {
-    background: var(--pl-brand-edge);
-    transform: scale(1.06);
-}
-
-.plant-search-send:hover svg {
-    transform: translateY(-2px);
-}
-
-.plant-search-send:active {
-    transform: scale(0.94);
 }
 
 .plant-finder-bottom {
@@ -1992,11 +1964,6 @@ body.has-sidebar.plant-body {
         min-height: 44px;
     }
 
-    .plant-search-send {
-        width: 40px;
-        height: 40px;
-    }
-
     .plant-finder-bottom {
         gap: 9px;
         padding-top: 10px;
@@ -2102,8 +2069,7 @@ body.has-sidebar.plant-body {
     .plant-card-media img,
     .plant-finder-pet,
     .plant-finder-card,
-    .plant-chip,
-    .plant-search-send {
+    .plant-chip {
         animation: none !important;
         transition: none !important;
     }
@@ -2393,4 +2359,160 @@ body.has-sidebar.plant-body {
 
 @media (prefers-reduced-motion: reduce) {
     .plant-modal[open] { animation: none; }
+}
+
+/* ---------------------------------------------------------------- Public header
+   A visitor has no sidebar, so the Plant Library header is the landing page's bar:
+   fixed across the top, no box of its own, the sprout wordmark on the left, the
+   links in the middle, "Masuk" as plain text and "Daftar" as the green pill. It
+   hovers over the mint band, and once the page scrolls it condenses into the same
+   cream pill the landing bar becomes. Members keep the floating sidebar as it was. */
+body.plant-body:not(.has-sidebar) .site-navbar {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 1030;
+    margin: 0;
+    padding: 10px max(12px, calc((100vw - 68rem) / 2));
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transition: padding-top 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar.is-scrolled {
+    padding-top: 14px;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar .container {
+    width: 100%;
+    max-width: 100%;
+    padding: 5px 5px 5px 12px;
+    gap: 16px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    transition: max-width 380ms cubic-bezier(0.32, 0.72, 0, 1),
+                background-color 300ms ease-out, border-color 300ms ease-out,
+                box-shadow 300ms ease-out;
+}
+
+/* Scrolled: the cream pill the landing bar condenses into. */
+body.plant-body:not(.has-sidebar) .site-navbar.is-scrolled .container {
+    max-width: 56rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(182, 154, 99, 0.38);
+    box-shadow: 0 18px 50px rgba(23, 48, 31, 0.14);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+}
+
+/* The open mobile menu needs a surface of its own now that the bar has none. */
+body.plant-body:not(.has-sidebar) .site-navbar:has(.navbar-collapse.show) .container,
+body.plant-body:not(.has-sidebar) .site-navbar:has(.navbar-collapse.collapsing) .container {
+    max-width: 100%;
+    border-color: rgba(182, 154, 99, 0.38);
+    border-radius: 22px;
+    background: #fdf7e8;
+    box-shadow: 0 18px 50px rgba(23, 48, 31, 0.14);
+}
+
+/* The landing wordmark: sprout mark, then Baloo 2 at 21px in ink. */
+body.plant-body:not(.has-sidebar) .site-navbar .navbar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    font-size: 21px;
+    font-weight: 800;
+    color: #17301f;
+}
+
+/* No sidebar here, so the logo needs none of the sidebar head's rule, margin or padding. */
+body.plant-body:not(.has-sidebar) .site-navbar .sidebar-head {
+    display: contents;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar .brand-sprout {
+    display: block;
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+}
+
+/* The landing links: 14px, muted green, 22px apart, centred by .mx-auto. */
+body.plant-body:not(.has-sidebar) .site-navbar .navbar-nav {
+    /* Bootstrap's .gap-2 on the list is !important, so this has to be too. */
+    gap: 22px !important;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar .navbar-nav .nav-link {
+    padding: 0;
+    background: none;
+    color: #4c6853;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar .navbar-nav .nav-link:hover,
+body.plant-body:not(.has-sidebar) .site-navbar .navbar-nav .nav-link:focus-visible {
+    color: #17301f;
+}
+
+/* "Masuk" is plain text on the landing page, not a second outlined pill. */
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-outline-success {
+    padding: 8px 6px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #4c6853;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-outline-success:hover,
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-outline-success:focus-visible {
+    background: transparent;
+    color: #17301f;
+}
+
+/* "Daftar" mirrors the landing call to action. */
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-success {
+    padding: 8px 18px;
+    border: 0;
+    border-radius: 999px;
+    background: #1a8a40;
+    box-shadow: none;
+    color: #fff;
+    font-family: 'Baloo 2', 'Trebuchet MS', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-success:hover,
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-success:focus-visible {
+    background: #157a38;
+    color: #fff;
+}
+
+/* The bar floats over the sheet, so the mint band runs under it and only the copy
+   starts below it. Sheets without a band open straight into their column, so they
+   clear the bar themselves. */
+body.plant-body:not(.has-sidebar) .plant-page > .plant-hero {
+    padding-top: calc(clamp(30px, 6vh, 50px) + 70px);
+}
+
+body.plant-body:not(.has-sidebar) .plant-page > .plant-inner:first-child {
+    padding-top: 100px;
+}
+
+@media (max-width: 767.98px) {
+    /* Links inside the dropped-down menu need their padding back. */
+    body.plant-body:not(.has-sidebar) .site-navbar .navbar-nav .nav-link {
+        padding: 8px 4px;
+    }
 }

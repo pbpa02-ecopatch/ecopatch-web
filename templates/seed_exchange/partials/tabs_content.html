@@ -1,5 +1,4 @@
 {% load static %}
-{% url 'seed_exchange:list' as seed_list_url %}
 {% comment %}
   Seed Exchange list: hidden params + filters + 3 section tabs + panel.
   Swapped as a whole via HTMX (#seed-tabs-content) so the active filter state,
@@ -67,13 +66,7 @@
         <span class="seed-tab-copy">
             <span class="seed-tab-line">
                 <span class="seed-tab-label">Listing Saya</span>
-                {% if user.is_authenticated %}
                 <span class="seed-tab-count">{{ my_listings|length }}</span>
-                {% else %}
-                <span class="seed-tab-count seed-tab-count--locked">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-                </span>
-                {% endif %}
             </span>
             <span class="seed-tab-sub">bibit, stek &amp; biji</span>
         </span>
@@ -90,13 +83,7 @@
         <span class="seed-tab-copy">
             <span class="seed-tab-line">
                 <span class="seed-tab-label">Booking Saya</span>
-                {% if user.is_authenticated %}
                 <span class="seed-tab-count">{{ my_bookings|length }}</span>
-                {% else %}
-                <span class="seed-tab-count seed-tab-count--locked">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-                </span>
-                {% endif %}
             </span>
             <span class="seed-tab-sub">status tukarmu</span>
         </span>
@@ -125,14 +112,10 @@
 <div id="panel-mine" class="seed-tab-panel active" role="tabpanel" aria-labelledby="tab-mine">
     <header class="seed-section-header">
         <h2 class="seed-section-title">Listing Saya</h2>
-        {% if user.is_authenticated %}
         <span class="seed-count" aria-live="polite">{{ my_listings|length }} listing</span>
-        {% endif %}
     </header>
 
-    {% if not user.is_authenticated %}
-        {% include "seed_exchange/partials/login_callout.html" with title="Masuk untuk melihat listingmu." text="Setelah masuk, kamu bisa membuat dan mengelola listing sendiri di sini." next_url=seed_list_url|add:"?tab=mine" %}
-    {% elif my_listings %}
+    {% if my_listings %}
         <div id="seed-mine" class="seed-grid">
             {% for listing in my_listings %}
                 {% include "seed_exchange/partials/card.html" with listing=listing %}
@@ -160,14 +143,10 @@
 <div id="panel-bookings" class="seed-tab-panel active" role="tabpanel" aria-labelledby="tab-bookings">
     <header class="seed-section-header">
         <h2 class="seed-section-title">Booking Saya</h2>
-        {% if user.is_authenticated %}
         <span class="seed-count" aria-live="polite">{{ my_bookings|length }} booking</span>
-        {% endif %}
     </header>
 
-    {% if not user.is_authenticated %}
-        {% include "seed_exchange/partials/login_callout.html" with title="Masuk untuk melihat bookingmu." text="Setelah masuk, kamu bisa booking listing dan memantau statusnya di sini." next_url=seed_list_url|add:"?tab=bookings" %}
-    {% elif my_bookings %}
+    {% if my_bookings %}
         <div id="seed-bookings" class="seed-grid">
             {% for listing in my_bookings %}
                 {% include "seed_exchange/partials/card.html" with listing=listing %}
@@ -200,8 +179,5 @@
         </svg>
         <span><b>Tip:</b> tulis jumlah bibit dan cara ambil di deskripsi — listing yang jelas biasanya lebih cepat dapat pasangan tukar.</span>
     </p>
-    {% if not user.is_authenticated %}
-        {% include "seed_exchange/partials/login_callout.html" with title="Ingin ikut bertukar bibit?" text="Masuk untuk membuat listing atau booking listing orang lain. Belum punya akun? Daftar gratis, kok." next_url=seed_list_url|add:"?tab=browse" %}
-    {% endif %}
 </div>
 {% endif %}

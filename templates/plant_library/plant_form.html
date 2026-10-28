@@ -133,6 +133,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="{% static_v 'plant_library/js/public_header.js' %}" defer></script>
 <script>
 document.querySelectorAll('[data-plant-select]').forEach(function (root) {
     var input = root.querySelector('input[type="hidden"]');

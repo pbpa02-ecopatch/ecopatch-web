@@ -80,11 +80,6 @@
                     <input id="plant-q" class="plant-search-input" type="search" name="q" value="{{ query }}"
                            placeholder='Coba "tanaman yang mudah dirawat dan teduh"'
                            aria-label="Cari tanaman" autocomplete="off" enterkeyhint="search">
-                    <button class="plant-search-send" type="submit" aria-label="Cari tanaman" title="Cari tanaman">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M12 19V5"/><path d="m5.5 11.5 6.5-6.5 6.5 6.5"/>
-                        </svg>
-                    </button>
                 </div>
 
                 <div class="plant-finder-bottom">
@@ -218,6 +213,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="{% static_v 'plant_library/js/public_header.js' %}" defer></script>
 <script src="{% static_v 'plant_library/js/quick_add.js' %}" defer></script>
 <script src="{% static_v 'plant_library/js/detail_modal.js' %}" defer></script>
 <script>

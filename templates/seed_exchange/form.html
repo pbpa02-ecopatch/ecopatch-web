@@ -162,7 +162,7 @@
                 {% endfor %}
                 <div class="seed-form-actions">
                     <button type="submit" class="btn-seed-primary">{% if mode == "update" %}Simpan perubahan{% else %}Simpan listing{% endif %}</button>
-                    <a class="btn-seed-secondary" href="{% if mode == "update" %}{% url 'seed_exchange:detail' listing.pk %}{% else %}{% url 'seed_exchange:list' %}?tab=mine{% endif %}">Batal</a>
+                    <a class="btn-seed-secondary" href="{% if mode == 'update' %}{% url 'seed_exchange:detail' listing.pk %}{% else %}{% url 'seed_exchange:list' %}?tab=mine{% endif %}">Batal</a>
                 </div>
             </form>
         </div>
