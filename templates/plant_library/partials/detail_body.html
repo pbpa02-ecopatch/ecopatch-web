@@ -5,7 +5,8 @@
         <figure class="plant-detail-media">
             {% if plant.image_url %}
                 <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy" decoding="async"
-                     onerror="this.onerror=null; this.src='{% static 'plant_library/img/plant-placeholder.svg' %}'; this.classList.add('plant-card-ph');">
+                     data-placeholder="{% static 'plant_library/img/plant-placeholder.svg' %}"
+                     onerror="this.onerror=null; this.src=this.dataset.placeholder; this.classList.add('plant-card-ph');">
             {% else %}
                 <img class="plant-card-ph" src="{% static 'plant_library/img/plant-placeholder.svg' %}"
                      alt="Ilustrasi {{ plant.name }}" loading="lazy" decoding="async">
