@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import date, timedelta
 from urllib.parse import urlencode
 
@@ -90,7 +91,9 @@ def _history(user, today):
         completed_on = None
         if task.status == Status.COMPLETED:
             completed_on = timezone.localtime(task.completed_at).date() if task.completed_at else task.due_date
-        entries.append(HistoryEntry(task.plant_name, task.task_type, task.status, task.due_date, completed_on))
+        entries.append(HistoryEntry(
+            task.plant_name, task.task_type, task.status, task.due_date, completed_on, task.patch_plant_id
+        ))
     return entries
 
 
@@ -101,14 +104,27 @@ def _suggestions_for_today(user, today, plants=None, watering_days=None):
 
 
 def _pots(plants, history, today, watering_days=None):
-    return [plant_status(plant, history, today, watering_days=watering_days) for plant in plants]
+    names = Counter(normalize(plant[0]) for plant in plants)
+    return [
+        plant_status(plant, history, today, watering_days=watering_days, name_is_unique=names[normalize(plant[0])] == 1)
+        for plant in plants
+    ]
+
+
+def _set_places(tasks, plants):
+    """Give each task the place (EcoPatch name) of its plant, shown only when the same plant name occurs more than once."""
+    places = {plant[2]: plant[3] for plant in plants}
+    for task in tasks:
+        task.place = places.get(task.patch_plant_id, "")
+    return tasks
 
 
 def _day_state(user, day, today, plants=None, watering_days=None):
     """The visible tasks of one day (skipped ones hidden) and, for today only, the open suggestions."""
+    plants = get_user_plants(user) if plants is None else plants
     tasks = [t for t in CareTask.objects.filter(user=user, due_date=day).order_by("created_at") if t.status != Status.SKIPPED]
     suggestions = _suggestions_for_today(user, today, plants, watering_days) if day == today else []
-    return tasks, suggestions
+    return _set_places(tasks, plants), suggestions
 
 
 def _progress(tasks, suggestions):
@@ -203,11 +219,11 @@ def care_task_list(request):
         "pending_tasks": [t for t in tasks if t.status == Status.PENDING],
         "done_tasks": [t for t in tasks if t.status == Status.COMPLETED],
         "suggestions": suggestions,
-        "skipped_suggestions": list(_skipped_suggestions(request.user, today)) if is_today else [],
+        "skipped_suggestions": _set_places(list(_skipped_suggestions(request.user, today)), plants) if is_today else [],
         "has_plants": bool(plants),
         "pots": _pots(plants, _history(request.user, today), today, watering_days),
         # Overdue tasks only show up when looking at today
-        "overdue_tasks": _overdue(request.user, today) if is_today else [],
+        "overdue_tasks": _set_places(_overdue(request.user, today), plants) if is_today else [],
         "progress": _progress(tasks, suggestions),
         "strip": _week_strip(request.user, selected, today, len(suggestions)),
         "prev_week_url": _list_url(selected - timedelta(days=7)),
@@ -297,16 +313,25 @@ def care_task_delete(request, pk):
 
 
 # ---------------------------------------------------------------- AJAX endpoints (JSON)
+def _plants_of_task(task, plants):
+    """The pot a task belongs to: the plant row it is linked to. A task from before tasks were linked has no row, so it
+    is matched by name, but only when that name is not shared by several pots (otherwise it is ambiguous)."""
+    if task.patch_plant_id:
+        return [plant for plant in plants if plant[2] == task.patch_plant_id]
+    same_name = [plant for plant in plants if normalize(plant[0]) == normalize(task.plant_name)]
+    return same_name if len(same_name) == 1 else []
+
+
 def _state_payload(user, task):
     """Shared by toggle, accept and skip, so the JS can reuse one handler for all three."""
     # Isi balasan: status task, progress hari itu, dan keadaan terbaru pot tanamannya. Dengan satu bentuk JSON,
     # smart_care.js cukup punya satu fungsi (applyCompletion) untuk memperbarui halaman setelah ketiga aksi itu.
     today = timezone.localdate()
     watering_days = get_user_watering_days(user)
-    tasks, suggestions = _day_state(user, task.due_date, today, watering_days=watering_days)
+    all_plants = get_user_plants(user)
+    tasks, suggestions = _day_state(user, task.due_date, today, all_plants, watering_days)
     # the plant's pot changes when its watering / fertilizing / inspection is ticked
-    wanted = normalize(task.plant_name)
-    plants = [plant for plant in get_user_plants(user) if normalize(plant[0]) == wanted]
+    plants = _plants_of_task(task, all_plants)
     return {
         "pot": _pots(plants, _history(user, today), today, watering_days)[0] if plants else None,
         "id": task.pk,
@@ -334,39 +359,41 @@ def care_task_complete(request, pk):
 def _valid_suggestion(request):
     """(patch_plant, task_type) when the posted pair belongs to this user and can be suggested."""
     # Input dari tombol saran tidak dipercaya begitu saja. Jenis tugas harus ada di INTERVALS (hanya yang memang bisa
-    # disarankan), dan nama tanaman dicocokkan ke tanaman milik user lewat find_patch_plant. Nama tanaman user lain
-    # atau jenis tugas karangan menghasilkan None, lalu view membalas 400.
+    # disarankan), dan ID tanaman harus berupa angka milik tanaman user ini yang ikut dirawat (find_patch_plant).
+    # ID tanaman user lain atau jenis tugas karangan menghasilkan None, lalu view membalas 400.
     task_type = request.POST.get("task_type", "")
     if task_type not in INTERVALS:
         return None
-    patch_plant = find_patch_plant(request.user, request.POST.get("plant_name", ""))
+    patch_plant = find_patch_plant(request.user, request.POST.get("patch_plant", ""))
     return (patch_plant, task_type) if patch_plant else None
 
 
 def _suggestion_task(request, status):
     """Create today's task for an accepted / skipped suggestion. Repeating the call never makes a second one:
-    an existing task for the same plant and type today (any status) is returned untouched."""
+    an existing task for the same plant (row) and type today (any status) is returned untouched."""
     found = _valid_suggestion(request)
     if found is None:
         return None, False
     patch_plant, task_type = found
-    plant_name = patch_plant_name(patch_plant)
     today = timezone.localdate()
-    for existing in CareTask.objects.filter(user=request.user, due_date=today, task_type=task_type):
-        if normalize(existing.plant_name) == normalize(plant_name):
-            return existing, False
+    existing = CareTask.objects.filter(
+        user=request.user, due_date=today, task_type=task_type, patch_plant=patch_plant
+    ).first()
+    if existing:
+        return existing, False
     # get_or_create + the partial unique constraint cover a double click racing past the check above
-    # Pertahanan berlapis: (1) loop di atas menangkap pengulangan biasa, (2) get_or_create membuat cek-lalu-buat
+    # Pertahanan berlapis: (1) pengecekan di atas menangkap pengulangan biasa, (2) get_or_create membuat cek-lalu-buat
     # menjadi satu langkah, (3) UniqueConstraint di database menolak duplikat bila dua request tiba bersamaan.
-    # Nilai di `defaults` hanya dipakai saat baris benar-benar baru dibuat; parameter lain menjadi kunci pencarian.
+    # Kunci pencarian adalah baris tanamannya (patch_plant), bukan namanya, jadi Basil di dua tempat tetap dua tugas.
+    # Nilai di `defaults` hanya dipakai saat baris benar-benar baru dibuat.
     task, created = CareTask.objects.get_or_create(
         user=request.user,
-        plant_name=plant_name,
+        patch_plant=patch_plant,
         task_type=task_type,
         due_date=today,
         source=CareTask.Source.SUGGESTED,
         defaults={
-            "patch_plant": patch_plant,
+            "plant_name": patch_plant_name(patch_plant),
             "is_outdoor": is_outdoor(patch_plant),
             "status": status,
             "completed_at": timezone.now() if status == Status.COMPLETED else None,
@@ -385,6 +412,7 @@ def suggestion_accept(request):
         return JsonResponse({"error": "Saran tidak dikenali."}, status=400)
     payload = _state_payload(request.user, task)
     # The row is replaced by a real task row (with edit / delete) rendered by the same template
+    _set_places([task], get_user_plants(request.user))
     payload.update(created=created, html=render_to_string("smart_care/_task_item.html", {"task": task}, request))
     return JsonResponse(payload)
 
@@ -398,10 +426,13 @@ def suggestion_skip(request):
     if task is None:
         return JsonResponse({"error": "Saran tidak dikenali."}, status=400)
     payload = _state_payload(request.user, task)
+    _set_places([task], get_user_plants(request.user))
     payload.update(
         created=created,
         skipped={
             "plant_name": task.plant_name,
+            "place": task.place,
+            "patch_plant": task.patch_plant_id,
             "task_type": task.task_type,
             "label": task.get_task_type_display(),
             "restore_url": reverse("smart_care:suggestion_restore"),
@@ -418,11 +449,9 @@ def suggestion_restore(request):
     if found is None:
         return JsonResponse({"error": "Saran tidak dikenali."}, status=400)
     patch_plant, task_type = found
-    plant_name = patch_plant_name(patch_plant)
-    skipped = [
-        task for task in _skipped_suggestions(request.user, timezone.localdate()).filter(task_type=task_type)
-        if normalize(task.plant_name) == normalize(plant_name)
-    ]
+    skipped = list(
+        _skipped_suggestions(request.user, timezone.localdate()).filter(task_type=task_type, patch_plant=patch_plant)
+    )
     for task in skipped:
         task.delete()
     return JsonResponse({"restored": bool(skipped)})

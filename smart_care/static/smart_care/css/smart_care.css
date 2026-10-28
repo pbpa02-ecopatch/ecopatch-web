@@ -1024,6 +1024,17 @@ body.has-sidebar.care-body {
     white-space: nowrap;
 }
 
+/* Where the plant is kept; only shown when the same plant name is in more than one place */
+.care-pot-place {
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--care-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .care-pot-label {
     color: var(--care-muted);
     font-size: 0.78rem;

@@ -196,8 +196,8 @@
                     </button>
                     <ul class="care-skipped-list" id="care-skipped-list" hidden>
                         {% for task in skipped_suggestions %}
-                            <li><span>{{ task.plant_name }} <small>{{ task.get_task_type_display }}</small></span>
-                                <button type="button" class="care-restore" data-plant="{{ task.plant_name }}" data-type="{{ task.task_type }}">Batalkan</button></li>
+                            <li><span>{{ task.plant_name }}{% if task.place %} ({{ task.place }}){% endif %} <small>{{ task.get_task_type_display }}</small></span>
+                                <button type="button" class="care-restore" data-pp="{{ task.patch_plant_id }}" data-plant="{{ task.plant_name }}" data-type="{{ task.task_type }}">Batalkan</button></li>
                         {% endfor %}
                     </ul>
                 </section>

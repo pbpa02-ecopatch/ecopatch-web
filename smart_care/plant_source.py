@@ -1,9 +1,12 @@
 """Where Smart Care learns which plants a user has: the plants in the user's My EcoPatch.
 
 A plant takes part in care (task form, suggestions, pots) while its status in My EcoPatch is Planted or
-Growing. A task links to its plant, but copies the plant's name and the indoor/outdoor flag when it is linked,
+Growing. Every row is its own pot: the same plant kept in two places (say indoors and on the balcony) has its own
+history, suggestions and indoor/outdoor flag. A task links to its plant, but copies the plant's name and the indoor/outdoor flag when it is linked,
 so the history still reads right after the plant is renamed in the Plant Library (removing the plant deletes its tasks).
 """
+from collections import Counter
+
 from django.db.models import Q
 
 from my_ecopatch.models import EcoPatch, PatchPlant
@@ -68,35 +71,41 @@ def user_patch_plants(user, keep=None):
     )
 
 
-def _one_per_name(user):
-    """One plant per name (ignoring case and extra spaces): the newest My EcoPatch row decides the spelling and
-    the indoor/outdoor flag, so a plant that sits in two patches is still one pot."""
-    chosen = {}
-    # Diurutkan dari pk terbesar, dan setdefault hanya menyimpan kemunculan pertama, jadi baris terbaru yang menang.
-    for patch_plant in user_patch_plants(user).order_by("-pk"):
-        name = patch_plant_name(patch_plant)
-        if name:
-            chosen.setdefault(normalize(name), patch_plant)
-    return sorted(chosen.values(), key=lambda patch_plant: normalize(patch_plant_name(patch_plant)))
-
-
 def get_user_plants(user):
-    """[(plant_name, is_outdoor)] sorted by name; this is what the suggestions and the pots are built from."""
-    return [(patch_plant_name(patch_plant), is_outdoor(patch_plant)) for patch_plant in _one_per_name(user)]
+    """[(plant_name, is_outdoor, patch_plant_id, place)] with one entry per plant row, sorted by name.
+
+    Each row is a pot of its own, because the same plant in two places is cared for differently (its own history, its
+    own flag). `patch_plant_id` is what the page and the suggestion buttons use to point at one pot. `place` is the
+    EcoPatch name, filled in only when the same plant name occurs more than once, so the page can tell them apart.
+    """
+    rows = [(patch_plant_name(patch_plant), patch_plant) for patch_plant in user_patch_plants(user)]
+    rows = [(name, patch_plant) for name, patch_plant in rows if name]  # a plant without any name cannot be shown
+    counts = Counter(normalize(name) for name, _ in rows)
+    pots = [
+        (name, is_outdoor(patch_plant), patch_plant.pk, patch_plant.patch.name if counts[normalize(name)] > 1 else "")
+        for name, patch_plant in rows
+    ]
+    return sorted(pots, key=lambda pot: (normalize(pot[0]), pot[3].casefold(), pot[2]))
 
 
 def get_user_watering_days(user):
-    """{normalized plant name: days between waterings} for the same plants get_user_plants returns."""
-    return {normalize(patch_plant_name(patch_plant)): watering_days(patch_plant) for patch_plant in _one_per_name(user)}
+    """{patch_plant_id: days between waterings} for the same plants get_user_plants returns."""
+    return {
+        patch_plant.pk: watering_days(patch_plant)
+        for patch_plant in user_patch_plants(user)
+        if patch_plant_name(patch_plant)
+    }
 
 
-def find_patch_plant(user, name):
-    """The user's plant behind a plant name posted by the suggestion buttons, or None."""
-    wanted = normalize(name)
-    for patch_plant in _one_per_name(user):
-        if normalize(patch_plant_name(patch_plant)) == wanted:
-            return patch_plant
-    return None
+def find_patch_plant(user, patch_plant_id):
+    """The user's plant row behind an id posted by the suggestion buttons, or None. The id comes from the browser,
+    so it is only trusted when it is a number and the row is one of this user's plants that take part in care."""
+    try:
+        wanted = int(patch_plant_id)
+    except (TypeError, ValueError):
+        return None
+    patch_plant = user_patch_plants(user).filter(pk=wanted).first()
+    return patch_plant if patch_plant and patch_plant_name(patch_plant) else None
 
 
 def get_user_city(user):

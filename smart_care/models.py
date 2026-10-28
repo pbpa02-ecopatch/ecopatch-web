@@ -69,9 +69,12 @@ class CareTask(models.Model):
         # Urutan bawaan setiap query CareTask: tanggal terdekat dulu, lalu yang dibuat lebih awal.
         ordering = ["due_date", "created_at"]
         constraints = [
-            # A double click or a retry can never create the same suggestion twice on one day
+            # A double click or a retry can never create the same suggestion twice on one day.
+            # Kuncinya baris tanaman (patch_plant), bukan nama: Basil di kamar dan Basil di balkon adalah dua tanaman
+            # yang masing-masing boleh punya satu saran per jenis per hari. Tugas lama tanpa tautan (patch_plant NULL)
+            # tidak terkena, karena nilai NULL tidak dianggap sama oleh constraint unik.
             models.UniqueConstraint(
-                fields=["user", "plant_name", "task_type", "due_date"],
+                fields=["user", "patch_plant", "task_type", "due_date"],
                 condition=Q(source="suggested"),
                 name="smart_care_one_suggestion_per_day",
             ),
