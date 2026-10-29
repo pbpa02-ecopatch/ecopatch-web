@@ -1,3 +1,5 @@
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -29,6 +31,14 @@ class GardenJournal(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="garden_journals")
+    ecopatch = models.ForeignKey(
+        "my_ecopatch.EcoPatch",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="journals",
+        help_text="Relasi ke EcoPatch milik user",
+    )
     ecopatch_name = models.CharField(
         max_length=200,
         blank=True,
@@ -104,3 +114,21 @@ class GardenJournal(models.Model):
             "ready_to_harvest": "badge-ds-healthy",
         }
         return ds_map.get(self.plant_condition, "badge-ds-attention")
+
+    def save(self, *args, **kwargs):
+        if self.ecopatch and not self.ecopatch_name:
+            self.ecopatch_name = self.ecopatch.name
+        elif self.ecopatch and self.ecopatch_name != self.ecopatch.name:
+            self.ecopatch_name = self.ecopatch.name
+        elif not self.ecopatch and self.ecopatch_name and self.user_id:
+            from my_ecopatch.models import EcoPatch
+            patch = EcoPatch.objects.filter(owner_id=self.user_id, name__iexact=self.ecopatch_name.strip()).first()
+            if patch:
+                self.ecopatch = patch
+        super().save(*args, **kwargs)
+
+
+@receiver(post_delete, sender=GardenJournal)
+def auto_delete_journal_photo_on_delete(sender, instance, **kwargs):
+    if instance.image:
+        instance.image.delete(save=False)
