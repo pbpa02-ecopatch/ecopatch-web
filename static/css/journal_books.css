@@ -2944,7 +2944,7 @@ body.has-sidebar.journal-body {
     position: absolute;
     inset: -75%;
     border-radius: 50%;
-    background: repeating-conic-gradient(from 0deg, rgba(255, 238, 180, 0.32) 0deg, rgba(255, 238, 180, 0.25) 5deg, transparent 10deg, transparent 20deg);
+    background: repeating-conic-gradient(from 0deg, rgba(255, 233, 165, 0.4) 0 6deg, transparent 6deg 20deg);
     -webkit-mask: radial-gradient(circle, transparent 0 18%, #000 32% 52%, transparent 72%);
     mask: radial-gradient(circle, transparent 0 18%, #000 32% 52%, transparent 72%);
     animation: journalSunRays 70s linear infinite;
