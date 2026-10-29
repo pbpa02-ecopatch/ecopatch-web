@@ -1784,38 +1784,6 @@ button.seed-filter {
     margin-bottom: 0;
 }
 
-.seed-reserve-contact {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    margin: 12px 0 14px;
-}
-
-.seed-contact-name {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 800;
-}
-
-.seed-contact-avatar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: #fffdf6;
-    color: var(--seed-brand-strong);
-    font-weight: 800;
-}
-
-.seed-contact-value {
-    color: var(--seed-muted);
-    font-size: 0.92rem;
-}
-
 /* ---------------------------------------------------------------- Form */
 .seed-form-card {
     width: 100%;
