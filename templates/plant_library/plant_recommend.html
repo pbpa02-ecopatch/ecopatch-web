@@ -10,72 +10,101 @@
 {% block main %}
 <main class="plant-main flex-grow-1">
 <div class="plant-page">
-    <div class="plant-inner">
-        <a class="plant-back" href="{% url 'plant_library:plant_list' %}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
-            </svg>
-            Kembali ke Plant Library
-        </a>
-
-        <header class="plant-head">
-            <div class="plant-head-copy">
-                <p class="plant-eyebrow">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M12 3v3M12 18v3M4.6 7.6 6.7 9.7M17.3 14.3l2.1 2.1M3 12h3M18 12h3M4.6 16.4l2.1-2.1M17.3 9.7l2.1-2.1"/>
-                        <circle cx="12" cy="12" r="3.2"/>
-                    </svg>
-                    Untuk kebunmu
-                </p>
-                <h1 class="plant-title">Rekomendasi Tanaman</h1>
+    <header class="plant-hero">
+        <div class="plant-hero-inner">
+            <div class="plant-hero-copy">
+                <svg class="plant-sprig plant-sprig--l" viewBox="0 0 90 150" focusable="false" aria-hidden="true">
+                    <path d="M44 146V32" stroke="#2fbf5c" stroke-width="4" stroke-linecap="round" fill="none"/>
+                    <path d="M44 122c-18 0-28-10-28-26 14 0 28 8 28 26Z" fill="#5ccf82"/>
+                    <path d="M44 102c0-16 10-26 26-26 0 16-10 26-26 26Z" fill="#2fbf5c"/>
+                    <path d="M44 80c-16 0-24-9-24-23 12 0 24 7 24 23Z" fill="#7bda97"/>
+                    <path d="M44 60c0-14 8-22 22-22 0 14-8 22-22 22Z" fill="#2fbf5c"/>
+                    <path d="M44 40c-9 0-14-6-14-14 7 0 14 4 14 14Z" fill="#5ccf82"/>
+                    <path d="M44 36c0-10 6-17 14-20 1 10-4 17-14 20Z" fill="#2fbf5c"/>
+                    <path d="M14 34l3-9 3 9 9 3-9 3-3 9-3-9-9-3Z" fill="#ff9d2e"/>
+                    <circle cx="80" cy="22" r="3.6" fill="#ff9d2e"/>
+                </svg>
+                <svg class="plant-sprig plant-sprig--r" viewBox="0 0 90 150" focusable="false" aria-hidden="true">
+                    <path d="M44 146V32" stroke="#2fbf5c" stroke-width="4" stroke-linecap="round" fill="none"/>
+                    <path d="M44 122c-18 0-28-10-28-26 14 0 28 8 28 26Z" fill="#5ccf82"/>
+                    <path d="M44 102c0-16 10-26 26-26 0 16-10 26-26 26Z" fill="#2fbf5c"/>
+                    <path d="M44 80c-16 0-24-9-24-23 12 0 24 7 24 23Z" fill="#7bda97"/>
+                    <path d="M44 60c0-14 8-22 22-22 0 14-8 22-22 22Z" fill="#2fbf5c"/>
+                    <path d="M44 40c-9 0-14-6-14-14 7 0 14 4 14 14Z" fill="#5ccf82"/>
+                    <path d="M44 36c0-10 6-17 14-20 1 10-4 17-14 20Z" fill="#2fbf5c"/>
+                    <path d="M16 30l3-9 3 9 9 3-9 3-3 9-3-9-9-3Z" fill="#4ecb72"/>
+                    <circle cx="78" cy="96" r="3.6" fill="#ff9d2e"/>
+                </svg>
+                <div class="plant-eyebrow" aria-hidden="true">
+                    <svg viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="9" height="9" rx="3" fill="#35c065"/><rect x="12" y="1" width="9" height="9" rx="3" fill="#5ccf82"/><rect x="1" y="12" width="9" height="9" rx="3" fill="#1f9142"/><rect x="12" y="12" width="9" height="9" rx="3" fill="#ff9d2e"/></svg>
+                    <span>Rekomendasi Kebun</span>
+                </div>
+                <h1 class="plant-title">Rekomendasi <span class="plant-title-hl">Tanaman</span></h1>
                 <p class="plant-sub">Kami mencocokkan cahaya dan ruang di EcoPatch-mu dengan isi katalog. Pilih kebun, hasilnya langsung menyesuaikan.</p>
+                <div class="plant-head-actions">
+                    <a class="plant-btn plant-btn--ghost" href="{% url 'plant_library:plant_list' %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
+                        </svg>
+                        Kembali ke Plant Library
+                    </a>
+                </div>
             </div>
-        </header>
+        </div>
+    </header>
 
+    <div class="plant-inner plant-inner--after-hero">
         {% if not user_patches %}
             <div class="plant-empty">
-                <img class="plant-empty-mascot" src="{% static 'my_ecopatch/petak.svg' %}" alt="" aria-hidden="true" width="132" height="129" loading="lazy">
+                <img class="plant-empty-mascot" src="{% static 'img/mascot/petak-semangat.png' %}" alt="" aria-hidden="true" width="132" height="129" loading="lazy">
                 <h2 class="plant-empty-title">Kamu belum memiliki EcoPatch</h2>
                 <p class="plant-empty-desc">Rekomendasi ini membaca luas ruang dan paparan sinar matahari dari kebunmu. Buat kebun virtual pertamamu dulu, ya.</p>
                 <a href="{% url 'my_ecopatch:list' %}" class="plant-btn plant-btn--primary">Buka My EcoPatch</a>
             </div>
         {% else %}
-            <form class="plant-patch-bar" method="get" action="{% url 'plant_library:plant_recommend' %}">
-                <span class="plant-patch-label">Kebun aktif</span>
-                <div class="dropdown plant-filter plant-patch-filter">
-                    <button type="button" class="plant-filter-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Pilih EcoPatch kamu, saat ini {{ selected_patch.name }}">
-                        <span class="plant-patch-dot" aria-hidden="true"></span>
-                        <span class="plant-patch-name">{{ selected_patch.name }}</span>
-                    </button>
-                    <ul class="dropdown-menu plant-menu plant-menu--wide">
-                        {% for patch in patch_options %}
-                            <li>
-                                <a class="dropdown-item plant-menu-item plant-menu-item--rich{% if selected_patch.pk == patch.pk %} active{% endif %}"
-                                   href="?patch={{ patch.pk }}">
-                                    <span class="plant-menu-name">{{ patch.name }}</span>
-                                    <span class="plant-menu-sub">{{ patch.space_label }}{% if patch.sun_label %} &middot; {{ patch.sun_label }}{% endif %}</span>
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+            <div class="plant-finder">
+                <img class="plant-finder-pet" src="{% static 'img/mascot/petak-semangat.png' %}" alt="" aria-hidden="true" width="126" height="123" loading="lazy" decoding="async">
+                <div class="plant-finder-card">
+                    <form class="plant-patch-bar" method="get" action="{% url 'plant_library:plant_recommend' %}" style="width: 100%; justify-content: space-between; flex-wrap: wrap; margin: 0;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1 1 auto;">
+                            <span class="plant-patch-label">Kebun aktif</span>
+                            <div class="dropdown plant-filter plant-patch-filter">
+                                <button type="button" class="plant-filter-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Pilih EcoPatch kamu, saat ini {{ selected_patch.name }}">
+                                    <span class="plant-patch-dot" aria-hidden="true"></span>
+                                    <span class="plant-patch-name">{{ selected_patch.name }}</span>
+                                </button>
+                                <ul class="dropdown-menu plant-menu plant-menu--wide">
+                                    {% for patch in patch_options %}
+                                        <li>
+                                            <a class="dropdown-item plant-menu-item plant-menu-item--rich{% if selected_patch.pk == patch.pk %} active{% endif %}"
+                                               href="?patch={{ patch.pk }}">
+                                                <span class="plant-menu-name">{{ patch.name }}</span>
+                                                <span class="plant-menu-sub">{{ patch.space_label }}{% if patch.sun_label %} &middot; {{ patch.sun_label }}{% endif %}</span>
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <noscript>
+                            <label class="visually-hidden" for="patch-selector">Pilih EcoPatch kamu</label>
+                            <div class="plant-select-wrap">
+                                <select name="patch" id="patch-selector" class="plant-select">
+                                    {% for patch in patch_options %}
+                                        <option value="{{ patch.pk }}" {% if selected_patch.pk == patch.pk %}selected{% endif %}>
+                                            {{ patch.name }} ({{ patch.space_label }}{% if patch.sun_label %}, {{ patch.sun_label }}{% endif %})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="plant-btn plant-btn--primary">Tampilkan</button>
+                        </noscript>
+                    </form>
                 </div>
-                <noscript>
-                    <label class="visually-hidden" for="patch-selector">Pilih EcoPatch kamu</label>
-                    <div class="plant-select-wrap">
-                        <select name="patch" id="patch-selector" class="plant-select">
-                            {% for patch in patch_options %}
-                                <option value="{{ patch.pk }}" {% if selected_patch.pk == patch.pk %}selected{% endif %}>
-                                    {{ patch.name }} ({{ patch.space_label }}{% if patch.sun_label %}, {{ patch.sun_label }}{% endif %})
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <button type="submit" class="plant-btn plant-btn--primary">Tampilkan</button>
-                </noscript>
-            </form>
+            </div>
 
             {% if selected_patch %}
-                <section class="plant-banner" aria-label="Ringkasan kebun">
+                <section class="plant-banner" style="margin-top: 24px;" aria-label="Ringkasan kebun">
                     <div>
                         <h2 class="plant-banner-name">{{ selected_patch.name }}</h2>
                         <div class="plant-banner-pills">
@@ -125,7 +154,7 @@
                     </div>
                 {% else %}
                     <div class="plant-empty">
-                        <img class="plant-empty-mascot" src="{% static 'my_ecopatch/petak.svg' %}" alt="" aria-hidden="true" width="132" height="129" loading="lazy">
+                        <img class="plant-empty-mascot" src="{% static 'img/mascot/petak-semangat.png' %}" alt="" aria-hidden="true" width="132" height="129" loading="lazy">
                         <h2 class="plant-empty-title">Belum ada tanaman yang cocok</h2>
                         <p class="plant-empty-desc">Tidak ada tanaman yang memenuhi seluruh kriteria ruang dan sinar matahari kebun ini. Coba lihat katalog lengkapnya.</p>
                         <a href="{% url 'plant_library:plant_list' %}" class="plant-btn plant-btn--primary">Lihat semua tanaman</a>
@@ -138,7 +167,7 @@
 </main>
 {% endblock %}
 
-{% block footer %}{% endblock %}
+{% block footer %}{% include "footer.html" %}{% endblock %}
 {% block extra_scripts %}<script src="{% static_v 'plant_library/js/quick_add.js' %}" defer></script>
 <script src="{% static_v 'plant_library/js/detail_modal.js' %}" defer></script>
 <script src="{% static_v 'plant_library/js/public_header.js' %}" defer></script>{% endblock %}
