@@ -5,7 +5,7 @@
 {% block body_class %} journal-body{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=15.0">
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=20.0">
 {% endblock %}
 
 {% block main %}
@@ -13,11 +13,8 @@
     <!-- Full-Width Botanical Notebook Hero Banner -->
     <section class="journal-hero-banner-full" aria-label="Garden Journal Header">
         <div class="journal-hero-art" aria-hidden="true">
-            <!-- Sun: #ff9d2e, low near horizon with thin halo (opacity .35) -->
-            <div class="journal-sun">
-                <span class="journal-sun-halo"></span>
-                <span class="journal-sun-core"></span>
-            </div>
+                        <!-- Sun: shining morning sun with rotating beams (matching My EcoPatch) -->
+            <div class="journal-sun" aria-hidden="true"></div>
 
             <!-- Clouds: peach-tinted drifting softly -->
             <svg class="journal-clouds" viewBox="0 0 1200 160" preserveAspectRatio="xMidYMin slice">
@@ -42,14 +39,34 @@
                         <ellipse cx="10" cy="-9" rx="13" ry="10" />
                     </g>
                 </g>
+                <!-- Animated Sky Butterflies -->
+                <g class="sky-bf" style="--bfd: 0s; --bfx0: -80px; --bfy0: 55px;">
+                    <g>
+                        <path class="sky-wg l" d="M0 0 C-13 -14 -20 3 0 7 Z" fill="#ffa726" opacity="0.92"/>
+                        <path class="sky-wg r" d="M0 0 C13 -14 20 3 0 7 Z" fill="#ffb74d" opacity="0.92"/>
+                        <ellipse cx="0" cy="3.5" rx="1.8" ry="5" fill="#5d4037"/>
+                    </g>
+                </g>
+                <g class="sky-bf" style="--bfd: -11s; --bfx0: -120px; --bfy0: 80px;">
+                    <g>
+                        <path class="sky-wg l" d="M0 0 C-11 -12 -17 3 0 6 Z" fill="#f48fb1" opacity="0.88"/>
+                        <path class="sky-wg r" d="M0 0 C11 -12 17 3 0 6 Z" fill="#ff80ab" opacity="0.88"/>
+                        <ellipse cx="0" cy="3" rx="1.5" ry="4.2" fill="#5d4037"/>
+                    </g>
+                </g>
+                <g class="sky-bf" style="--bfd: -22s; --bfx0: -60px; --bfy0: 100px;">
+                    <g>
+                        <path class="sky-wg l" d="M0 0 C-10 -11 -15 2 0 5.5 Z" fill="#aed581" opacity="0.82"/>
+                        <path class="sky-wg r" d="M0 0 C10 -11 15 2 0 5.5 Z" fill="#8bc34a" opacity="0.82"/>
+                        <ellipse cx="0" cy="2.5" rx="1.4" ry="3.8" fill="#33691e"/>
+                    </g>
+                </g>
             </svg>
 
-            <!-- Flying Birds Silhouette -->
-            <svg class="journal-birds" viewBox="0 0 120 40">
-                <path d="M6 22 q8 -14 16 0 q8 -14 16 0" fill="none" stroke="#8a6a4a" stroke-width="2.2"
-                    stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M62 12 q6 -10 12 0 q6 -10 12 0" fill="none" stroke="#8a6a4a" stroke-width="1.8"
-                    stroke-linecap="round" stroke-linejoin="round" opacity="0.75" />
+            <!-- Flying Birds Silhouette (Matching My EcoPatch) -->
+            <svg class="journal-birds" viewBox="0 0 120 40" focusable="false" aria-hidden="true">
+                <path d="M6 22q8-14 16 0q8-14 16 0" fill="none" stroke="#6b8f77" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M62 12q6-10 12 0q6-10 12 0" fill="none" stroke="#6b8f77" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
             </svg>
 
             <!-- Distant Hill Layer — #9ad5b5 (far green) spans 100% width smoothly -->
@@ -184,7 +201,7 @@
             </svg>
 
             <!-- Botanical Journals, Seedling & Mug (Sitting on the wooden desk, proportional) -->
-            <svg class="journal-desk-props" viewBox="0 0 220 90" aria-hidden="true">
+            <svg class="journal-desk-props" viewBox="0 0 240 90" aria-hidden="true">
                 <defs>
                     <linearGradient id="g-book-green" x1="0" y1="0" x2="1" y2="0">
                         <stop offset="0%" stop-color="#196b32" />
@@ -259,6 +276,32 @@
                             <polygon points="1212,-16 1217.5,-16 1214.7,-24" fill="#eed9b7" />
                             <polygon points="1213.5,-22 1216,-22 1214.7,-24" fill="#1f9142" />
                         </g>
+                    </g>
+
+                    <!-- Standing Photo Frame on Desk (next to pencil mug) -->
+                    <g transform="translate(1234, 12)" filter="url(#desk-shadow)">
+                        <!-- Easel kickstand on desk surface -->
+                        <line x1="14" y1="34" x2="20" y2="42" stroke="#7a4e1a" stroke-width="2" stroke-linecap="round" opacity="0.8" />
+                        <!-- Outer wooden frame border -->
+                        <rect x="0" y="0" width="28" height="37" rx="3" fill="#cf9f65" stroke="#7a4e1a" stroke-width="1.2" />
+                        <!-- Frame inner mat -->
+                        <rect x="3.5" y="3.5" width="21" height="30" rx="1.5" fill="#fdfaf4" stroke="#d5c4a1" stroke-width="0.6" />
+                        <!-- Photo area (botanical green) -->
+                        <rect x="5.5" y="5.5" width="17" height="19" rx="1" fill="#ebf6e5" />
+                        <!-- Plant stem -->
+                        <path d="M14 23 V14" stroke="#167a38" stroke-width="1.3" stroke-linecap="round" />
+                        <!-- Left leaf -->
+                        <path d="M14 18 C10 13 6 16 9 20 C11 22 14 20 14 18 Z" fill="#2fbf5c" />
+                        <!-- Right leaf -->
+                        <path d="M14 16 C18 11 22 14 19 18 C17 20 14 18 14 16 Z" fill="#44cb6f" />
+                        <!-- Flower bloom dot -->
+                        <circle cx="14" cy="13" r="1.3" fill="#ff9d2e" />
+                        <!-- Glass reflection glare -->
+                        <line x1="6.5" y1="6.5" x2="15" y2="15" stroke="#ffffff" stroke-width="0.8" opacity="0.45" stroke-linecap="round" />
+                        <!-- Caption line on white mat below photo -->
+                        <line x1="7" y1="28.5" x2="18" y2="28.5" stroke="#8c7853" stroke-width="0.7" stroke-linecap="round" opacity="0.5" />
+                        <!-- Frame top highlight -->
+                        <rect x="1" y="1" width="26" height="2" rx="1" fill="#f0d9a8" opacity="0.6" />
                     </g>
                 </g>
             </svg>

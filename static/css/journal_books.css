@@ -152,6 +152,7 @@
     0% {
         transform: translateY(0) rotate(0deg);
     }
+
     100% {
         transform: translateY(12px) rotate(15deg);
     }
@@ -161,17 +162,20 @@
     0% {
         transform: translateY(0) rotate(0deg);
     }
+
     100% {
         transform: translateY(-10px) rotate(-12deg);
     }
 }
 
 @keyframes sparkleTwinkle {
+
     0%,
     100% {
         opacity: 0.3;
         transform: scale(0.85);
     }
+
     50% {
         opacity: 0.9;
         transform: scale(1.15) rotate(10deg);
@@ -272,10 +276,12 @@
 }
 
 @keyframes mascotHover {
+
     0%,
     100% {
         transform: translateY(0px) rotate(0deg);
     }
+
     50% {
         transform: translateY(-8px) rotate(1.5deg);
     }
@@ -305,10 +311,12 @@
 }
 
 @keyframes speechWiggle {
+
     0%,
     100% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.04) rotate(-1.5deg);
     }
@@ -342,6 +350,7 @@
         padding: 24px 20px;
         border-radius: 20px;
     }
+
     .journal-mascot-speech {
         right: 0;
         top: -14px;
@@ -802,6 +811,7 @@
         opacity: 0;
         transform: translateY(4px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1147,17 +1157,20 @@
         box-shadow: -8px 0 20px rgba(0, 0, 0, 0.12);
         background-color: #fffff8;
     }
+
     40% {
         opacity: 1;
         transform: perspective(1400px) rotateY(-35deg);
         box-shadow: -20px 0 40px rgba(0, 0, 0, 0.18);
         background-color: #f4ebd2;
     }
+
     80% {
         opacity: 0.4;
         transform: perspective(1400px) rotateY(-82deg);
         box-shadow: -4px 0 8px rgba(0, 0, 0, 0.06);
     }
+
     100% {
         opacity: 0;
         transform: perspective(1400px) rotateY(-90deg);
@@ -1173,16 +1186,19 @@
         transform: perspective(1400px) rotateY(-90deg);
         background-color: #f4ebd2;
     }
+
     30% {
         opacity: 0.5;
         transform: perspective(1400px) rotateY(-60deg);
     }
+
     70% {
         opacity: 1;
         transform: perspective(1400px) rotateY(-20deg);
         background-color: #faf7ef;
         box-shadow: -16px 0 32px rgba(0, 0, 0, 0.14);
     }
+
     100% {
         opacity: 0;
         transform: perspective(1400px) rotateY(0deg);
@@ -1205,6 +1221,7 @@
         opacity: 0.4;
         transform: translateX(8px);
     }
+
     100% {
         opacity: 1;
         transform: translateX(0);
@@ -1216,6 +1233,7 @@
         opacity: 0.4;
         transform: translateX(-8px);
     }
+
     100% {
         opacity: 1;
         transform: translateX(0);
@@ -2637,6 +2655,7 @@
         flex-direction: column;
         gap: 20px;
     }
+
     .onboarding-arrow {
         transform: rotate(90deg);
         margin: -8px 0;
@@ -2912,11 +2931,42 @@ body.has-sidebar.journal-body {
     position: absolute;
     right: 22%;
     bottom: 120px;
-    width: 100px;
-    height: 100px;
+    width: clamp(84px, 9.5vw, 115px);
+    aspect-ratio: 1;
     border-radius: 50%;
-    background: radial-gradient(circle at 48% 48%, #ffb84a 0, #ff9d2e 60%, transparent 68%);
-    filter: drop-shadow(0 0 32px rgba(255, 157, 46, 0.35));
+    background: radial-gradient(circle at 50% 50%, #ffe9a6 0%, #ffdc7d 34%, #feba54 62%, rgba(254, 186, 84, 0.42) 80%, transparent 100%);
+    filter: drop-shadow(0 0 26px rgba(254, 186, 84, 0.5));
+    animation: journalSunRise 9s ease-in-out infinite;
+}
+
+.journal-sun::before {
+    content: "";
+    position: absolute;
+    inset: -75%;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg, rgba(255, 238, 180, 0.32) 0deg, rgba(255, 238, 180, 0.25) 5deg, transparent 10deg, transparent 20deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 18%, #000 32% 52%, transparent 72%);
+    mask: radial-gradient(circle, transparent 0 18%, #000 32% 52%, transparent 72%);
+    animation: journalSunRays 70s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes journalSunRise {
+
+    0%,
+    100% {
+        transform: translateY(6px);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes journalSunRays {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Clouds: soft peach drift */
@@ -2933,10 +2983,26 @@ body.has-sidebar.journal-body {
 
 .journal-birds {
     position: absolute;
-    right: 30%;
-    top: 85px;
+    left: 32%;
+    top: clamp(48px, 11vh, 96px);
     width: 84px;
     height: 28px;
+    animation: journalBirdsFly 46s linear infinite;
+    will-change: transform;
+}
+
+@keyframes journalBirdsFly {
+    0% {
+        transform: translate(-60px, 6px);
+    }
+
+    50% {
+        transform: translate(260px, -10px);
+    }
+
+    100% {
+        transform: translate(560px, 6px);
+    }
 }
 
 /* Hills: seamless 100% full-width curve stretch */
@@ -2996,8 +3062,8 @@ body.has-sidebar.journal-body {
     bottom: 28px;
     left: 57%;
     transform: translateX(-50%);
-    width: 180px;
-    height: 72px;
+    width: 196px;
+    height: 74px;
     z-index: 2;
     display: block;
     pointer-events: none;
@@ -3059,6 +3125,7 @@ body.has-sidebar.journal-body {
     from {
         transform: rotate(-3.5deg);
     }
+
     to {
         transform: rotate(3.5deg);
     }
@@ -3068,17 +3135,20 @@ body.has-sidebar.journal-body {
     from {
         transform: rotate(-3deg);
     }
+
     to {
         transform: rotate(3deg);
     }
 }
 
 @keyframes deskTwinkle {
+
     0%,
     100% {
         opacity: 0.25;
         transform: scale(0.6);
     }
+
     50% {
         opacity: 1;
         transform: scale(1.15);
@@ -3090,6 +3160,7 @@ body.has-sidebar.journal-body {
         opacity: 0.35;
         transform: scale(0.9);
     }
+
     to {
         opacity: 0.75;
         transform: scale(1.12);
@@ -3100,22 +3171,27 @@ body.has-sidebar.journal-body {
     from {
         transform: translateX(0);
     }
+
     to {
         transform: translateX(330px);
     }
 }
 
 @keyframes deskFly {
+
     0%,
     100% {
         transform: translate(1470px, 368px);
     }
+
     25% {
         transform: translate(1530px, 338px);
     }
+
     50% {
         transform: translate(1604px, 366px);
     }
+
     75% {
         transform: translate(1540px, 396px);
     }
@@ -3128,6 +3204,7 @@ body.has-sidebar.journal-body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .journal-hero-art *,
     .journal-hero-art *::before {
         animation: none !important;
@@ -3599,13 +3676,16 @@ body.has-sidebar.journal-body {
 }
 
 @keyframes petakMascotFloat {
+
     0%,
     100% {
         transform: translateY(0) rotate(0deg);
     }
+
     30% {
         transform: translateY(-9px) rotate(-1.5deg);
     }
+
     68% {
         transform: translateY(-4px) rotate(1.2deg);
     }
@@ -4065,6 +4145,7 @@ body.has-sidebar.journal-body {
         padding: 0 44px;
         font-size: 0.95rem;
     }
+
     .journal-search-icon {
         left: 14px;
     }
@@ -4126,6 +4207,7 @@ body.has-sidebar.journal-body {
 /* Prefers-Reduced-Motion: completely stop animations for accessibility */
 
 @media (prefers-reduced-motion: reduce) {
+
     .journal-desk-scene *,
     .journal-desk-scene .sw,
     .journal-desk-scene .pn,
@@ -4133,7 +4215,7 @@ body.has-sidebar.journal-body {
     .journal-desk-scene .halo,
     .journal-desk-scene .cl,
     .journal-desk-scene .bf,
-    .journal-desk-scene .wg,
+    y .journal-desk-scene .wg,
     .journal-bubble,
     .journal-mascot-petak-img,
     .btn-listing-style,
@@ -4146,45 +4228,118 @@ body.has-sidebar.journal-body {
 
 /* Dark Mode Theme Support (Comfortable Contrast) */
 
+
+
+/* ── Sky Butterflies (journal-clouds SVG) ──────────────────────────────── */
+.journal-hero-art .sky-bf {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: skyBfFly 28s linear var(--bfd, 0s) infinite;
+}
+
+.journal-hero-art .sky-wg {
+    transform-box: fill-box;
+}
+
+.journal-hero-art .sky-wg.l {
+    transform-origin: 100% 50%;
+    animation: skyWingFlap 0.32s ease-in-out infinite alternate;
+}
+
+.journal-hero-art .sky-wg.r {
+    transform-origin: 0 50%;
+    animation: skyWingFlap 0.32s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes skyBfFly {
+    0% {
+        transform: translate(var(--bfx0, -80px), var(--bfy0, 60px)) scale(0.75);
+        opacity: 0;
+    }
+
+    4% {
+        opacity: 0.9;
+    }
+
+    25% {
+        transform: translate(300px, calc(var(--bfy0, 60px) - 15px)) scale(1.0);
+        opacity: 0.95;
+    }
+
+    50% {
+        transform: translate(700px, calc(var(--bfy0, 60px) + 20px)) scale(0.9);
+        opacity: 0.9;
+    }
+
+    75% {
+        transform: translate(1050px, calc(var(--bfy0, 60px) - 10px)) scale(0.85);
+        opacity: 0.8;
+    }
+
+    95% {
+        opacity: 0;
+    }
+
+    100% {
+        transform: translate(1250px, var(--bfy0, 60px)) scale(0.7);
+        opacity: 0;
+    }
+}
+
+@keyframes skyWingFlap {
+    to {
+        transform: scaleX(0.2);
+    }
+}
+
 @media (prefers-color-scheme: dark) {
     .journal-hero-banner-full {
         background: linear-gradient(180deg, #1c140a 0%, #2b1f11 55%, #3a2612 100%);
         border-bottom-color: #4a3622;
     }
+
     .journal-hero-title {
-    font-family: var(--font-display, 'Baloo 2', sans-serif);
-    font-size: clamp(3rem, 5.2vw, 4.8rem);
-    font-weight: 800;
-    color: #22301f;
-    line-height: 1;
-    letter-spacing: -0.03em;
-    margin: 0 0 14px;
-}
+        font-family: var(--font-display, 'Baloo 2', sans-serif);
+        font-size: clamp(3rem, 5.2vw, 4.8rem);
+        font-weight: 800;
+        color: #22301f;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        margin: 0 0 14px;
+    }
+
     .journal-hero-lead {
         color: #d1c2a5;
     }
+
     .stat-pill-chip {
         background: #251e14;
         border-color: #52402a;
         color: #f7edd7;
     }
+
     .stat-pill-chip strong {
         color: #6ef0a0;
     }
+
     .stat-pill-icon {
         color: #6ef0a0;
     }
+
     .journal-bubble {
         background: #203022;
         border-color: #3b533d;
         color: #f0faf1;
     }
+
     .journal-bubble-text {
         color: #daf0d8;
     }
+
     .journal-day-name {
         color: #d1c2a5;
     }
+
     .legend-chip {
         color: #d1c2a5;
     }
@@ -4203,4 +4358,3 @@ body.has-sidebar.journal-body {
 .journal-hero-cta-wrap {
     margin-top: 10px;
 }
-
