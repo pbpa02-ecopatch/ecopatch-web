@@ -36,6 +36,10 @@
                     <path d="M16 30l3-9 3 9 9 3-9 3-3 9-3-9-9-3Z" fill="#4ecb72"/>
                     <circle cx="78" cy="96" r="3.6" fill="#ff9d2e"/>
                 </svg>
+                <div class="plant-eyebrow" aria-hidden="true">
+                    <svg viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="9" height="9" rx="3" fill="#35c065"/><rect x="12" y="1" width="9" height="9" rx="3" fill="#5ccf82"/><rect x="1" y="12" width="9" height="9" rx="3" fill="#1f9142"/><rect x="12" y="12" width="9" height="9" rx="3" fill="#ff9d2e"/></svg>
+                    <span>Plant Library</span>
+                </div>
                 <h1 class="plant-title">Plant <span class="plant-title-hl">Library</span></h1>
                 <p class="plant-sub">Cari tanaman yang pas dengan cahaya dan ruangmu.{% if not user.is_authenticated %} Semua yang ada di sini boleh dibuka tanpa akun.{% endif %}</p>
                 <div class="plant-head-actions">
@@ -121,6 +125,7 @@
                         {% if selected_indoor_outdoor %}<input type="hidden" name="indoor_outdoor" value="{{ selected_indoor_outdoor }}">{% endif %}
                         {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
                         {% if selected_space_requirement %}<input type="hidden" name="space_requirement" value="{{ selected_space_requirement }}">{% endif %}
+                        {% if selected_watering %}<input type="hidden" name="watering" value="{{ selected_watering }}">{% endif %}
 
                         {% for dd in dropdowns %}
                             <div class="dropdown plant-filter">
@@ -150,7 +155,7 @@
                     </div>
                 </div>
             </div>
-        </form>
+                </form>
 
         <section class="plant-ask" aria-label="FAQ pencarian tanaman">
             <div class="plant-ask-pet">
@@ -221,6 +226,7 @@
 <script src="{% static_v 'plant_library/js/public_header.js' %}" defer></script>
 <script src="{% static_v 'plant_library/js/quick_add.js' %}" defer></script>
 <script src="{% static_v 'plant_library/js/detail_modal.js' %}" defer></script>
+<script src="{% static_v 'plant_library/js/search_suggest.js' %}" defer></script>
 <script>
 (function () {
     function getInput() {
@@ -270,4 +276,4 @@
 </script>
 {% endblock %}
 
-{% block footer %}{% endblock %}
+{% block footer %}{% include "footer.html" %}{% endblock %}

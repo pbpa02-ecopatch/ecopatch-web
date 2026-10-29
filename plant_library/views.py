@@ -1,4 +1,5 @@
 from functools import wraps
+import json
 from urllib.parse import urlencode
 import re
 
@@ -31,6 +32,14 @@ _KEYWORD_MAP = [
     # indoor / outdoor
     ("dalam ruangan",    "indoor_outdoor", "indoor"),
     ("luar ruangan",     "indoor_outdoor", "outdoor"),
+    # watering
+    ("tahan lupa disiram", "watering", "low"),
+    ("jarang disiram",     "watering", "low"),
+    ("sering disiram",     "watering", "high"),
+    ("siram sedang",       "watering", "moderate"),
+    ("penyiraman sedang",  "watering", "moderate"),
+    ("jarang siram",       "watering", "low"),
+    ("sering siram",       "watering", "high"),
     # shorter single-word phrases — must come after longer ones
     ("mudah",            "difficulty", "easy"),
     ("sedang",           "difficulty", "medium"),
@@ -45,6 +54,7 @@ _KEYWORD_MAP = [
 _STOP_WORDS = {
     "yang", "dan", "tanaman", "untuk", "dirawat",
     "apa", "apakah", "di", "ke", "dari", "dengan", "cocok", "ada", "ya", "dong", "sebaiknya", "paling",
+    "disiram", "siram", "penyiraman",
 }
 
 # Chip cepat di kotak pencarian. Sama seperti di landing page: tiga kelompok
@@ -55,7 +65,7 @@ _CHIP_GROUPS = [
     ("indoor_outdoor", "Lokasi", "place", [("indoor", "Indoor"), ("outdoor", "Outdoor")]),
 ]
 
-_FILTER_FIELDS = ("q", "category", "sunlight", "difficulty", "indoor_outdoor", "space_requirement")
+_FILTER_FIELDS = ("q", "category", "sunlight", "difficulty", "indoor_outdoor", "space_requirement", "watering")
 
 
 def _filter_params(request):
@@ -103,6 +113,7 @@ def _filter_dropdowns(params):
     """Dropdown filter gaya Seed Exchange: label aktif + daftar tautan."""
     config = [
         ('category', 'Semua kategori', Plant.Category.choices),
+        ('watering', 'Semua penyiraman', Plant.Watering.choices),
         ('space_requirement', 'Semua ruang', Plant.SpaceRequirement.choices),
     ]
     dropdowns = []
@@ -252,6 +263,9 @@ def plant_list(request):
     difficulty = request.GET.get('difficulty', '').strip()
     indoor_outdoor = request.GET.get('indoor_outdoor', '').strip()
     space_requirement = request.GET.get('space_requirement', '').strip()
+    watering = request.GET.get('watering', '').strip()
+    if watering not in dict(Plant.Watering.choices):
+        watering = ''
 
     # Natural-language keyword parsing dari query teks
     kw_filters = {}
@@ -265,6 +279,8 @@ def plant_list(request):
             difficulty = kw_filters['difficulty']
         if not indoor_outdoor and 'indoor_outdoor' in kw_filters:
             indoor_outdoor = kw_filters['indoor_outdoor']
+        if not watering and 'watering' in kw_filters:
+            watering = kw_filters['watering']
 
         # Cari lewat nama/scientific_name hanya kalau masih ada sisa teks
         if remaining_text:
@@ -283,9 +299,11 @@ def plant_list(request):
         plants = plants.filter(indoor_outdoor=indoor_outdoor)
     if space_requirement:
         plants = plants.filter(space_requirement=space_requirement)
+    if watering:
+        plants = plants.filter(watering=watering)
 
     has_active_filters = bool(
-        query or category or sunlight or difficulty or indoor_outdoor or space_requirement
+        query or category or sunlight or difficulty or indoor_outdoor or space_requirement or watering
     )
 
     params = _filter_params(request)
@@ -297,6 +315,7 @@ def plant_list(request):
         'sunlight': dict(Plant.Sunlight.choices),
         'difficulty': dict(Plant.Difficulty.choices),
         'indoor_outdoor': dict(Plant.Placement.choices),
+        'watering': dict(Plant.Watering.choices),
     }
     for field, value in kw_filters.items():
         if not request.GET.get(field):
@@ -323,6 +342,7 @@ def plant_list(request):
         'selected_difficulty': difficulty,
         'selected_indoor_outdoor': indoor_outdoor,
         'selected_space_requirement': space_requirement,
+        'selected_watering': watering,
         'has_active_filters': has_active_filters,
         'filter_groups': build_chip_groups(params),
         'dropdowns': _filter_dropdowns(params),
@@ -333,6 +353,8 @@ def plant_list(request):
         'difficulty_choices': Plant.Difficulty.choices,
         'placement_choices': Plant.Placement.choices,
         'space_choices': Plant.SpaceRequirement.choices,
+        'watering_choices': Plant.Watering.choices,
+        'plant_names_json': json.dumps(list(Plant.objects.values_list('name', flat=True).distinct().order_by('name'))),
     }
     return render(request, 'plant_library/plant_list.html', context)
 
