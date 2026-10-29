@@ -2886,8 +2886,8 @@ body.has-sidebar.journal-body {
 .journal-hero-banner-full {
     width: 100%;
     position: relative;
-    background: linear-gradient(180deg, #fdebc9 0%, #ffd8a8 55%, #ffb86b 100%);
-    border-bottom: 2px solid #eacd95;
+    background: radial-gradient(70% 90% at 76% 78%, rgba(255, 240, 200, 0.65) 0%, transparent 62%), linear-gradient(180deg, #fff4dc 0%, #eef8e2 46%, #dff2d4 100%);
+    border-bottom: 3px solid #d8c48d;
     padding: clamp(28px, 4vh, 40px) 20px 0 calc(var(--journal-offset, 0px) + 20px);
     overflow: hidden;
     isolation: isolate;
