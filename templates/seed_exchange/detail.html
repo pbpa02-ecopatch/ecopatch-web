@@ -42,6 +42,11 @@
                             {{ listing.city }}
                         </span>
                     </div>
+                    {% if is_owner %}
+                    <div class="seed-detail-contact">
+                        <span class="seed-detail-contact-value">{{ listing.owner_contact|default:"-" }}</span>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -54,6 +59,13 @@
                     <span class="seed-pill seed-pill--type">{{ listing.get_item_type_display }}</span>
                     <span class="seed-pill seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
                 </div>
+                <section class="seed-note{% if not listing.description %} seed-note--empty{% endif %}">
+                    {% if listing.description %}
+                    <p class="seed-note-text">{{ listing.description }}</p>
+                    {% else %}
+                    <p class="seed-note-text seed-note-text--empty">Pemilik belum menulis catatan. Tanya lewat booking, ya.</p>
+                    {% endif %}
+                </section>
                 <dl class="seed-meta-grid">
                     <div class="seed-meta">
                         <dt>Tanaman</dt>

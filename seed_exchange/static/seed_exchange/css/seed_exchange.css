@@ -1691,6 +1691,11 @@ button.seed-filter {
     white-space: pre-line;
 }
 
+/* The note has no heading any more, so its text starts at the card padding. */
+.seed-note-text:first-child {
+    margin-top: 0;
+}
+
 .seed-note-text--empty {
     color: var(--seed-muted);
     font-style: italic;
