@@ -1889,77 +1889,19 @@ button.seed-filter {
 
 /* Read-only city + contact, pulled straight from the profile. */
 .seed-loc {
-    position: relative;
-    display: flex;
     grid-column: 1 / -1;
-    align-items: flex-start;
-    gap: 14px;
-    overflow: hidden;
     padding: 16px 18px;
     border: 1.5px solid var(--seed-line);
     border-radius: 20px;
-    background: linear-gradient(135deg, #fffdf6, #f7f0dc);
-}
-
-.seed-loc::after {
-    content: '';
-    position: absolute;
-    right: -22px;
-    bottom: -34px;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: rgba(47, 191, 92, 0.08);
-    pointer-events: none;
+    background: #fffdf6;
 }
 
 .seed-loc--missing {
     border-color: rgba(255, 157, 46, 0.55);
-    background: linear-gradient(135deg, #fffdf6, #fdf0dc);
-}
-
-.seed-loc--missing::after {
-    background: rgba(255, 157, 46, 0.12);
-}
-
-.seed-loc-pin {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 46px;
-    height: 46px;
-    border-radius: 15px;
-    background: var(--seed-brand-soft);
-    color: var(--seed-brand-strong);
-}
-
-.seed-loc--missing .seed-loc-pin {
-    background: var(--seed-warn-bg);
-    color: var(--seed-warn);
-}
-
-.seed-loc-pin svg {
-    width: 24px;
-    height: 24px;
 }
 
 .seed-loc-body {
     min-width: 0;
-}
-
-.seed-loc-kicker {
-    margin: 0 0 6px;
-    color: var(--seed-muted);
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-}
-
-.seed-loc-kicker b {
-    color: var(--seed-fg);
-    letter-spacing: 0;
-    text-transform: none;
 }
 
 .seed-loc-facts {
