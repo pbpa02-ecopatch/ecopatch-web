@@ -1,3960 +1,2034 @@
 /* =========================================================
-
    GARDEN JOURNAL — DESIGN SYSTEM TOKENS
-
    ========================================================= */
-
-
 
 :root {
-
     /* --- Typography --- */
-
     --font-display: 'Baloo 2', sans-serif;
-
     --font-body: 'Plus Jakarta Sans', sans-serif;
-
-
-
     /* Font sizes */
-
     --fs-display-xl: 32px;
-
     --lh-display-xl: 40px;
-
     --fs-h1: 26px;
-
     --lh-h1: 34px;
-
     --fs-h2: 20px;
-
     --lh-h2: 28px;
-
     --fs-body: 15px;
-
     --lh-body: 22px;
-
     --fs-caption: 13px;
-
     --lh-caption: 18px;
-
     --fs-overline: 11px;
-
     --lh-overline: 14px;
-
-
-
     /* --- Spacing --- */
-
     --space-1: 4px;
-
     --space-2: 8px;
-
     --space-4: 16px;
-
     --space-6: 24px;
-
     --space-8: 32px;
-
-
-
     /* --- Corner Radius --- */
-
     --radius-sm: 10px;
-
     --radius-md: 18px;
-
     --radius-lg: 28px;
-
     --radius-full: 999px;
-
-
-
     /* --- Shadows --- */
-
     --shadow-sm: 0 1px 2px rgba(34, 48, 31, 0.08);
-
     --shadow-md: 0 6px 16px rgba(34, 48, 31, 0.08);
-
     --shadow-pressed: inset 0 2px 4px rgba(34, 48, 31, 0.18);
-
-
-
     /* --- Color Tokens --- */
-
     --ink: #22301f;
-
     --ink-muted: #59684f;
-
     --border: #e6cf95;
-
     --journal-line-strong: #b9a46a;
-
     /* Earthy brown dashed border matching +listing baru */
-
     --journal-soil: #8a6a4a;
-
     --surface-input: #fdedc9;
-
     --surface-white: #ffffff;
-
-
-
     /* --- Button colors --- */
-
     --btn-primary-bg: #1f9142;
-
     --btn-primary-fg: #ffffff;
-
     --btn-secondary-bg: #cbf5d6;
-
     --btn-secondary-fg: #155e2e;
-
     --btn-ghost-border: #e6cf95;
-
     --btn-ghost-fg: #22301f;
-
     --btn-danger-bg: #8c5344;
-
     --btn-danger-fg: #ffffff;
-
-
-
     /* --- Badge colors (Soft Botanical Earth Tones) --- */
-
     --badge-healthy-bg: #cbf5d6;
-
     --badge-healthy-fg: #15652f;
-
     --badge-attention-bg: #fde9c9;
-
     --badge-attention-fg: #96540c;
-
     --badge-sky-bg: #e5eff2;
-
     --badge-sky-fg: #456b77;
-
     --badge-danger-bg: #fbf0ea;
-
     --badge-danger-fg: #8c5344;
-
     --badge-planned-bg: #fae8be;
-
     --badge-planned-fg: #7d5a15;
-
 }
 
-
-
 /* =========================================================
-
    GARDEN JOURNAL - 3D BOOK STYLING & PATTERNS
-
    ========================================================= */
 
-
-
 .journal-page-header {
-
     margin-bottom: 2rem;
-
 }
-
-
 
 .journal-title {
-
     font-family: var(--font-display);
-
     font-weight: 700;
-
     font-size: var(--fs-display-xl);
-
     line-height: var(--lh-display-xl);
-
     color: var(--ink);
-
     letter-spacing: -0.3px;
-
 }
-
-
 
 .journal-subtitle {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-body);
-
     line-height: var(--lh-body);
-
     color: var(--ink-muted);
-
 }
 
-
-
 /* =========================================================
-
    GARDEN JOURNAL HERO BANNER — Animated & Botanical
-
    ========================================================= */
 
 .journal-hero-banner {
-
     background: linear-gradient(135deg, #FFFDF7 0%, #FFF4D9 100%);
-
     border: 1.5px solid #ecd8ab;
-
     border-radius: 28px;
-
     padding: 32px 36px;
-
     margin-bottom: 24px;
-
     position: relative;
-
     overflow: hidden;
-
     box-shadow: 0 8px 24px rgba(60, 45, 20, 0.05);
-
 }
-
-
 
 .journal-hero-decors {
-
     position: absolute;
-
     inset: 0;
-
     pointer-events: none;
-
     overflow: hidden;
-
 }
-
-
 
 .journal-decor-leaf {
-
     position: absolute;
-
     opacity: 0.22;
-
     filter: drop-shadow(0 2px 4px rgba(31, 145, 66, 0.15));
-
 }
-
-
 
 .journal-decor-leaf-1 {
-
     top: -10px;
-
     right: 25%;
-
     animation: leafFloat1 6s ease-in-out infinite alternate;
-
 }
-
-
 
 .journal-decor-leaf-2 {
-
     bottom: -15px;
-
     left: 45%;
-
     animation: leafFloat2 7s ease-in-out infinite alternate;
-
 }
-
-
 
 .journal-decor-sparkle {
-
     position: absolute;
-
     color: #ff9d2e;
-
     font-size: 1.1rem;
-
     animation: sparkleTwinkle 3s ease-in-out infinite;
-
 }
-
-
 
 .journal-decor-sparkle-1 {
-
     top: 18px;
-
     right: 20%;
-
     animation-delay: 0.5s;
-
 }
-
-
 
 .journal-decor-sparkle-2 {
-
     bottom: 22px;
-
     right: 32%;
-
     animation-delay: 1.8s;
-
 }
-
-
 
 @keyframes leafFloat1 {
-
     0% {
-
         transform: translateY(0) rotate(0deg);
-
     }
-
-
 
     100% {
-
         transform: translateY(12px) rotate(15deg);
-
     }
-
 }
-
-
 
 @keyframes leafFloat2 {
-
     0% {
-
         transform: translateY(0) rotate(0deg);
-
     }
-
-
 
     100% {
-
         transform: translateY(-10px) rotate(-12deg);
-
     }
-
 }
-
-
 
 @keyframes sparkleTwinkle {
 
-
-
     0%,
-
     100% {
-
         opacity: 0.3;
-
         transform: scale(0.85);
-
     }
-
-
 
     50% {
-
         opacity: 0.9;
-
         transform: scale(1.15) rotate(10deg);
-
     }
-
 }
-
-
 
 .journal-hero-badge {
-
     display: inline-flex;
-
     align-items: center;
-
     gap: 7px;
-
     padding: 5px 14px;
-
     background: rgba(45, 125, 50, 0.09);
-
     border: 1px solid rgba(45, 125, 50, 0.2);
-
     border-radius: 999px;
-
     font-size: 0.76rem;
-
     font-weight: 700;
-
     letter-spacing: 1.2px;
-
     text-transform: uppercase;
-
     color: #246d29;
-
     margin-bottom: 12px;
-
 }
-
-
 
 .journal-hero-title {
-
     font-family: var(--font-display, 'Baloo 2', sans-serif);
-
     font-size: clamp(1.75rem, 3.6vw, 3.4rem);
-
     font-weight: 800;
-
     color: #22301f;
-
     line-height: 1.05;
-
     letter-spacing: -0.03em;
-
     margin: 0 0 8px;
-
 }
-
-
 
 .journal-hero-title .accent-journal {
-
     color: #1f9142;
-
     position: relative;
-
     display: inline-block;
-
 }
-
-
 
 .journal-hero-title .accent-journal::after {
-
     content: '';
-
     position: absolute;
-
     left: 0;
-
     bottom: 3px;
-
     width: 100%;
-
     height: 7px;
-
     background: #ffc46a;
-
     border-radius: 3px;
-
     z-index: -1;
-
     opacity: 0.75;
-
 }
-
-
 
 .journal-hero-lead {
-
     font-size: 0.95rem;
-
     line-height: 1.55;
-
     color: #556b4f;
-
     max-width: 560px;
-
     margin-bottom: 18px;
-
 }
-
-
 
 .journal-hero-chips {
-
     display: flex;
-
     flex-wrap: wrap;
-
     gap: 8px;
-
 }
-
-
 
 .journal-chip {
-
     display: inline-flex;
-
     align-items: center;
-
     gap: 6px;
-
     background: #ffffff;
-
     border: 1.2px solid #ebd9b0;
-
     border-radius: 999px;
-
     padding: 5px 13px;
-
     font-size: 0.78rem;
-
     font-weight: 600;
-
     color: #2d4529;
-
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-
     transition: transform 0.2s ease;
-
 }
-
-
 
 .journal-chip:hover {
-
     transform: translateY(-1px);
-
 }
-
-
 
 .journal-hero-right {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     justify-content: center;
-
     position: relative;
-
     padding-top: 10px;
-
 }
-
-
 
 .journal-hero-mascot-box {
-
     position: relative;
-
     text-align: center;
-
     animation: mascotHover 4s ease-in-out infinite;
-
 }
-
-
 
 @keyframes mascotHover {
 
-
-
     0%,
-
     100% {
-
         transform: translateY(0px) rotate(0deg);
-
     }
-
-
 
     50% {
-
         transform: translateY(-8px) rotate(1.5deg);
-
     }
-
 }
-
-
 
 .journal-hero-mascot-img {
-
     width: 115px;
-
     height: auto;
-
     filter: drop-shadow(0 10px 14px rgba(45, 65, 30, 0.12));
-
 }
-
-
 
 .journal-mascot-speech {
-
     position: absolute;
-
     top: -18px;
-
     right: -24px;
-
     background: #ffffff;
-
     border: 1.5px solid #ebd9b0;
-
     border-radius: 14px;
-
     padding: 5px 11px;
-
     font-size: 0.74rem;
-
     font-weight: 700;
-
     color: #246d29;
-
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-
     white-space: nowrap;
-
     animation: speechWiggle 4s ease-in-out infinite;
-
     z-index: 2;
-
 }
-
-
 
 @keyframes speechWiggle {
 
-
-
     0%,
-
     100% {
-
         transform: scale(1);
-
     }
-
-
 
     50% {
-
         transform: scale(1.04) rotate(-1.5deg);
-
     }
-
 }
-
-
 
 .journal-mascot-speech::after {
-
     content: '';
-
     position: absolute;
-
     bottom: -6px;
-
     left: 20px;
-
     width: 0;
-
     height: 0;
-
     border-left: 6px solid transparent;
-
     border-right: 6px solid transparent;
-
     border-top: 6px solid #ffffff;
-
 }
-
-
 
 .journal-hero-cta {
-
     margin-top: 14px;
-
     box-shadow: 0 4px 14px rgba(31, 145, 66, 0.25);
-
     transition: all 0.25s ease;
-
 }
-
-
 
 .journal-hero-cta:hover {
-
     transform: translateY(-2px);
-
     box-shadow: 0 6px 18px rgba(31, 145, 66, 0.35);
-
 }
-
-
 
 @media (max-width: 767.98px) {
-
     .journal-hero-banner {
-
         padding: 24px 20px;
-
         border-radius: 20px;
-
     }
-
-
 
     .journal-mascot-speech {
-
         right: 0;
-
         top: -14px;
-
     }
-
 }
 
-
-
 /* =========================================================
-
    FILTER PILLS — Design System
-
    ========================================================= */
 
 .filter-pill-btn {
-
     height: 40px;
-
     padding: 0 16px;
-
     border-radius: var(--radius-full);
-
     background: #fffdf6;
-
     border: 1.5px solid rgba(182, 154, 99, 0.38);
-
     font-family: var(--font-body);
-
     font-size: 0.88rem;
-
     line-height: 1;
-
     font-weight: 700;
-
     color: var(--ink-muted);
-
     display: inline-flex;
-
     align-items: center;
-
     gap: 6px;
-
     transition: border-color 0.18s ease, color 0.18s ease;
-
 }
-
-
 
 .filter-pill-btn:hover,
 
 .filter-pill-btn:focus-within {
-
     border-color: var(--btn-secondary-fg);
-
     color: var(--btn-secondary-fg);
-
 }
-
-
 
 .filter-pill-btn input {
-
     font: inherit;
-
     color: var(--ink);
-
 }
-
-
 
 /* Book Container Grid */
 
 .book-shelf-grid {
-
     display: grid;
-
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-
     gap: 2.5rem 2rem;
-
     padding: 1rem 0;
-
 }
-
-
 
 /* 3D Realistic Book Item */
 
 .book-item {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     text-decoration: none;
-
     color: inherit;
-
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-
     perspective: 1000px;
-
 }
-
-
 
 .book-item:hover {
-
     transform: translateY(-8px) scale(1.02);
-
     text-decoration: none;
-
     color: inherit;
-
 }
-
-
 
 .book-cover-wrap {
-
     position: relative;
-
     width: 170px;
-
     height: 235px;
-
     border-radius: 6px 14px 14px 6px;
-
     box-shadow:
-
         -5px 0 0 -2px #ffffff,
-
         -7px 0 0 -3px #dedede,
-
         -10px 0 18px rgba(0, 0, 0, 0.18),
-
         8px 12px 24px rgba(34, 48, 31, 0.15);
-
     overflow: hidden;
-
     cursor: pointer;
-
     transition: box-shadow 0.3s ease;
-
 }
-
-
 
 .book-item:hover .book-cover-wrap {
-
     box-shadow:
-
         -5px 0 0 -2px #ffffff,
-
         -7px 0 0 -3px #dedede,
-
         -12px 0 22px rgba(0, 0, 0, 0.22),
-
         12px 18px 30px rgba(34, 48, 31, 0.22);
-
 }
-
-
 
 /* Book Spine shadow simulation */
 
 .book-cover-wrap::before {
-
     content: '';
-
     position: absolute;
-
     top: 0;
-
     left: 0;
-
     bottom: 0;
-
     width: 14px;
-
     background: linear-gradient(to right,
-
             rgba(0, 0, 0, 0.25) 0%,
-
             rgba(0, 0, 0, 0.08) 50%,
-
             rgba(255, 255, 255, 0.3) 70%,
-
             rgba(0, 0, 0, 0.12) 100%);
-
     z-index: 10;
-
     pointer-events: none;
-
 }
-
-
 
 /* Book Page Edges (Right side white paper layers) */
 
 .book-cover-wrap::after {
-
     content: '';
-
     position: absolute;
-
     top: 3px;
-
     right: 0;
-
     bottom: 3px;
-
     width: 4px;
-
     background: repeating-linear-gradient(to bottom,
-
             #fbfbfb,
-
             #fbfbfb 2px,
-
             #e5e5e5 2px,
-
             #e5e5e5 3px);
-
     box-shadow: -1px 0 2px rgba(0, 0, 0, 0.15);
-
     z-index: 9;
-
 }
-
-
 
 /* Inner Book Texture & Header Plate */
 
 .book-inner {
-
     width: 100%;
-
     height: 100%;
-
     display: flex;
-
     flex-direction: column;
-
     justify-content: space-between;
-
     padding: 1.2rem 1rem;
-
     position: relative;
-
     z-index: 1;
-
 }
-
-
 
 .book-title-plate {
-
     background: rgba(255, 255, 255, 0.92);
-
     backdrop-filter: blur(4px);
-
     border-radius: 10px;
-
     padding: 8px 10px;
-
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-
     border: 1px solid rgba(255, 255, 255, 0.7);
-
     text-align: center;
-
 }
-
-
 
 .book-title-plate .book-plant-name {
-
     font-family: 'Baloo 2', sans-serif;
-
     font-weight: 700;
-
     font-size: 0.95rem;
-
     color: #22301f;
-
     margin: 0;
-
     line-height: 1.2;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
-
     display: -webkit-box;
-
     -webkit-line-clamp: 2;
-
     -webkit-box-orient: vertical;
-
 }
-
-
 
 .book-badge-row {
-
     display: flex;
-
     justify-content: center;
-
     align-items: center;
-
     margin-top: 4px;
-
 }
-
-
 
 .book-condition-badge {
-
     font-size: 0.68rem;
-
     font-weight: 700;
-
     padding: 3px 8px;
-
     border-radius: 999px;
-
     text-transform: capitalize;
-
 }
-
-
 
 .book-footer-info {
-
     text-align: center;
-
     background: rgba(255, 255, 255, 0.88);
-
     border-radius: 8px;
-
     padding: 4px 6px;
-
     font-size: 0.72rem;
-
     font-weight: 600;
-
     color: #435338;
-
 }
-
-
 
 /* PATTERN 1: BRUSHES — Brand color blobs on warm cream (Soft Earth Mineral Sky) */
 
 /* PATTERN 1: BRUSHES — Kertas Serat Botani & Marmer Tanah (Earthy Pressed Parchment) */
 
 .pattern-brushes {
-
     background-color: #f4ecdc;
-
     background-image:
-
         linear-gradient(135deg, rgba(184, 115, 82, 0.22) 0%, transparent 50%),
-
         linear-gradient(45deg, rgba(92, 122, 85, 0.18) 0%, transparent 60%),
-
         radial-gradient(ellipse at 80% 20%, rgba(193, 130, 75, 0.2) 0%, transparent 50%),
-
         radial-gradient(ellipse at 20% 80%, rgba(70, 95, 65, 0.18) 0%, transparent 45%);
-
     background-size: 100% 100%;
-
 }
-
-
 
 /* PATTERN 2: DOTS — Kain Linen & Serat Rami Alami (Woven Earthy Linen Texture) */
 
 .pattern-dots {
-
     background-color: #f2ebd9;
-
     background-image:
-
         linear-gradient(90deg, rgba(140, 110, 80, 0.08) 1px, transparent 1px),
-
         linear-gradient(0deg, rgba(140, 110, 80, 0.08) 1px, transparent 1px),
-
         linear-gradient(45deg, rgba(110, 85, 55, 0.04) 25%, transparent 25%, transparent 75%, rgba(110, 85, 55, 0.04) 75%),
-
         linear-gradient(-45deg, rgba(110, 85, 55, 0.04) 25%, transparent 25%, transparent 75%, rgba(110, 85, 55, 0.04) 75%);
-
     background-size: 8px 8px, 8px 8px, 16px 16px, 16px 16px;
-
 }
-
-
 
 /* PATTERN 3: FLOWERS — Daun Herbal & Kertas Daur Ulang Alami (Warm Sage Earthy Texture) */
 
 .pattern-flowers {
-
     background-color: #e6ede3;
-
     background-image:
-
         radial-gradient(ellipse at 15% 15%, rgba(92, 122, 85, 0.22) 0%, transparent 50%),
-
         radial-gradient(ellipse at 85% 85%, rgba(140, 110, 80, 0.20) 0%, transparent 55%),
-
         linear-gradient(125deg, rgba(74, 103, 65, 0.12) 0%, transparent 35%, rgba(184, 135, 90, 0.14) 70%, transparent 100%),
-
         repeating-linear-gradient(45deg, transparent, transparent 14px, rgba(92, 122, 85, 0.04) 14px, rgba(92, 122, 85, 0.04) 15px);
-
     background-size: 100% 100%, 100% 100%, 100% 100%, 20px 20px;
-
 }
-
-
 
 /* PATTERN 4: SEEDS — Kanvas Sage & Serat Daun Herbal (Sage Green Earth Weave) */
 
 .pattern-seeds {
-
     background-color: #dce7db;
-
     background-image:
-
         linear-gradient(90deg, rgba(67, 83, 56, 0.08) 1px, transparent 1px),
-
         linear-gradient(0deg, rgba(67, 83, 56, 0.08) 1px, transparent 1px),
-
         radial-gradient(circle at 50% 50%, rgba(92, 122, 85, 0.12) 0%, transparent 60%);
-
     background-size: 12px 12px, 12px 12px, 100% 100%;
-
 }
-
-
 
 /* PATTERN 5: SOFT — Vintage journal ruled lines on warm cream */
 
 .pattern-soft {
-
     background-color: #faf8f2;
-
     background-image:
-
         repeating-linear-gradient(0deg,
-
             transparent, transparent 18px,
-
             rgba(34, 48, 31, 0.11) 18px, rgba(34, 48, 31, 0.11) 20px),
-
         repeating-linear-gradient(90deg,
-
             transparent, transparent 18px,
-
             rgba(34, 48, 31, 0.05) 18px, rgba(34, 48, 31, 0.05) 20px);
-
 }
-
-
 
 /* PATTERN 6: LEAVES — Design system foliage wash */
 
 .pattern-leaves {
-
     background-color: #e5f5eb;
-
     background-image:
-
         radial-gradient(ellipse at 25% 25%, rgba(31, 145, 66, 0.18) 0%, transparent 50%),
-
         radial-gradient(ellipse at 75% 75%, rgba(78, 203, 114, 0.18) 0%, transparent 50%),
-
         linear-gradient(135deg, rgba(34, 48, 31, 0.08) 0%, transparent 60%);
-
     background-size: 100% 100%;
-
 }
-
-
 
 /* PATTERN 7: BARK — Kayu coklat hangat, serat pohon */
 
 .pattern-bark {
-
     background-color: #d4a96a;
-
     background-image:
-
         linear-gradient(135deg, rgba(107, 66, 38, 0.22) 0%, transparent 50%),
-
         radial-gradient(ellipse at 75% 30%, rgba(139, 94, 60, 0.25) 0%, transparent 55%),
-
         radial-gradient(ellipse at 25% 75%, rgba(160, 120, 76, 0.20) 0%, transparent 50%),
-
         repeating-linear-gradient(0deg, transparent, transparent 12px, rgba(107, 66, 38, 0.05) 12px, rgba(107, 66, 38, 0.05) 14px);
-
     background-size: 100% 100%, 100% 100%, 100% 100%, 100% 14px;
-
 }
-
-
 
 /* PATTERN 8: TERRA — Tanah liat terracotta hangat bergradien alami */
 
 .pattern-terra {
-
     background-color: #ebdcd0;
-
     background-image:
-
         linear-gradient(135deg, rgba(160, 82, 45, 0.20) 0%, transparent 60%),
-
         radial-gradient(ellipse at 75% 25%, rgba(193, 123, 90, 0.22) 0%, transparent 50%),
-
         radial-gradient(ellipse at 25% 75%, rgba(139, 94, 60, 0.18) 0%, transparent 50%);
-
     background-size: 100% 100%;
-
 }
-
-
 
 /* PATTERN 9: MOSS — Lumut hijau bumi muted */
 
 .pattern-moss {
-
     background-color: #c8d8b8;
-
     background-image:
-
         radial-gradient(ellipse at 30% 30%, rgba(61, 92, 53, 0.22) 0%, transparent 55%),
-
         radial-gradient(ellipse at 70% 70%, rgba(107, 143, 94, 0.22) 0%, transparent 55%),
-
         linear-gradient(45deg, rgba(74, 103, 65, 0.12) 0%, transparent 60%);
-
     background-size: 100% 100%;
-
 }
-
-
 
 /* PATTERN 10: CLAY — Kertas pasir keemasan earthy wash */
 
 .pattern-clay {
-
     background-color: #f0dfc8;
-
     background-image:
-
         linear-gradient(135deg, rgba(193, 123, 90, 0.20) 0%, transparent 55%),
-
         radial-gradient(ellipse at 80% 20%, rgba(139, 94, 60, 0.18) 0%, transparent 50%),
-
         radial-gradient(ellipse at 20% 80%, rgba(212, 169, 106, 0.25) 0%, transparent 50%);
-
     background-size: 100% 100%;
-
 }
-
-
 
 /* PATTERN 11: SOLID (Plain color — background-color set via JS from data-cover-color) */
 
 .pattern-solid {
-
     background-color: #4ecb72;
-
     /* fallback, overridden by JS */
-
 }
-
-
 
 /* PATTERN 12: PEBBLES — Bulat-bulat botanikal hangat di atas krem lembut */
 
 .pattern-pebbles {
-
     background-color: #f5f0e8;
-
     background-image:
-
         radial-gradient(circle at 50% 50%, #1f9142 13%, transparent 15%),
-
         radial-gradient(circle at 20% 20%, #d4a96a 11%, transparent 13%),
-
         radial-gradient(circle at 80% 80%, #4ecb72 12%, transparent 14%),
-
         radial-gradient(circle at 78% 22%, #8b5e3c 9%, transparent 11%),
-
         radial-gradient(circle at 22% 78%, #ff9d2e 10%, transparent 12%),
-
         radial-gradient(circle at 50% 80%, #3d5c35 8%, transparent 10%),
-
         radial-gradient(circle at 80% 50%, #c8d8b8 10%, transparent 12%),
-
         radial-gradient(circle at 20% 50%, #d0e8d8 9%, transparent 11%);
-
     background-size: 70px 70px;
-
 }
-
-
 
 /* PATTERN 13: POLKADOT — Motif polkadot warna bumi hangat dan estetik tanpa biru */
 
 .pattern-polkadot,
 
 .pattern-amber {
-
     background-color: #faf4e6;
-
     background-image:
-
         radial-gradient(circle, #c26d42 16%, transparent 18%),
-
         radial-gradient(circle, #527853 16%, transparent 18%);
-
     background-position: 0 0, 16px 16px;
-
     background-size: 32px 32px;
-
 }
-
-
-
-
 
 /* Book Below Title Labels */
 
 .book-label-area {
-
     margin-top: 14px;
-
     text-align: center;
-
 }
-
-
 
 .book-label-title {
-
     font-weight: 700;
-
     font-size: 1rem;
-
     color: #22301f;
-
     margin-bottom: 2px;
-
 }
-
-
 
 .book-label-meta {
-
     font-size: 0.8rem;
-
     color: #59684f;
-
 }
-
-
 
 /* COVER PICKER in Form */
 
 .cover-picker-group {
-
     display: flex;
-
     flex-wrap: wrap;
-
     gap: 1rem;
-
     margin-top: 0.5rem;
-
 }
-
-
 
 .cover-option-label {
-
     cursor: pointer;
-
     text-align: center;
-
     position: relative;
-
 }
-
-
 
 .cover-option-input {
-
     position: absolute;
-
     opacity: 0;
-
     pointer-events: none;
-
 }
-
-
 
 .cover-option-preview {
-
     width: 65px;
-
     height: 90px;
-
     border-radius: 4px 10px 10px 4px;
-
     border: 2px solid transparent;
-
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-
     transition: all 0.2s ease;
-
     position: relative;
-
     overflow: hidden;
-
 }
-
-
 
 .cover-option-preview::before {
-
     content: '';
-
     position: absolute;
-
     left: 0;
-
     top: 0;
-
     bottom: 0;
-
     width: 6px;
-
     background: rgba(0, 0, 0, 0.2);
-
 }
-
-
 
 .cover-option-input:checked+.cover-option-preview {
-
     border-color: #1f9142;
-
     transform: scale(1.08);
-
     box-shadow: 0 6px 16px rgba(31, 145, 66, 0.35);
-
 }
-
-
 
 .cover-option-title {
-
     font-size: 0.75rem;
-
     font-weight: 600;
-
     color: #435338;
-
     margin-top: 6px;
-
     display: block;
-
 }
-
-
 
 /* TAB GROUP */
 
 .cover-tab-group {
-
     display: flex;
-
     gap: 0.5rem;
-
     border-bottom: 2px solid #e8dbbe;
-
     padding-bottom: 0;
-
 }
-
-
 
 .cover-tab-btn {
-
     background: none;
-
     border: none;
-
     border-bottom: 2.5px solid transparent;
-
     margin-bottom: -2px;
-
     padding: 8px 18px;
-
     font-size: 0.88rem;
-
     font-weight: 600;
-
     color: #59684f;
-
     cursor: pointer;
-
     border-radius: 6px 6px 0 0;
-
     transition: color 0.18s, border-color 0.18s, background 0.18s;
-
 }
-
-
 
 .cover-tab-btn:hover {
-
     color: #1f9142;
-
     background: rgba(79, 203, 114, 0.07);
-
 }
-
-
 
 .cover-tab-btn.active {
-
     color: #1f9142;
-
     border-bottom-color: #1f9142;
-
     background: rgba(79, 203, 114, 0.05);
-
 }
-
-
 
 .cover-tab-content {
-
     padding-top: 1rem;
-
     animation: fadeInTab 0.2s ease;
-
 }
-
-
 
 @keyframes fadeInTab {
-
     from {
-
         opacity: 0;
-
         transform: translateY(4px);
-
     }
-
-
 
     to {
-
         opacity: 1;
-
         transform: translateY(0);
-
     }
-
 }
-
-
 
 /* COLOR SWATCH GROUP */
 
 .color-swatch-group {
-
     display: flex;
-
     flex-wrap: wrap;
-
     gap: 10px;
-
 }
-
-
 
 .color-swatch-btn {
-
     width: 36px;
-
     height: 36px;
-
     border-radius: 50%;
-
     border: 2.5px solid transparent;
-
     cursor: pointer;
-
     transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
-
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.13);
-
     padding: 0;
-
     outline: none;
-
 }
-
-
 
 .color-swatch-btn:hover {
-
     transform: scale(1.15);
-
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-
 }
-
-
 
 .color-swatch-btn.selected {
-
     border-color: #1f9142;
-
     transform: scale(1.18);
-
     box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.28), 0 4px 12px rgba(0, 0, 0, 0.18);
-
 }
-
-
 
 /* CUSTOM COLOR PICKER */
 
 .color-custom-picker {
-
     width: 48px;
-
     height: 48px;
-
     border-radius: 50%;
-
     border: 2px solid #ddd;
-
     padding: 2px;
-
     cursor: pointer;
-
     background: none;
-
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
     transition: box-shadow 0.2s;
-
 }
-
-
 
 .color-custom-picker:hover {
-
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-
 }
-
-
 
 /* =========================================================
-
    OPEN BOOK DETAIL SPREAD (DUA HALAMAN BUKU TERBUKA)
-
    ========================================================= */
 
-
-
 .open-book-wrapper {
-
     max-width: 1060px;
-
     margin: 1.5rem auto 3rem auto;
-
     perspective: 1500px;
-
 }
-
-
 
 .open-book {
-
     display: flex;
-
     background: #fbf6ec;
-
     border-radius: var(--radius-lg);
-
     box-shadow: var(--shadow-md), 0 15px 35px rgba(34, 48, 31, 0.1);
-
     position: relative;
-
     overflow: hidden;
-
     min-height: clamp(340px, 30vw, 400px);
-
     border: 1.5px solid var(--border);
-
     align-items: stretch;
-
 }
-
-
 
 /* Left Page (Halaman Kiri) */
 
 .book-page-left {
-
     flex: 1 1 50%;
-
     width: 50%;
-
     background: #faf5ea;
-
     padding: 2.5rem 2.8rem;
-
     display: flex;
-
     flex-direction: column;
-
     justify-content: space-between;
-
     position: relative;
-
     box-shadow: inset -15px 0 25px -15px rgba(0, 0, 0, 0.08);
-
     border-right: 1px solid #e8dbbe;
-
     box-sizing: border-box;
-
 }
-
-
 
 /* Center Book Spine (Punggung Tengah Buku) */
 
 .book-spine-center {
-
     width: 20px;
-
     background: linear-gradient(to right,
-
             rgba(0, 0, 0, 0.08) 0%,
-
             rgba(0, 0, 0, 0.22) 30%,
-
             rgba(255, 255, 255, 0.4) 50%,
-
             rgba(0, 0, 0, 0.22) 70%,
-
             rgba(0, 0, 0, 0.08) 100%);
-
     box-shadow:
-
         inset 1px 0 3px rgba(0, 0, 0, 0.15),
-
         inset -1px 0 3px rgba(0, 0, 0, 0.15);
-
     position: relative;
-
     z-index: 5;
-
     flex-shrink: 0;
-
 }
-
-
 
 /* Right Page (Halaman Kanan) */
 
 .book-page-right {
-
     flex: 1 1 50%;
-
     width: 50%;
-
     background: #fffdf9;
-
     padding: 2.5rem 2.8rem;
-
     display: flex;
-
     flex-direction: column;
-
     justify-content: space-between;
-
     position: relative;
-
     box-shadow: inset 15px 0 25px -15px rgba(0, 0, 0, 0.08);
-
     box-sizing: border-box;
-
 }
-
-
 
 #page-content {
-
     height: 100%;
-
     display: flex;
-
     flex-direction: column;
-
     justify-content: space-between;
-
     flex: 1 1 auto;
-
 }
-
-
 
 /* Plant Profile on Left Page */
 
 .plant-left-icon {
-
     font-size: 3.2rem;
-
     line-height: 1;
-
     margin-bottom: 1.2rem;
-
 }
-
-
 
 .plant-left-title {
-
     font-family: var(--font-display);
-
     font-weight: 700;
-
     font-size: var(--fs-display-xl);
-
     line-height: var(--lh-display-xl);
-
     color: var(--ink);
-
     margin-bottom: 0.8rem;
-
 }
-
-
 
 .book-tag-pill {
-
     display: inline-flex;
-
     align-items: center;
-
     padding: var(--space-1) 14px;
-
     border-radius: var(--radius-full);
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     line-height: var(--lh-caption);
-
     font-weight: 600;
-
     /* Colors come from Bootstrap badge variants or DS custom below */
-
 }
-
-
 
 /* Entry Content on Right Page */
 
 .entry-right-header {
-
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
-
     margin-bottom: 1.2rem;
-
 }
-
-
 
 .entry-right-meta {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     line-height: var(--lh-caption);
-
     font-weight: 600;
-
     color: var(--ink-muted);
-
 }
-
-
 
 .entry-right-title {
-
     font-family: var(--font-display);
-
     font-weight: 700;
-
     font-size: var(--fs-h1);
-
     line-height: var(--lh-h1);
-
     color: var(--ink);
-
     margin-bottom: 0.8rem;
-
 }
-
-
 
 .entry-right-notes {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-body);
-
     line-height: var(--lh-body);
-
     color: #3b4737;
-
     margin-bottom: 1.5rem;
-
     font-style: italic;
-
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    white-space: pre-wrap;
 }
-
-
 
 /* Polaroid Photo Slot */
 
 .photo-polaroid-slot {
-
     width: 140px;
-
     height: 140px;
-
     margin: 1.2rem auto;
-
     border: 2px dashed #d5c39c;
-
     border-radius: 16px;
-
     background: #faf4e6;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     justify-content: center;
-
     color: #8c7b5a;
-
     font-size: 0.8rem;
-
     cursor: default;
-
     transition: all 0.2s ease;
-
 }
-
-
 
 /* Page Turn Navigation Buttons */
 
 .page-turn-btn {
-
     width: 36px;
-
     height: 36px;
-
     border-radius: 50%;
-
     background: #ffffff;
-
     border: 1.5px solid #dfcfab;
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
     color: #22301f;
-
     text-decoration: none;
-
     font-size: 0.95rem;
-
     font-weight: bold;
-
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-
     transition: all 0.2s ease;
-
     cursor: pointer;
-
     padding: 0;
-
     line-height: 1;
-
 }
-
-
 
 .page-turn-btn:hover:not(:disabled):not(.disabled) {
-
     background: #1f9142;
-
     color: #ffffff;
-
     border-color: #1f9142;
-
     transform: scale(1.1);
-
     box-shadow: 0 4px 10px rgba(31, 145, 66, 0.3);
-
 }
-
-
 
 .page-turn-btn:disabled,
 
 .page-turn-btn.disabled {
-
     opacity: 0.3;
-
     pointer-events: none;
-
     cursor: not-allowed;
-
     border-color: #e5dac2;
-
     background: #f7f3ea;
-
 }
-
-
 
 /* Dots Page Indicator */
 
 .page-dots-indicator {
-
     display: flex;
-
     justify-content: center;
-
     align-items: center;
-
     gap: 8px;
-
     margin-top: 1.5rem;
-
 }
-
-
 
 .page-dot {
-
     width: 10px;
-
     height: 10px;
-
     border-radius: 50%;
-
     background: #dfcfab;
-
     display: inline-block;
-
     transition: all 0.2s ease;
-
     cursor: pointer;
-
 }
-
-
 
 .page-dot:hover {
-
     background: #1f9142;
-
     transform: scale(1.25);
-
 }
-
-
 
 .page-dot.active {
-
     background: #1f9142;
-
     transform: scale(1.35);
-
     box-shadow: 0 2px 6px rgba(31, 145, 66, 0.4);
-
 }
-
-
 
 .book-bottom-footer {
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     padding-top: 1rem;
-
     border-top: 1.5px solid #e8dbbe;
-
     font-size: 0.82rem;
-
     color: #796b4f;
-
     min-height: 48px;
-
     margin-top: auto;
-
     width: 100%;
-
     box-sizing: border-box;
-
 }
-
-
 
 .view-panel {
-
     transition: opacity 0.2s ease;
-
 }
 
-
-
 /* =========================================================
-
    3D PAGE FLIP ANIMATION
-
    ========================================================= */
-
-
 
 /* The overlay sits on top of the right page and "flips" */
 
 .flip-overlay {
-
     position: absolute;
-
     inset: 0;
-
     background: #fffdf9;
-
     z-index: 20;
-
     transform-origin: left center;
-
     pointer-events: none;
-
     opacity: 0;
-
     border-radius: 0 0 0 0;
-
-
-
     /* Subtle paper texture */
-
     background-image:
-
         repeating-linear-gradient(0deg,
-
             transparent,
-
             transparent 28px,
-
             rgba(230, 207, 149, 0.18) 28px,
-
             rgba(230, 207, 149, 0.18) 29px);
-
 }
-
-
 
 /* Forward flip: next page (right → fold left → disappear) */
 
 @keyframes flipForward {
-
     0% {
-
         opacity: 1;
-
         transform: perspective(1400px) rotateY(0deg);
-
         box-shadow: -8px 0 20px rgba(0, 0, 0, 0.12);
-
         background-color: #fffff8;
-
     }
-
-
 
     40% {
-
         opacity: 1;
-
         transform: perspective(1400px) rotateY(-35deg);
-
         box-shadow: -20px 0 40px rgba(0, 0, 0, 0.18);
-
         background-color: #f4ebd2;
-
     }
-
-
 
     80% {
-
         opacity: 0.4;
-
         transform: perspective(1400px) rotateY(-82deg);
-
         box-shadow: -4px 0 8px rgba(0, 0, 0, 0.06);
-
     }
-
-
 
     100% {
-
         opacity: 0;
-
         transform: perspective(1400px) rotateY(-90deg);
-
         box-shadow: none;
-
     }
-
 }
-
-
 
 /* Backward flip: prev page (fold in from left → fully visible → fade) */
 
 @keyframes flipBackward {
-
     0% {
-
         opacity: 0;
-
         transform: perspective(1400px) rotateY(-90deg);
-
         background-color: #f4ebd2;
-
     }
-
-
 
     30% {
-
         opacity: 0.5;
-
         transform: perspective(1400px) rotateY(-60deg);
-
     }
-
-
 
     70% {
-
         opacity: 1;
-
         transform: perspective(1400px) rotateY(-20deg);
-
         background-color: #faf7ef;
-
         box-shadow: -16px 0 32px rgba(0, 0, 0, 0.14);
-
     }
-
-
 
     100% {
-
         opacity: 0;
-
         transform: perspective(1400px) rotateY(0deg);
-
         box-shadow: none;
-
     }
-
 }
-
-
 
 .flip-overlay.flip-forward {
-
     animation: flipForward 0.48s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-
 }
-
-
 
 .flip-overlay.flip-backward {
-
     animation: flipBackward 0.48s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-
 }
-
-
 
 /* Page Turn Content Transitions */
 
 @keyframes pageFlipInRight {
-
     0% {
-
         opacity: 0.4;
-
         transform: translateX(8px);
-
     }
-
-
 
     100% {
-
         opacity: 1;
-
         transform: translateX(0);
-
     }
-
 }
-
-
 
 @keyframes pageFlipInLeft {
-
     0% {
-
         opacity: 0.4;
-
         transform: translateX(-8px);
-
     }
-
-
 
     100% {
-
         opacity: 1;
-
         transform: translateX(0);
-
     }
-
 }
-
-
 
 .page-flip-in-right {
-
     animation: pageFlipInRight 0.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
-
 }
-
-
 
 .page-flip-in-left {
-
     animation: pageFlipInLeft 0.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
-
 }
 
-
-
 /* =========================================================
-
    RIWAYAT (HISTORY) VIEW — Stat Cards, Chart, Grouped List
-
    ========================================================= */
-
-
 
 /* ---- Stat Cards ---- */
 
 .stat-card {
-
     background: var(--surface-white);
-
     border: 1.5px solid var(--border);
-
     border-radius: var(--radius-md);
-
     padding: var(--space-4) 18px;
-
     box-shadow: var(--shadow-md);
-
     height: 100%;
-
 }
-
-
 
 .stat-card-label {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-overline);
-
     line-height: var(--lh-overline);
-
     font-weight: 700;
-
     color: #8c7b5a;
-
     text-transform: uppercase;
-
     letter-spacing: 0.08em;
-
     margin-bottom: var(--space-1);
-
 }
-
-
 
 .stat-card-value {
-
     font-family: var(--font-display);
-
     font-size: var(--fs-h1);
-
     line-height: var(--lh-h1);
-
     font-weight: 700;
-
     color: var(--ink);
-
 }
-
-
 
 .stat-card-unit {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-body);
-
     font-weight: 600;
-
     color: var(--ink-muted);
-
 }
-
-
 
 /* ---- Chart Card ---- */
 
 .history-chart-card {
-
     background: var(--surface-white);
-
     border: 1.5px solid var(--border);
-
     border-radius: var(--radius-md);
-
     padding: var(--space-4) 20px 14px;
-
     box-shadow: var(--shadow-md);
-
 }
-
-
 
 .history-chart-title {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-overline);
-
     font-weight: 700;
-
     color: var(--ink-muted);
-
     text-transform: uppercase;
-
     letter-spacing: 0.08em;
-
     margin-bottom: 10px;
-
 }
-
-
 
 /* ---- Group Tab Toggle (Per minggu / Per bulan) ---- */
 
 .history-group-tabs {
-
     display: inline-flex;
-
     background: #f5edd8;
-
     border-radius: 999px;
-
     padding: 3px;
-
     gap: 2px;
-
 }
-
-
 
 .history-group-tab {
-
     border: none;
-
     background: transparent;
-
     border-radius: 999px;
-
     padding: 5px 18px;
-
     font-size: 0.82rem;
-
     font-weight: 600;
-
     color: #59684f;
-
     cursor: pointer;
-
     transition: all 0.2s ease;
-
 }
-
-
 
 .history-group-tab.active {
-
     background: #1f9142;
-
     color: #ffffff;
-
     box-shadow: 0 2px 8px rgba(31, 145, 66, 0.25);
-
 }
-
-
 
 .history-group-tab:hover:not(.active) {
-
     background: rgba(31, 145, 66, 0.1);
-
     color: #1f9142;
-
 }
-
-
 
 /* ---- Group Section Header ---- */
 
 .history-group {
-
     border-radius: 0;
-
     transition: all 0.2s ease;
-
 }
-
-
 
 .history-group-header {
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     padding: 8px 12px;
-
     border-bottom: 2px solid #e8dfc8;
-
     margin-bottom: 12px;
-
     cursor: pointer;
-
     user-select: none;
-
     border-radius: 8px;
-
     transition: background-color 0.15s ease, border-color 0.15s ease;
-
 }
-
-
 
 .history-group-header:hover {
-
     background-color: rgba(31, 145, 66, 0.06);
-
 }
-
-
 
 .history-group-chevron {
-
     display: inline-block;
-
     transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
-
     font-size: 0.72rem;
-
     color: #1f9142;
-
     transform: rotate(0deg);
-
 }
-
-
 
 .history-group.collapsed .history-group-chevron {
-
     transform: rotate(-90deg);
-
 }
-
-
 
 .history-group.collapsed .history-group-entries {
-
     display: none !important;
-
 }
-
-
 
 .history-group.collapsed .history-group-header {
-
     border-bottom: 1px dashed #d5c8ad;
-
     opacity: 0.85;
-
 }
-
-
 
 .history-group.collapsed:hover .history-group-header {
-
     opacity: 1;
-
 }
-
-
 
 .history-group-label {
-
     font-weight: 700;
-
     font-size: 0.9rem;
-
     color: #22301f;
-
 }
-
-
 
 .history-group-count {
-
     font-size: 0.75rem;
-
     font-weight: 600;
-
     color: #8c7b5a;
-
     background: #f5edd8;
-
     padding: 2px 10px;
-
     border-radius: 999px;
-
 }
-
-
 
 /* ---- Entry Cards ---- */
 
 .history-entry-card {
-
     display: flex;
-
     gap: 0;
-
     background: var(--surface-white);
-
     border: 1.5px solid var(--border);
-
     border-radius: var(--radius-md);
-
     overflow: hidden;
-
     box-shadow: var(--shadow-sm);
-
     transition: box-shadow 0.2s ease, transform 0.15s ease;
-
 }
-
-
 
 .history-entry-card:hover {
-
     box-shadow: var(--shadow-md);
-
     transform: translateY(-2px);
-
 }
-
-
 
 .history-entry-left {
-
     width: 5px;
-
     flex-shrink: 0;
-
 }
-
-
 
 .history-entry-color-bar {
-
     width: 100%;
-
     height: 100%;
-
     min-height: 60px;
-
     border-radius: 0;
-
     opacity: 0.75;
-
 }
-
-
 
 /* Bootstrap contextual colors for the bar */
 
 .history-entry-color-bar.bg-success {
-
     background-color: #198754 !important;
-
 }
-
-
 
 .history-entry-color-bar.bg-warning {
-
     background-color: #ffc107 !important;
-
 }
-
-
 
 .history-entry-color-bar.bg-danger {
-
     background-color: #dc3545 !important;
-
 }
-
-
 
 .history-entry-color-bar.bg-info {
-
     background-color: #0dcaf0 !important;
-
 }
-
-
 
 .history-entry-color-bar.bg-primary {
-
     background-color: #0d6efd !important;
-
 }
-
-
 
 .history-entry-color-bar.bg-secondary {
-
     background-color: #6c757d !important;
-
 }
-
-
 
 .history-entry-body {
-
     flex: 1;
-
     padding: 14px 16px 12px;
-
 }
-
-
 
 .history-entry-title {
-
     font-family: var(--font-body);
-
     font-weight: 700;
-
     font-size: var(--fs-body);
-
     line-height: var(--lh-body);
-
     color: var(--ink);
-
     margin-bottom: var(--space-1);
-
 }
-
-
 
 .history-entry-notes {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     line-height: var(--lh-caption);
-
     color: var(--ink-muted);
-
     margin-bottom: 0;
-
     display: -webkit-box;
-
     -webkit-line-clamp: 3;
-
     -webkit-box-orient: vertical;
-
     overflow: hidden;
-
 }
-
-
 
 .view-toggle-btn {
-
     border: 1.5px solid var(--border);
-
     background: var(--surface-white);
-
     border-radius: var(--radius-full);
-
     padding: var(--space-2) var(--space-4);
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     line-height: var(--lh-caption);
-
     font-weight: 600;
-
     color: var(--ink-muted);
-
     cursor: pointer;
-
     transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
-
     box-shadow: var(--shadow-sm);
-
     display: inline-flex;
-
     align-items: center;
-
     gap: var(--space-1);
-
 }
-
-
 
 .view-toggle-btn:hover:not(.active) {
-
     background: var(--surface-input);
-
     border-color: var(--btn-primary-bg);
-
     color: var(--btn-primary-bg);
-
 }
-
-
 
 .view-toggle-btn.active {
-
     background: var(--btn-primary-bg);
-
     border-color: var(--btn-primary-bg);
-
     color: var(--btn-primary-fg);
-
     box-shadow: var(--shadow-md);
-
 }
 
-
-
 /* =========================================================
-
    SAMPUL BUKU PICKER MODAL & COMPACT CARD
-
    ========================================================= */
-
-
 
 /* Compact Card on the Form */
 
 .cover-compact-card {
-
     background: var(--surface-white);
-
     border: 1.5px solid var(--border);
-
     border-radius: var(--radius-md);
-
     padding: var(--space-4) 18px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 12px;
-
     transition: border-color 0.2s, box-shadow 0.2s;
-
 }
-
-
 
 .cover-compact-card:hover {
-
     border-color: #c8a84b;
-
     box-shadow: var(--shadow-md);
-
 }
-
-
 
 .book-mini-thumb {
-
     width: 44px;
-
     height: 60px;
-
     border-radius: 3px 8px 8px 3px;
-
     position: relative;
-
     overflow: hidden;
-
     flex-shrink: 0;
-
     box-shadow:
-
         -2px 0 0 -1px #ffffff,
-
         -4px 0 0 -2px #dedede,
-
         2px 4px 10px rgba(0, 0, 0, 0.12);
-
 }
-
-
 
 .book-mini-thumb::before {
-
     content: '';
-
     position: absolute;
-
     left: 0;
-
     top: 0;
-
     bottom: 0;
-
     width: 4px;
-
     background: rgba(0, 0, 0, 0.18);
-
 }
-
-
 
 .btn-ganti-sampul {
-
     background: #e8f8ed;
-
     color: #1f9142;
-
     border: none;
-
     border-radius: 999px;
-
     font-size: 0.88rem;
-
     font-weight: 600;
-
     padding: 8px 18px;
-
     transition: background 0.18s, transform 0.18s;
-
 }
-
-
 
 .btn-ganti-sampul:hover {
-
     background: #d4f3dd;
-
     color: #157333;
-
     transform: translateY(-1px);
-
 }
-
-
 
 /* Modal Book Preview */
 
 .modal-book-preview-wrap {
-
     perspective: 800px;
-
 }
-
-
 
 .modal-book-preview {
-
     width: 110px;
-
     height: 152px;
-
     border-radius: 4px 12px 12px 4px;
-
     position: relative;
-
     overflow: hidden;
-
     box-shadow:
-
         -4px 0 0 -1px #ffffff,
-
         -7px 0 0 -2px #dedede,
-
         -10px 0 16px rgba(0, 0, 0, 0.14),
-
         6px 12px 24px rgba(34, 48, 31, 0.18);
-
     transition: transform 0.25s ease, background 0.25s ease;
-
 }
-
-
 
 .modal-book-preview::before {
-
     content: '';
-
     position: absolute;
-
     left: 0;
-
     top: 0;
-
     bottom: 0;
-
     width: 8px;
-
     background: linear-gradient(90deg, rgba(0, 0, 0, 0.22) 0%, rgba(255, 255, 255, 0.18) 25%, rgba(0, 0, 0, 0.12) 100%);
-
     z-index: 2;
-
 }
-
-
 
 .modal-book-title-tag {
-
     position: absolute;
-
     bottom: 18px;
-
     left: 16px;
-
     font-size: 0.78rem;
-
     font-weight: 700;
-
     color: #22301f;
-
     letter-spacing: -0.2px;
-
     z-index: 2;
-
     pointer-events: none;
-
 }
-
-
 
 /* Modal Tabs */
 
 .modal-cover-tabs {
-
     border-bottom: 1.5px solid #eaeaea;
-
 }
-
-
 
 .modal-cover-tab-btn {
-
     background: none;
-
     border: none;
-
     border-bottom: 2.5px solid transparent;
-
     padding: 10px 0;
-
     font-size: 0.95rem;
-
     font-weight: 600;
-
     color: #6c757d;
-
     cursor: pointer;
-
     text-align: center;
-
     transition: color 0.18s, border-color 0.18s;
-
 }
-
-
 
 .modal-cover-tab-btn:hover {
-
     color: #1f9142;
-
 }
-
-
 
 .modal-cover-tab-btn.active {
-
     color: #1f9142;
-
     border-bottom-color: #1f9142;
-
     font-weight: 700;
-
 }
-
-
 
 /* 3-Column Pattern Grid */
 
 .modal-pattern-grid {
-
     display: grid;
-
     grid-template-columns: repeat(3, 1fr);
-
     gap: 14px 12px;
-
     padding: 12px 2px;
-
 }
-
-
 
 .modal-pattern-item {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     cursor: pointer;
-
 }
-
-
 
 .modal-pattern-card {
-
     width: 100%;
-
     aspect-ratio: 3 / 4.2;
-
     border-radius: 12px;
-
     border: 2px solid transparent;
-
     position: relative;
-
     overflow: hidden;
-
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-
     transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-
 }
-
-
 
 .modal-pattern-item:hover .modal-pattern-card {
-
     transform: translateY(-2px);
-
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
-
 }
-
-
 
 .modal-pattern-item.selected .modal-pattern-card {
-
     border-color: #1f9142;
-
     box-shadow: 0 0 0 2px rgba(31, 145, 66, 0.2), 0 4px 12px rgba(31, 145, 66, 0.25);
-
 }
-
-
 
 .modal-check-badge {
-
     position: absolute;
-
     top: 6px;
-
     right: 6px;
-
     width: 20px;
-
     height: 20px;
-
     border-radius: 50%;
-
     background: #1f9142;
-
     display: none;
-
     align-items: center;
-
     justify-content: center;
-
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
-
     z-index: 3;
-
 }
-
-
 
 .modal-pattern-item.selected .modal-check-badge {
-
     display: flex;
-
 }
-
-
 
 .modal-pattern-label {
-
     margin-top: 6px;
-
     font-size: 0.8rem;
-
     font-weight: 500;
-
     color: #435338;
-
     text-align: center;
-
 }
-
-
 
 .modal-pattern-item.selected .modal-pattern-label {
-
     font-weight: 700;
-
     color: #1f9142;
-
 }
-
-
 
 /* Modal Color Swatch Groups */
 
 .modal-swatch-section-title {
-
     font-size: 0.82rem;
-
     font-weight: 600;
-
     color: #59684f;
-
     margin-bottom: 8px;
-
 }
-
-
 
 .modal-swatch-row {
-
     display: flex;
-
     flex-wrap: wrap;
-
     gap: 10px;
-
 }
-
-
 
 .modal-swatch-circle {
-
     width: 36px;
-
     height: 36px;
-
     border-radius: 50%;
-
     border: 2px solid transparent;
-
     cursor: pointer;
-
     padding: 0;
-
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-
     transition: transform 0.18s ease, box-shadow 0.18s ease;
-
 }
-
-
 
 .modal-swatch-circle:hover {
-
     transform: scale(1.15);
-
 }
-
-
 
 .modal-swatch-circle.selected {
-
     border-color: #1f9142;
-
     transform: scale(1.18);
-
     box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.3), 0 4px 10px rgba(0, 0, 0, 0.18);
-
 }
-
-
 
 /* Rainbow Button */
 
 .modal-rainbow-btn {
-
     width: 40px;
-
     height: 40px;
-
     border-radius: 50%;
-
     background: conic-gradient(from 90deg, #ff2a2a, #ff9900, #ffee00, #33cc33, #00bfff, #3366ff, #9933ff, #ff3399, #ff2a2a);
-
     border: 2px solid #ffffff;
-
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
-
     cursor: pointer;
-
     transition: transform 0.18s, box-shadow 0.18s;
-
 }
-
-
 
 .modal-rainbow-btn:hover {
-
     transform: scale(1.12);
-
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-
 }
-
-
 
 .modal-rainbow-btn.selected {
-
     box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.35), 0 4px 12px rgba(0, 0, 0, 0.2);
-
 }
-
-
 
 /* =========================================================
-
    KONDISI TANAMAN GRID CARDS & PHOTO UPLOAD BOX
-
    ========================================================= */
 
-
-
 .condition-grid {
-
     display: grid;
-
     grid-template-columns: repeat(3, 1fr);
-
     gap: 12px;
-
 }
-
-
 
 @media (max-width: 576px) {
-
     .condition-grid {
-
         grid-template-columns: repeat(2, 1fr);
-
         gap: 8px;
-
     }
-
 }
-
-
 
 .condition-card {
-
     background: var(--surface-white);
-
     border: 1.5px solid #e8ede7;
-
     border-radius: var(--radius-sm);
-
     padding: var(--space-4) 10px;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     justify-content: center;
-
     gap: var(--space-2);
-
     cursor: pointer;
-
     transition: all 0.18s ease;
-
     user-select: none;
-
     text-align: center;
-
     box-shadow: var(--shadow-sm);
-
 }
-
-
 
 .condition-card:hover {
-
     border-color: #93e0a8;
-
     background: #f4fbf6;
-
     transform: translateY(-2px);
-
     box-shadow: var(--shadow-md);
-
 }
-
-
 
 .condition-card.active {
-
     background: #eaf7ee;
-
     border-color: var(--btn-primary-bg);
-
     box-shadow: 0 0 0 2px rgba(31, 145, 66, 0.2), var(--shadow-md);
-
 }
-
-
 
 .condition-card-icon {
-
     line-height: 1;
-
 }
-
-
 
 .condition-card-label {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     line-height: var(--lh-caption);
-
     font-weight: 600;
-
     color: #435338;
-
 }
-
-
 
 .condition-card.active .condition-card-label {
-
     color: var(--btn-primary-bg);
-
     font-weight: 700;
-
 }
-
-
 
 /* Photo Upload Box */
 
 .photo-upload-box {
-
     border: 2px dashed var(--border);
-
     background: #fdfbf5;
-
     border-radius: var(--radius-md);
-
     cursor: pointer;
-
     transition: border-color 0.2s, background-color 0.2s;
-
 }
-
-
 
 .photo-upload-box:hover {
-
     border-color: var(--btn-primary-bg);
-
     background: #f2f9f4;
-
 }
-
-
 
 .photo-placeholder {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     justify-content: center;
-
 }
-
-
 
 .photo-preview-wrap {
-
     position: relative;
-
     display: inline-block;
-
     max-width: 100%;
-
 }
-
-
 
 .photo-preview-img {
-
     max-height: 240px;
-
     max-width: 100%;
-
     object-fit: contain;
-
     border-radius: 10px;
-
 }
-
-
 
 /* =========================================================
-
    2-STEP JOURNAL FORM WIZARD
-
    ========================================================= */
 
-
-
 .wizard-steps-bar {
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     gap: var(--space-2);
-
     padding: var(--space-2) var(--space-4);
-
     background: var(--surface-white);
-
     border: 1.5px solid var(--border);
-
     border-radius: var(--radius-full);
-
     max-width: 520px;
-
     margin: 0 auto 1.75rem auto;
-
     box-shadow: var(--shadow-sm);
-
 }
-
-
 
 .wizard-step-item {
-
     display: flex;
-
     align-items: center;
-
     gap: 8px;
-
     cursor: default;
-
     color: #798a72;
-
     transition: all 0.25s ease;
-
 }
-
-
 
 .wizard-step-item.clickable {
-
     cursor: pointer;
-
 }
-
-
 
 .wizard-step-item .step-circle {
-
     width: 28px;
-
     height: 28px;
-
     border-radius: 50%;
-
     background: #e2ede2;
-
     color: #556b4f;
-
     font-size: 0.82rem;
-
     font-weight: 700;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     transition: all 0.25s ease;
-
 }
-
-
 
 .wizard-step-item .step-label {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     line-height: var(--lh-caption);
-
     font-weight: 600;
-
 }
-
-
 
 .wizard-step-item.active {
-
     color: #1f9142;
-
 }
-
-
 
 .wizard-step-item.active .step-circle {
-
     background: #1f9142;
-
     color: #ffffff;
-
     box-shadow: 0 2px 8px rgba(31, 145, 66, 0.3);
-
 }
-
-
 
 .wizard-step-item.completed {
-
     color: #14401f;
-
 }
-
-
 
 .wizard-step-item.completed .step-circle {
-
     background: #28a745;
-
     color: #ffffff;
-
 }
-
-
 
 .wizard-step-line {
-
     flex: 1;
-
     max-width: 48px;
-
     height: 2px;
-
     background: #d4e3d4;
-
     border-radius: 2px;
-
 }
-
-
 
 /* Setup Summary Bar in Step 2 */
 
 .setup-summary-bar {
-
     background: var(--btn-secondary-bg);
-
     border: 1.5px solid #cce8d2;
-
     border-radius: var(--radius-md);
-
     padding: var(--space-2) var(--space-4);
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 12px;
-
     margin-bottom: 1.5rem;
-
     box-shadow: var(--shadow-sm);
-
 }
-
-
 
 .setup-summary-thumb {
-
     width: 32px;
-
     height: 44px;
-
     border-radius: 4px;
-
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-
     flex-shrink: 0;
-
 }
-
-
 
 /* Quick Plant Chips in Step 1 */
 
 .plant-chips-wrap {
-
     display: flex;
-
     flex-wrap: wrap;
-
     gap: var(--space-1);
-
     margin-top: var(--space-2);
-
 }
-
-
 
 .plant-quick-chip {
-
     background: var(--badge-healthy-bg);
-
     border: 1px solid #c2e2c8;
-
     color: var(--badge-healthy-fg);
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     line-height: var(--lh-caption);
-
     font-weight: 600;
-
     padding: 3px 12px;
-
     border-radius: var(--radius-full);
-
     cursor: pointer;
-
     transition: all 0.2s ease;
-
     user-select: none;
-
     display: inline-flex;
-
     align-items: center;
-
 }
-
-
 
 .chip-dot {
-
     display: inline-block;
-
     width: 6px;
-
     height: 6px;
-
     border-radius: 50%;
-
     background: var(--btn-primary-bg);
-
     margin-right: 6px;
-
 }
-
-
 
 .plant-quick-chip:hover {
-
     background: var(--btn-primary-bg);
-
     color: var(--btn-primary-fg);
-
     border-color: var(--btn-primary-bg);
-
     transform: translateY(-1px);
-
     box-shadow: var(--shadow-sm);
-
 }
 
-
-
 /* =========================================================
-
    DS — FORM CONTROLS (Input, Select, Textarea)
-
    ========================================================= */
-
-
 
 .journal-page .form-control,
 
@@ -3963,26 +2037,15 @@
 .card .form-control,
 
 .card .form-select {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-body);
-
     line-height: var(--lh-body);
-
     background-color: var(--surface-input);
-
     border: 1px solid var(--border);
-
     border-radius: var(--radius-sm);
-
     color: var(--ink);
-
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
-
 }
-
-
 
 .journal-page .form-control:focus,
 
@@ -3991,246 +2054,129 @@
 .card .form-control:focus,
 
 .card .form-select:focus {
-
     border-color: var(--btn-primary-bg);
-
     box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.15);
-
     background-color: var(--surface-input);
-
     color: var(--ink);
-
 }
-
-
 
 .journal-page .form-label,
 
 .card .form-label {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-body);
-
     line-height: var(--lh-body);
-
     font-weight: 600;
-
     color: var(--ink);
-
 }
-
-
 
 .journal-page .form-text,
 
 .card .form-text {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     color: var(--ink-muted);
-
 }
 
-
-
 /* =========================================================
-
    DS — BUTTON OVERRIDES FOR JOURNAL PAGES
-
    ========================================================= */
-
-
 
 .btn-ganti-sampul {
-
     background: var(--surface-white);
-
     color: var(--ink);
-
     border: 1.5px solid var(--border);
-
     border-radius: var(--radius-full);
-
     padding: 6px 18px;
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     font-weight: 600;
-
     transition: all 0.18s ease;
-
     box-shadow: var(--shadow-sm);
-
 }
-
-
 
 .btn-ganti-sampul:hover {
-
     background: #f5edd8;
-
     border-color: #c8a84b;
-
     box-shadow: var(--shadow-md);
-
 }
-
-
 
 .btn-apply-cover {
-
     background: var(--btn-primary-bg);
-
     color: var(--btn-primary-fg);
-
     border: none;
-
     border-radius: var(--radius-full);
-
     font-family: var(--font-body);
-
     font-size: var(--fs-body);
-
     font-weight: 600;
-
     transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
-
 }
-
-
 
 .btn-apply-cover:hover {
-
     background: #167534;
-
     color: var(--btn-primary-fg);
-
     transform: translateY(-1px);
-
     box-shadow: 0 4px 12px rgba(31, 145, 66, 0.3);
-
 }
-
-
 
 /* =========================================================
-
    DS — CUSTOM BADGE PILL COLORS (override Bootstrap subtles)
-
    ========================================================= */
 
-
-
 .badge-ds-healthy {
-
     background: var(--badge-healthy-bg) !important;
-
     color: var(--badge-healthy-fg) !important;
-
     border-radius: var(--radius-full);
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     font-weight: 500;
-
 }
-
-
 
 .badge-ds-attention {
-
     background: var(--badge-attention-bg) !important;
-
     color: var(--badge-attention-fg) !important;
-
     border-radius: var(--radius-full);
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     font-weight: 500;
-
 }
-
-
 
 .badge-ds-wilting,
 
 .badge-ds-danger {
-
     background: var(--badge-danger-bg) !important;
-
     color: var(--badge-danger-fg) !important;
-
     border: 1px solid #ebd7cb !important;
-
     border-radius: var(--radius-full);
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     font-weight: 500;
-
 }
-
-
 
 .badge-ds-flowering,
 
 .badge-ds-sky {
-
     background: var(--badge-sky-bg) !important;
-
     color: var(--badge-sky-fg) !important;
-
     border: 1px solid #d0e2e7 !important;
-
     border-radius: var(--radius-full);
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     font-weight: 500;
-
 }
-
-
 
 .badge-ds-planned {
-
     background: var(--badge-planned-bg) !important;
-
     color: var(--badge-planned-fg) !important;
-
     border-radius: var(--radius-full);
-
     font-family: var(--font-body);
-
     font-size: var(--fs-caption);
-
     font-weight: 500;
-
 }
 
-
-
 /* =========================================================
-
    DS — BUTTON COMPONENT STYLES (Design System Specifications)
-
    ========================================================= */
-
-
 
 .btn-ds-primary,
 
@@ -4239,36 +2185,20 @@
 .view-panel .btn-success,
 
 .journal-page-header .btn-success {
-
     background: var(--btn-primary-bg) !important;
-
     color: var(--btn-primary-fg) !important;
-
     border: none !important;
-
     border-radius: var(--radius-full) !important;
-
     padding: var(--space-2) var(--space-6) !important;
-
     font-family: var(--font-body) !important;
-
     font-size: var(--fs-caption) !important;
-
     font-weight: 700 !important;
-
     box-shadow: var(--shadow-sm);
-
     transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
 }
-
-
 
 .btn-ds-primary:hover,
 
@@ -4277,152 +2207,80 @@
 .view-panel .btn-success:hover,
 
 .journal-page-header .btn-success:hover {
-
     background: #177334 !important;
-
     color: #ffffff !important;
-
     transform: translateY(-1px);
-
     box-shadow: var(--shadow-md);
-
 }
-
-
 
 .btn-ds-secondary {
-
     background: var(--btn-secondary-bg) !important;
-
     color: var(--btn-secondary-fg) !important;
-
     border: none !important;
-
     border-radius: var(--radius-full) !important;
-
     padding: var(--space-2) var(--space-6) !important;
-
     font-family: var(--font-body) !important;
-
     font-size: var(--fs-caption) !important;
-
     font-weight: 700 !important;
-
     box-shadow: var(--shadow-sm);
-
     transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
 }
-
-
 
 .btn-ds-secondary:hover {
-
     background: #b5ecc3 !important;
-
     color: #0f4621 !important;
-
     transform: translateY(-1px);
-
 }
-
-
 
 .btn-ds-ghost {
-
     background: var(--surface-white) !important;
-
     color: var(--btn-ghost-fg) !important;
-
     border: 1.5px solid var(--btn-ghost-border) !important;
-
     border-radius: var(--radius-full) !important;
-
     padding: var(--space-2) var(--space-6) !important;
-
     font-family: var(--font-body) !important;
-
     font-size: var(--fs-caption) !important;
-
     font-weight: 600 !important;
-
     transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
 }
-
-
 
 .btn-ds-ghost:hover {
-
     background: var(--surface-input) !important;
-
     border-color: #d8be7c !important;
-
     color: var(--ink) !important;
-
 }
-
-
 
 .btn-ds-danger,
 
 .btn-ds-delete {
-
     background: #fcf6f2 !important;
-
     color: #8c5344 !important;
-
     border: 1.5px solid #ecd8ce !important;
-
     border-radius: var(--radius-full) !important;
-
     padding: var(--space-2) var(--space-6) !important;
-
     font-family: var(--font-body) !important;
-
     font-size: var(--fs-caption) !important;
-
     font-weight: 600 !important;
-
     transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
 }
-
-
 
 .btn-ds-danger:hover,
 
 .btn-ds-delete:hover {
-
     background: #f5e4db !important;
-
     color: #723c30 !important;
-
     border-color: #dfbfb2 !important;
-
     transform: translateY(-1px);
-
 }
-
-
 
 /* Override bootstrap subtle badges to warm earth tones in journal */
 
@@ -4437,14 +2295,9 @@
 .book-page-right .bg-danger-subtle,
 
 #left-condition-badge.bg-danger-subtle {
-
     background-color: #fbf0ea !important;
-
     border-color: #ebd7cb !important;
-
 }
-
-
 
 .journal-module .text-danger,
 
@@ -4457,12 +2310,8 @@
 .book-page-right .text-danger,
 
 #left-condition-badge.text-danger {
-
     color: #8c5344 !important;
-
 }
-
-
 
 .journal-module .border-danger-subtle,
 
@@ -4471,12 +2320,8 @@
 .open-book-wrapper .border-danger-subtle,
 
 #left-condition-badge.border-danger-subtle {
-
     border-color: #ebd7cb !important;
-
 }
-
-
 
 .journal-module .bg-primary-subtle,
 
@@ -4487,14 +2332,9 @@
 .book-page-left .bg-primary-subtle,
 
 .book-page-right .bg-primary-subtle {
-
     background-color: #eaf1f4 !important;
-
     border-color: #d2e3e8 !important;
-
 }
-
-
 
 .journal-module .text-primary,
 
@@ -4505,38 +2345,22 @@
 .book-page-left .text-primary,
 
 .book-page-right .text-primary {
-
     color: #3f6874 !important;
-
 }
-
-
 
 /* DS — Card Component Style */
 
 .card-ds {
-
     background: var(--surface-white);
-
     border: 1.5px solid var(--border) !important;
-
     border-radius: var(--radius-lg) !important;
-
     box-shadow: var(--shadow-md) !important;
-
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-
 }
-
-
 
 .card-ds:hover {
-
     box-shadow: 0 10px 24px rgba(34, 48, 31, 0.12) !important;
-
 }
-
-
 
 /* DS — Standardized Small Buttons (Edit, Hapus, etc.) */
 
@@ -4547,1185 +2371,653 @@
 .btn-sm.btn-ds-ghost,
 
 .btn-sm.btn-ds-danger {
-
     padding: 6px 16px !important;
-
     font-size: 0.8rem !important;
-
     line-height: 1.2 !important;
-
     height: 32px !important;
-
     min-height: 32px !important;
-
     border-radius: var(--radius-full) !important;
-
     display: inline-flex !important;
-
     align-items: center !important;
-
     justify-content: center !important;
-
     font-weight: 600 !important;
-
     box-sizing: border-box !important;
-
 }
 
-
-
 /* =========================================================
-
    COMPACT BOOK SPREAD STYLES (Mockup Refinement)
-
    ========================================================= */
 
-
-
 .summary-mini-card {
-
     background: #ffffff;
-
     border: 1.5px solid #efe4cb;
-
     border-radius: 10px;
-
     padding: 8px 6px;
-
     text-align: center;
-
     box-shadow: 0 1px 3px rgba(34, 48, 31, 0.04);
-
 }
-
-
 
 .summary-mini-card .stat-num {
-
     font-family: var(--font-display);
-
     font-weight: 700;
-
     font-size: 1.45rem;
-
     line-height: 1.1;
-
     color: var(--ink);
-
 }
-
-
 
 .summary-mini-card .stat-desc {
-
     font-family: var(--font-body);
-
     font-size: 0.72rem;
-
     color: var(--ink-muted);
-
     margin-top: 2px;
-
 }
-
-
 
 .book-toc-list {
-
     max-height: 125px;
-
     overflow-y: auto;
-
     scrollbar-width: thin;
-
     scrollbar-color: #dfcfab transparent;
-
     padding-right: 2px;
-
 }
-
-
 
 .book-toc-list::-webkit-scrollbar {
-
     width: 5px;
-
 }
-
-
 
 .book-toc-list::-webkit-scrollbar-track {
-
     background: transparent;
-
 }
-
-
 
 .book-toc-list::-webkit-scrollbar-thumb {
-
     background-color: #dfcfab;
-
     border-radius: 999px;
-
 }
-
-
 
 .book-toc-item {
-
     border: 1.5px solid transparent;
-
     border-radius: 8px;
-
     padding: 6px 10px;
-
     transition: all 0.15s ease;
-
     cursor: pointer;
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     margin-bottom: 4px;
-
     background: rgba(255, 255, 255, 0.65);
-
 }
-
-
 
 .book-toc-item:hover {
-
     background: rgba(70, 104, 66, 0.06);
-
     border-color: rgba(70, 104, 66, 0.25);
-
 }
-
-
 
 .book-toc-item.active {
-
     background: #ffffff;
-
     border-color: #387638;
-
     box-shadow: 0 2px 6px rgba(56, 118, 56, 0.12);
-
 }
-
-
 
 .photo-compact-slot {
-
     border: 1.5px dashed #dfcfab;
-
     border-radius: 12px;
-
     background: #faf5ea;
-
     cursor: pointer;
-
     transition: all 0.2s ease;
-
     padding: 12px;
-
 }
-
-
 
 .photo-compact-slot:hover {
-
     border-color: #387638;
-
     background: #f4eee0;
-
 }
 
-
-
 /* =========================================================
-
    ONBOARDING 3-LANGKAH (EMPTY STATE RAK BUKU)
-
    ========================================================= */
 
 .onboarding-steps-card {
-
     background: #ffffff;
-
     border-radius: 24px;
-
     border: 1.5px solid #ecd8ab;
-
     box-shadow: 0 14px 34px rgba(34, 48, 31, 0.07);
-
     padding: 2.2rem 2.4rem 2rem 2.4rem;
-
     position: relative;
-
     max-width: 960px;
-
     margin: 1.25rem auto 2.5rem auto;
-
 }
-
-
-
-
 
 .onboarding-mascot-anchor {
-
     position: absolute;
-
     top: -46px;
-
     left: 50%;
-
     transform: translateX(-50%);
-
     display: flex;
-
     align-items: flex-end;
-
     gap: 8px;
-
     z-index: 5;
-
 }
-
-
 
 .onboarding-mascot-img {
-
     width: 60px;
-
     height: auto;
-
     object-fit: contain;
-
     filter: drop-shadow(0 4px 8px rgba(34, 48, 31, 0.15));
-
 }
-
-
 
 .onboarding-speech-bubble {
-
     background: #eef8ee;
-
     color: #27672b;
-
     border: 1px solid #d4e7d0;
-
     border-radius: 12px;
-
     padding: 5px 12px;
-
     font-size: 0.78rem;
-
     font-weight: 700;
-
     box-shadow: 0 3px 8px rgba(34, 48, 31, 0.06);
-
     white-space: nowrap;
-
     position: relative;
-
     margin-bottom: 12px;
-
 }
-
-
 
 .onboarding-speech-bubble::after {
-
     content: "";
-
     position: absolute;
-
     bottom: -6px;
-
     left: 14px;
-
     border-width: 6px 6px 0;
-
     border-style: solid;
-
     border-color: #eef8ee transparent;
-
     display: block;
-
     width: 0;
-
 }
-
-
 
 .onboarding-title {
-
     font-family: 'Baloo 2', cursive;
-
     font-size: 1.7rem;
-
     font-weight: 800;
-
     color: #1e331c;
-
     letter-spacing: -0.3px;
-
 }
-
-
 
 .onboarding-subtitle {
-
     color: #63705f;
-
     font-size: 0.92rem;
-
 }
-
-
 
 .onboarding-time-badge {
-
     display: inline-flex;
-
     align-items: center;
-
     background: #f7f5ed;
-
     color: #55624e;
-
     padding: 4px 12px;
-
     border-radius: 999px;
-
     font-size: 0.76rem;
-
     font-weight: 600;
-
 }
-
-
 
 .onboarding-steps-row {
-
     display: flex;
-
     align-items: stretch;
-
     justify-content: space-between;
-
     gap: 12px;
-
     margin: 2rem 0 1.5rem 0;
-
 }
-
-
 
 .onboarding-step-card {
-
     flex: 1 1 0;
-
     background: #fbfbf9;
-
     border: 1.5px solid #ebe6dc;
-
     border-radius: 18px;
-
     padding: 1.5rem 1.1rem;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     text-align: center;
-
     position: relative;
-
     transition: all 0.25s ease;
-
 }
-
-
 
 .onboarding-step-card.active {
-
     border: 2px solid #2e7d32;
-
     background: #ffffff;
-
     box-shadow: 0 8px 24px rgba(46, 125, 50, 0.12);
-
 }
-
-
 
 .onboarding-step-pill {
-
     position: absolute;
-
     top: -11px;
-
     left: 50%;
-
     transform: translateX(-50%);
-
     background: #2e7d32;
-
     color: #ffffff;
-
     font-size: 0.68rem;
-
     font-weight: 700;
-
     padding: 2px 10px;
-
     border-radius: 999px;
-
     white-space: nowrap;
-
     letter-spacing: 0.2px;
-
 }
-
-
 
 .onboarding-step-num {
-
     width: 24px;
-
     height: 24px;
-
     border-radius: 50%;
-
     background: #e8f5e9;
-
     color: #2e7d32;
-
     font-size: 0.78rem;
-
     font-weight: 800;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     margin-bottom: 8px;
-
 }
-
-
 
 .onboarding-step-num.done {
-
     background: #2e7d32;
-
     color: #ffffff;
-
 }
-
-
 
 .onboarding-step-icon-wrap {
-
     width: 58px;
-
     height: 58px;
-
     border-radius: 50%;
-
     background: #edf7ed;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     margin-bottom: 12px;
-
 }
-
-
 
 .onboarding-step-title {
-
     font-size: 0.96rem;
-
     font-weight: 700;
-
     color: #1e331c;
-
     margin-bottom: 6px;
-
 }
-
-
 
 .onboarding-step-desc {
-
     font-size: 0.78rem;
-
     color: #63705f;
-
     line-height: 1.42;
-
     margin-bottom: 10px;
-
 }
-
-
 
 .onboarding-arrow {
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     color: #a9b7a4;
-
     font-size: 1.3rem;
-
     user-select: none;
-
 }
-
-
 
 @media (max-width: 768px) {
-
     .onboarding-steps-row {
-
         flex-direction: column;
-
         gap: 20px;
-
     }
-
-
 
     .onboarding-arrow {
-
         transform: rotate(90deg);
-
         margin: -8px 0;
-
     }
-
 }
 
-
-
 /* =========================================================
-
    COVER PICKER MODAL & SEGMENTED PILL TABS (DESIGN SYSTEM)
-
    ========================================================= */
 
 .modal-book-preview-wrap {
-
     width: 120px;
-
     height: 165px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     perspective: 600px;
-
 }
-
-
 
 .modal-book-preview {
-
     width: 110px;
-
     height: 155px;
-
     border-radius: 6px 14px 14px 6px;
-
     position: relative;
-
     box-shadow: 0 10px 24px rgba(34, 48, 31, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08);
-
     border-left: 6px solid rgba(255, 255, 255, 0.45);
-
     display: flex;
-
     align-items: flex-end;
-
     justify-content: center;
-
     padding-bottom: 16px;
-
     transition: transform 0.3s ease, background 0.3s ease;
-
 }
-
-
 
 .modal-book-preview:hover {
-
     transform: rotateY(-8deg) scale(1.02);
-
 }
-
-
 
 .modal-book-title-tag {
-
     background: rgba(255, 255, 255, 0.92);
-
     backdrop-filter: blur(4px);
-
     border: 1px solid rgba(230, 207, 149, 0.8);
-
     border-radius: 999px;
-
     padding: 3px 12px;
-
     font-size: 0.72rem;
-
     font-weight: 700;
-
     color: #22301f;
-
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-
 }
-
-
 
 /* Tabs: Design system pill segmented control */
 
 .modal-cover-tabs {
-
     background: #f1ede3;
-
     border: 1.5px solid #e2d2b5;
-
     border-radius: 999px;
-
     padding: 4px;
-
     display: flex;
-
     gap: 4px;
-
     width: 100%;
-
 }
-
-
 
 .modal-cover-tab {
-
     flex: 1;
-
     border: none;
-
     background: transparent;
-
     padding: 7px 16px;
-
     border-radius: 999px;
-
     font-size: 0.85rem;
-
     font-weight: 700;
-
     color: #556b4f;
-
     transition: all 0.2s ease;
-
     cursor: pointer;
-
     text-align: center;
-
     outline: none;
-
 }
-
-
 
 .modal-cover-tab:hover {
-
     color: #22301f;
-
     background: rgba(255, 255, 255, 0.5);
-
 }
-
-
 
 .modal-cover-tab.active {
-
     background: #1f9142;
-
     color: #ffffff;
-
     box-shadow: 0 2px 8px rgba(31, 145, 66, 0.28);
-
 }
-
-
 
 /* Pattern Grid */
 
 .modal-pattern-grid {
-
     display: grid;
-
     grid-template-columns: repeat(3, 1fr);
-
     gap: 12px;
-
     padding: 4px 2px;
-
 }
-
-
 
 .modal-pattern-item {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     cursor: pointer;
-
     transition: transform 0.15s ease;
-
 }
-
-
 
 .modal-pattern-item:hover {
-
     transform: translateY(-2px);
-
 }
-
-
 
 .modal-pattern-card {
-
     width: 100%;
-
     aspect-ratio: 3 / 4;
-
     border-radius: 6px 10px 10px 6px;
-
     position: relative;
-
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-
     border: 2px solid transparent;
-
     border-left: 4px solid rgba(255, 255, 255, 0.4);
-
     transition: all 0.2s ease;
-
 }
-
-
 
 .modal-pattern-item.selected .modal-pattern-card {
-
     border-color: #1f9142;
-
     box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.28);
-
     transform: scale(1.02);
-
 }
-
-
 
 .modal-check-badge {
-
     position: absolute;
-
     top: 5px;
-
     right: 5px;
-
     width: 20px;
-
     height: 20px;
-
     border-radius: 50%;
-
     background: #1f9142;
-
     display: none;
-
     align-items: center;
-
     justify-content: center;
-
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-
 }
-
-
 
 .modal-pattern-item.selected .modal-check-badge {
-
     display: flex;
-
 }
-
-
 
 .modal-pattern-label {
-
     font-size: 0.78rem;
-
     font-weight: 600;
-
     color: #556b4f;
-
     margin-top: 6px;
-
     text-align: center;
-
 }
-
-
 
 .modal-pattern-item.selected .modal-pattern-label {
-
     color: #1f9142;
-
     font-weight: 700;
-
 }
-
-
 
 /* Swatches for Solid Color Tab */
 
 .modal-swatch-section-title {
-
     font-size: 0.74rem;
-
     font-weight: 700;
-
     text-transform: uppercase;
-
     letter-spacing: 0.8px;
-
     color: #798a72;
-
     margin-bottom: 8px;
-
     margin-top: 10px;
-
 }
-
-
 
 .modal-swatch-row {
-
     display: flex;
-
     flex-wrap: wrap;
-
     gap: 8px;
-
 }
-
-
 
 .modal-swatch-circle {
-
     width: 32px;
-
     height: 32px;
-
     border-radius: 50%;
-
     border: 2px solid transparent;
-
     cursor: pointer;
-
     transition: transform 0.15s, box-shadow 0.15s;
-
     outline: none;
-
 }
-
-
 
 .modal-swatch-circle:hover {
-
     transform: scale(1.15);
-
 }
-
-
 
 .modal-swatch-circle.selected {
-
     border-color: #1f9142;
-
     box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.35);
-
     transform: scale(1.08);
-
 }
-
-
 
 .modal-rainbow-btn {
-
     width: 36px;
-
     height: 36px;
-
     border-radius: 50%;
-
     border: 2px dashed #9aa895;
-
     background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
-
     cursor: pointer;
-
     transition: transform 0.15s;
-
 }
-
-
 
 .modal-rainbow-btn:hover {
-
     transform: scale(1.1);
-
 }
-
-
 
 .modal-rainbow-btn.selected {
-
     border: 2.5px solid #1f9142;
-
     box-shadow: 0 0 0 3px rgba(31, 145, 66, 0.35);
-
 }
-
-
 
 .btn-apply-cover {
-
     background: #1f9142;
-
     border: none;
-
     font-weight: 700;
-
     transition: background 0.2s ease, transform 0.15s ease;
-
 }
-
-
 
 .btn-apply-cover:hover {
-
     background: #187434;
-
     transform: translateY(-1px);
-
 }
-
-
 
 /* =========================================================
-
    FULL-WIDTH BOTANICAL NOTEBOOK HERO (SMART CARE COHESION)
-
    ========================================================= */
 
-
-
 :root {
-
     --journal-offset: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2);
-
 }
-
-
 
 body.has-sidebar.journal-body {
-
     padding-left: 0 !important;
-
     background: #faefd5;
-
 }
-
-
 
 .journal-main {
-
     display: flex;
-
     flex-direction: column;
-
     min-width: 0;
-
 }
-
-
 
 /* Full-width notebook paper hero banner (runs edge-to-edge across screen) */
 
 .journal-hero-banner-full {
-
     width: 100%;
-
     position: relative;
-
-    background: linear-gradient(180deg, #fdebc9 0%, #ffd8a8 55%, #ffb86b 100%);
-
-    border-bottom: 2px solid #eacd95;
-
+    background: radial-gradient(70% 90% at 76% 78%, rgba(255, 240, 200, 0.65) 0%, transparent 62%), linear-gradient(180deg, #fff4dc 0%, #eef8e2 46%, #dff2d4 100%);
+    border-bottom: 3px solid #d8c48d;
     padding: clamp(28px, 4vh, 40px) 20px 0 calc(var(--journal-offset, 0px) + 20px);
-
     overflow: hidden;
-
     isolation: isolate;
-
     box-sizing: border-box;
-
     min-height: clamp(340px, 30vw, 400px);
-
 }
-
-
 
 /* Background Art Layer Container */
 
 .journal-hero-art {
-
     position: absolute;
-
     inset: 0;
-
     z-index: 0;
-
     pointer-events: none;
-
     user-select: none;
-
     overflow: hidden;
-
 }
-
-
 
 /* Sun element: #ff9d2e, low near horizon with thin halo (opacity .35) */
 
 .journal-sun {
-
     position: absolute;
-
     right: 22%;
-
     bottom: 120px;
-
-    width: 100px;
-
-    height: 100px;
-
+    width: clamp(84px, 9.5vw, 115px);
+    aspect-ratio: 1;
     border-radius: 50%;
-
-    background: radial-gradient(circle at 48% 48%, #ffb84a 0, #ff9d2e 60%, transparent 68%);
-
-    filter: drop-shadow(0 0 32px rgba(255, 157, 46, 0.35));
-
+    background: radial-gradient(circle at 50% 50%, #ffe9a6 0%, #ffdc7d 34%, #feba54 62%, rgba(254, 186, 84, 0.42) 80%, transparent 100%);
+    filter: drop-shadow(0 0 26px rgba(254, 186, 84, 0.5));
+    animation: journalSunRise 9s ease-in-out infinite;
 }
 
+.journal-sun::before {
+    content: "";
+    position: absolute;
+    inset: -75%;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg, rgba(255, 238, 180, 0.32) 0deg, rgba(255, 238, 180, 0.25) 5deg, transparent 10deg, transparent 20deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 18%, #000 32% 52%, transparent 72%);
+    mask: radial-gradient(circle, transparent 0 18%, #000 32% 52%, transparent 72%);
+    animation: journalSunRays 70s linear infinite;
+    pointer-events: none;
+}
 
+@keyframes journalSunRise {
+
+    0%,
+    100% {
+        transform: translateY(6px);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes journalSunRays {
+    to {
+        transform: rotate(360deg);
+    }
+}
 
 /* Clouds: soft peach drift */
 
 .journal-clouds {
-
     position: absolute;
-
     left: 0;
-
     top: 15px;
-
     width: 100%;
-
     height: 130px;
-
 }
-
-
 
 /* Birds */
 
 .journal-birds {
-
     position: absolute;
-
-    right: 30%;
-
-    top: 85px;
-
+    left: 32%;
+    top: clamp(48px, 11vh, 96px);
     width: 84px;
-
     height: 28px;
-
+    animation: journalBirdsFly 46s linear infinite;
+    will-change: transform;
 }
 
+@keyframes journalBirdsFly {
+    0% {
+        transform: translate(-60px, 6px);
+    }
 
+    50% {
+        transform: translate(260px, -10px);
+    }
+
+    100% {
+        transform: translate(560px, 6px);
+    }
+}
 
 /* Hills: seamless 100% full-width curve stretch */
 
 .journal-hills {
-
     position: absolute;
-
     left: 0;
-
     width: 100%;
-
     display: block;
-
 }
-
-
 
 .journal-hills--back {
     bottom: 28px;
     height: clamp(80px, 14vh, 120px);
 }
-
-
 
 .journal-fence {
     position: absolute;
@@ -5736,14 +3028,10 @@ body.has-sidebar.journal-body {
     display: block;
 }
 
-
-
 .journal-hills--front {
     bottom: 28px;
     height: clamp(70px, 12vh, 110px);
 }
-
-
 
 .journal-flora {
     position: absolute;
@@ -5753,8 +3041,6 @@ body.has-sidebar.journal-body {
     height: 64px;
     display: block;
 }
-
-
 
 /* Full Wooden Botanical Desk: y=100, height 100px (potong setengah) across 100% width */
 
@@ -5769,8 +3055,6 @@ body.has-sidebar.journal-body {
     z-index: 1;
 }
 
-
-
 /* Botanical journals, seedling & mug resting proportionally on the desk */
 
 .journal-desk-props {
@@ -5778,26 +3062,18 @@ body.has-sidebar.journal-body {
     bottom: 28px;
     left: 57%;
     transform: translateX(-50%);
-    width: 180px;
-    height: 72px;
+    width: 196px;
+    height: 74px;
     z-index: 2;
     display: block;
     pointer-events: none;
 }
 
-
-
 @media (max-width: 991.98px) {
-
     .journal-desk-props {
-
         display: none;
-
     }
-
 }
-
-
 
 /* Animation helpers */
 
@@ -5812,780 +3088,396 @@ body.has-sidebar.journal-body {
 .journal-hero-art .bf,
 
 .journal-hero-art .wg {
-
     transform-box: fill-box;
-
 }
-
-
 
 .journal-hero-art .sw {
-
     transform-origin: 50% 0;
-
     animation: deskSwing 3.6s ease-in-out var(--d, 0s) infinite alternate;
-
 }
-
-
 
 .journal-hero-art .pn {
-
     transform-origin: 50% 100%;
-
     animation: deskSway 3.2s ease-in-out var(--d, 0s) infinite alternate;
-
 }
-
-
 
 .journal-hero-art .cl {
-
     animation: deskCloud 32s linear var(--d, 0s) infinite;
-
 }
-
-
 
 .journal-hero-art .bf {
-
     animation: deskFly 18s ease-in-out infinite;
-
 }
-
-
 
 .journal-hero-art .wg {
-
     animation: deskFlap 0.28s ease-in-out infinite alternate;
-
 }
-
-
 
 .journal-hero-art .wg.l {
-
     transform-origin: 100% 50%;
-
 }
-
-
 
 .journal-hero-art .wg.r {
-
     transform-origin: 0 50%;
-
 }
-
-
 
 @keyframes deskSwing {
-
     from {
-
         transform: rotate(-3.5deg);
-
     }
-
-
 
     to {
-
         transform: rotate(3.5deg);
-
     }
-
 }
-
-
 
 @keyframes deskSway {
-
     from {
-
         transform: rotate(-3deg);
-
     }
-
-
 
     to {
-
         transform: rotate(3deg);
-
     }
-
 }
-
-
 
 @keyframes deskTwinkle {
 
-
-
     0%,
-
     100% {
-
         opacity: 0.25;
-
         transform: scale(0.6);
-
     }
-
-
 
     50% {
-
         opacity: 1;
-
         transform: scale(1.15);
-
     }
-
 }
-
-
 
 @keyframes deskHalo {
-
     from {
-
         opacity: 0.35;
-
         transform: scale(0.9);
-
     }
-
-
 
     to {
-
         opacity: 0.75;
-
         transform: scale(1.12);
-
     }
-
 }
-
-
 
 @keyframes deskCloud {
-
     from {
-
         transform: translateX(0);
-
     }
-
-
 
     to {
-
         transform: translateX(330px);
-
     }
-
 }
-
-
 
 @keyframes deskFly {
 
-
-
     0%,
-
     100% {
-
         transform: translate(1470px, 368px);
-
     }
-
-
 
     25% {
-
         transform: translate(1530px, 338px);
-
     }
-
-
 
     50% {
-
         transform: translate(1604px, 366px);
-
     }
-
-
 
     75% {
-
         transform: translate(1540px, 396px);
-
     }
-
 }
-
-
 
 @keyframes deskFlap {
-
     to {
-
         transform: scaleX(0.25);
-
     }
-
 }
-
-
 
 @media (prefers-reduced-motion: reduce) {
 
-
-
     .journal-hero-art *,
-
     .journal-hero-art *::before {
-
         animation: none !important;
-
     }
-
 }
-
-
 
 @media (max-width: 991.98px) {
-
     .journal-hero-banner-full {
-
         padding: 24px 20px 0 20px;
-
     }
-
 }
-
-
 
 /* Left content container */
 
 .journal-hero-content-left {
-
     position: relative;
-
     padding-left: 0;
-
     border-left: none;
-
     z-index: 2;
-
     max-width: 540px;
-
 }
-
-
 
 .journal-hero-content-left::before {
-
     display: none;
-
 }
-
-
 
 @media (max-width: 767.98px) {
-
     .journal-hero-content-left {
-
         padding-left: 0;
-
         border-left: none;
-
     }
-
 }
-
-
-
-
 
 .journal-hero-inner {
-
     max-width: 1360px;
-
     width: 100%;
-
     margin: 0 auto;
-
     position: relative;
-
     z-index: 3;
-
     padding: 0 20px 24px;
-
 }
-
-
 
 .journal-sheet-body {
-
     background: linear-gradient(180deg, #fdf7e8 0%, #faefd5 100%);
-
     padding-left: var(--journal-offset);
-
     flex: 1 0 auto;
-
 }
-
-
 
 @media (max-width: 991.98px) {
-
     .journal-sheet-body {
-
         padding-left: 0;
-
     }
-
 }
-
-
 
 /* Minimal Clean Footer (Matching Reference) */
 
 .journal-foot {
-
     border-top: 1.5px solid rgba(182, 154, 99, 0.3);
-
     padding: 24px 0 36px;
-
     margin-top: 48px;
-
 }
-
-
 
 .journal-foot-row {
-
     font-size: 0.88rem;
-
     color: #64755f;
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
     line-height: 1.5;
-
 }
-
-
-
-
 
 /* Typography adhering strictly to Design System */
 
 .journal-hero-badge {
-
     display: inline-flex;
-
     align-items: center;
-
     background: #eaf5ea;
-
     color: #1f9142;
-
     border: 1px solid #c2e2c5;
-
     border-radius: 999px;
-
     padding: 4px 14px;
-
     font-size: 0.8rem;
-
     font-weight: 700;
-
     letter-spacing: 0.02em;
-
     text-transform: uppercase;
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
 }
-
-
 
 .journal-hero-title {
-
     font-family: var(--font-display, 'Baloo 2', sans-serif);
-
     font-size: clamp(3rem, 5.2vw, 4.8rem);
-
     font-weight: 800;
-
     color: #22301f;
-
     line-height: 1;
-
     letter-spacing: -0.03em;
-
     margin: 0 0 14px;
-
 }
-
-
 
 .journal-hero-lead {
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
     font-size: 0.92rem;
-
     color: #525c46;
-
     font-weight: 500;
-
     line-height: 1.45;
-
 }
-
-
 
 /* Stats Pill Chips — Solid white (#fff), border 1.5px #eacd95, no backdrop-filter */
 
 .journal-stats-pills {
-
     display: flex;
-
     align-items: center;
-
     flex-wrap: nowrap;
-
     gap: 10px;
-
 }
-
-
 
 @media (max-width: 767.98px) {
-
     .journal-stats-pills {
-
         flex-wrap: wrap;
-
     }
-
 }
-
-
 
 .stat-pill-chip {
-
     display: inline-flex;
-
     align-items: center;
-
     gap: 7px;
-
     padding: 4px 12px;
-
     border-radius: 999px;
-
     border: 1.5px solid #eacd95;
-
     background: #ffffff;
-
     box-shadow: 0 1px 3px rgba(34, 48, 31, 0.05);
-
     font-size: 0.82rem;
-
     font-weight: 600;
-
     color: #22301f;
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-
     white-space: nowrap;
-
 }
-
-
 
 .stat-pill-chip:hover {
-
     transform: translateY(-1px);
-
     box-shadow: 0 3px 8px rgba(34, 48, 31, 0.08);
-
 }
-
-
 
 .stat-pill-icon {
-
     flex-shrink: 0;
-
     color: #1f9142;
-
 }
-
-
 
 .stat-pill-chip strong {
-
     font-weight: 800;
-
     color: #1f9142;
-
     font-size: 0.95rem;
-
 }
-
-
 
 /* 7 Hari Terakhir Calendar Card (Exact Match to Reference Screenshot) */
 
 .journal-week-calendar-wrap {
-
     display: inline-flex;
-
     flex-direction: column;
-
     gap: 8px;
-
     background: #ffffff;
-
     border: 1.5px solid #dfcca0;
-
     border-radius: 20px;
-
     padding: 12px 18px 12px;
-
     box-shadow: 0 4px 16px rgba(45, 35, 20, 0.06);
-
     max-width: 100%;
-
 }
-
-
 
 .journal-week-label {
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
     font-size: 0.95rem;
-
     font-weight: 700;
-
     color: #22301f;
-
 }
-
-
 
 .journal-week-strip {
-
     display: flex;
-
     align-items: center;
-
     gap: 8px;
-
 }
-
-
 
 .journal-day-col {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     gap: 5px;
-
     position: relative;
-
 }
-
-
 
 .journal-day-circle {
-
     width: 24px;
-
     height: 24px;
-
     border-radius: 50%;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     font-size: 0.76rem;
-
     font-weight: 800;
-
     transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
-
 }
-
-
 
 .journal-day-circle.is-empty {
-
     border: 1.5px dashed var(--seed-line-strong, var(--journal-line-strong, #b9a46a));
-
     background: transparent;
-
     color: transparent;
-
 }
-
-
 
 .journal-day-circle.has-entry {
-
     background: #1f9142;
-
     border: 1.5px solid #1f9142;
-
     color: #ffffff;
-
     box-shadow: 0 3px 8px rgba(31, 145, 66, 0.28);
-
 }
-
-
 
 .journal-day-col.is-today .journal-day-circle {
-
     outline: 2.5px solid #1f9142;
-
     outline-offset: 2.5px;
-
 }
-
-
 
 .journal-day-name {
-
     font-size: 0.72rem;
-
     font-weight: 700;
-
     color: #525c46;
-
     line-height: 1;
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
 }
-
-
 
 .today-indicator-dot {
-
     display: none;
-
 }
-
-
 
 /* Calendar Legend (UI/UX Matching Screenshot) */
 
 .journal-calendar-legend {
-
     display: flex;
-
     align-items: center;
-
     flex-wrap: wrap;
-
     gap: 10px;
-
     font-size: 0.68rem;
-
     color: #525c46;
-
     font-weight: 600;
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
     border-top: 1px dashed #e8d8be;
-
     padding-top: 8px;
-
     margin-top: 4px;
-
 }
-
-
 
 .legend-chip {
-
     display: inline-flex;
-
     align-items: center;
-
     gap: 6px;
-
 }
-
-
 
 .legend-circle {
-
     width: 12px;
-
     height: 12px;
-
     border-radius: 50%;
-
     display: inline-block;
-
     flex-shrink: 0;
-
 }
-
-
 
 .legend-circle.has-entry {
-
     background: #1f9142;
-
     border: none;
-
 }
-
-
 
 .legend-circle.is-empty {
-
     border: 1.5px dashed var(--seed-line-strong, var(--journal-line-strong, #b9a46a));
-
     background: transparent;
-
 }
-
-
 
 .legend-circle.is-today-dot {
-
     border: 2px solid #1f9142;
-
     background: transparent;
-
 }
-
-
 
 /* Primary Hero CTA Button (Exact Match to '+ Buat Listing' Pill Design) */
 
@@ -6594,1326 +3486,674 @@ body.has-sidebar.journal-body {
 .journal-main-cta,
 
 .btn-ds-primary.journal-main-cta {
-
     display: inline-flex !important;
-
     align-items: center !important;
-
     justify-content: center !important;
-
     gap: 8px !important;
-
     height: 48px !important;
-
     padding: 0 28px !important;
-
     background: #0d6832 !important;
-
     color: #ffffff !important;
-
     border: 2px solid transparent !important;
-
     border-radius: 9999px !important;
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif) !important;
-
     font-size: 0.98rem !important;
-
     font-weight: 700 !important;
-
     text-decoration: none !important;
-
     box-shadow: 0 4px 0 #074720 !important;
-
     cursor: pointer !important;
-
     transition: transform 0.15s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.15s ease, background 0.15s ease !important;
-
     white-space: nowrap !important;
-
 }
-
-
 
 .btn-listing-style:hover,
 
 .journal-main-cta:hover,
 
 .btn-ds-primary.journal-main-cta:hover {
-
     background: #0f7539 !important;
-
     color: #ffffff !important;
-
     transform: translateY(-2px) !important;
-
     box-shadow: 0 6px 0 #074720 !important;
-
 }
-
-
 
 .btn-listing-style:active,
 
 .journal-main-cta:active,
 
 .btn-ds-primary.journal-main-cta:active {
-
     transform: translateY(2px) !important;
-
     box-shadow: 0 2px 0 #074720 !important;
-
 }
-
-
 
 .btn-listing-style svg,
 
 .journal-main-cta svg,
 
 .btn-ds-primary.journal-main-cta svg {
-
     stroke-width: 2.4;
-
     flex-shrink: 0;
-
 }
 
-
-
 /* =========================================================
-
    SPEECH BUBBLE DIALOG POP-UP & ENLARGED PETAK MASCOT
-
    ========================================================= */
-
-
 
 /* Dialogue scene & speech bubble (Proportional, balanced, no crowding) */
 
 .journal-dialog-scene {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     gap: 10px;
-
     width: 100%;
-
     max-width: 280px;
-
     margin-left: auto;
-
     margin-right: 12px;
-
     position: relative;
-
     z-index: 5;
-
 }
-
-
 
 @media (max-width: 991.98px) {
-
     .journal-dialog-scene {
-
         margin: 16px auto 0;
-
         align-items: center;
-
     }
-
 }
-
-
 
 .journal-bubble {
-
     position: relative;
-
     width: 100%;
-
     background: #ffffff;
-
     border-radius: 18px 18px 18px 6px;
-
     padding: 11px 16px 13px;
-
     box-shadow: 0 8px 24px -6px rgba(45, 35, 20, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
-
     border: 1.5px solid #dfcca0;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: flex-start;
-
     gap: 5px;
-
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-
 }
-
-
 
 .journal-bubble:hover {
-
     transform: translateY(-2px);
-
     box-shadow: 0 12px 28px -6px rgba(45, 35, 20, 0.18);
-
 }
-
-
 
 .journal-bubble::after {
-
     content: "";
-
     position: absolute;
-
     left: 42px;
-
     bottom: -8px;
-
     width: 14px;
-
     height: 14px;
-
     background: #ffffff;
-
     border-right: 1.5px solid #dfcca0;
-
     border-bottom: 1.5px solid #dfcca0;
-
     transform: rotate(45deg);
-
     border-radius: 0 0 3px 0;
-
 }
-
-
 
 .journal-bubble-pill {
-
     display: inline-flex;
-
     align-items: center;
-
     padding: 2.5px 10px;
-
     border-radius: 999px;
-
     font-size: 0.72rem;
-
     font-weight: 800;
-
     letter-spacing: 0.03em;
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
 }
-
-
 
 .journal-bubble-pill.is-ok {
-
     background: #e2f4e5;
-
     color: #167a38;
-
 }
-
-
 
 .journal-bubble-pill.is-tip {
-
     background: #e0f2fe;
-
     color: #0369a1;
-
 }
-
-
 
 .journal-bubble-text {
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
     font-size: 0.88rem;
-
     font-weight: 500;
-
     line-height: 1.4;
-
     color: #22301f;
-
     margin: 0;
-
 }
-
-
 
 .journal-bubble-text strong {
-
     font-weight: 700;
-
 }
-
-
 
 .journal-bubble-link {
-
     color: #167a38;
-
     font-weight: 700;
-
     text-decoration: underline;
-
 }
-
-
 
 .journal-bubble-link:hover {
-
     color: #0f5a28;
-
 }
-
-
 
 /* Mascot Petak Mencatat (Prominent Size, Vector SVG) */
 
 .journal-mascot-petak-wrap {
-
     display: flex;
-
     justify-content: center;
-
     align-items: center;
-
     width: 100%;
-
     margin-top: 4px;
-
 }
-
-
 
 .journal-mascot-petak-img {
-
     width: clamp(140px, 14vw, 210px);
-
     height: auto;
-
     filter: drop-shadow(0 10px 18px rgba(50, 40, 25, 0.14));
-
     cursor: pointer;
-
     transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
-
 }
 
-
-
 .journal-mascot-petak-img:hover {
-
     transform: translateY(-8px) scale(1.04) rotate(1.5deg);
-
     filter: drop-shadow(0 16px 26px rgba(50, 40, 25, 0.22));
-
 }
-
-
 
 .journal-mascot-petak-img:active {
-
     transform: translateY(-2px) scale(1.01);
-
 }
-
-
 
 .journal-mascot-petak-img:hover {
-
     transform: translateY(-8px) scale(1.04);
-
     filter: drop-shadow(0 16px 26px rgba(45, 35, 20, 0.22));
-
 }
-
-
 
 .journal-mascot-petak-img:active {
-
     transform: translateY(-4px) scale(1.02);
-
 }
-
-
 
 @keyframes petakMascotFloat {
 
-
-
     0%,
-
     100% {
-
         transform: translateY(0) rotate(0deg);
-
     }
-
-
 
     30% {
-
         transform: translateY(-9px) rotate(-1.5deg);
-
     }
-
-
 
     68% {
-
         transform: translateY(-4px) rotate(1.2deg);
-
     }
-
 }
 
-
-
-
-
 /* =========================================================
-
    SHELF & BOOK ENHANCEMENTS
-
    ========================================================= */
-
-
 
 /* Spiral Bound Holes on Book Item Spine */
 
 .book-spiral-spine {
-
     position: absolute;
-
     left: 4px;
-
     top: 8px;
-
     bottom: 8px;
-
     width: 12px;
-
     display: flex;
-
     flex-direction: column;
-
     justify-content: space-between;
-
     align-items: center;
-
     z-index: 12;
-
     pointer-events: none;
-
 }
-
-
 
 .book-spiral-hole {
-
     width: 6px;
-
     height: 6px;
-
     border-radius: 50%;
-
     background: #3c4939;
-
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.65);
-
 }
-
-
 
 /* "+ Buku Baru" dashed action card (Exact Match to Seed Exchange Listing Card) */
 
 .book-cover-add-wrap {
-
     position: relative;
-
     width: 170px;
-
     height: 235px;
-
     border-radius: 24px;
-
     border: 2px dashed #b9a46a;
-
     background: rgba(255, 253, 246, 0.75);
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     box-shadow: none;
-
     transition: all 0.25s cubic-bezier(0.2, 0.8, 0.3, 1);
-
     cursor: pointer;
-
 }
-
-
 
 .book-item-add:hover .book-cover-add-wrap {
-
     background: #fffdf6;
-
     border-color: #167a38;
-
     transform: translateY(-4px);
-
     box-shadow: 0 10px 24px rgba(22, 122, 56, 0.12);
-
 }
-
-
 
 .book-cover-add-inner {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     gap: 12px;
-
 }
-
-
 
 .book-add-icon {
-
     width: 50px;
-
     height: 50px;
-
     border-radius: 50%;
-
     background: #e2f4e5;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     color: #167a38;
-
     box-shadow: none;
-
     transition: transform 0.2s ease, background-color 0.2s ease;
-
 }
-
-
 
 .book-item-add:hover .book-add-icon {
-
     transform: scale(1.08);
-
     background: #d4edd8;
-
 }
-
-
 
 .book-add-label {
-
     font-size: 1.02rem;
-
     font-weight: 800;
-
     color: #167a38;
-
     text-decoration: none !important;
-
     letter-spacing: -0.01em;
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
 }
-
-
 
 /* =========================================================
-
    CUSTOM SCROLLABLE DROPDOWNS (EcoPatch & Nama Tanaman)
-
    ========================================================= */
 
-
-
 .journal-select-wrapper {
-
     position: relative;
-
     width: 100%;
-
 }
-
-
 
 .journal-select-btn {
-
     display: flex;
-
     align-items: center;
-
     gap: 8px;
-
     width: 100%;
-
     height: 48px;
-
     padding: 0 18px;
-
     background: #fffdf6;
-
     border: 1.5px solid rgba(182, 154, 99, 0.38);
-
     border-radius: 999px;
-
     font: 600 0.95rem/1 var(--font-body);
-
     color: var(--ink-muted);
-
     text-align: left;
-
     transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
-
     cursor: pointer;
-
 }
-
-
 
 .journal-select-label {
-
     flex: 1 1 auto;
-
     min-width: 0;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
-
     white-space: nowrap;
-
 }
-
-
 
 .journal-select-btn::after {
-
     display: none !important;
-
     /* Hilangkan default bootstrap caret triangle */
-
 }
-
-
 
 .journal-select-btn:hover {
-
     border-color: var(--btn-secondary-fg);
-
     color: var(--btn-secondary-fg);
-
 }
-
-
 
 .journal-select-btn:focus,
 
 .journal-select-btn.show {
-
     border-color: var(--btn-secondary-fg);
-
     background: #fffdf6;
-
     box-shadow: 0 0 0 4px rgba(31, 145, 66, 0.2);
-
     outline: none;
-
 }
-
-
 
 .journal-select-btn--active {
-
     border-color: var(--btn-secondary-fg);
-
     background: var(--btn-secondary-bg);
-
     color: var(--btn-secondary-fg);
-
 }
-
-
 
 .journal-select-dot {
-
     width: 7px;
-
     height: 7px;
-
     flex: none;
-
     border-radius: 50%;
-
     background: var(--btn-primary-bg);
-
 }
-
-
 
 .journal-select-dot[hidden] {
-
     display: none;
-
 }
-
-
 
 .journal-select-btn.show .journal-select-chevron {
-
     transform: rotate(180deg);
-
 }
-
-
 
 .journal-select-chevron {
-
     color: currentColor;
-
     opacity: 0.7;
-
     transition: transform 0.2s ease;
-
     flex-shrink: 0;
-
 }
-
-
 
 /* Scrollable container with max-height and custom scrollbar */
 
 .journal-select-menu {
-
     width: 100%;
-
     max-height: 240px;
-
     overflow-y: auto;
-
     -webkit-overflow-scrolling: touch;
-
     scroll-behavior: smooth;
-
     padding: 8px;
-
     border: 1.5px solid var(--border);
-
     border-radius: 18px;
-
     background: #fffdf6;
-
     box-shadow: 0 18px 36px -18px rgba(34, 48, 31, 0.45);
-
     margin-top: 8px;
-
     z-index: 1050;
-
     scrollbar-width: thin;
-
     scrollbar-color: #9ecc9f #f7f9f7;
-
 }
-
-
 
 .journal-select-menu::-webkit-scrollbar {
-
     width: 6px;
-
 }
-
-
 
 .journal-select-menu::-webkit-scrollbar-track {
-
     background: #f7f9f7;
-
     border-radius: 8px;
-
 }
-
-
 
 .journal-select-menu::-webkit-scrollbar-thumb {
-
     background: #a4d3a6;
-
     border-radius: 8px;
-
 }
-
-
 
 .journal-select-menu::-webkit-scrollbar-thumb:hover {
-
     background: #1f9142;
-
 }
-
-
 
 .journal-select-item {
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 10px;
-
     width: 100%;
-
     padding: 9px 12px;
-
     border: none;
-
     border-radius: 12px;
-
     background: transparent;
-
     color: var(--ink);
-
     font: 600 0.92rem/1.3 var(--font-body);
-
     text-align: left;
-
     cursor: pointer;
-
     transition: background 0.15s ease, color 0.15s ease;
-
 }
-
-
 
 .journal-select-item:hover,
 
 .journal-select-item:focus {
-
     background: var(--btn-secondary-bg);
-
     color: var(--btn-secondary-fg);
-
 }
-
-
 
 .journal-select-item.active {
-
     background: var(--btn-secondary-bg);
-
     color: var(--btn-secondary-fg);
-
     font-weight: 800;
-
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* =========================================================
-
-   JOURNAL BROWSER � search bar + dropdown filters
-
-   Mirrors the Seed Exchange list so both shelves behave the
-
-   same: search on top, plain pill dropdowns underneath.
-
+   JOURNAL BROWSER — search bar + dropdown filters Mirrors the Seed Exchange list so both shelves behave the same: search on top, plain pill dropdowns underneath.
    ========================================================= */
 
 .journal-search-bar {
-
     margin-bottom: 14px;
-
 }
-
-
 
 .journal-search-bar form {
-
     position: relative;
-
 }
-
-
 
 .journal-search-icon {
-
     position: absolute;
-
     left: 16px;
-
     top: 50%;
-
     display: grid;
-
     place-items: center;
-
     width: 20px;
-
     height: 20px;
-
     transform: translateY(-50%);
-
     color: var(--ink-muted);
-
     pointer-events: none;
-
 }
-
-
 
 .journal-search-icon svg {
-
     display: block;
-
     width: 100%;
-
     height: 100%;
-
 }
-
-
 
 .journal-search-input {
-
     width: 100%;
-
     height: 52px;
-
     padding: 0 48px;
-
     border: 1.5px solid var(--border);
-
     border-radius: 16px;
-
     background: #fffdf6;
-
     color: var(--ink);
-
     font: 500 1rem var(--font-body);
-
     transition: border-color 0.2s, box-shadow 0.2s;
-
 }
-
-
 
 .journal-search-input::placeholder {
-
     color: var(--ink-muted);
-
     font-weight: 500;
-
 }
-
-
 
 .journal-search-input:focus {
-
     outline: none;
-
     border-color: var(--btn-primary-bg);
-
     box-shadow: 0 0 0 4px rgba(31, 145, 66, 0.16);
-
 }
-
-
 
 .journal-search-input::-webkit-search-cancel-button,
 
 .journal-search-input::-webkit-search-decoration {
-
     -webkit-appearance: none;
-
     appearance: none;
-
 }
-
-
 
 .journal-search-input::-ms-clear {
-
     display: none;
-
 }
-
-
 
 .journal-search-clear {
-
     position: absolute;
-
     right: 12px;
-
     top: 50%;
-
     display: grid;
-
     place-items: center;
-
     width: 32px;
-
     height: 32px;
-
     padding: 0;
-
     border: 0;
-
     border-radius: 50%;
-
     background: transparent;
-
     color: var(--ink-muted);
-
     transform: translateY(-50%);
-
     cursor: pointer;
-
     transition: background-color 0.18s, color 0.18s, transform 0.12s;
-
 }
-
-
 
 .journal-search-clear svg {
-
     width: 16px;
-
     height: 16px;
-
 }
-
-
 
 .journal-search-clear:hover,
 
 .journal-search-clear:focus-visible {
-
     background: #eaf5ea;
-
     color: var(--btn-secondary-fg);
-
     outline: none;
-
 }
-
-
 
 .journal-search-clear:active {
-
     transform: translateY(-50%) scale(0.94);
-
 }
-
-
 
 .journal-search-clear[hidden] {
-
     display: none;
-
 }
-
-
 
 .journal-filters {
-
     display: flex;
-
     flex-wrap: wrap;
-
     align-items: center;
-
     gap: 8px;
-
     margin: 0;
-
 }
-
-
 
 .journal-filter {
-
     display: inline-flex;
-
     align-items: center;
-
     gap: 6px;
-
     height: 40px;
-
     padding: 0 16px;
-
     border: 1.5px solid rgba(182, 154, 99, 0.38);
-
     border-radius: 999px;
-
     background: #fffdf6;
-
     color: var(--ink-muted);
-
     font: 700 0.88rem/1 var(--font-body);
-
     max-width: 100%;
-
     transition: background-color 0.18s, border-color 0.18s, color 0.18s;
-
 }
-
-
 
 .journal-filter::after {
-
     margin-left: 2px;
-
 }
-
-
 
 .journal-filter:hover {
-
     border-color: var(--btn-secondary-fg);
-
     color: var(--btn-secondary-fg);
-
 }
-
-
 
 .journal-filter:focus {
-
     outline: none;
-
     border-color: var(--btn-secondary-fg);
-
     box-shadow: 0 0 0 4px rgba(31, 145, 66, 0.24);
-
 }
-
-
 
 .journal-filter--active {
-
     border-color: var(--btn-secondary-fg);
-
     background: var(--btn-secondary-bg);
-
     color: var(--btn-secondary-fg);
-
 }
-
-
 
 .journal-filter-dot {
-
     display: inline-block;
-
     width: 7px;
-
     height: 7px;
-
     flex-shrink: 0;
-
     border-radius: 50%;
-
     background: var(--btn-primary-bg);
-
 }
-
-
 
 .journal-filter-dot[hidden] {
-
     display: none;
-
 }
-
-
 
 .journal-menu {
-
     min-width: 190px;
-
     padding: 8px;
-
     border: 1.5px solid var(--border);
-
     border-radius: 18px;
-
     background: #fffdf6;
-
     box-shadow: 0 18px 36px -18px rgba(34, 48, 31, 0.45);
-
 }
-
-
 
 .journal-menu-item {
-
     padding: 9px 12px;
-
     border-radius: 12px;
-
     color: var(--ink);
-
     font: 600 0.92rem/1.3 var(--font-body);
-
 }
-
-
 
 .journal-menu-item:hover,
 
 .journal-menu-item:focus-visible {
-
     background: var(--btn-secondary-bg);
-
     color: var(--btn-secondary-fg);
-
 }
-
-
 
 .journal-menu-item.active {
-
     background: var(--btn-secondary-bg);
-
     color: var(--btn-secondary-fg);
-
     font-weight: 800;
-
 }
-
-
 
 .journal-filter-reset {
-
     display: inline-flex;
-
     align-items: center;
-
     gap: 6px;
-
     height: 40px;
-
     padding: 0 14px;
-
     border: 1.5px dashed #b9a46a;
-
     border-radius: 999px;
-
     background: transparent;
-
     color: var(--ink-muted);
-
     font: 700 0.88rem/1 var(--font-body);
-
     text-decoration: none;
-
     transition: background-color 0.18s, border-color 0.18s, color 0.18s;
-
 }
-
-
 
 .journal-filter-reset:hover,
 
 .journal-filter-reset:focus-visible {
-
     border-color: var(--badge-danger-fg);
-
     background: var(--badge-danger-bg);
-
     color: var(--badge-danger-fg);
-
     outline: none;
-
 }
-
-
 
 @media (max-width: 576px) {
-
     .journal-search-input {
-
         padding: 0 44px;
-
         font-size: 0.95rem;
-
     }
-
-
 
     .journal-search-icon {
-
         left: 14px;
-
     }
-
 }
 
-
-
 /* =========================================================
-
    RESPONSIVENESS, ACCESSIBILITY & THEME SUPPORT
-
    ========================================================= */
-
-
 
 /* Robust Text Wrapping across all zoom levels and viewports */
 
@@ -7932,26 +4172,16 @@ body.has-sidebar.journal-body {
 .book-card-title,
 
 .book-card-meta {
-
     overflow-wrap: break-word;
-
     word-break: break-word;
-
 }
-
-
 
 /* Minimum zoom support: 25%–200% */
 
 :root {
-
     zoom: 1;
-
     /* base; no override needed, just ensure min-zoom works via contain */
-
 }
-
-
 
 /* Ensure no horizontal overflow at 320px..1920px and zoom 25%-200% */
 
@@ -7960,200 +4190,170 @@ body.has-sidebar.journal-body {
 .journal-main,
 
 .journal-sheet-body {
-
     max-width: 100%;
-
     box-sizing: border-box;
-
     min-width: 0;
-
 }
-
-
 
 /* Dropdown menus constrained to viewport */
 
 .dropdown-menu.journal-menu,
 
 .dropdown-menu.journal-select-menu {
-
     max-width: min(340px, calc(100vw - 32px));
-
     overflow-wrap: break-word;
-
 }
-
-
 
 /* Prefers-Reduced-Motion: completely stop animations for accessibility */
 
 @media (prefers-reduced-motion: reduce) {
 
-
-
     .journal-desk-scene *,
-
     .journal-desk-scene .sw,
-
     .journal-desk-scene .pn,
-
     .journal-desk-scene .tw,
-
     .journal-desk-scene .halo,
-
     .journal-desk-scene .cl,
-
     .journal-desk-scene .bf,
-
-    .journal-desk-scene .wg,
-
+    y .journal-desk-scene .wg,
     .journal-bubble,
-
     .journal-mascot-petak-img,
-
     .btn-listing-style,
-
     .stat-pill-chip {
-
         animation: none !important;
-
         transition: none !important;
-
         transform: none !important;
-
     }
-
 }
-
-
 
 /* Dark Mode Theme Support (Comfortable Contrast) */
 
-@media (prefers-color-scheme: dark) {
 
-    .journal-hero-banner-full {
 
-        background: linear-gradient(180deg, #1c140a 0%, #2b1f11 55%, #3a2612 100%);
+/* ── Sky Butterflies (journal-clouds SVG) ──────────────────────────────── */
+.journal-hero-art .sky-bf {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: skyBfFly 28s linear var(--bfd, 0s) infinite;
+}
 
-        border-bottom-color: #4a3622;
+.journal-hero-art .sky-wg {
+    transform-box: fill-box;
+}
 
+.journal-hero-art .sky-wg.l {
+    transform-origin: 100% 50%;
+    animation: skyWingFlap 0.32s ease-in-out infinite alternate;
+}
+
+.journal-hero-art .sky-wg.r {
+    transform-origin: 0 50%;
+    animation: skyWingFlap 0.32s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes skyBfFly {
+    0% {
+        transform: translate(var(--bfx0, -80px), var(--bfy0, 60px)) scale(0.75);
+        opacity: 0;
     }
 
+    4% {
+        opacity: 0.9;
+    }
 
+    25% {
+        transform: translate(300px, calc(var(--bfy0, 60px) - 15px)) scale(1.0);
+        opacity: 0.95;
+    }
+
+    50% {
+        transform: translate(700px, calc(var(--bfy0, 60px) + 20px)) scale(0.9);
+        opacity: 0.9;
+    }
+
+    75% {
+        transform: translate(1050px, calc(var(--bfy0, 60px) - 10px)) scale(0.85);
+        opacity: 0.8;
+    }
+
+    95% {
+        opacity: 0;
+    }
+
+    100% {
+        transform: translate(1250px, var(--bfy0, 60px)) scale(0.7);
+        opacity: 0;
+    }
+}
+
+@keyframes skyWingFlap {
+    to {
+        transform: scaleX(0.2);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .journal-hero-banner-full {
+        background: linear-gradient(180deg, #1c140a 0%, #2b1f11 55%, #3a2612 100%);
+        border-bottom-color: #4a3622;
+    }
 
     .journal-hero-title {
-
-    font-family: var(--font-display, 'Baloo 2', sans-serif);
-
-    font-size: clamp(3rem, 5.2vw, 4.8rem);
-
-    font-weight: 800;
-
-    color: #22301f;
-
-    line-height: 1;
-
-    letter-spacing: -0.03em;
-
-    margin: 0 0 14px;
-
-}
-
-
+        font-family: var(--font-display, 'Baloo 2', sans-serif);
+        font-size: clamp(3rem, 5.2vw, 4.8rem);
+        font-weight: 800;
+        color: #22301f;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        margin: 0 0 14px;
+    }
 
     .journal-hero-lead {
-
         color: #d1c2a5;
-
     }
-
-
 
     .stat-pill-chip {
-
         background: #251e14;
-
         border-color: #52402a;
-
         color: #f7edd7;
-
     }
-
-
 
     .stat-pill-chip strong {
-
         color: #6ef0a0;
-
     }
-
-
 
     .stat-pill-icon {
-
         color: #6ef0a0;
-
     }
-
-
 
     .journal-bubble {
-
         background: #203022;
-
         border-color: #3b533d;
-
         color: #f0faf1;
-
     }
-
-
 
     .journal-bubble-text {
-
         color: #daf0d8;
-
     }
-
-
 
     .journal-day-name {
-
         color: #d1c2a5;
-
     }
-
-
 
     .legend-chip {
-
         color: #d1c2a5;
-
     }
-
 }
-
-
 
 .journal-hero-eyebrow {
-
     font-size: 0.72rem;
-
     font-weight: 800;
-
     letter-spacing: 0.13em;
-
     color: #496a4e;
-
     margin: 0 0 6px;
-
     text-transform: uppercase;
-
     font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-
 }
-
-
 
 .journal-hero-cta-wrap {
     margin-top: 10px;
