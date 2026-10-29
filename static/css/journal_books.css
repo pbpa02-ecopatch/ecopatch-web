@@ -1955,19 +1955,18 @@
 
 
 .entry-right-notes {
-
     font-family: var(--font-body);
-
     font-size: var(--fs-body);
-
     line-height: var(--lh-body);
-
     color: #3b4737;
-
     margin-bottom: 1.5rem;
-
     font-style: italic;
-
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    white-space: pre-wrap;
 }
 
 
