@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 430" role="img" aria-label="Petak sedang mencatat jurnal kebun">
+<style>
+    .ps-char { transform-box: fill-box; transform-origin: 50% 100%; animation: ps-bob 4.6s ease-in-out infinite; }
+    .ps-frond { transform-box: view-box; }
+    .ps-frond--1 { transform-origin: 196px 216px; animation: ps-sway 4.4s ease-in-out infinite; animation-delay: -0.6s; }
+    .ps-frond--2 { transform-origin: 248px 216px; animation: ps-sway 4.9s ease-in-out infinite; animation-delay: -2.4s; }
+    .ps-frond--3 { transform-origin: 220px 216px; animation: ps-sway 4.1s ease-in-out infinite; animation-delay: -1.4s; }
+    .ps-eyes { transform-box: fill-box; transform-origin: 50% 50%; animation: ps-blink 5.2s infinite; }
+    .ps-pencil { transform-box: view-box; transform-origin: 388px 254px; animation: ps-write 2.8s ease-in-out infinite; }
+    @keyframes ps-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+    @keyframes ps-sway { 0%, 100% { rotate: -2.6deg; } 50% { rotate: 2.6deg; } }
+    @keyframes ps-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.08); } }
+    @keyframes ps-write { 0%, 100% { rotate: 0deg; } 25% { rotate: -6deg; } 75% { rotate: 5deg; } }
+    @media (prefers-reduced-motion: reduce) {
+        .ps-char, .ps-frond, .ps-eyes, .ps-pencil { animation: none; }
+    }
+</style>
+
+<!-- Ground Soft Shadow -->
+<ellipse cx="230" cy="405" rx="145" ry="14" fill="#22301f" opacity="0.14"/>
+
+<g class="ps-char">
+    <!-- 1. Sprout Leaves on Head (Same as my_ecopatch & smart_care) -->
+    <g class="ps-frond ps-frond--1">
+        <path d="M198 220C196 194 190 176 184 160" stroke="#1f9142" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <g transform="translate(184 160) scale(-0.62 0.62) rotate(-24)">
+            <path d="M0 0C10-34 46-52 84-46 80-10 40 12 0 0Z" fill="#2fbf5c"/>
+            <path d="M0 0C40 12 80-10 84-46 70-20 36-6 0 0Z" fill="#1f9142" opacity="0.55"/>
+            <path d="M8-5C32-22 54-34 78-44" stroke="#bdeec7" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.85"/>
+        </g>
+    </g>
+    <g class="ps-frond ps-frond--2">
+        <path d="M244 220C246 196 252 182 258 168" stroke="#1f9142" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <g transform="translate(258 168) scale(0.66 0.66) rotate(-34)">
+            <path d="M0 0C10-34 46-52 84-46 80-10 40 12 0 0Z" fill="#2fbf5c"/>
+            <path d="M0 0C40 12 80-10 84-46 70-20 36-6 0 0Z" fill="#1f9142" opacity="0.55"/>
+            <path d="M8-5C32-22 54-34 78-44" stroke="#bdeec7" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.85"/>
+        </g>
+    </g>
+    <g class="ps-frond ps-frond--3">
+        <path d="M220 220C220 182 218 146 220 108" stroke="#1f9142" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <g transform="translate(220 108) rotate(-13)">
+            <path d="M0 0C10-34 46-52 84-46 80-10 40 12 0 0Z" fill="#2fbf5c"/>
+            <path d="M0 0C40 12 80-10 84-46 70-20 36-6 0 0Z" fill="#1f9142" opacity="0.55"/>
+            <path d="M8-5C32-22 54-34 78-44" stroke="#bdeec7" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.85"/>
+        </g>
+        <g transform="translate(220 108) scale(-1 1) rotate(-13)">
+            <path d="M0 0C10-34 46-52 84-46 80-10 40 12 0 0Z" fill="#2fbf5c"/>
+            <path d="M0 0C40 12 80-10 84-46 70-20 36-6 0 0Z" fill="#1f9142" opacity="0.55"/>
+            <path d="M8-5C32-22 54-34 78-44" stroke="#bdeec7" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.85"/>
+        </g>
+    </g>
+
+    <!-- 2. Feet -->
+    <rect x="140" y="362" width="60" height="34" rx="17" fill="#e8841a"/>
+    <rect x="240" y="362" width="60" height="34" rx="17" fill="#e8841a"/>
+
+    <!-- 3. Pot Body -->
+    <rect x="88" y="236" width="264" height="144" rx="42" fill="#ff9d2e"/>
+    <path d="M92 344H348v2a42 42 0 0 1-42 42H134a42 42 0 0 1-42-42Z" fill="#e8841a" opacity="0.5"/>
+    <path d="M112 280a36 36 0 0 1 20-32" stroke="#ffd08f" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.75"/>
+    <circle cx="112" cy="268" r="3.6" fill="#cf6f10"/>
+    <circle cx="330" cy="268" r="3.6" fill="#cf6f10"/>
+    <circle cx="114" cy="360" r="3.6" fill="#cf6f10"/>
+
+    <!-- 4. Rim & Soil -->
+    <rect x="66" y="196" width="308" height="54" rx="27" fill="#ffb85c"/>
+    <rect x="66" y="224" width="308" height="20" rx="10" fill="#ff9d2e" opacity="0.55"/>
+    <rect x="94" y="202" width="252" height="30" rx="15" fill="#5b3a24"/>
+    <rect x="94" y="202" width="252" height="12" rx="6" fill="#47301e"/>
+    <circle cx="132" cy="218" r="3.4" fill="#7a5233"/>
+    <circle cx="238" cy="220" r="3" fill="#7a5233"/>
+    <circle cx="286" cy="215" r="2.6" fill="#7a5233"/>
+
+    <!-- 5. Stitched Leaf Patch on Belly -->
+    <g transform="translate(290 342) rotate(8)">
+        <rect x="-27" y="-27" width="54" height="54" rx="14" fill="#fbf0d4"/>
+        <rect x="-27" y="-27" width="54" height="54" rx="14" fill="none" stroke="#8a6a4a" stroke-width="2" stroke-dasharray="5 4"/>
+        <path d="M-7 15C-11 2-4-9 9-13 11 2 4 12-7 15Z" fill="#2fbf5c"/>
+        <path d="M-2 10C0 2 4-4 8-8" stroke="#bdeec7" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- 6. Face -->
+    <g class="ps-eyes">
+        <ellipse cx="164" cy="282" rx="11" ry="16" fill="#22301f"/>
+        <circle cx="168" cy="274" r="4.5" fill="#fff"/>
+        <circle cx="160" cy="289" r="2" fill="#fff" opacity="0.8"/>
+        <ellipse cx="276" cy="282" rx="11" ry="16" fill="#22301f"/>
+        <circle cx="280" cy="274" r="4.5" fill="#fff"/>
+        <circle cx="272" cy="289" r="2" fill="#fff" opacity="0.8"/>
+    </g>
+    <!-- Rosy Cheeks -->
+    <ellipse cx="130" cy="310" rx="17" ry="10.5" fill="#ff8fa8" opacity="0.85"/>
+    <ellipse cx="310" cy="310" rx="17" ry="10.5" fill="#ff8fa8" opacity="0.85"/>
+    <!-- Smiling Mouth with Tongue -->
+    <path d="M196 304Q220 330 244 304Z" fill="#22301f" stroke="#22301f" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M204 315Q220 325 236 315Q220 307 204 315Z" fill="#ff8fa8"/>
+
+    <!-- 7. Left Hand: Holding Garden Journal Notebook -->
+    <g>
+        <!-- Arm reaching forward -->
+        <path d="M100 292 Q64 300 52 322" stroke="#ff9d2e" stroke-width="24" fill="none" stroke-linecap="round"/>
+        <path d="M100 292 Q64 300 52 322" stroke="#ffb85c" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6" transform="translate(-2 -3)"/>
+        
+        <!-- Garden Notebook -->
+        <g transform="translate(18, 252) rotate(-8)">
+            <!-- Book Cover Drop Shadow -->
+            <rect x="2" y="4" width="70" height="92" rx="9" fill="#1b0e04" opacity="0.18"/>
+            <!-- Emerald Hardcover -->
+            <rect x="0" y="0" width="70" height="92" rx="9" fill="#1f9142"/>
+            <!-- Spine Fold -->
+            <rect x="0" y="0" width="12" height="92" rx="4" fill="#166d31"/>
+            <!-- Inner Pages Block -->
+            <rect x="14" y="6" width="52" height="80" rx="4" fill="#fffcf2"/>
+            <line x1="22" y1="22" x2="58" y2="22" stroke="#bfe5c7" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="22" y1="34" x2="58" y2="34" stroke="#bfe5c7" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="22" y1="46" x2="52" y2="46" stroke="#bfe5c7" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Stitched Plant Crest on Book Cover -->
+            <circle cx="40" cy="64" r="10" fill="#2fbf5c"/>
+            <path d="M40 70 V58" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M40 63 C36 62 34 59 34 56 C38 56 40 58 40 63 Z" fill="#ffffff"/>
+            <path d="M40 61 C44 60 46 57 46 54 C42 54 40 56 40 61 Z" fill="#ffffff"/>
+            <!-- Ribbon bookmark dangling -->
+            <path d="M44 86 v16 l4 -4 l4 4 v-16 z" fill="#ff8fa8"/>
+        </g>
+        <!-- Hand gripping the book -->
+        <circle cx="68" cy="326" r="16" fill="#ff9d2e"/>
+        <circle cx="63" cy="321" r="5" fill="#ffb85c" opacity="0.75"/>
+    </g>
+
+    <!-- 8. Right Hand: Holding Drafting Pencil Poised to Write -->
+    <g class="ps-pencil">
+        <!-- Arm reaching up & holding pencil -->
+        <path d="M340 292 Q372 284 394 256" stroke="#ff9d2e" stroke-width="24" fill="none" stroke-linecap="round"/>
+        <path d="M340 292 Q372 284 394 256" stroke="#ffb85c" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6" transform="translate(2 -3)"/>
+
+        <!-- Drafting Pencil -->
+        <g transform="translate(388, 206) rotate(32)">
+            <!-- Pencil body -->
+            <rect x="0" y="0" width="13" height="74" rx="2.5" fill="#ffd34e"/>
+            <rect x="4" y="0" width="5" height="74" fill="#ffb85c"/>
+            <!-- Ferrule & Pink Eraser -->
+            <rect x="0" y="58" width="13" height="10" fill="#d4af37"/>
+            <rect x="0" y="68" width="13" height="12" rx="3.5" fill="#ff8fa8"/>
+            <!-- Sharpened Cone & Lead -->
+            <polygon points="0,0 13,0 6.5,-18" fill="#f0d5a8"/>
+            <polygon points="4,-11 9,-11 6.5,-18" fill="#22301f"/>
+        </g>
+
+        <!-- Hand gripping pencil -->
+        <circle cx="396" cy="254" r="16" fill="#ff9d2e"/>
+        <circle cx="391" cy="249" r="5" fill="#ffb85c" opacity="0.75"/>
+    </g>
+</g>
+</svg>
+

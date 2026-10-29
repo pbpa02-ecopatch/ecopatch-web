@@ -25,7 +25,7 @@
             <p class="mep-band-links">
                 <a href="{% url 'my_ecopatch:update' patch.pk %}">Ubah</a>
                 <span aria-hidden="true">&middot;</span>
-                <a href="{% url 'my_ecopatch:delete' patch.pk %}" class="mep-link-danger" data-confirm-delete data-confirm-title="Hapus EcoPatch?" data-confirm-name="{{ patch.name }}" data-confirm-note="Semua tanaman di dalamnya ikut terhapus. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus EcoPatch">Hapus</a>
+                <a href="{% url 'my_ecopatch:delete' patch.pk %}" class="mep-link-danger" data-confirm-delete data-confirm-title="Hapus EcoPatch?" data-confirm-name="{{ patch.name }}" data-confirm-note="Semua tanaman di dalamnya{% with jcount=patch.journals.count %}{% if jcount %} dan {{ jcount }} catatan jurnal{% endif %}{% endwith %} ikut terhapus. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus EcoPatch">Hapus</a>
             </p>
         </div>
     </div>

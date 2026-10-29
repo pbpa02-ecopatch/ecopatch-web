@@ -79,7 +79,7 @@
     <div class="mep-map">
     {% for patch in patches %}
     <article class="mep-garden">
-    <a class="mep-trash" href="{% url 'my_ecopatch:delete' patch.pk %}" data-confirm-delete data-confirm-title="Hapus EcoPatch?" data-confirm-name="{{ patch.name }}" data-confirm-note="Semua tanaman di dalamnya ikut terhapus. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus EcoPatch"
+    <a class="mep-trash" href="{% url 'my_ecopatch:delete' patch.pk %}" data-confirm-delete data-confirm-title="Hapus EcoPatch?" data-confirm-name="{{ patch.name }}" data-confirm-note="Semua tanaman di dalamnya{% with jcount=patch.journals.count %}{% if jcount %} dan {{ jcount }} catatan jurnal{% endif %}{% endwith %} ikut terhapus. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus EcoPatch"
        aria-label="Hapus EcoPatch {{ patch.name }}" title="Hapus EcoPatch">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>
     </a>

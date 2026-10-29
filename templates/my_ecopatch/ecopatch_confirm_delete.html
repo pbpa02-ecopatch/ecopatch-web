@@ -5,7 +5,7 @@
 <section class="patch-form-shell">
     <h1 class="patch-page-title">Hapus EcoPatch?</h1>
     <p class="patch-page-lead">
-        Kamu akan menghapus <strong>{{ patch.name }}</strong>{% if patch.plant_total %} beserta {{ patch.plant_quantity }} tanaman ({{ patch.plant_total }} entri) di dalamnya{% endif %}.
+        Kamu akan menghapus <strong>{{ patch.name }}</strong>{% if patch.plant_total %} beserta {{ patch.plant_quantity }} tanaman ({{ patch.plant_total }} entri) di dalamnya{% endif %}{% with jcount=patch.journals.count %}{% if jcount %} dan {{ jcount }} catatan jurnal ikut terhapus{% endif %}{% endwith %}.
         Tindakan ini tidak bisa dibatalkan.
     </p>
     <form method="post" class="patch-form-actions">

@@ -14,7 +14,7 @@
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item">
-                    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none">Koleksi Jurnal</a>
+                    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none">Garden Journal</a>
                 </li>
                 {% if journal %}
                     <li class="breadcrumb-item">
@@ -43,7 +43,7 @@
                     Buat EcoPatch Sekarang
                 </a>
                 <a href="{% url 'garden_journal:list' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2">
-                    Kembali ke Koleksi Jurnal
+                    Kembali ke Garden Journal
                 </a>
             </div>
         </div>
@@ -364,6 +364,7 @@
                                 </label>
                                 {% if user_patches %}
                                     <div class="dropdown journal-select-wrapper" id="ecopatchSelectWrapper">
+                                        <input type="hidden" name="ecopatch" id="id_ecopatch" value="{{ form.ecopatch.value|default:'' }}">
                                         <input type="hidden" name="ecopatch_name" id="id_ecopatch_name" value="{{ form.ecopatch_name.value|default:'' }}">
                                         <button type="button" class="journal-select-btn dropdown-toggle w-100{% if form.ecopatch_name.value %} journal-select-btn--active{% endif %}" id="ecopatchSelectBtn"
                                                 data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
@@ -381,7 +382,7 @@
                                             {% for patch in user_patches %}
                                                 <li>
                                                     <button type="button" class="dropdown-item journal-select-item {% if form.ecopatch_name.value == patch.name %}active{% endif %}"
-                                                            data-ecopatch-val="{{ patch.name }}">
+                                                            data-ecopatch-val="{{ patch.name }}" data-ecopatch-id="{{ patch.pk }}">
                                                         <span class="fw-semibold">{{ patch.name }}</span>
                                                         <span class="badge rounded-pill bg-light text-muted border px-2 py-1" style="font-size: 11px;">{{ patch.get_space_type_display }}</span>
                                                     </button>
@@ -446,7 +447,8 @@
                     {% else %}
                     <!-- Mode Edit atau Tambah ke Buku Ada: Setup tidak ditampilkan. Nilai dikirim via hidden inputs -->
                     <input type="hidden" name="plant_name" id="id_plant_name" value="{{ form.plant_name.value|default:'' }}">
-                    <input type="hidden" name="ecopatch_name" id="id_ecopatch_name" value="{{ form.ecopatch_name.value|default:'' }}">
+                    <input type="hidden" name="ecopatch" id="id_ecopatch" value="{{ form.ecopatch.value|default:'' }}">
+                                        <input type="hidden" name="ecopatch_name" id="id_ecopatch_name" value="{{ form.ecopatch_name.value|default:'' }}">
                     <input type="hidden" name="cover_pattern" id="id_cover_pattern" value="{{ form.cover_pattern.value|default:'soft' }}">
                     <input type="hidden" name="cover_color" id="id_cover_color" value="{{ form.cover_color.value|default:'' }}">
                     {% endif %}
