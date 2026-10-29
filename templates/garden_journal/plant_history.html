@@ -11,7 +11,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
     <a href="{% url 'garden_journal:list' %}" class="btn btn-ds-ghost d-inline-flex align-items-center">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        Kembali ke Koleksi Jurnal
+        Kembali ke Garden Journal
     </a>
     <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name|urlencode }}" class="btn btn-ds-primary">
         + Tambah Catatan
@@ -610,12 +610,12 @@ function renderPage(idx) {
                     </div>
 
                     <!-- Notes -->
-                    <p class="entry-right-notes mb-3" style="white-space: pre-wrap; font-size: 0.9rem; line-height: 1.55; color: #444;">${escHtml(e.notes)}</p>
+                    <p class="entry-right-notes mb-3" style="white-space: pre-wrap; font-size: 0.92rem; line-height: 1.6; color: #3b4737; overflow-wrap: anywhere; word-break: break-word; text-align: justify; text-justify: inter-word; hyphens: auto; padding-right: 2px;">${escHtml(e.notes)}</p>
 
                     <!-- Photo slot or polaroid -->
                     ${e.image_url ? `
                         <div class="journal-photo-polaroid mt-3">
-                            <div class="journal-polaroid-frame text-center p-2 bg-white shadow-sm rounded border" style="border-color: #efe4cb !important; display: inline-block;">
+                            <div class="journal-polaroid-frame text-center p-2 bg-white shadow-sm rounded border" style="border-color: #efe4cb !important; display: inline-block; max-width: 100%; box-sizing: border-box;">
                                 <img src="${e.image_url}" alt="${escHtml(e.title)}" class="journal-polaroid-img rounded" style="max-height: 160px; max-width: 100%; object-fit: cover; cursor: pointer;" onclick="window.open('${e.image_url}', '_blank')">
                                 <div class="journal-polaroid-caption text-muted small mt-1" style="font-size: 0.72rem;">Foto: ${e.date}</div>
                                 <div class="mt-1">
@@ -828,7 +828,7 @@ async function processQuickUpload(file) {
     const formData = new FormData();
     formData.append('image', file);
 
-    showToast('Mengunggah foto tanaman...', 'info');
+    const loadingToast = showToast('Mengunggah foto tanaman...', 'info');
 
     try {
         const res = await fetch(uploadUrl, {
@@ -838,6 +838,9 @@ async function processQuickUpload(file) {
             },
             body: formData,
         });
+        if (loadingToast && typeof loadingToast.dismiss === 'function') {
+            loadingToast.dismiss();
+        }
         const data = await res.json();
         if (data.success && data.image_url) {
             entry.image_url = data.image_url;
@@ -850,6 +853,9 @@ async function processQuickUpload(file) {
             showToast(data.error || 'Gagal mengunggah foto tanaman.', 'warning');
         }
     } catch (err) {
+        if (loadingToast && typeof loadingToast.dismiss === 'function') {
+            loadingToast.dismiss();
+        }
         console.error(err);
         showToast('Gagal mengunggah foto. Pastikan koneksi lancar.', 'warning');
     } finally {
@@ -905,6 +911,15 @@ function showToast(message, type = 'success') {
         container.className = 'toast-container site-toasts';
         document.body.appendChild(container);
     }
+
+    // Dismiss any active info/loading toast immediately before showing a result toast
+    if (type !== 'info') {
+        container.querySelectorAll('.site-toast--info').forEach(t => {
+            t.classList.remove('show');
+            setTimeout(() => t.remove(), 250);
+        });
+    }
+
     const toastEl = document.createElement('div');
     toastEl.className = `toast site-toast site-toast--${type} show`;
     toastEl.setAttribute('role', 'status');
@@ -915,15 +930,23 @@ function showToast(message, type = 'success') {
     `;
     container.appendChild(toastEl);
 
-    setTimeout(() => {
+    let hideTimer = null;
+    function dismissToast() {
+        if (hideTimer) clearTimeout(hideTimer);
         toastEl.classList.remove('show');
-        setTimeout(() => toastEl.remove(), 350);
-    }, 4000);
+        setTimeout(() => toastEl.remove(), 250);
+    }
 
-    toastEl.querySelector('.site-toast-close')?.addEventListener('click', () => {
-        toastEl.classList.remove('show');
-        setTimeout(() => toastEl.remove(), 350);
-    });
+    toastEl.dismiss = dismissToast;
+
+    // Normal toasts auto-hide after 3.5s, loading info toasts stay until explicitly dismissed
+    if (type !== 'info') {
+        hideTimer = setTimeout(dismissToast, 3500);
+    }
+
+    toastEl.querySelector('.site-toast-close')?.addEventListener('click', dismissToast);
+
+    return toastEl;
 }
 
 /* ---- Init on load ---- */

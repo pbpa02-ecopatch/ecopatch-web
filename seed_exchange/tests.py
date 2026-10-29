@@ -538,6 +538,19 @@ class SeedExchangeFlowTests(TestCase):
         self.assertIn('0812-0000-0000', content)
         self.assertNotIn('Batalkan booking saya', content)
 
+    def test_completed_requester_still_sees_contact_in_the_owner_card(self):
+        # The contact lives in the owner card, so it stays reachable after the
+        # booking is completed and the status box no longer repeats it.
+        self._request_booking()
+        self.listing.status = 'completed'
+        self.listing.save()
+        self.client.login(username='teman', password='test123')
+        content = self.client.get(reverse('seed_exchange:detail', args=[self.listing.pk])).content.decode()
+        self.assertIn('Selesai', content)
+        self.assertIn('0812-0000-0000', content)
+        self.assertIn('di kartu pemilik', content)
+        self.assertNotIn('Hubungi via Email', content)
+
     def test_owner_sees_requester_name(self):
         self._request_booking()
         self.client.login(username='rheina', password='test123')

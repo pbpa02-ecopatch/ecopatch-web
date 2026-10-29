@@ -1,10 +1,11 @@
-from datetime import timedelta
+import datetime
+from datetime import date, timedelta
 from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -28,11 +29,30 @@ def _journal_filter_url(active, **changes):
     return f"{base}?{query}" if query else base
 
 
-def _journal_filter_dropdowns(active, ecopatch_names, conditions):
-    """Dropdown options in the same shape the Seed Exchange filter uses."""
+def _journal_filter_dropdowns(active, ecopatch_names, conditions, show_photo_filter=False):
+    """Dropdown options in the same shape the Seed Exchange filter uses.
+
+    ``show_photo_filter`` should be True only when at least one journal entry
+    already has a photo attached (i.e. the upload feature is live).  Pass False
+    (the default) to hide the photo filter entirely while the feature is still
+    being built.
+    """
     config = [
         ("ecopatch_name", "Semua EcoPatch", [(name, name) for name in ecopatch_names]),
         ("condition", "Semua Kondisi", list(conditions)),
+        # Photo filter — hidden until upload feature is live.
+        # When show_photo_filter=True this entry is included with updated labels:
+        #   all  → "Semua Catatan"
+        #   yes  → "Ada Foto"
+        #   no   → "Tanpa Foto"
+        *([("has_photo", "Semua Catatan", [("yes", "Ada Foto"), ("no", "Tanpa Foto")])]
+          if show_photo_filter else []),
+        ("sort", "Urutkan", [
+            ("newest", "Terbaru"),
+            ("oldest", "Terlama"),
+            ("a_z", "A → Z"),
+            ("z_a", "Z → A"),
+        ]),
     ]
     dropdowns = []
     for name, all_label, options in config:
@@ -59,6 +79,7 @@ def _journal_filter_dropdowns(active, ecopatch_names, conditions):
                 "current_label": labels.get(current, all_label),
                 "items": items,
                 "is_active": bool(current),
+                "aria_label": "Filter foto" if name == "has_photo" else ("Filter " + all_label.replace("Semua ", "") if all_label.startswith("Semua ") else all_label),
             }
         )
     return dropdowns
@@ -66,16 +87,21 @@ def _journal_filter_dropdowns(active, ecopatch_names, conditions):
 
 def _get_filtered_journals(request):
     """Helper query filter untuk list dan AJAX live filter."""
-    journals = GardenJournal.objects.filter(user=request.user)
+    journals = GardenJournal.objects.filter(user=request.user).select_related("ecopatch")
 
-    ecopatch_name = request.GET.get("ecopatch_name", "").strip()
+    ecopatch_param = request.GET.get("ecopatch", "").strip() or request.GET.get("ecopatch_name", "").strip()
     plant_name = request.GET.get("plant_name", "").strip()
     condition = request.GET.get("condition", "").strip()
     date_from = request.GET.get("date_from", "").strip()
     date_to = request.GET.get("date_to", "").strip()
 
-    if ecopatch_name:
-        journals = journals.filter(ecopatch_name__icontains=ecopatch_name)
+    if ecopatch_param:
+        if ecopatch_param.isdigit():
+            journals = journals.filter(ecopatch_id=int(ecopatch_param))
+        else:
+            journals = journals.filter(
+                Q(ecopatch__name__icontains=ecopatch_param) | Q(ecopatch_name__icontains=ecopatch_param)
+            )
     if plant_name:
         journals = journals.filter(plant_name__icontains=plant_name)
     if condition:
@@ -85,6 +111,23 @@ def _get_filtered_journals(request):
     if date_to:
         journals = journals.filter(date__lte=date_to)
 
+    has_photo = request.GET.get("has_photo", "").strip()
+    if has_photo == "yes":
+        # Ada Foto: hanya catatan yang punya foto
+        journals = journals.exclude(image="").exclude(image__isnull=True)
+    elif has_photo == "no":
+        # Tanpa Foto: hanya catatan tanpa foto
+        journals = journals.filter(Q(image="") | Q(image__isnull=True))
+
+    sort = request.GET.get("sort", "").strip()
+    if sort == "oldest":
+        journals = journals.order_by("date", "created_at")
+    elif sort == "a_z":
+        journals = journals.order_by("plant_name")
+    elif sort == "z_a":
+        journals = journals.order_by("-plant_name")
+    else:
+        journals = journals.order_by("-date", "-created_at")
     return journals
 
 
@@ -127,6 +170,19 @@ def _get_plant_books(request):
                 "ecopatch_name": latest.ecopatch_name,
                 "latest_entry": latest,
             })
+
+    # Sort books sesuai parameter sort
+    sort = request.GET.get("sort", "").strip()
+    if sort == "oldest":
+        books.sort(key=lambda b: (b["latest_date"] or datetime.date.min, b["latest_entry"].created_at if b.get("latest_entry") else datetime.datetime.min))
+    elif sort == "z_a":
+        books.sort(key=lambda b: b["plant_name"].lower(), reverse=True)
+    elif sort == "a_z":
+        books.sort(key=lambda b: b["plant_name"].lower())
+    else:
+        # Default atau "newest": urutkan dari catatan terbaru
+        books.sort(key=lambda b: (b["latest_date"] or datetime.date.min, b["latest_entry"].created_at if b.get("latest_entry") else datetime.datetime.min), reverse=True)
+
     return books
 
 
@@ -174,6 +230,10 @@ def journal_list(request):
     user_plants = _get_user_patch_plants(request.user)
     has_planned_plants = _has_planned_plants(request.user)
 
+    # Tampilkan filter foto hanya jika minimal 1 catatan sudah punya foto.
+    # Ganti ini jadi True ketika fitur upload foto sudah aktif penuh.
+    has_any_photo = user_journals.exclude(image="").exclude(image__isnull=True).exists()
+
     ecopatch_names = list(
         user_journals.exclude(ecopatch_name="")
         .values_list("ecopatch_name", flat=True)
@@ -184,6 +244,8 @@ def journal_list(request):
         "ecopatch_name": request.GET.get("ecopatch_name", "").strip(),
         "plant_name": request.GET.get("plant_name", "").strip(),
         "condition": request.GET.get("condition", "").strip(),
+        "has_photo": request.GET.get("has_photo", "").strip() if has_any_photo else "",
+        "sort": request.GET.get("sort", "").strip(),
     }
 
     today = timezone.localdate()
@@ -213,17 +275,21 @@ def journal_list(request):
         "last_7_days": last_7_days,
         "ecopatch_names": ecopatch_names,
         "conditions": GardenJournal.CONDITION_CHOICES,
+        "has_any_photo": has_any_photo,
         "filter_dropdowns": _journal_filter_dropdowns(
-            active, ecopatch_names, GardenJournal.CONDITION_CHOICES
+            active, ecopatch_names, GardenJournal.CONDITION_CHOICES,
+            show_photo_filter=has_any_photo,
         ),
-        "has_active_filters": bool(active["ecopatch_name"] or active["condition"]),
+        "has_active_filters": bool(active["ecopatch_name"] or active["condition"] or active["has_photo"] or active["sort"]),
         "filters_reset_url": _journal_filter_url(
-            active, ecopatch_name="", condition=""
+            active, ecopatch_name="", condition="", has_photo="", sort=""
         ),
         "search_clear_url": _journal_filter_url(active, plant_name=""),
         "selected_ecopatch_name": active["ecopatch_name"],
         "selected_plant_name": active["plant_name"],
         "selected_condition": active["condition"],
+        "selected_has_photo": active["has_photo"],
+        "selected_sort": active["sort"],
         "date_from": request.GET.get("date_from", ""),
         "date_to": request.GET.get("date_to", ""),
         "has_ecopatch": has_ecopatch,
@@ -257,7 +323,6 @@ def journal_filter_ajax(request):
 def plant_journal_history(request, plant_name):
     """Membuka lembaran buku dua sisi (open book spread) untuk satu tanaman."""
     import json
-    from datetime import timedelta
 
     journals_query = GardenJournal.objects.filter(
         user=request.user, plant_name=plant_name
@@ -408,10 +473,12 @@ def journal_create(request):
             start_at_step_2 = True
 
     if request.method == "POST":
-        form = GardenJournalForm(request.POST, request.FILES)
+        form = GardenJournalForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             journal = form.save(commit=False)
             journal.user = request.user
+            if not journal.ecopatch and journal.ecopatch_name:
+                journal.ecopatch = user_patches.filter(name__iexact=journal.ecopatch_name.strip()).first()
             journal.save()
             messages.success(request, f"Catatan untuk '{journal.plant_name}' berhasil ditambahkan ke lembar buku!")
             return redirect("garden_journal:plant_history", plant_name=journal.plant_name)
@@ -431,8 +498,9 @@ def journal_create(request):
         elif has_ecopatch:
             first_patch = user_patches.first()
             if first_patch:
+                initial_data["ecopatch"] = first_patch.pk
                 initial_data["ecopatch_name"] = first_patch.name
-        form = GardenJournalForm(initial=initial_data)
+        form = GardenJournalForm(initial=initial_data, user=request.user)
 
     patch_plants_data = {}
     for patch in user_patches:
@@ -485,13 +553,16 @@ def journal_edit(request, pk):
     user_patches = EcoPatch.objects.filter(owner=request.user).prefetch_related("plants__plant")
 
     if request.method == "POST":
-        form = GardenJournalForm(request.POST, request.FILES, instance=journal)
+        form = GardenJournalForm(request.POST, request.FILES, instance=journal, user=request.user)
         if form.is_valid():
-            form.save()
+            edited_journal = form.save(commit=False)
+            if not edited_journal.ecopatch and edited_journal.ecopatch_name:
+                edited_journal.ecopatch = user_patches.filter(name__iexact=edited_journal.ecopatch_name.strip()).first()
+            edited_journal.save()
             messages.success(request, f"Catatan '{journal.title}' berhasil diperbarui.")
             return redirect("garden_journal:plant_history", plant_name=journal.plant_name)
     else:
-        form = GardenJournalForm(instance=journal)
+        form = GardenJournalForm(instance=journal, user=request.user)
 
     patch_plants_data = {}
     for patch in user_patches:

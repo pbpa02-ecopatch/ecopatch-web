@@ -1,14 +1,22 @@
 from django import forms
 from django.forms import ModelForm
 
+from my_ecopatch.models import EcoPatch
 from .models import GardenJournal
 
 
 class GardenJournalForm(ModelForm):
+    ecopatch = forms.ModelChoiceField(
+        queryset=EcoPatch.objects.all(),
+        required=False,
+        widget=forms.HiddenInput(attrs={"id": "id_ecopatch"}),
+    )
+
     class Meta:
         model = GardenJournal
         fields = [
             "plant_name",
+            "ecopatch",
             "ecopatch_name",
             "date",
             "title",
@@ -21,6 +29,7 @@ class GardenJournalForm(ModelForm):
         ]
         labels = {
             "plant_name": "Nama Tanaman",
+            "ecopatch": "EcoPatch",
             "ecopatch_name": "Nama EcoPatch",
             "plant_height": "Ukuran / Tinggi Tanaman (cm)",
             "image": "Foto Tanaman (Opsional)",
@@ -28,6 +37,7 @@ class GardenJournalForm(ModelForm):
         }
         help_texts = {
             "plant_name": "Isi nama tanaman yang dicatat (misal: Monstera, Tomat Ceri, Cabai Rawit).",
+            "ecopatch": "Pilih EcoPatch tempat tanamanmu tumbuh.",
             "ecopatch_name": "Isi nama kebunmu (contoh: Balkon Timur, Kebun Depan).",
             "plant_height": "Tinggi batang, panjang sulur, atau bentang tanaman dalam cm.",
             "image": "Upload foto perkembangan tanaman hari ini (JPG/PNG).",
@@ -53,6 +63,28 @@ class GardenJournalForm(ModelForm):
                 attrs={"rows": 4, "class": "form-control", "placeholder": "Ada daun baru? Perlu disiram? Tulis apa yang kamu lihat hari ini."}
             ),
         }
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        if user is not None:
+            self.fields["ecopatch"].queryset = EcoPatch.objects.filter(owner=user)
+        self.fields["ecopatch"].required = False
+        self.fields["ecopatch_name"].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        ecopatch = cleaned_data.get("ecopatch")
+        ecopatch_name = cleaned_data.get("ecopatch_name", "").strip()
+
+        if ecopatch:
+            cleaned_data["ecopatch_name"] = ecopatch.name
+        elif ecopatch_name and self.user:
+            matched = EcoPatch.objects.filter(owner=self.user, name__iexact=ecopatch_name).first()
+            if matched:
+                cleaned_data["ecopatch"] = matched
+                cleaned_data["ecopatch_name"] = matched.name
+        return cleaned_data
 
     def clean_plant_height(self):
         height = self.cleaned_data.get("plant_height")

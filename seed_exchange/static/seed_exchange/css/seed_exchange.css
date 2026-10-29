@@ -158,8 +158,8 @@ body.has-sidebar:has(.seed-page) .site-footer {
     min-height: clamp(390px, 44vh, 460px);
     border-bottom: 3px solid #d8c48d;
     background:
-        radial-gradient(80% 90% at 88% 6%, rgba(255, 214, 122, 0.5) 0%, rgba(255, 214, 122, 0) 62%),
-        linear-gradient(180deg, #fff8e6 0%, #f2f9e7 48%, #e2f3d9 100%);
+        radial-gradient(70% 90% at 84% 4%, rgba(255, 216, 120, 0.62) 0%, rgba(255, 216, 120, 0) 64%),
+        linear-gradient(180deg, #ffefc4 0%, #fff7e0 34%, #eef7df 66%, #dff1d4 100%);
 }
 
 .seed-hero-art {
@@ -211,12 +211,30 @@ body.has-sidebar:has(.seed-page) .site-footer {
     position: absolute;
     top: clamp(18px, 4vh, 40px);
     right: 11%;
+    z-index: 0;
     width: clamp(100px, 12vw, 150px);
     aspect-ratio: 1;
     border-radius: 50%;
     background: radial-gradient(circle at 50% 46%, #fff8cf 0 36%, #ffdd85 37% 58%, rgba(255, 216, 115, 0.38) 59% 76%, rgba(255, 216, 115, 0) 77%);
     filter: drop-shadow(0 0 28px rgba(255, 205, 95, 0.55));
     animation: seed-sun-glow 7s ease-in-out infinite;
+}
+
+/* Soft rays turning slowly behind the disc. */
+.seed-sun::before {
+    content: "";
+    position: absolute;
+    inset: -85%;
+    z-index: -1;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg, rgba(255, 214, 122, 0.34) 0 7deg, rgba(255, 214, 122, 0) 7deg 20deg);
+    -webkit-mask-image: radial-gradient(circle, #000 0 30%, transparent 68%);
+    mask-image: radial-gradient(circle, #000 0 30%, transparent 68%);
+    animation: seed-rays 70s linear infinite;
+}
+
+@keyframes seed-rays {
+    to { transform: rotate(360deg); }
 }
 
 @keyframes seed-sun-glow {
@@ -287,6 +305,25 @@ body.has-sidebar:has(.seed-page) .site-footer {
     50% { rotate: 2.8deg; }
 }
 
+/* Village rooftops sit behind the hills, then a picket fence runs along them. */
+.seed-town {
+    position: absolute;
+    left: 0;
+    bottom: clamp(88px, 12vh, 130px);
+    width: 100%;
+    height: clamp(120px, 17vh, 170px);
+    opacity: 0.95;
+}
+
+.seed-fence {
+    position: absolute;
+    left: 0;
+    bottom: clamp(36px, 6vh, 58px);
+    width: 100%;
+    height: clamp(70px, 10vh, 96px);
+    filter: drop-shadow(0 3px 3px rgba(23, 48, 31, 0.1));
+}
+
 .seed-hills {
     position: absolute;
     left: -2%;
@@ -304,15 +341,6 @@ body.has-sidebar:has(.seed-page) .site-footer {
     height: clamp(110px, 15vh, 160px);
 }
 
-.seed-shrubs {
-    position: absolute;
-    left: -1%;
-    bottom: 20px;
-    width: 102%;
-    height: 110px;
-    opacity: 0.95;
-}
-
 .seed-flowers {
     position: absolute;
     left: 0;
@@ -322,39 +350,41 @@ body.has-sidebar:has(.seed-page) .site-footer {
     opacity: 0.9;
 }
 
-.seed-sprout {
+/* A butterfly drifts over the garden, wings flapping. */
+.seed-butterfly {
     position: absolute;
-    bottom: 8px;
-    width: auto;
-    height: 54px;
-    transform-origin: 50% 100%;
-    filter: drop-shadow(0 3px 4px rgba(23, 48, 31, 0.12));
-    animation: seed-sprout-sway 5.4s ease-in-out infinite;
+    left: 25%;
+    top: 52%;
+    width: 30px;
+    height: 23px;
+    animation: seed-butterfly-fly 11s ease-in-out infinite;
 }
 
-.seed-sprout--1 {
-    left: 8%;
-    height: 56px;
+.seed-butterfly-wing {
+    transform-box: view-box;
+    transform-origin: 20px 15px;
+    animation: seed-wing 0.5s ease-in-out infinite alternate;
 }
 
-.seed-sprout--2 {
-    left: 34%;
-    height: 46px;
-    animation-delay: -1.4s;
-    animation-duration: 6.2s;
+.seed-butterfly-wing--r {
+    animation-name: seed-wing-r;
 }
 
-.seed-sprout--3 {
-    left: 62%;
-    height: 40px;
-    opacity: 0.85;
-    animation-delay: -2.8s;
-    animation-duration: 5.8s;
+@keyframes seed-wing {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0.35); }
 }
 
-@keyframes seed-sprout-sway {
-    0%, 100% { transform: rotate(-2deg); }
-    50% { transform: rotate(2.4deg); }
+@keyframes seed-wing-r {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0.35); }
+}
+
+@keyframes seed-butterfly-fly {
+    0%, 100% { transform: translate(0, 0) rotate(-6deg); }
+    25% { transform: translate(60px, -26px) rotate(8deg); }
+    50% { transform: translate(130px, 6px) rotate(-4deg); }
+    75% { transform: translate(70px, 22px) rotate(10deg); }
 }
 
 .seed-leaf {
@@ -387,59 +417,91 @@ body.has-sidebar:has(.seed-page) .site-footer {
 
 /* --- mascot + stall --- */
 .seed-hero-mascot {
+    --seed-mascot-w: clamp(210px, 17.5vw, 250px);
+    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
     align-self: end;
-    width: clamp(330px, 30vw, 430px);
+    width: clamp(300px, 36vw, 470px);
     margin-bottom: 2px;
 }
 
 .seed-speech {
     position: relative;
+    z-index: 2;
+    box-sizing: border-box;
     align-self: flex-end;
-    max-width: 310px;
-    margin: 0 4px 4px 0;
-    padding: 12px 16px;
-    border: 1px solid rgba(182, 154, 99, 0.4);
-    border-radius: 20px 20px 6px 20px;
-    background: #fffef7;
-    box-shadow: 0 10px 22px rgba(23, 48, 31, 0.12);
-    color: #3f5744;
-    font-size: 0.82rem;
-    line-height: 1.45;
+    width: min(331px, 100%);
+    margin: 0 0 -24px;
+    padding: 12px 17px 14px;
+    border: 0;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(23, 48, 31, 0.13), 0 1px 3px rgba(23, 48, 31, 0.06);
+    color: var(--seed-fg);
+    font-family: var(--seed-body);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.seed-speech p {
+    margin: 6px 0 0;
+    color: inherit;
+    font: inherit;
+}
+
+.seed-speech a {
+    color: var(--seed-brand-strong);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.seed-speech-badge {
+    display: inline-block;
+    padding: 2px 11px;
+    border-radius: 999px;
+    background: #e0f3e4;
+    color: #1b7a3c;
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 17px;
 }
 
 .seed-speech::after {
     content: "";
     position: absolute;
-    right: 52px;
-    bottom: -7px;
+    right: calc(var(--seed-mascot-w) / 2 - 7px);
+    bottom: -6px;
     width: 14px;
     height: 14px;
-    border-right: 1px solid rgba(182, 154, 99, 0.4);
-    border-bottom: 1px solid rgba(182, 154, 99, 0.4);
-    background: #fffef7;
+    border: 0;
+    border-radius: 0 0 3px 0;
+    background: #fff;
     transform: rotate(45deg);
 }
 
 .seed-mascot-row {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: flex-end;
-    justify-content: center;
+    justify-content: flex-end;
     width: 100%;
 }
 
 .seed-mascot-row img {
-    width: clamp(180px, 18.5vw, 250px);
+    width: var(--seed-mascot-w);
     height: auto;
-    filter: drop-shadow(0 16px 24px rgba(23, 48, 31, 0.2));
+    filter: none;
 }
 
 .seed-stall {
-    width: clamp(145px, 15.5vw, 208px);
-    margin-right: -46px;
-    margin-bottom: 6px;
+    width: clamp(150px, 16.5vw, 218px);
+    margin-right: -22px;
+    margin-bottom: 4px;
     filter: drop-shadow(0 8px 12px rgba(23, 48, 31, 0.14));
 }
 
@@ -1629,6 +1691,11 @@ button.seed-filter {
     white-space: pre-line;
 }
 
+/* The note has no heading any more, so its text starts at the card padding. */
+.seed-note-text:first-child {
+    margin-top: 0;
+}
+
 .seed-note-text--empty {
     color: var(--seed-muted);
     font-style: italic;
@@ -1715,38 +1782,6 @@ button.seed-filter {
 
 .seed-reserve-box p:last-child {
     margin-bottom: 0;
-}
-
-.seed-reserve-contact {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    margin: 12px 0 14px;
-}
-
-.seed-contact-name {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 800;
-}
-
-.seed-contact-avatar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: #fffdf6;
-    color: var(--seed-brand-strong);
-    font-weight: 800;
-}
-
-.seed-contact-value {
-    color: var(--seed-muted);
-    font-size: 0.92rem;
 }
 
 /* ---------------------------------------------------------------- Form */
@@ -1854,77 +1889,19 @@ button.seed-filter {
 
 /* Read-only city + contact, pulled straight from the profile. */
 .seed-loc {
-    position: relative;
-    display: flex;
     grid-column: 1 / -1;
-    align-items: flex-start;
-    gap: 14px;
-    overflow: hidden;
     padding: 16px 18px;
     border: 1.5px solid var(--seed-line);
     border-radius: 20px;
-    background: linear-gradient(135deg, #fffdf6, #f7f0dc);
-}
-
-.seed-loc::after {
-    content: '';
-    position: absolute;
-    right: -22px;
-    bottom: -34px;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: rgba(47, 191, 92, 0.08);
-    pointer-events: none;
+    background: #fffdf6;
 }
 
 .seed-loc--missing {
     border-color: rgba(255, 157, 46, 0.55);
-    background: linear-gradient(135deg, #fffdf6, #fdf0dc);
-}
-
-.seed-loc--missing::after {
-    background: rgba(255, 157, 46, 0.12);
-}
-
-.seed-loc-pin {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 46px;
-    height: 46px;
-    border-radius: 15px;
-    background: var(--seed-brand-soft);
-    color: var(--seed-brand-strong);
-}
-
-.seed-loc--missing .seed-loc-pin {
-    background: var(--seed-warn-bg);
-    color: var(--seed-warn);
-}
-
-.seed-loc-pin svg {
-    width: 24px;
-    height: 24px;
 }
 
 .seed-loc-body {
     min-width: 0;
-}
-
-.seed-loc-kicker {
-    margin: 0 0 6px;
-    color: var(--seed-muted);
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-}
-
-.seed-loc-kicker b {
-    color: var(--seed-fg);
-    letter-spacing: 0;
-    text-transform: none;
 }
 
 .seed-loc-facts {
@@ -2407,22 +2384,19 @@ select.seed-input {
     }
 
     .seed-hero-mascot {
-        width: clamp(210px, 25vw, 275px);
-    }
-
-    .seed-mascot-row img {
-        width: clamp(150px, 18vw, 200px);
+        --seed-mascot-w: clamp(150px, 18vw, 190px);
+        width: clamp(270px, 34vw, 340px);
     }
 
     .seed-stall {
-        width: clamp(116px, 13.5vw, 156px);
-        margin-right: -30px;
+        width: clamp(118px, 14vw, 160px);
+        margin-right: -24px;
     }
 
     .seed-speech {
         max-width: 230px;
         padding: 10px 13px;
-        font-size: 0.76rem;
+        font-size: 0.8rem;
     }
 }
 
@@ -2435,11 +2409,8 @@ select.seed-input {
     }
 
     .seed-hero-mascot {
+        --seed-mascot-w: 146px;
         width: 198px;
-    }
-
-    .seed-mascot-row img {
-        width: 146px;
     }
 
     .seed-stall {
@@ -2520,6 +2491,7 @@ select.seed-input {
         right: 0;
         bottom: 0;
         left: 0;
+        align-items: center;
         width: 100%;
         margin: 0;
         z-index: 3;
@@ -2527,6 +2499,10 @@ select.seed-input {
 
     .seed-speech {
         display: none;
+    }
+
+    .seed-mascot-row {
+        justify-content: center;
     }
 
     .seed-mascot-row img {
@@ -2538,6 +2514,20 @@ select.seed-input {
         width: 136px;
         margin-right: -24px;
         margin-bottom: 4px;
+    }
+
+    .seed-town {
+        height: 100px;
+        bottom: 70px;
+    }
+
+    .seed-fence {
+        height: 64px;
+        bottom: 30px;
+    }
+
+    .seed-butterfly {
+        display: none;
     }
 
     .seed-bunting {
@@ -2564,16 +2554,6 @@ select.seed-input {
 
     .seed-hills--front {
         height: 100px;
-    }
-
-    .seed-sprout--2,
-    .seed-sprout--3 {
-        display: none;
-    }
-
-    .seed-sprout--1 {
-        left: 5%;
-        height: 42px;
     }
 
     .seed-leaf--b {

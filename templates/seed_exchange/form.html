@@ -62,15 +62,8 @@
                     {% if field.name == 'description' %}
                     <h2 class="seed-form-section">Lokasi &amp; kontak</h2>
                     <div class="seed-loc{% if not location_ready %} seed-loc--missing{% endif %}">
-                        <span class="seed-loc-pin" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 21s-6.5-5.4-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21Z"/>
-                                <circle cx="12" cy="10.5" r="2.4"/>
-                            </svg>
-                        </span>
                         <div class="seed-loc-body">
                             {% if location_ready %}
-                            <p class="seed-loc-kicker">Kota &amp; kontak listing</p>
                             <div class="seed-loc-facts">
                                 <span class="seed-loc-fact">
                                     <span class="seed-loc-label">Kota</span>
@@ -86,7 +79,6 @@
                                 <a href="{% url 'main:profile' %}">Ubah di profil</a>
                             </p>
                             {% else %}
-                            <p class="seed-loc-kicker">Hampir siap</p>
                             <p class="seed-loc-title">Lengkapi kota &amp; kontak di profil dulu, yuk.</p>
                             <p class="seed-loc-hint">Sekarang data ini diambil dari profil supaya peminat selalu menghubungi kontak yang benar. Isi sekali saja, semua listing ikut.</p>
                             <a class="seed-loc-cta" href="{% url 'main:profile' %}">

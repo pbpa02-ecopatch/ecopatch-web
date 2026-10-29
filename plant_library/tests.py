@@ -299,6 +299,21 @@ class ParseQueryKeywordsTests(TestCase):
         self.assertEqual(filters, {"indoor_outdoor": "outdoor"})
         self.assertEqual(remaining, "bayam")
 
+    def test_keyword_watering_phrases(self):
+        """Uji berbagai kata kunci watering dipetakan ke level penyiraman yang benar."""
+        cases = {
+            "tanaman yang jarang disiram": {"watering": "low"},
+            "tahan lupa disiram": {"watering": "low"},
+            "sering disiram": {"watering": "high"},
+            "penyiraman sedang": {"watering": "moderate"},
+            "siram sedang": {"watering": "moderate"},
+        }
+        for phrase, expected in cases.items():
+            with self.subTest(phrase=phrase):
+                filters, remaining = parse_query_keywords(phrase)
+                self.assertEqual(filters, expected)
+                self.assertEqual(remaining, "")
+
 
 @override_settings(ROOT_URLCONF=__name__)
 class KeywordSearchIntegrationTests(TestCase):
@@ -358,6 +373,38 @@ class KeywordSearchIntegrationTests(TestCase):
         # Pakis Haji lolos easy tapi namanya tidak mengandung 'bayam',
         # Bayam Merah mengandung 'bayam' tapi difficulty=hard → 0 hasil
         self.assertContains(res, "Tidak ada tanaman ditemukan")
+
+    def test_view_watering_filter_param(self):
+        """GET ?watering=low menyaring tanaman watering=low."""
+        url = reverse("plant_library:plant_list") + "?watering=low"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertNotContains(res, "Bayam Merah")
+
+    def test_view_watering_filter_invalid_param_is_ignored(self):
+        """GET ?watering=invalid_value diabaikan dan tidak menyebabkan error 500."""
+        url = reverse("plant_library:plant_list") + "?watering=banjir"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertContains(res, "Bayam Merah")
+
+    def test_view_watering_via_search_keyword(self):
+        """Pencarian teks 'jarang disiram' otomatis memicu filter watering=low."""
+        url = reverse("plant_library:plant_list") + "?q=jarang+disiram"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertNotContains(res, "Bayam Merah")
+
+    def test_view_watering_and_sunlight_combined(self):
+        """Filter kombinasi watering dan sunlight keduanya dipertahankan."""
+        url = reverse("plant_library:plant_list") + "?watering=low&sunlight=shade"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertNotContains(res, "Bayam Merah")
 
 
 class WateringIntervalTests(TestCase):

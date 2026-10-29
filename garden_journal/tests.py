@@ -192,3 +192,131 @@ class GardenJournalViewTests(TestCase):
         self.journal.refresh_from_db()
         self.assertTrue(self.journal.image)
 
+class EcoPatchCascadeJournalTests(TestCase):
+    def setUp(self):
+        from my_ecopatch.models import EcoPatch
+
+        # User 1 & User 2
+        self.user1 = User.objects.create_user(username="haikal", password="password123")
+        self.user2 = User.objects.create_user(username="rheina", password="password123")
+
+        # EcoPatches for user 1
+        self.patch1 = EcoPatch.objects.create(
+            owner=self.user1, name="Kebun Balkon", space_type="balcony", city="Jakarta"
+        )
+        self.patch2 = EcoPatch.objects.create(
+            owner=self.user1, name="Teras Depan", space_type="terrace", city="Bandung"
+        )
+
+        # EcoPatch for user 2 with identical name
+        self.patch_user2 = EcoPatch.objects.create(
+            owner=self.user2, name="Kebun Balkon", space_type="balcony", city="Surabaya"
+        )
+
+        # Journals for user 1 on patch 1 (Tanaman Tomat)
+        self.journal_p1_1 = GardenJournal.objects.create(
+            user=self.user1,
+            ecopatch=self.patch1,
+            ecopatch_name=self.patch1.name,
+            plant_name="Tomat Ceri",
+            title="Tomat Semai",
+            date=date.today(),
+            notes="Mulai tumbuh",
+            plant_condition="healthy",
+        )
+        self.journal_p1_2 = GardenJournal.objects.create(
+            user=self.user1,
+            ecopatch=self.patch1,
+            ecopatch_name=self.patch1.name,
+            plant_name="Tomat Ceri",
+            title="Tomat Berdaun 4",
+            date=date.today(),
+            notes="Daun bertambah",
+            plant_condition="healthy",
+        )
+
+        # Journal for user 1 on patch 2 (Tanaman Cabai)
+        self.journal_p2 = GardenJournal.objects.create(
+            user=self.user1,
+            ecopatch=self.patch2,
+            ecopatch_name=self.patch2.name,
+            plant_name="Cabai Rawit",
+            title="Cabai Mulai Berbunga",
+            date=date.today(),
+            notes="Bunga putih muncul",
+            plant_condition="flowering",
+        )
+
+        # Journal for user 2 on user 2's patch (Tanaman Tomat Ceri milik user 2)
+        self.journal_user2 = GardenJournal.objects.create(
+            user=self.user2,
+            ecopatch=self.patch_user2,
+            ecopatch_name=self.patch_user2.name,
+            plant_name="Tomat Ceri",
+            title="Tomat User 2",
+            date=date.today(),
+            notes="Catatan milik user lain",
+            plant_condition="healthy",
+        )
+
+    def test_delete_ecopatch_deletes_associated_journals(self):
+        """Hapus EcoPatch => jurnal patch itu hilang."""
+        self.patch1.delete()
+        self.assertFalse(GardenJournal.objects.filter(pk=self.journal_p1_1.pk).exists())
+        self.assertFalse(GardenJournal.objects.filter(pk=self.journal_p1_2.pk).exists())
+
+    def test_other_patches_journals_for_same_user_remain(self):
+        """Jurnal patch lain milik user yang sama tetap ada."""
+        self.patch1.delete()
+        self.assertTrue(GardenJournal.objects.filter(pk=self.journal_p2.pk).exists())
+        self.journal_p2.refresh_from_db()
+        self.assertEqual(self.journal_p2.plant_name, "Cabai Rawit")
+
+    def test_other_users_journals_remain(self):
+        """Jurnal milik user lain tetap ada."""
+        self.patch1.delete()
+        self.assertTrue(GardenJournal.objects.filter(pk=self.journal_user2.pk).exists())
+        self.journal_user2.refresh_from_db()
+        self.assertEqual(self.journal_user2.user, self.user2)
+
+    def test_deleted_book_does_not_appear_in_journal_list(self):
+        """Buku yang semua catatannya hilang tidak muncul lagi di journal_list."""
+        self.client.login(username="haikal", password="password123")
+        # Sebelum hapus patch1, Tomat Ceri ada di rak buku
+        res_before = self.client.get(reverse("garden_journal:list"))
+        self.assertEqual(res_before.status_code, 200)
+        self.assertContains(res_before, "Tomat Ceri")
+        self.assertContains(res_before, "Cabai Rawit")
+
+        # Hapus patch1
+        self.patch1.delete()
+
+        # Setelah hapus patch1, Tomat Ceri (semua catatannya terhapus) hilang dari rak buku
+        res_after = self.client.get(reverse("garden_journal:list"))
+        self.assertEqual(res_after.status_code, 200)
+        self.assertNotContains(res_after, "Tomat Ceri")
+        # Cabai Rawit (dari patch2) masih tetap ada
+        self.assertContains(res_after, "Cabai Rawit")
+
+    def test_photo_deleted_from_storage_on_journal_delete(self):
+        """Hapus file foto saat jurnal terhapus, lewat post_delete signal."""
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        import os
+
+        dummy_img = (
+            b"\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00"
+            b"\xff\xff\xff\x00\x00\x00\x21\xf9\x04\x01\x00\x00\x00"
+            b"\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02"
+            b"\x44\x01\x00\x3b"
+        )
+        photo = SimpleUploadedFile("test_cascade_del.gif", dummy_img, content_type="image/gif")
+        self.journal_p1_1.image = photo
+        self.journal_p1_1.save()
+
+        file_path = self.journal_p1_1.image.path
+        self.assertTrue(os.path.exists(file_path))
+
+        # Hapus patch1 -> cascade delete journal_p1_1 -> post_delete signal fires
+        self.patch1.delete()
+
+        self.assertFalse(os.path.exists(file_path))
