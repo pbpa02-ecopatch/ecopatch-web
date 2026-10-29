@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% load static asset_version %}{% static_v 'css/custom.css' %}">
+    <link rel="icon" type="image/svg+xml" href="{% static_v 'img/logo.svg' %}">
     <script>
         try {
             if (localStorage.getItem('sidebar-collapsed') === '1') document.documentElement.classList.add('sidebar-collapsed');
@@ -103,7 +104,17 @@
         document.querySelectorAll('.site-toast').forEach(function (el) {
             bootstrap.Toast.getOrCreateInstance(el).show();
         });
+        // A long dropdown opens already scrolled to the chosen option, so the current choice is never out of sight
+        document.addEventListener('shown.bs.dropdown', function (event) {
+            var menu = event.target.parentElement && event.target.parentElement.querySelector('.dropdown-menu');
+            var current = menu && menu.querySelector('.active, [aria-current="true"], [aria-selected="true"]');
+            if (!current || menu.scrollHeight <= menu.clientHeight) return;
+            menu.scrollTop = current.offsetTop - (menu.clientHeight - current.offsetHeight) / 2;
+        });
     </script>
+    {# Every delete pop-up posts through this form: the CSRF cookie is HttpOnly, so the token has to come from here #}
+    <form id="site-delete-form" method="post" hidden>{% csrf_token %}</form>
+    <script src="{% static_v 'js/confirm-delete.js' %}" defer></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

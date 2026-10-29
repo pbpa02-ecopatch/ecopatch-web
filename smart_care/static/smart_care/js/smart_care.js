@@ -1,6 +1,17 @@
 /* Smart Care page: the weather scene, the week strip, the garden, AJAX completion with undo, suggestions
    (accept / skip / undo), the pots and the popups. Every rule (rainy day, headline, advice, suggestions, pot
    levels) comes from Django; this file only renders what the JSON says. */
+/* Peta alur file ini:
+     loadWeather()        GET  smart_care:weather        -> renderScene / renderWeek / renderHints
+     applyCompletion()    POST /<pk>/complete/           -> centang tugas, geser baris, perbarui pot, kebun, dan titik minggu
+     acceptSuggestion()   POST suggestions/accept/       -> baris saran diganti baris tugas hasil render server (data.html);
+                                                            yang dikirim adalah ID baris tanaman (data-pp), bukan namanya
+     skipSuggestion()     POST suggestions/skip/         -> saran hilang, toast "Saran dilewati" dengan tombol batal
+     restoreSuggestion()  POST suggestions/restore/      -> batalkan lewati
+   Semua POST lewat post(), yang menyertakan header X-CSRFToken. Tokennya diambil dari data-csrf di #care-page karena
+   cookie CSRF berstatus HttpOnly dan tidak bisa dibaca JavaScript. URL endpoint juga dibaca dari atribut data-* halaman,
+   bukan ditulis ulang di sini, sehingga perubahan di urls.py tidak perlu menyentuh file ini.
+   Form tambah/ubah tugas tidak ada di sini: itu ditangani HTMX (hx-get / hx-post) dan modal Bootstrap di template. */
 (function () {
   'use strict';
 
@@ -243,7 +254,7 @@
     el.classList.toggle('is-due', pot.watering_due);
     el.classList.toggle('is-empty', pot.never_recorded);
     $('.care-pot-label', el).textContent = pot.label;
-    $('.care-pot-btn', el).setAttribute('aria-label', pot.plant_name + ': ' + pot.label + '. Lihat tugasnya');
+    $('.care-pot-btn', el).setAttribute('aria-label', pot.plant_name + (pot.place ? ' (' + pot.place + ')' : '') + ': ' + pot.label + '. Lihat tugasnya');
     $all('.care-pot-dot', el).forEach(function (dot) {
       dot.classList.toggle('is-on', !!pot[dot.dataset.dot + '_ok']);
     });
@@ -254,9 +265,12 @@
     }
   }
 
-  // Clicking a pot jumps to that plant's rows
-  function showPlantRows(key) {
-    var rows = $all('.care-task').filter(function (row) { return normalize(row.dataset.plant) === key; });
+  // Clicking a pot jumps to that plant's rows. A task points at its plant by id (data-pp); one from before tasks were
+  // linked to plants has no id and is matched by the name instead.
+  function showPlantRows(key, name) {
+    var rows = $all('.care-task').filter(function (row) {
+      return row.dataset.pp ? row.dataset.pp === key : normalize(row.dataset.plant) === normalize(name);
+    });
     if (!rows.length) return;
     var visible = rows.filter(function (row) { return row.offsetParent !== null; });
     var target = visible.length ? visible : rows;
@@ -370,7 +384,7 @@
 
   /* ------------------------------------------------------------------ suggestions */
   function acceptSuggestion(row) {
-    return post(page.dataset.acceptUrl, { plant_name: row.dataset.plant, task_type: row.dataset.type }).then(function (data) {
+    return post(page.dataset.acceptUrl, { patch_plant: row.dataset.pp, task_type: row.dataset.type }).then(function (data) {
       // The suggestion becomes a real task row (edit / delete included), then plays the usual tick
       var holder = document.createElement('div');
       holder.innerHTML = data.html.trim();
@@ -384,16 +398,17 @@
   }
 
   function skipSuggestion(row) {
-    return post(page.dataset.skipUrl, { plant_name: row.dataset.plant, task_type: row.dataset.type }).then(function (data) {
+    return post(page.dataset.skipUrl, { patch_plant: row.dataset.pp, task_type: row.dataset.type }).then(function (data) {
       var li = document.createElement('li');
       var label = document.createElement('span');
-      label.textContent = data.skipped.plant_name + ' ';
+      label.textContent = data.skipped.plant_name + (data.skipped.place ? ' (' + data.skipped.place + ')' : '') + ' ';
       var type = document.createElement('small');
       type.textContent = data.skipped.label;
       label.appendChild(type);
       var undo = document.createElement('button');
       undo.type = 'button';
       undo.className = 'care-restore';
+      undo.dataset.pp = data.skipped.patch_plant;
       undo.dataset.plant = data.skipped.plant_name;
       undo.dataset.type = data.skipped.task_type;
       undo.textContent = 'Batalkan';
@@ -409,7 +424,7 @@
   }
 
   function restoreSuggestion(button) {
-    return post(page.dataset.restoreUrl, { plant_name: button.dataset.plant, task_type: button.dataset.type }).then(function () {
+    return post(page.dataset.restoreUrl, { patch_plant: button.dataset.pp, task_type: button.dataset.type }).then(function () {
       window.location.reload(); // the suggestion is rebuilt on the server, so just reload
     });
   }
@@ -431,7 +446,8 @@
     }
 
     if (potButton) {
-      showPlantRows(potButton.closest('.care-pot').dataset.key);
+      var pot = potButton.closest('.care-pot');
+      showPlantRows(pot.dataset.key, pot.dataset.name);
       return;
     }
 

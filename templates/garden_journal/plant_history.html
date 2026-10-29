@@ -11,7 +11,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
     <a href="{% url 'garden_journal:list' %}" class="btn btn-ds-ghost d-inline-flex align-items-center">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        Kembali ke Koleksi Jurnal
+        Kembali ke Garden Journal
     </a>
     <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name|urlencode }}" class="btn btn-ds-primary">
         + Tambah Catatan
@@ -25,17 +25,25 @@
             <span id="total-count" class="fw-bold text-dark">{{ total_entries }}</span> catatan untuk <strong class="text-dark">{{ plant_name }}</strong>
         </div>
         <form id="book-filter-form" class="d-flex flex-wrap align-items-center gap-2 m-0">
-            <div class="filter-pill-btn">
-                <select name="condition" id="filter-condition" class="filter-pill-select">
-                    <option value="">Semua Kondisi</option>
+            <div class="dropdown">
+                <input type="hidden" name="condition" id="filter-condition" value="{{ selected_condition }}">
+                <button type="button" class="journal-filter dropdown-toggle{% if selected_condition %} journal-filter--active{% endif %}" id="conditionFilterBtn"
+                        data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
+                    <span class="journal-filter-dot" id="conditionFilterDot" aria-hidden="true"{% if not selected_condition %} hidden{% endif %}></span>
+                    <span id="conditionFilterLabel">{{ selected_condition_label|default:"Semua Kondisi" }}</span>
+                </button>
+                <ul class="dropdown-menu journal-menu" id="conditionFilterMenu" aria-labelledby="conditionFilterBtn">
+                    <li>
+                        <button type="button" class="dropdown-item journal-menu-item{% if not selected_condition %} active{% endif %}"
+                                data-condition-val="" data-condition-label="Semua Kondisi">Semua Kondisi</button>
+                    </li>
                     {% for val, label in conditions %}
-                        {% if selected_condition == val %}
-                            <option value="{{ val }}" selected>{{ label }}</option>
-                        {% else %}
-                            <option value="{{ val }}">{{ label }}</option>
-                        {% endif %}
+                    <li>
+                        <button type="button" class="dropdown-item journal-menu-item{% if selected_condition == val %} active{% endif %}"
+                                data-condition-val="{{ val }}" data-condition-label="{{ label }}">{{ label }}</button>
+                    </li>
                     {% endfor %}
-                </select>
+                </ul>
             </div>
             <div class="filter-pill-btn">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#798a72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -216,8 +224,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script id="all-entries-data" type="application/json">{{ all_entries_json|safe }}</script>
-<script id="chart-data" type="application/json">{{ chart_data|safe }}</script>
+{{ all_entries|json_script:"all-entries-data" }}
+{{ chart_data|json_script:"chart-data" }}
 <div id="page-config"
      data-plant-name="{{ plant_name|escape }}"
      data-create-url="{% url 'garden_journal:create' %}?plant_name={{ plant_name|urlencode }}"
@@ -248,11 +256,11 @@ let currentGrouping = 'week';
 let heightChartInstance = null;
 
 /* -------- Helpers -------- */
+// Titles and notes are typed by people and end up in text AND in quoted attributes (title="...", alt="..."),
+// so the quotes have to be escaped too: textContent -> innerHTML alone leaves " and ' untouched.
 function escHtml(str) {
     if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+    return String(str).replace(/[&<>"']/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[ch]));
 }
 
 function formatShortDate(dateIso) {
@@ -602,12 +610,12 @@ function renderPage(idx) {
                     </div>
 
                     <!-- Notes -->
-                    <p class="entry-right-notes mb-3" style="white-space: pre-wrap; font-size: 0.9rem; line-height: 1.55; color: #444;">${escHtml(e.notes)}</p>
+                    <p class="entry-right-notes mb-3" style="white-space: pre-wrap; font-size: 0.92rem; line-height: 1.6; color: #3b4737; overflow-wrap: anywhere; word-break: break-word; text-align: justify; text-justify: inter-word; hyphens: auto; padding-right: 2px;">${escHtml(e.notes)}</p>
 
                     <!-- Photo slot or polaroid -->
                     ${e.image_url ? `
                         <div class="journal-photo-polaroid mt-3">
-                            <div class="journal-polaroid-frame text-center p-2 bg-white shadow-sm rounded border" style="border-color: #efe4cb !important; display: inline-block;">
+                            <div class="journal-polaroid-frame text-center p-2 bg-white shadow-sm rounded border" style="border-color: #efe4cb !important; display: inline-block; max-width: 100%; box-sizing: border-box;">
                                 <img src="${e.image_url}" alt="${escHtml(e.title)}" class="journal-polaroid-img rounded" style="max-height: 160px; max-width: 100%; object-fit: cover; cursor: pointer;" onclick="window.open('${e.image_url}', '_blank')">
                                 <div class="journal-polaroid-caption text-muted small mt-1" style="font-size: 0.72rem;">Foto: ${e.date}</div>
                                 <div class="mt-1">
@@ -820,7 +828,7 @@ async function processQuickUpload(file) {
     const formData = new FormData();
     formData.append('image', file);
 
-    showToast('Mengunggah foto tanaman...', 'info');
+    const loadingToast = showToast('Mengunggah foto tanaman...', 'info');
 
     try {
         const res = await fetch(uploadUrl, {
@@ -830,6 +838,9 @@ async function processQuickUpload(file) {
             },
             body: formData,
         });
+        if (loadingToast && typeof loadingToast.dismiss === 'function') {
+            loadingToast.dismiss();
+        }
         const data = await res.json();
         if (data.success && data.image_url) {
             entry.image_url = data.image_url;
@@ -842,6 +853,9 @@ async function processQuickUpload(file) {
             showToast(data.error || 'Gagal mengunggah foto tanaman.', 'warning');
         }
     } catch (err) {
+        if (loadingToast && typeof loadingToast.dismiss === 'function') {
+            loadingToast.dismiss();
+        }
         console.error(err);
         showToast('Gagal mengunggah foto. Pastikan koneksi lancar.', 'warning');
     } finally {
@@ -861,63 +875,7 @@ function confirmDeleteEntry(idx) {
     const entry = filteredEntries[idx];
     if (!entry) return;
 
-    // Bersihkan toast konfirmasi lama jika masih ada
-    const existing = document.getElementById('delete-confirm-toast');
-    if (existing) existing.remove();
-
-    let container = document.querySelector('.site-toasts');
-    if (!container) {
-        container = document.createElement('div');
-        container.className = 'toast-container site-toasts';
-        document.body.appendChild(container);
-    }
-
-    const toastEl = document.createElement('div');
-    toastEl.id = 'delete-confirm-toast';
-    toastEl.className = 'toast site-toast show';
-    toastEl.style.borderColor = '#ecd8ce';
-    toastEl.style.borderLeft = '5px solid #8c5344';
-    toastEl.style.background = '#fefdfb';
-    toastEl.style.display = 'flex';
-    toastEl.style.opacity = '1';
-    toastEl.setAttribute('role', 'alert');
-    toastEl.setAttribute('aria-live', 'assertive');
-
-    toastEl.innerHTML = `
-        <div class="site-toast-body w-100">
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c5344" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
-                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                </svg>
-                <strong style="color: #22301f; font-size: 0.92rem;">Hapus Catatan Jurnal?</strong>
-            </div>
-            <p class="mb-2 text-muted fw-normal" style="font-size: 0.82rem; line-height: 1.4;">
-                Kamu yakin ingin menghapus catatan <strong>"${escHtml(entry.title)}"</strong>? Tindakan ini tidak dapat dibatalkan.
-            </p>
-            <div class="d-flex justify-content-end gap-2 pt-1 border-top" style="border-color: #f1eae2 !important;">
-                <button type="button" class="btn btn-sm btn-ds-ghost py-1 px-3" id="btn-cancel-delete" style="font-size: 0.78rem; border-radius: 6px;">
-                    Batal
-                </button>
-                <button type="button" class="btn btn-sm btn-ds-delete py-1 px-3 fw-semibold" id="btn-confirm-delete" style="font-size: 0.78rem; border-radius: 6px;">
-                    Ya, Hapus
-                </button>
-            </div>
-        </div>
-        <button type="button" class="btn-close site-toast-close" aria-label="Tutup"></button>
-    `;
-
-    container.appendChild(toastEl);
-
-    const closeToast = () => {
-        toastEl.classList.remove('show');
-        setTimeout(() => toastEl.remove(), 250);
-    };
-
-    toastEl.querySelector('.site-toast-close')?.addEventListener('click', closeToast);
-    toastEl.querySelector('#btn-cancel-delete')?.addEventListener('click', closeToast);
-
-    toastEl.querySelector('#btn-confirm-delete')?.addEventListener('click', function() {
-        closeToast();
+    const postDelete = () => {
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = entry.delete_url;
@@ -928,7 +886,19 @@ function confirmDeleteEntry(idx) {
         form.appendChild(csrf);
         document.body.appendChild(form);
         form.submit();
-    });
+    };
+
+    // the site-wide delete pop-up (static/js/confirm-delete.js); the browser's own confirm() if it is not available
+    if (window.siteConfirmDelete) {
+        window.siteConfirmDelete({
+            title: 'Hapus catatan jurnal?',
+            name: entry.title,
+            note: 'Catatan ini dihapus selamanya. Tindakan ini tidak bisa dibatalkan.',
+            yes: 'Ya, hapus catatan'
+        }, postDelete);
+    } else if (confirm('Hapus catatan ini?')) {
+        postDelete();
+    }
 }
 
 /* ===============================================================
@@ -941,32 +911,66 @@ function showToast(message, type = 'success') {
         container.className = 'toast-container site-toasts';
         document.body.appendChild(container);
     }
+
+    // Dismiss any active info/loading toast immediately before showing a result toast
+    if (type !== 'info') {
+        container.querySelectorAll('.site-toast--info').forEach(t => {
+            t.classList.remove('show');
+            setTimeout(() => t.remove(), 250);
+        });
+    }
+
     const toastEl = document.createElement('div');
     toastEl.className = `toast site-toast site-toast--${type} show`;
     toastEl.setAttribute('role', 'status');
     toastEl.setAttribute('aria-live', 'polite');
     toastEl.innerHTML = `
-        <div class="site-toast-body">${message}</div>
+        <div class="site-toast-body">${escHtml(message)}</div>
         <button type="button" class="btn-close site-toast-close" data-bs-dismiss="toast" aria-label="Tutup"></button>
     `;
     container.appendChild(toastEl);
 
-    setTimeout(() => {
+    let hideTimer = null;
+    function dismissToast() {
+        if (hideTimer) clearTimeout(hideTimer);
         toastEl.classList.remove('show');
-        setTimeout(() => toastEl.remove(), 350);
-    }, 4000);
+        setTimeout(() => toastEl.remove(), 250);
+    }
 
-    toastEl.querySelector('.site-toast-close')?.addEventListener('click', () => {
-        toastEl.classList.remove('show');
-        setTimeout(() => toastEl.remove(), 350);
-    });
+    toastEl.dismiss = dismissToast;
+
+    // Normal toasts auto-hide after 3.5s, loading info toasts stay until explicitly dismissed
+    if (type !== 'info') {
+        hideTimer = setTimeout(dismissToast, 3500);
+    }
+
+    toastEl.querySelector('.site-toast-close')?.addEventListener('click', dismissToast);
+
+    return toastEl;
 }
 
 /* ---- Init on load ---- */
 document.addEventListener('DOMContentLoaded', function() {
     // Setup filter change listeners
     const fCond = document.getElementById('filter-condition');
-    if (fCond) fCond.addEventListener('change', applyFilters);
+    const fCondMenu = document.getElementById('conditionFilterMenu');
+    const fCondBtn = document.getElementById('conditionFilterBtn');
+    const fCondLabel = document.getElementById('conditionFilterLabel');
+    const fCondDot = document.getElementById('conditionFilterDot');
+    if (fCondMenu) {
+        fCondMenu.addEventListener('click', function (e) {
+            const item = e.target.closest('[data-condition-val]');
+            if (!item) return;
+            const value = item.getAttribute('data-condition-val') || '';
+            const label = item.getAttribute('data-condition-label') || 'Semua Kondisi';
+            if (fCond) fCond.value = value;
+            if (fCondLabel) fCondLabel.textContent = label;
+            if (fCondDot) fCondDot.hidden = !value;
+            if (fCondBtn) fCondBtn.classList.toggle('journal-filter--active', !!value);
+            fCondMenu.querySelectorAll('[data-condition-val]').forEach(el => el.classList.toggle('active', el === item));
+            applyFilters();
+        });
+    }
 
     const fDate = document.getElementById('filter-date');
     if (fDate) fDate.addEventListener('change', applyFilters);

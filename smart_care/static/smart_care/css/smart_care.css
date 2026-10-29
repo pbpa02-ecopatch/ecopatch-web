@@ -309,6 +309,8 @@ body.has-sidebar.care-body {
     height: var(--fh);
     display: block;
     z-index: 2;
+    /* with preserveAspectRatio="slice" the top of the drawing is cropped on wide screens; the umbrella lives up there */
+    overflow: visible;
 }
 
 .care-floor .care-pp {
@@ -490,6 +492,22 @@ body.has-sidebar.care-body {
     background: #fff;
     transform: rotate(45deg) skew(10deg, 10deg);
     border-radius: 0 0 4px 0;
+}
+
+/* In the rain the umbrella stands over Petak, with its tip at y=23 of the 1200x280 drawing. The drawing is scaled to cover
+   the scene ("slice", bottom aligned), so its tip is 262 units above the scene's floor line at that scale; the bubble
+   rises to just clear it. The umbrella is hidden again while Petak is proud, so the bubble drops back. */
+.care-bubble {
+    transition: bottom 0.4s cubic-bezier(0.3, 1.2, 0.5, 1);
+}
+
+.care-scene[data-sky="rain"]:not([data-pet="proud"]) .care-bubble {
+    /* never so high that the top of the bubble leaves the scene (a wide, short scene has no room for both) */
+    bottom: max(calc(var(--fh) + 4px), min(calc(262 * max(100vw / 1200, var(--fh) / 280)), calc(100% - 150px)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .care-bubble { transition: none; }
 }
 
 .care-bubble p {
@@ -1002,6 +1020,17 @@ body.has-sidebar.care-body {
     max-width: 100%;
     overflow: hidden;
     font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Where the plant is kept; only shown when the same plant name is in more than one place */
+.care-pot-place {
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--care-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

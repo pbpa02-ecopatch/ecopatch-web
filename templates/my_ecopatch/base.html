@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body_class %} mep-module{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'my_ecopatch/garden.css' %}">{% endblock %}
+{% block main %}<main id="mep-main" class="flex-grow-1">{% block garden_content %}{% endblock %}</main>{% endblock %}
+{% block extra_scripts %}<script src="{% static 'my_ecopatch/garden.js' %}" defer></script>{% endblock %}

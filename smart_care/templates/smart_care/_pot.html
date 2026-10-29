@@ -1,5 +1,5 @@
-<li class="care-pot{% if pot.watering_due %} is-due{% endif %}{% if pot.never_recorded %} is-empty{% endif %}" data-key="{{ pot.key }}" style="--water: {{ pot.water }}">
-    <button type="button" class="care-pot-btn" aria-label="{{ pot.plant_name }}: {{ pot.label }}. Lihat tugasnya">
+<li class="care-pot{% if pot.watering_due %} is-due{% endif %}{% if pot.never_recorded %} is-empty{% endif %}" data-key="{{ pot.key }}" data-name="{{ pot.plant_name }}" style="--water: {{ pot.water }}">
+    <button type="button" class="care-pot-btn" aria-label="{{ pot.plant_name }}{% if pot.place %} ({{ pot.place }}){% endif %}: {{ pot.label }}. Lihat tugasnya">
         <svg class="care-pot-svg" viewBox="0 0 64 76" aria-hidden="true">
             <defs>
                 <clipPath id="pot-clip-{{ forloop.counter }}"><path d="M12 24h40l-3.5 42a5 5 0 0 1-5 4.6H20.5a5 5 0 0 1-5-4.6z"/></clipPath>
@@ -11,6 +11,7 @@
             <rect class="pot-rim" x="8" y="18" width="48" height="8" rx="3"/>
         </svg>
         <span class="care-pot-name">{{ pot.plant_name }}</span>
+        {% if pot.place %}<span class="care-pot-place">{{ pot.place }}</span>{% endif %}
         <span class="care-pot-label">{{ pot.label }}</span>
         <span class="care-pot-dots">
             <span class="care-pot-dot{% if pot.fertilizing_ok %} is-on{% endif %}" data-dot="fertilizing"

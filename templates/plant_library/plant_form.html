@@ -1,200 +1,153 @@
 {% extends "base.html" %}
+{% load static asset_version %}
 {% block title %}{% if is_edit %}Ubah {{ plant.name }}{% else %}Tambah Tanaman Baru{% endif %} - Plant Library{% endblock %}
+{% block body_class %} plant-body{% endblock %}
 
 {% block extra_head %}
-<style>
-    .plant-form-container {
-        max-width: 860px;
-        margin: 0 auto 40px;
-    }
-    .plant-back-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--ink-muted);
-        text-decoration: none;
-        font-weight: 600;
-        margin-bottom: 20px;
-        padding: 6px 14px;
-        border-radius: 999px;
-        background: var(--surface-200);
-        border: 1px solid var(--border);
-        transition: all 0.2s ease;
-    }
-    .plant-back-btn:hover {
-        background: var(--surface-300);
-        color: var(--ink);
-    }
-    .plant-form-card {
-        background: var(--surface-200);
-        border: 1px solid var(--border);
-        border-radius: 28px;
-        padding: 36px;
-        box-shadow: 0 8px 24px rgba(34, 48, 31, 0.08);
-    }
-    .plant-form-title {
-        font-size: clamp(1.8rem, 3vw, 2.3rem);
-        color: var(--ink);
-        font-family: 'Baloo 2', sans-serif;
-        margin-bottom: 6px;
-    }
-    .plant-form-subtitle {
-        color: var(--ink-muted);
-        margin-bottom: 28px;
-        font-size: 0.98rem;
-    }
-    .plant-field-label {
-        font-weight: 700;
-        font-size: 0.92rem;
-        color: var(--ink);
-        margin-bottom: 6px;
-    }
-    .form-control, .form-select {
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 10px 14px;
-        color: var(--ink);
-        background: var(--surface-200);
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: var(--brand-500);
-        box-shadow: 0 0 0 3px var(--brand-300);
-    }
-    .plant-form-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: 32px;
-        padding-top: 20px;
-        border-top: 1px dashed var(--border);
-    }
-</style>
+<link rel="stylesheet" href="{% static_v 'plant_library/css/plant_library.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="plant-form-container">
-    <a href="{% if is_edit %}{% url 'plant_library:plant_detail' plant.pk %}{% else %}{% url 'plant_library:plant_list' %}{% endif %}" class="plant-back-btn">
-        <span>←</span>
-        <span>Kembali</span>
-    </a>
+{% block main %}
+<main class="plant-main flex-grow-1">
+<div class="plant-page">
+    <div class="plant-inner plant-inner--narrow">
+        <a class="plant-back" href="{% if is_edit %}{% url 'plant_library:plant_detail' plant.pk %}{% else %}{% url 'plant_library:plant_list' %}{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
+            </svg>
+            {% if is_edit %}Kembali ke {{ plant.name }}{% else %}Kembali ke Plant Library{% endif %}
+        </a>
 
-    <div class="plant-form-card">
-        <h1 class="plant-form-title">
-            {% if is_edit %}✏️ Ubah Tanaman: {{ plant.name }}{% else %}🌱 Tambah Tanaman Baru{% endif %}
-        </h1>
-        <p class="plant-form-subtitle">
-            Lengkapi data spesifikasi dan perawatan tanaman untuk katalog Plant Library.
-        </p>
-
-        {% if form.errors %}
-            <div class="alert alert-danger" role="alert">
-                <strong>Mohon periksa kesalahan input berikut:</strong>
-                <ul class="mb-0 mt-2">
-                    {% for field, errors in form.errors.items %}
-                        {% for error in errors %}
-                            <li>{{ field|capfirst }}: {{ error }}</li>
-                        {% endfor %}
-                    {% endfor %}
-                </ul>
+        <header class="plant-head">
+            <div class="plant-head-copy">
+                <p class="plant-eyebrow">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 21v-8"/>
+                        <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                        <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                        <path d="M5 21h14"/>
+                    </svg>
+                    Plant Library &middot; {% if is_edit %}ubah tanaman{% else %}tanaman baru{% endif %}
+                </p>
+                <h1 class="plant-title">{% if is_edit %}Ubah {{ plant.name }}{% else %}Tambah Tanaman{% endif %}</h1>
+                <p class="plant-sub">Lengkapi spesifikasi dan panduan perawatan supaya tanaman ini gampang ditemukan dan dirawat.</p>
+                <p class="plant-form-legend"><span class="plant-required" aria-hidden="true">*</span> wajib diisi</p>
             </div>
-        {% endif %}
+            <div class="plant-head-art" aria-hidden="true">
+                <img src="{% static 'my_ecopatch/petak.svg' %}" alt="" width="150" height="147" loading="lazy" decoding="async">
+            </div>
+        </header>
 
-        <form method="post" novalidate>
-            {% csrf_token %}
+        <div class="plant-form-card">
+            <p class="plant-form-note">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 21v-8"/>
+                    <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                    <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                </svg>
+                <span>Data ini tampil di katalog publik dan dipakai sebagai acuan jadwal Smart Care pengguna.</span>
+            </p>
 
-            <div class="row g-3">
-                <!-- Nama Tanaman -->
-                <div class="col-12 col-md-6">
-                    <label for="{{ form.name.id_for_label }}" class="plant-field-label">
-                        Nama Tanaman <span class="text-danger">*</span>
+            <form method="post" class="plant-form">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                    <div class="plant-form-errors" role="alert">
+                        <strong>Mohon periksa input berikut:</strong>
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ field|capfirst }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <h2 class="plant-form-section">Identitas tanaman</h2>
+
+                <div class="plant-field">
+                    <label class="plant-label" for="{{ form.name.id_for_label }}">
+                        Nama tanaman <span class="plant-required" aria-hidden="true">*</span>
                     </label>
                     {{ form.name }}
+                    {% for error in form.name.errors %}<p class="plant-form-error">{{ error }}</p>{% endfor %}
                 </div>
 
-                <!-- Nama Ilmiah -->
-                <div class="col-12 col-md-6">
-                    <label for="{{ form.scientific_name.id_for_label }}" class="plant-field-label">
-                        Nama Ilmiah (Latin)
+                <div class="plant-field">
+                    <label class="plant-label" for="{{ form.scientific_name.id_for_label }}">
+                        Nama ilmiah (Latin)
+                        <span class="plant-optional-tag">(opsional)</span>
                     </label>
                     {{ form.scientific_name }}
+                    {% for error in form.scientific_name.errors %}<p class="plant-form-error">{{ error }}</p>{% endfor %}
                 </div>
 
-                <!-- Kategori -->
-                <div class="col-12 col-md-6">
-                    <label for="{{ form.category.id_for_label }}" class="plant-field-label">
-                        Kategori Tanaman <span class="text-danger">*</span>
-                    </label>
-                    {{ form.category }}
-                </div>
+                {% include "plant_library/partials/select_field.html" with field=form.category %}
+                {% include "plant_library/partials/select_field.html" with field=form.difficulty %}
 
-                <!-- Tingkat Kesulitan -->
-                <div class="col-12 col-md-6">
-                    <label for="{{ form.difficulty.id_for_label }}" class="plant-field-label">
-                        Tingkat Kesulitan <span class="text-danger">*</span>
-                    </label>
-                    {{ form.difficulty }}
-                </div>
+                <h2 class="plant-form-section">Kebutuhan tumbuh</h2>
 
-                <!-- Kebutuhan Sinar Matahari -->
-                <div class="col-12 col-md-6">
-                    <label for="{{ form.sunlight.id_for_label }}" class="plant-field-label">
-                        Kebutuhan Sinar Matahari <span class="text-danger">*</span>
-                    </label>
-                    {{ form.sunlight }}
-                </div>
+                {% include "plant_library/partials/select_field.html" with field=form.sunlight %}
+                {% include "plant_library/partials/select_field.html" with field=form.watering %}
+                {% include "plant_library/partials/select_field.html" with field=form.indoor_outdoor %}
+                {% include "plant_library/partials/select_field.html" with field=form.space_requirement %}
 
-                <!-- Frekuensi Penyiraman -->
-                <div class="col-12 col-md-6">
-                    <label for="{{ form.watering.id_for_label }}" class="plant-field-label">
-                        Frekuensi Penyiraman <span class="text-danger">*</span>
-                    </label>
-                    {{ form.watering }}
-                </div>
+                <h2 class="plant-form-section">Catatan &amp; foto</h2>
 
-                <!-- Penempatan -->
-                <div class="col-12 col-md-6">
-                    <label for="{{ form.indoor_outdoor.id_for_label }}" class="plant-field-label">
-                        Penempatan Ruang <span class="text-danger">*</span>
-                    </label>
-                    {{ form.indoor_outdoor }}
-                </div>
-
-                <!-- Kebutuhan Ruang -->
-                <div class="col-12 col-md-6">
-                    <label for="{{ form.space_requirement.id_for_label }}" class="plant-field-label">
-                        Kebutuhan Ruang / Wadah <span class="text-danger">*</span>
-                    </label>
-                    {{ form.space_requirement }}
-                </div>
-
-                <!-- URL Gambar -->
-                <div class="col-12">
-                    <label for="{{ form.image_url.id_for_label }}" class="plant-field-label">
-                        URL Gambar Tanaman (Opsional)
+                <div class="plant-field plant-field--wide">
+                    <label class="plant-label" for="{{ form.image_url.id_for_label }}">
+                        URL gambar tanaman
+                        <span class="plant-optional-tag">(opsional)</span>
                     </label>
                     {{ form.image_url }}
-                    <small class="text-muted">Masukkan tautan URL langsung ke gambar tanaman (JPG, PNG, WebP).</small>
+                    <p class="plant-form-hint">Tempel tautan langsung ke gambar JPG, PNG, atau WebP. Kosongkan saja kalau belum ada foto.</p>
+                    {% for error in form.image_url.errors %}<p class="plant-form-error">{{ error }}</p>{% endfor %}
                 </div>
 
-                <!-- Deskripsi & Panduan -->
-                <div class="col-12">
-                    <label for="{{ form.description.id_for_label }}" class="plant-field-label">
-                        Deskripsi & Panduan Perawatan
+                <div class="plant-field plant-field--wide">
+                    <label class="plant-label" for="{{ form.description.id_for_label }}">
+                        Deskripsi &amp; panduan perawatan
+                        <span class="plant-optional-tag">(opsional)</span>
                     </label>
                     {{ form.description }}
+                    {% for error in form.description.errors %}<p class="plant-form-error">{{ error }}</p>{% endfor %}
                 </div>
-            </div>
 
-            <div class="plant-form-actions">
-                <button type="submit" class="btn btn-success">
-                    {% if is_edit %}Simpan Perubahan{% else %}Tambah Tanaman{% endif %}
-                </button>
-                <a href="{% if is_edit %}{% url 'plant_library:plant_detail' plant.pk %}{% else %}{% url 'plant_library:plant_list' %}{% endif %}" class="btn btn-outline-success">
-                    Batal
-                </a>
-            </div>
-        </form>
+                <div class="plant-form-actions">
+                    <a href="{% if is_edit %}{% url 'plant_library:plant_detail' plant.pk %}{% else %}{% url 'plant_library:plant_list' %}{% endif %}" class="plant-btn plant-btn--ghost">
+                        Batal
+                    </a>
+                    <button type="submit" class="plant-btn plant-btn--primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M20 6 9 17l-5-5"/>
+                        </svg>
+                        {% if is_edit %}Simpan perubahan{% else %}Tambah tanaman{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+</main>
 {% endblock %}
 
+{% block extra_scripts %}
+<script src="{% static_v 'plant_library/js/public_header.js' %}" defer></script>
+<script>
+document.querySelectorAll('[data-plant-select]').forEach(function (root) {
+    var input = root.querySelector('input[type="hidden"]');
+    var label = root.querySelector('[data-plant-label]');
+    root.querySelectorAll('[data-plant-option]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            input.value = btn.getAttribute('data-value');
+            label.textContent = btn.textContent.trim();
+            root.querySelectorAll('[data-plant-option]').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block footer %}{% include "footer.html" %}{% endblock %}

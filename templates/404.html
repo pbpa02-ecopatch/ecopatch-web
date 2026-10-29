@@ -1,6 +1,7 @@
+{% load static %}
 {# Halaman 404: dipakai Django untuk setiap URL yang tidak ada (saat DEBUG=False). Berdiri sendiri, tidak memakai base.html. #}
 <!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>404 · EcoPatch</title><meta name="robots" content="noindex">
+<title>404 · EcoPatch</title><link rel="icon" type="image/svg+xml" href="{% static 'img/logo.svg' %}"><meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>:root{--fg:#17301f;--muted:#4c6853;--brand-strong:#167a38;--mango:#ff9d2e;--font-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;--font-body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -21,7 +22,7 @@ a{color:inherit}
 /* top bar */
 .top{position:absolute;z-index:6;top:clamp(18px,3.4vh,30px);left:clamp(16px,3.4vw,48px);right:clamp(16px,3.4vw,48px);display:flex;align-items:center;justify-content:space-between}
 .brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font:800 1.2rem var(--font-display);letter-spacing:-.01em}
-.brand svg{width:28px;height:28px}
+.brand img{width:28px;height:28px}
 .back{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.92rem;color:var(--muted);text-decoration:none;padding:6px 10px 6px 4px;border-radius:99px}
 .back svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .back:hover{color:var(--fg)}
@@ -115,7 +116,7 @@ a{color:inherit}
 
   <header class="top">
     <a class="back" href="{% url 'main:home' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Ke beranda</a>
-    <a class="brand" href="{% url 'main:home' %}" aria-label="EcoPatch, ke beranda"><svg viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="9" height="9" rx="3" fill="#35c065"/><rect x="12" y="1" width="9" height="9" rx="3" fill="#5ccf82"/><rect x="1" y="12" width="9" height="9" rx="3" fill="#1f9142"/><rect x="12" y="12" width="9" height="9" rx="3" fill="#ff9d2e"/></svg><span>EcoPatch</span></a>
+    <a class="brand" href="{% url 'main:home' %}" aria-label="EcoPatch, ke beranda"><img src="{% static 'img/logo.svg' %}" alt="" width="28" height="28"><span>EcoPatch</span></a>
   </header>
 
   <section class="hero">

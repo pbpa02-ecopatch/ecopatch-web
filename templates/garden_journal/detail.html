@@ -14,7 +14,7 @@
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item">
-                    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none">Koleksi Jurnal</a>
+                    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none">Garden Journal</a>
                 </li>
                 {% if journal.plant_name %}
                     <li class="breadcrumb-item">
@@ -73,7 +73,7 @@
                 <!-- Catatan -->
                 <div class="mb-4">
                     <h6 class="text-muted fw-semibold small text-uppercase mb-2">Catatan</h6>
-                    <p class="text-body" style="white-space: pre-wrap; font-size: 1rem; line-height: 1.6;">{{ journal.notes }}</p>
+                    <p class="text-body" style="white-space: pre-wrap; font-size: 1rem; line-height: 1.6; overflow-wrap: anywhere; word-break: break-word; text-align: justify; text-justify: inter-word;">{{ journal.notes }}</p>
                 </div>
 
                 <!-- Footer info -->
@@ -93,7 +93,7 @@
                     Edit Catatan
                 </a>
                 <form method="post" action="{% url 'garden_journal:delete' journal.pk %}"
-                      onsubmit="return confirm('Yakin ingin menghapus catatan ini?')">
+                      onsubmit="return window.siteConfirmDelete ? true : confirm('Yakin ingin menghapus catatan ini?')" data-confirm-delete data-confirm-title="Hapus catatan?" data-confirm-name="{{ journal.title }}" data-confirm-note="Catatan ini dihapus selamanya. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus catatan">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-ds-danger">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -102,7 +102,7 @@
                 </form>
                 <a href="{% url 'garden_journal:list' %}" class="btn btn-link text-muted ms-auto d-inline-flex align-items-center text-decoration-none">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-                    Kembali ke Koleksi Jurnal
+                    Kembali ke Garden Journal
                 </a>
             </div>
         </div>

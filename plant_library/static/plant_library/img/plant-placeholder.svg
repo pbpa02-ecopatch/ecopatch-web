@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" role="img" aria-label="Ilustrasi tanaman dalam pot">
+  <ellipse cx="200" cy="236" rx="92" ry="11" fill="#17301f" opacity=".08"/>
+
+  <!-- leaves -->
+  <g fill="none" stroke="#2f8f4e" stroke-width="4" stroke-linecap="round">
+    <path d="M200 178c0-26 0-54 0-80"/>
+    <path d="M200 156c-14-18-30-28-50-32"/>
+    <path d="M200 144c16-16 34-24 56-26"/>
+  </g>
+
+  <path d="M200 132c-15-24-15-56 0-82 15 26 15 58 0 82Z" fill="#2fbf5c"/>
+  <path d="M200 132c-9-22-9-48 0-66 9 18 9 44 0 66Z" fill="#5ccf82"/>
+
+  <path d="M150 124c-31 0-52-21-52-52 31 0 52 21 52 52Z" fill="#1f9142"/>
+  <path d="M150 124c-23 0-39-16-39-39 23 0 39 16 39 39Z" fill="#35c065" opacity=".85"/>
+
+  <path d="M250 118c0-31 22-52 53-52 0 31-22 52-53 52Z" fill="#5ccf82"/>
+  <path d="M250 118c0-22 16-38 39-38 0 22-16 38-39 38Z" fill="#7bda97" opacity=".9"/>
+
+  <path d="M168 158c-24 0-41-17-41-41 24 0 41 17 41 41Z" fill="#7bda97"/>
+  <path d="M232 152c0-24 17-41 41-41 0 24-17 41-41 41Z" fill="#35c065"/>
+
+  <!-- pot -->
+  <path d="M150 176h100l-10 49a11 11 0 0 1-11 9h-58a11 11 0 0 1-11-9Z" fill="#d98b5f"/>
+  <path d="M200 176h50l-10 49a11 11 0 0 1-11 9h-29Z" fill="#c4744b" opacity=".55"/>
+  <rect x="142" y="162" width="116" height="20" rx="10" fill="#c4744b"/>
+  <ellipse cx="200" cy="169" rx="48" ry="6" fill="#8a6a4a" opacity=".55"/>
+
+  <!-- little sparkles -->
+  <g fill="#ff9d2e" opacity=".9">
+    <circle cx="126" cy="92" r="4"/>
+    <circle cx="286" cy="78" r="3"/>
+    <circle cx="304" cy="128" r="2.5"/>
+  </g>
+  <g stroke="#ff9d2e" stroke-width="2.4" stroke-linecap="round" opacity=".65">
+    <path d="M126 74v8M122 78h8"/>
+    <path d="M292 96v6M289 99h6"/>
+  </g>
+</svg>

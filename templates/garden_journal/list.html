@@ -2,137 +2,619 @@
 {% load static %}
 
 {% block title %}Garden Journal — EcoPatch{% endblock %}
+{% block body_class %} journal-body{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=5.0">
+<link rel="stylesheet" href="{% static 'css/journal_books.css' %}?v=20.0">
 {% endblock %}
 
-{% block content %}
-<section class="journal-hero-banner">
-    <!-- Floating background botanical decors -->
-    <div class="journal-hero-decors" aria-hidden="true">
-        <svg class="journal-decor-leaf journal-decor-leaf-1" width="48" height="48" viewBox="0 0 24 24" fill="#2d7d32"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2zm0 3c-3.866 0-7 3.134-7 7 0 2.22 1.033 4.198 2.645 5.48L12 11.5V5z"/></svg>
-        <svg class="journal-decor-leaf journal-decor-leaf-2" width="40" height="40" viewBox="0 0 24 24" fill="#529e46"><path d="M17.5 2C15 2 13 4 12 6c-1-2-3-4-5.5-4C3 2 1 4.5 1 8c0 5 7 11 11 14 4-3 11-9 11-14 0-3.5-2-6-5.5-6z"/></svg>
-        <span class="journal-decor-sparkle journal-decor-sparkle-1">✦</span>
-        <span class="journal-decor-sparkle journal-decor-sparkle-2">✦</span>
-    </div>
+{% block main %}
+<main class="journal-main flex-grow-1">
+    <!-- Full-Width Botanical Notebook Hero Banner -->
+    <section class="journal-hero-banner-full" aria-label="Garden Journal Header">
+        <div class="journal-hero-art" aria-hidden="true">
+                        <!-- Sun: shining morning sun with rotating beams (matching My EcoPatch) -->
+            <div class="journal-sun" aria-hidden="true"></div>
 
-    <div class="row align-items-center g-4 position-relative" style="z-index: 1;">
-        <!-- Left: Branding & Intro -->
-        <div class="col-lg-8 col-md-7">
-            <div class="journal-hero-badge">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                </svg>
-                Jurnal Perkembangan Kebun
-            </div>
-            <h1 class="journal-hero-title">
-                Setiap Lembar, Rekam Cerita <span class="accent-journal">Tumbuh Kebunmu</span>
-            </h1>
-            <p class="journal-hero-lead">
-                Buka buku jurnalmu untuk mencatat tinggi berkala, amati perubahan kondisi tanaman, dan kumpulkan potret tanaman harian di setiap lembarnya.
-            </p>
-            <div class="journal-hero-chips">
-                <span class="journal-chip">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2d7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 5 5c0 2-2 3-5 5-3-2-5-3-5-5a5 5 0 0 1 5-5z"/><path d="M7 12h10l-1.5 8h-7z"/></svg>
-                    <strong>{{ total_plants|default:0 }}</strong> Buku Tanaman
-                </span>
-                <span class="journal-chip">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2d7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
-                    <strong>{{ total_user_journals|default:0 }}</strong> Lembar Catatan
-                </span>
-                <span class="journal-chip">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2d7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                    Foto Tanaman & Grafik
-                </span>
-            </div>
+            <!-- Clouds: peach-tinted drifting softly -->
+            <svg class="journal-clouds" viewBox="0 0 1200 160" preserveAspectRatio="xMidYMin slice">
+                <g class="cl" style="--d: 0s;">
+                    <g transform="translate(1020, 42) scale(1.15)" fill="#fdebc9" opacity="0.92">
+                        <ellipse cx="0" cy="0" rx="36" ry="12" />
+                        <ellipse cx="-12" cy="-9" rx="19" ry="14" />
+                        <ellipse cx="12" cy="-12" rx="16" ry="12" />
+                    </g>
+                </g>
+                <g class="cl" style="--d: -16s;">
+                    <g transform="translate(320, 68) scale(0.9)" fill="#ffd8a8" opacity="0.85">
+                        <ellipse cx="0" cy="0" rx="34" ry="11" />
+                        <ellipse cx="-11" cy="-8" rx="17" ry="13" />
+                        <ellipse cx="11" cy="-10" rx="15" ry="11" />
+                    </g>
+                </g>
+                <g class="cl" style="--d: -8s;">
+                    <g transform="translate(740, 96) scale(0.75)" fill="#fdebc9" opacity="0.80">
+                        <ellipse cx="0" cy="0" rx="30" ry="10" />
+                        <ellipse cx="-10" cy="-7" rx="15" ry="12" />
+                        <ellipse cx="10" cy="-9" rx="13" ry="10" />
+                    </g>
+                </g>
+                <!-- Animated Sky Butterflies -->
+                <g class="sky-bf" style="--bfd: 0s; --bfx0: -80px; --bfy0: 55px;">
+                    <g>
+                        <path class="sky-wg l" d="M0 0 C-13 -14 -20 3 0 7 Z" fill="#ffa726" opacity="0.92"/>
+                        <path class="sky-wg r" d="M0 0 C13 -14 20 3 0 7 Z" fill="#ffb74d" opacity="0.92"/>
+                        <ellipse cx="0" cy="3.5" rx="1.8" ry="5" fill="#5d4037"/>
+                    </g>
+                </g>
+                <g class="sky-bf" style="--bfd: -11s; --bfx0: -120px; --bfy0: 80px;">
+                    <g>
+                        <path class="sky-wg l" d="M0 0 C-11 -12 -17 3 0 6 Z" fill="#f48fb1" opacity="0.88"/>
+                        <path class="sky-wg r" d="M0 0 C11 -12 17 3 0 6 Z" fill="#ff80ab" opacity="0.88"/>
+                        <ellipse cx="0" cy="3" rx="1.5" ry="4.2" fill="#5d4037"/>
+                    </g>
+                </g>
+                <g class="sky-bf" style="--bfd: -22s; --bfx0: -60px; --bfy0: 100px;">
+                    <g>
+                        <path class="sky-wg l" d="M0 0 C-10 -11 -15 2 0 5.5 Z" fill="#aed581" opacity="0.82"/>
+                        <path class="sky-wg r" d="M0 0 C10 -11 15 2 0 5.5 Z" fill="#8bc34a" opacity="0.82"/>
+                        <ellipse cx="0" cy="2.5" rx="1.4" ry="3.8" fill="#33691e"/>
+                    </g>
+                </g>
+            </svg>
+
+            <!-- Flying Birds Silhouette (Matching My EcoPatch) -->
+            <svg class="journal-birds" viewBox="0 0 120 40" focusable="false" aria-hidden="true">
+                <path d="M6 22q8-14 16 0q8-14 16 0" fill="none" stroke="#6b8f77" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M62 12q6-10 12 0q6-10 12 0" fill="none" stroke="#6b8f77" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+            </svg>
+
+            <!-- Distant Hill Layer — #9ad5b5 (far green) spans 100% width smoothly -->
+            <svg class="journal-hills journal-hills--back" viewBox="0 0 1440 240" preserveAspectRatio="none">
+                <path d="M0 110 C260 48 520 44 780 88 C1040 132 1240 96 1440 70 V240 H0 Z" fill="#9ad5b5" />
+            </svg>
+
+            <!-- Picket fence pattern matching My EcoPatch across 100% width -->
+            <svg class="journal-fence" viewBox="0 0 1440 76" preserveAspectRatio="none">
+                <defs>
+                    <pattern id="journal-picket" width="30" height="76" patternUnits="userSpaceOnUse">
+                        <path d="M4 76V18l9-11 9 11v58Z" fill="#fbf1d6" stroke="#d9c28f" stroke-width="2"
+                            stroke-linejoin="round" />
+                    </pattern>
+                </defs>
+                <rect y="0" width="100%" height="76" fill="url(#journal-picket)" />
+                <rect y="22" width="100%" height="7" rx="3.5" fill="#e8d3a0" />
+                <rect y="50" width="100%" height="7" rx="3.5" fill="#e8d3a0" />
+            </svg>
+
+            <!-- Foreground Rolling Hill Layer — #6fbf8e (near green) spans 100% width smoothly -->
+            <svg class="journal-hills journal-hills--front" viewBox="0 0 1440 200" preserveAspectRatio="none">
+                <path d="M0 130 C300 70 600 80 900 58 C1200 36 1360 80 1440 70 V200 H0 Z" fill="#6fbf8e" />
+            </svg>
+
+            <!-- Green Shrubs, Flowers & Fluttering Butterflies -->
+            <svg class="journal-flora" viewBox="0 0 1440 110" preserveAspectRatio="xMidYMax meet">
+                <g fill="#6fbf8e">
+                    <circle cx="160" cy="74" r="24" />
+                    <circle cx="192" cy="58" r="32" />
+                    <circle cx="228" cy="76" r="22" />
+                    <circle cx="680" cy="78" r="20" />
+                    <circle cx="706" cy="64" r="28" />
+                    <circle cx="738" cy="78" r="18" />
+                    <circle cx="1280" cy="76" r="22" />
+                    <circle cx="1308" cy="60" r="30" />
+                    <circle cx="1340" cy="76" r="20" />
+                </g>
+                <g fill="#4a9f6a">
+                    <circle cx="192" cy="50" r="8" />
+                    <circle cx="706" cy="56" r="7" />
+                    <circle cx="1308" cy="52" r="8" />
+                </g>
+                <!-- Flowers -->
+                <g fill="none" stroke="#4a9f6a" stroke-width="2" stroke-linecap="round">
+                    <path d="M120 74 v16" />
+                    <path d="M420 72 v18" />
+                    <path d="M820 76 v16" />
+                    <path d="M1160 74 v16" />
+                </g>
+                <g fill="#fffdf6">
+                    <g transform="translate(120, 70)">
+                        <circle cy="-6" r="4.5" />
+                        <circle cx="6" r="4.5" />
+                        <circle cy="6" r="4.5" />
+                        <circle cx="-6" r="4.5" />
+                    </g>
+                    <g transform="translate(820, 72)">
+                        <circle cy="-6" r="4.5" />
+                        <circle cx="6" r="4.5" />
+                        <circle cy="6" r="4.5" />
+                        <circle cx="-6" r="4.5" />
+                    </g>
+                </g>
+                <g fill="#ff8fa8">
+                    <g transform="translate(420, 68)">
+                        <circle cy="-6" r="4.5" />
+                        <circle cx="6" r="4.5" />
+                        <circle cy="6" r="4.5" />
+                        <circle cx="-6" r="4.5" />
+                    </g>
+                    <g transform="translate(1160, 70)">
+                        <circle cy="-6" r="4.5" />
+                        <circle cx="6" r="4.5" />
+                        <circle cy="6" r="4.5" />
+                        <circle cx="-6" r="4.5" />
+                    </g>
+                </g>
+                <g fill="#ff9d2e">
+                    <circle cx="120" cy="70" r="3.2" />
+                    <circle cx="420" cy="68" r="3.2" />
+                    <circle cx="820" cy="72" r="3.2" />
+                    <circle cx="1160" cy="70" r="3.2" />
+                </g>
+                <!-- Animated Butterflies -->
+                <g class="bf" style="--d: 0s;">
+                    <g transform="translate(1080, 42)">
+                        <path class="wg l" d="M0 0 C-14 -16 -22 4 0 8 Z" fill="#ffa726" />
+                        <path class="wg r" d="M0 0 C14 -16 22 4 0 8 Z" fill="#ffb74d" />
+                        <ellipse cx="0" cy="4" rx="2" ry="6" fill="#5d4037" />
+                    </g>
+                </g>
+                <g class="bf" style="--d: -6s;">
+                    <g transform="translate(620, 54) scale(0.85)">
+                        <path class="wg l" d="M0 0 C-14 -16 -22 4 0 8 Z" fill="#ff80ab" />
+                        <path class="wg r" d="M0 0 C14 -16 22 4 0 8 Z" fill="#ff4081" />
+                        <ellipse cx="0" cy="4" rx="2" ry="6" fill="#5d4037" />
+                    </g>
+                </g>
+            </svg>
+
+            <!-- Full Wooden Botanical Desk (Setengah Tebal: height 100px, y=100) -->
+            <svg class="journal-desk" viewBox="0 0 1440 28" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="g-wood-top" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#eed29e" />
+                        <stop offset="40%" stop-color="#deb87e" />
+                        <stop offset="85%" stop-color="#cca062" />
+                        <stop offset="100%" stop-color="#ba8d4f" />
+                    </linearGradient>
+                    <linearGradient id="g-wood-front" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#ba8d4f" />
+                        <stop offset="60%" stop-color="#a47738" />
+                        <stop offset="100%" stop-color="#93682c" />
+                    </linearGradient>
+                    <pattern id="g-wood-planks" width="320" height="65" patternUnits="userSpaceOnUse">
+                        <line x1="319" y1="0" x2="319" y2="65" stroke="#663e0e" stroke-width="1.8" opacity="0.32" />
+                        <line x1="0" y1="0" x2="0" y2="65" stroke="#e8c288" stroke-width="1.2" opacity="0.25" />
+                    </pattern>
+                </defs>
+
+                <!-- Desk Surface: top edge highlight + warm oak strip -->
+                <rect y="0" width="100%" height="28" fill="url(#g-wood-top)" />
+                <line x1="0" y1="0" x2="100%" y2="0" stroke="#faedd1" stroke-width="2" />
+                <line x1="0" y1="2" x2="100%" y2="2" stroke="#ffffff" stroke-width="1" opacity="0.45" />
+                <g fill="none" opacity="0.28" stroke-linecap="round">
+                    <line x1="0" y1="8" x2="100%" y2="8" stroke="#8d5f22" stroke-width="1.4" />
+                    <line x1="0" y1="16" x2="100%" y2="16" stroke="#fae5bf" stroke-width="1.1" />
+                    <line x1="0" y1="22" x2="100%" y2="22" stroke="#8d5f22" stroke-width="1.2" />
+                </g>
+                <rect y="26" width="100%" height="2" fill="#6d4615" opacity="0.35" />
+            </svg>
+
+            <!-- Botanical Journals, Seedling & Mug (Sitting on the wooden desk, proportional) -->
+            <svg class="journal-desk-props" viewBox="0 0 240 90" aria-hidden="true">
+                <defs>
+                    <linearGradient id="g-book-green" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#196b32" />
+                        <stop offset="35%" stop-color="#249a4a" />
+                        <stop offset="100%" stop-color="#145728" />
+                    </linearGradient>
+                    <linearGradient id="g-book-blue" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#17778d" />
+                        <stop offset="35%" stop-color="#26a8c7" />
+                        <stop offset="100%" stop-color="#135e70" />
+                    </linearGradient>
+                    <linearGradient id="g-brass" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#fae8a5" />
+                        <stop offset="45%" stop-color="#d9b641" />
+                        <stop offset="100%" stop-color="#9e7c1a" />
+                    </linearGradient>
+                    <filter id="desk-shadow" x="-8%" y="-8%" width="116%" height="120%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#3d2a14" flood-opacity="0.12" />
+                    </filter>
+                </defs>
+
+                <g transform="translate(-1040, 40)">
+                    <!-- Bottom Book: Green Hardcover -->
+                    <rect x="1050" y="24" width="124" height="26" rx="5" fill="url(#g-book-green)"
+                        filter="url(#desk-shadow)" />
+                    <rect x="1060" y="29" width="114" height="16" rx="2" fill="#fff9eb" />
+                    <line x1="1062" y1="33" x2="1172" y2="33" stroke="#e8dcbe" stroke-width="1" />
+                    <line x1="1062" y1="37" x2="1172" y2="37" stroke="#e8dcbe" stroke-width="1" />
+                    <line x1="1062" y1="41" x2="1172" y2="41" stroke="#e8dcbe" stroke-width="1" />
+                    <rect x="1050" y="24" width="10" height="26" rx="2" fill="url(#g-brass)" />
+
+                    <!-- Top Book: Teal Botanical Log -->
+                    <rect x="1054" y="-2" width="116" height="26" rx="5" fill="url(#g-book-blue)"
+                        filter="url(#desk-shadow)" />
+                    <rect x="1064" y="3" width="106" height="16" rx="2" fill="#fff9eb" />
+                    <line x1="1066" y1="7" x2="1168" y2="7" stroke="#e8dcbe" stroke-width="1" />
+                    <line x1="1066" y1="11" x2="1168" y2="11" stroke="#e8dcbe" stroke-width="1" />
+                    <rect x="1054" y="-2" width="9" height="26" rx="2" fill="url(#g-brass)" />
+
+                    <!-- Pink Ribbon Bookmark -->
+                    <g class="sw" style="--d: 0.4s;">
+                        <path d="M1142 18 v34 l5 -6 l5 6 v-34 z" fill="#ff8fa8" />
+                    </g>
+
+                    <!-- Tiny Seedling Plant Pot -->
+                    <rect x="1098" y="-18" width="28" height="17" rx="3.5" fill="#f2a243" filter="url(#desk-shadow)" />
+                    <rect x="1096" y="-20" width="32" height="4.5" rx="2" fill="#ffbe6b" />
+                    <g transform="translate(1112, -20)">
+                        <path d="M0 0 C-4 -14 -14 -12 -12 -3 C-12 5 -2 8 0 10 Z" fill="#2fbf5c" />
+                        <path d="M0 0 C4 -14 14 -12 14 -3 C14 5 2 8 0 10 Z" fill="#1f9142" />
+                        <circle cx="0" cy="0" r="1.5" fill="#ffd95c" />
+                    </g>
+
+                    <!-- Ceramic Pencil & Brush Mug -->
+                    <rect x="1190" y="16" width="38" height="34" rx="7" fill="#f2a243" filter="url(#desk-shadow)" />
+                    <rect x="1192" y="18" width="34" height="6" rx="3" fill="#ffbe6b" />
+                    <rect x="1194" y="28" width="30" height="18" rx="4" fill="#df8720" />
+                    <g class="pn" style="--d: 1.1s;">
+                        <g transform="rotate(-14 1198 18)">
+                            <rect x="1194" y="-22" width="8" height="40" rx="1.5" fill="#f0d5a8" />
+                            <line x1="1194" y1="-17" x2="1198" y2="-17" stroke="#8d6b38" stroke-width="1" />
+                            <line x1="1194" y1="-12" x2="1199" y2="-12" stroke="#8d6b38" stroke-width="1" />
+                            <line x1="1194" y1="-7" x2="1198" y2="-7" stroke="#8d6b38" stroke-width="1" />
+                        </g>
+                        <g transform="rotate(-3 1206 18)">
+                            <path d="M1206 18 V-20" stroke="#8d6238" stroke-width="4.5" stroke-linecap="round" />
+                            <rect x="1204" y="-18" width="4" height="6" rx="1" fill="url(#g-brass)" />
+                            <path d="M1204 -18 Q1206 -26 1206 -27 Q1206 -26 1208 -18 Z" fill="#22301f" />
+                        </g>
+                        <g transform="rotate(9 1214 18)">
+                            <rect x="1212" y="-16" width="5.5" height="36" rx="1.2" fill="#1f9142" />
+                            <polygon points="1212,-16 1217.5,-16 1214.7,-24" fill="#eed9b7" />
+                            <polygon points="1213.5,-22 1216,-22 1214.7,-24" fill="#1f9142" />
+                        </g>
+                    </g>
+
+                    <!-- Standing Photo Frame on Desk (next to pencil mug) -->
+                    <g transform="translate(1234, 12)" filter="url(#desk-shadow)">
+                        <!-- Easel kickstand on desk surface -->
+                        <line x1="14" y1="34" x2="20" y2="42" stroke="#7a4e1a" stroke-width="2" stroke-linecap="round" opacity="0.8" />
+                        <!-- Outer wooden frame border -->
+                        <rect x="0" y="0" width="28" height="37" rx="3" fill="#cf9f65" stroke="#7a4e1a" stroke-width="1.2" />
+                        <!-- Frame inner mat -->
+                        <rect x="3.5" y="3.5" width="21" height="30" rx="1.5" fill="#fdfaf4" stroke="#d5c4a1" stroke-width="0.6" />
+                        <!-- Photo area (botanical green) -->
+                        <rect x="5.5" y="5.5" width="17" height="19" rx="1" fill="#ebf6e5" />
+                        <!-- Plant stem -->
+                        <path d="M14 23 V14" stroke="#167a38" stroke-width="1.3" stroke-linecap="round" />
+                        <!-- Left leaf -->
+                        <path d="M14 18 C10 13 6 16 9 20 C11 22 14 20 14 18 Z" fill="#2fbf5c" />
+                        <!-- Right leaf -->
+                        <path d="M14 16 C18 11 22 14 19 18 C17 20 14 18 14 16 Z" fill="#44cb6f" />
+                        <!-- Flower bloom dot -->
+                        <circle cx="14" cy="13" r="1.3" fill="#ff9d2e" />
+                        <!-- Glass reflection glare -->
+                        <line x1="6.5" y1="6.5" x2="15" y2="15" stroke="#ffffff" stroke-width="0.8" opacity="0.45" stroke-linecap="round" />
+                        <!-- Caption line on white mat below photo -->
+                        <line x1="7" y1="28.5" x2="18" y2="28.5" stroke="#8c7853" stroke-width="0.7" stroke-linecap="round" opacity="0.5" />
+                        <!-- Frame top highlight -->
+                        <rect x="1" y="1" width="26" height="2" rx="1" fill="#f0d9a8" opacity="0.6" />
+                    </g>
+                </g>
+            </svg>
         </div>
 
-        <!-- Right: Animated Mascot Petak Mencatat & CTA -->
-        <div class="col-lg-4 col-md-5 text-center">
-            <div class="journal-hero-right">
-                <div class="journal-hero-mascot-box">
-                    <div class="journal-mascot-speech">
-                        Catat kabar tanamanmu hari ini!
+        <div class="journal-hero-inner">
+            <div class="row align-items-center g-3">
+                <!-- Left Column: Branding, Copy, Stats, Week Calendar & Primary Action -->
+                <div class="col-lg-6 col-md-6 d-flex flex-column justify-content-center">
+                    <div class="journal-hero-content-left">
+                        <p class="journal-hero-eyebrow">JURNAL PERKEMBANGAN KEBUN</p>
+
+                        <!-- Judul Halaman -->
+                        <h1 class="journal-hero-title">
+                            Garden Journal
+                        </h1>
+
+                        <!-- Subtitle -->
+                        <p class="journal-hero-lead">
+                            Rekam cerita tumbuh kebunmu, satu lembar setiap hari.
+                        </p>
+
+                        <!-- Stats + Week Calendar side-by-side row -->
+                        <div class="d-flex flex-wrap align-items-start gap-2 mb-2">
+                        <!-- Pill Chips Stats Summary (Solid white, bordered, inline) -->
+                        <div class="journal-stats-pills">
+                            <span class="stat-pill-chip">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f9142"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                                    class="stat-pill-icon">
+                                    <path d="M7 20h10" />
+                                    <path d="M10 20c5.5-2.5.8-6.4 3-10" />
+                                    <path
+                                        d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" />
+                                </svg>
+                                <strong>{{ books|length }}</strong> Buku Tanaman
+                            </span>
+                            <span class="stat-pill-chip">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f9142"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                                    class="stat-pill-icon">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                    <line x1="10" y1="9" x2="8" y2="9" />
+                                </svg>
+                                <strong>{{ total_user_journals }}</strong> Lembar Catatan
+                            </span>
+                            <span class="stat-pill-chip">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f9142"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                                    class="stat-pill-icon">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="16" y1="2" x2="16" y2="6" />
+                                    <line x1="8" y1="2" x2="8" y2="6" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                                <strong>{{ days_written_count }}</strong> Hari Menulis
+                            </span>
+                        </div>
+
+                        <!-- Kalender 7 Hari Terakhir & Legenda -->
+                        <div class="journal-week-calendar-wrap mb-0">
+                            <div class="d-flex align-items-center flex-wrap gap-3">
+                                <span class="journal-week-label">7 hari terakhir</span>
+                                <div class="journal-week-strip" role="group" aria-label="Aktivitas 7 hari terakhir">
+                                    {% for day in last_7_days %}
+                                    <div class="journal-day-col {% if day.is_today %}is-today{% endif %}"
+                                        title="{{ day.date|date:'l, d M Y' }}{% if day.is_today %} (Hari ini){% endif %} - {% if day.has_entry %}Sudah ada catatan{% else %}Belum ada catatan{% endif %}">
+                                        <div
+                                            class="journal-day-circle {% if day.has_entry %}has-entry{% else %}is-empty{% endif %}">
+                                            {% if day.has_entry %}
+                                            <span class="check-icon" aria-hidden="true"><svg width="10" height="10"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="20 6 9 17 4 12" />
+                                                </svg></span>
+                                            {% endif %}
+                                        </div>
+                                        <span class="journal-day-name">{{ day.day_name }}</span>
+                                        {% if day.is_today %}
+                                        <span class="today-indicator-dot" title="Hari ini" aria-label="Hari ini"></span>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Legenda Kalender (Clean UI/UX) -->
+                            <div class="journal-calendar-legend mt-2">
+                                <span class="legend-chip"><span class="legend-circle has-entry"></span> Sudah
+                                    mencatat</span>
+                                <span class="legend-chip"><span class="legend-circle is-empty"></span> Belum ada</span>
+                                <span class="legend-chip"><span class="legend-circle is-today-dot"></span> Hari
+                                    ini</span>
+                            </div>
+                        </div><!-- /week-cal -->
+                        </div><!-- /stats+week flex row -->
+
+                        <!-- Dynamic Header Primary Action Button (Matching '+ Buat Listing' Pill Design) -->
+                        <div class="journal-hero-cta-wrap">
+                            {% if not has_user_plants %}
+                            <a href="{% url 'my_ecopatch:list' %}" class="btn-listing-style" id="heroActionBtn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                                    class="me-1.5">
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <line x1="5" y1="12" x2="19" y2="12" />
+                                </svg>
+                                Tambah Tanaman di My EcoPatch
+                            </a>
+                            {% else %}
+                            <a href="{% url 'garden_journal:create' %}" class="btn-listing-style" id="heroActionBtn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                                    class="me-1.5">
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <line x1="5" y1="12" x2="19" y2="12" />
+                                </svg>
+                                Tulis Jurnal Baru
+                            </a>
+                            {% endif %}
+                        </div>
                     </div>
-                    <img src="{% static 'img/mascot/petak-mencatat.png' %}" alt="Petak Mencatat" class="journal-hero-mascot-img">
                 </div>
-                <a href="{% url 'garden_journal:create' %}" class="btn btn-ds-primary px-4 py-2 fw-semibold journal-hero-cta" style="border-radius: 999px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    Tulis Jurnal Baru
-                </a>
+
+                <!-- Right Column: Speech Bubble Dialog & Mascot Petak -->
+                <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                    <div class="journal-dialog-scene">
+                        <!-- Dialogue / Speech Bubble Pop-Up (Matches Smart Care & Seed Exchange) -->
+                        <div class="journal-bubble" role="status" aria-live="polite">
+                            {% if not has_user_plants %}
+                            <span class="journal-bubble-pill is-ok">Kebunmu masih kosong</span>
+                            <p class="journal-bubble-text mb-0">
+                                Tambahkan tanamanmu dulu di <a href="{% url 'my_ecopatch:list' %}"
+                                    class="journal-bubble-link">My EcoPatch</a>, nanti bukunya otomatis aku buatkan di
+                                sini.
+                            </p>
+                            {% elif has_planned_plants %}
+                            <span class="journal-bubble-pill is-tip">Tips Integrasi</span>
+                            <p class="journal-bubble-text mb-0">
+                                Buku tanamanmu sudah siap dicatat! Nanti kalau bibitnya sudah ditanam di pot/tanah, ubah
+                                status ke <strong>Planted</strong> di My EcoPatch ya, supaya Smart Care bisa bantu
+                                ingetin jadwal siram!
+                            </p>
+                            {% elif not books %}
+                            <span class="journal-bubble-pill is-ok">Tanaman sudah siap</span>
+                            <p class="journal-bubble-text mb-0">
+                                Tanamanmu sudah terdaftar! Yuk tulis catatan pertamamu dengan klik <strong>Tulis Jurnal
+                                    Baru</strong>.
+                            </p>
+                            {% else %}
+                            <span class="journal-bubble-pill is-ok">Catatan Kebun</span>
+                            <p class="journal-bubble-text mb-0">
+                                Sudah catat kabar kebunmu hari ini? Rekam pertumbuhan dan cerita kebunmu yuk!
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Mascot Petak Mencatat (Prominent Size) -->
+                        <div class="journal-mascot-petak-wrap">
+                            <img src="{% static 'img/mascot/petak-mencatat.svg' %}" alt="Petak Mencatat"
+                                class="journal-mascot-petak-img" width="245" height="225">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+    </section>
+
+    <!-- Lower Sheet Content: Filter & Search Bar + Book Shelf -->
+    <div class="journal-sheet-body">
+        <div class="container py-4">
+            {% url 'garden_journal:list' as journal_list_url %}
+            {% if books or total_user_journals %}
+            <!-- Search Bar (full width, mirrors Seed Exchange) -->
+            <div class="journal-search-bar">
+                <form method="get" action="{{ journal_list_url }}" hx-get="{{ journal_list_url }}"
+                    hx-target="#journal-filters-shelf" hx-select="#journal-filters-shelf" hx-swap="outerHTML"
+                    hx-push-url="true" hx-trigger="submit" hx-include="#journal-active-params">
+                    <span class="journal-search-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <path d="m20 20-3.2-3.2"></path>
+                        </svg>
+                    </span>
+                    <input id="journal-q" class="journal-search-input" type="search" name="plant_name"
+                        value="{{ selected_plant_name }}" placeholder="Cari tanaman di jurnalmu..."
+                        aria-label="Cari tanaman di jurnalmu" hx-get="{{ journal_list_url }}"
+                        hx-target="#journal-filters-shelf" hx-select="#journal-filters-shelf" hx-swap="outerHTML"
+                        hx-push-url="true" hx-trigger="keyup changed delay:400ms, search"
+                        hx-include="#journal-active-params">
+                    <a id="journal-search-clear" class="journal-search-clear" href="{{ search_clear_url }}"
+                        aria-label="Hapus pencarian" {% if not selected_plant_name %} hidden{% endif %}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </a>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Filters + shelf share one HTMX target so both stay in sync. -->
+            <div id="journal-filters-shelf">
+                <div id="journal-active-params" hidden>
+                    {% if selected_ecopatch_name %}<input type="hidden" name="ecopatch_name"
+                        value="{{ selected_ecopatch_name }}">{% endif %}
+                    {% if selected_condition %}<input type="hidden" name="condition" value="{{ selected_condition }}">{% endif %}
+                    {% if has_any_photo and selected_has_photo %}<input type="hidden" name="has_photo" value="{{ selected_has_photo }}">{% endif %}
+                    {% if selected_sort %}<input type="hidden" name="sort" value="{{ selected_sort }}">{% endif %}
+                </div>
+
+                {% if books or total_user_journals %}
+                <form id="journal-filter-form" class="journal-filters" method="get" action="{{ journal_list_url }}">
+                    {% for dd in filter_dropdowns %}
+                    <div class="dropdown">
+                        <button type="button"
+                            class="journal-filter dropdown-toggle{% if dd.is_active %} journal-filter--active{% endif %}"
+                            data-bs-toggle="dropdown" aria-expanded="false"
+                            {% if dd.aria_label %}aria-label="{{ dd.aria_label }}"{% elif dd.name == "has_photo" %}aria-label="Filter foto"{% endif %}>
+                            {% if dd.is_active %}<span class="journal-filter-dot" aria-hidden="true"></span>{% endif %}
+                            {{ dd.current_label }}
+                        </button>
+                        <ul class="dropdown-menu journal-menu">
+                            {% for item in dd.items %}
+                            <li>
+                                <a class="dropdown-item journal-menu-item{% if item.selected %} active{% endif %}"
+                                    href="{{ item.url }}" hx-get="{{ item.url }}" hx-target="#journal-filters-shelf"
+                                    hx-select="#journal-filters-shelf" hx-swap="outerHTML" hx-push-url="true">
+                                    {{ item.label }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+
+                    {% if has_active_filters %}
+                    <a class="journal-filter-reset" href="{{ filters_reset_url }}" hx-get="{{ filters_reset_url }}"
+                        hx-target="#journal-filters-shelf" hx-select="#journal-filters-shelf" hx-swap="outerHTML"
+                        hx-push-url="true" aria-label="Reset filter">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            aria-hidden="true">
+                            <path
+                                d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                        </svg>
+                        Reset
+                    </a>
+                    {% endif %}
+                </form>
+                {% endif %}
+
+                <!-- Book Shelf Container (HTMX Target) -->
+                <div id="book-shelf-container" aria-label="Daftar buku jurnal">
+                    {% include "garden_journal/partials/book_grid.html" %}
+                </div>
+            </div>
+
+            <!-- Minimal Bottom Footer (Matching Example) -->
+            <footer class="journal-foot">
+                <div class="journal-foot-row">
+                    <span>&copy; {% now "Y" %} EcoPatch &middot; Small Spaces, Greener Living.</span>
+                </div>
+            </footer>
+        </div>
     </div>
-</section>
-
-<!-- Filter Bar: Pill style matching the design -->
-<form id="filter-form" class="d-flex flex-wrap align-items-center gap-2 mb-4">
-    <!-- Filter EcoPatch -->
-    <div class="filter-pill-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#556b4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M7 10h10l-1.5 9h-7z"/><path d="M12 10V4"/><path d="M8 6c0-1.1 1.8-2 4-2s4 .9 4 2"/></svg>
-        <select name="ecopatch_name" id="id_ecopatch" class="filter-pill-select"
-                hx-get="{% url 'garden_journal:filter_ajax' %}"
-                hx-target="#book-shelf-container"
-                hx-trigger="change"
-                hx-include="#filter-form">
-            <option value="">Semua EcoPatch</option>
-            {% for ep in ecopatch_names %}
-                <option value="{{ ep }}" {% if selected_ecopatch_name == ep %}selected{% endif %}>
-                    {{ ep }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <!-- Filter Kondisi Tanaman -->
-    <div class="filter-pill-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#556b4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M11 20A7 7 0 0 1 4 13C4 8 8 3 13 3c0 7-3 10-2 17Z"/><path d="M8 12c3-1 6-1 9 1"/></svg>
-        <select name="condition" id="id_condition" class="filter-pill-select"
-                hx-get="{% url 'garden_journal:filter_ajax' %}"
-                hx-target="#book-shelf-container"
-                hx-trigger="change"
-                hx-include="#filter-form">
-            <option value="">Semua Kondisi</option>
-            {% for val, label in conditions %}
-                <option value="{{ val }}" {% if selected_condition == val %}selected{% endif %}>
-                    {{ label }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <!-- Live Search Tanaman -->
-    <div class="filter-pill-btn ms-auto">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#798a72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" name="plant_name"
-               class="border-0 bg-transparent text-dark small"
-               style="outline: none; width: 140px;"
-               placeholder="Cari tanaman..."
-               value="{{ selected_plant_name }}"
-               hx-get="{% url 'garden_journal:filter_ajax' %}"
-               hx-target="#book-shelf-container"
-               hx-trigger="keyup changed delay:350ms"
-               hx-include="#filter-form">
-    </div>
-</form>
-
-<!-- Book Shelf Container (HTMX Target) -->
-<div id="book-shelf-container">
-    {% include "garden_journal/partials/book_grid.html" %}
-</div>
-
+</main>
 {% endblock %}
+
+{% block footer %}{% endblock %}
 
 {% block extra_scripts %}
 <script>
     function applyBookCoverColors() {
-        document.querySelectorAll('[data-cover-color]').forEach(function(el) {
-            el.style.backgroundColor = el.dataset.coverColor;
+        document.querySelectorAll('[data-cover-color]').forEach(function (el) {
+            if (el.dataset.coverColor) {
+                el.style.backgroundColor = el.dataset.coverColor;
+            }
         });
     }
     applyBookCoverColors();
     document.addEventListener('htmx:afterSwap', applyBookCoverColors);
+
+    (function () {
+        var input = document.getElementById('journal-q');
+        var clear = document.getElementById('journal-search-clear');
+        if (!input || !clear) return;
+
+        function sync() {
+            clear.hidden = input.value.trim() === '';
+        }
+
+        input.addEventListener('input', sync);
+        input.addEventListener('search', sync);
+
+        clear.addEventListener('click', function (event) {
+            input.value = '';
+            sync();
+            if (window.htmx) {
+                // Re-run the search with an empty query in place.
+                event.preventDefault();
+                input.focus();
+                input.dispatchEvent(new Event('search', { bubbles: true }));
+            }
+        });
+
+        sync();
+    })();
 </script>
 {% endblock %}

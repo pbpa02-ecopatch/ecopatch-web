@@ -1,0 +1,2645 @@
+/* Plant Library
+   The same visual system as Seed Exchange and Smart Care: one cream sheet that
+   runs edge to edge, content in a centred column, white cards with soil
+   hairlines, Baloo headings, chunky pill buttons. The search composer follows
+   the landing page, where the pet sits on the top edge of the box.
+   Every class is prefixed plant- (or scoped under .plant-page) so nothing
+   leaks into the other modules. Tokens are local for the same reason. */
+
+body.has-sidebar.plant-body {
+    padding-left: 0;
+    background: #faefd5;
+}
+
+/* Only a member has the floating sidebar, so only a member needs its gutter. */
+body.has-sidebar .plant-page {
+    --pl-offset: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2);
+}
+
+.plant-main {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.plant-page {
+    --pl-sheet-top: #fdf7e8;
+    --pl-sheet-bot: #faefd5;
+    --pl-line: rgba(182, 154, 99, 0.38);
+    --pl-line-strong: #b9a46a;
+    --pl-fg: #17301f;
+    --pl-muted: #4c6853;
+    --pl-brand: #2fbf5c;
+    --pl-brand-strong: #167a38;
+    --pl-brand-edge: #0f5a28;
+    --pl-brand-soft: #e2f4e5;
+    --pl-mango: #ff9d2e;
+    --pl-mango-soft: #fde5cb;
+    --pl-mango-ink: #8a4a10;
+    --pl-sky: #29b6d8;
+    --pl-sky-soft: #d9f1f7;
+    --pl-sky-ink: #10647a;
+    --pl-danger: #b8362a;
+    --pl-danger-soft: #fbe0dc;
+    --pl-display: 'Baloo 2', 'Trebuchet MS', system-ui, sans-serif;
+    --pl-body: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    /* Signed-out visitors have no sidebar, so the sheet must not reserve its gutter.
+       (--side-width is set on <html> for every wide screen, member or not.) */
+    --pl-offset: 0px;
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    min-width: 0;
+    background: linear-gradient(180deg, var(--pl-sheet-top) 0%, var(--pl-sheet-top) 26%, var(--pl-sheet-bot) 100%);
+    color: var(--pl-fg);
+    font: 400 1rem/1.55 var(--pl-body);
+    -webkit-text-size-adjust: 100%;
+}
+
+.plant-page [hidden] {
+    display: none !important;
+}
+
+.plant-page svg {
+    flex: none;
+}
+
+.plant-page :focus-visible {
+    outline: 3px solid var(--pl-mango);
+    outline-offset: 3px;
+    border-radius: 12px;
+}
+
+.plant-inner {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    max-width: calc(960px + var(--pl-offset) + 48px);
+    margin: 0 auto;
+    padding: 30px 20px 56px calc(var(--pl-offset) + 24px);
+}
+
+/* Keeps the composer, the FAQ helper and the results from touching. */
+#plant-library-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ---------------------------------------------------------------- Module head */
+.plant-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px 32px;
+}
+
+.plant-head-copy {
+    min-width: 0;
+}
+
+.plant-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 6px;
+    color: var(--pl-brand-strong);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.plant-eyebrow svg {
+    width: 18px;
+    height: 18px;
+}
+
+.plant-title {
+    margin: 0;
+    font: 800 clamp(2.2rem, 4vw, 3.2rem) / 0.98 var(--pl-display);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+}
+
+.plant-sub {
+    margin: 8px 0 0;
+    max-width: 52ch;
+    color: var(--pl-muted);
+    font-weight: 500;
+}
+
+.plant-head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.plant-head-art {
+    width: clamp(104px, 13vw, 150px);
+    flex: none;
+    filter: drop-shadow(0 14px 22px rgba(23, 48, 31, 0.16));
+}
+
+.plant-head-art img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ---------------------------------------------------------------- Buttons */
+.plant-page .plant-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border: 1.5px solid transparent;
+    border-radius: 99px;
+    font: 800 0.92rem/1 var(--pl-body);
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.3, 1.4, 0.5, 1), background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.plant-page .plant-btn svg {
+    width: 17px;
+    height: 17px;
+}
+
+.plant-page .plant-btn:hover {
+    transform: translateY(-1px);
+}
+
+.plant-page .plant-btn--primary {
+    background: var(--pl-brand-strong);
+    border-color: var(--pl-brand-edge);
+    color: #fff;
+    box-shadow: 0 10px 20px -12px rgba(15, 90, 40, 0.9);
+}
+
+.plant-page .plant-btn--primary:hover {
+    background: var(--pl-brand-edge);
+    color: #fff;
+}
+
+.plant-page .plant-btn--ghost {
+    background: #fffdf6;
+    border-color: var(--pl-line);
+    color: var(--pl-fg);
+}
+
+.plant-page .plant-btn--ghost:hover {
+    border-color: var(--pl-line-strong);
+    background: #fff;
+    color: var(--pl-brand-strong);
+}
+
+.plant-page .plant-btn--danger {
+    background: var(--pl-danger-soft);
+    border-color: transparent;
+    color: var(--pl-danger);
+}
+
+.plant-page .plant-btn--danger:hover {
+    background: var(--pl-danger);
+    color: #fff;
+}
+
+.plant-page .plant-btn--sm {
+    padding: 8px 14px;
+    font-size: 0.84rem;
+}
+
+/* ---------------------------------------------------------------- Finder */
+.plant-finder {
+    position: relative;
+    margin-top: 16px;
+}
+
+/* The pet sits on the top edge of the composer, exactly like the landing page. */
+.plant-finder-pet {
+    position: absolute;
+    right: clamp(4px, 2vw, 22px);
+    bottom: calc(100% - 12px);
+    width: clamp(94px, 11vw, 126px);
+    height: auto;
+    z-index: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 12px 18px rgba(23, 48, 31, 0.16));
+}
+
+.plant-finder:focus-within .plant-finder-pet {
+    animation: plant-pet-hop 0.7s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+@keyframes plant-pet-hop {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    45% { transform: translateY(-8px) rotate(-3deg); }
+}
+
+.plant-finder-card {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 18px 14px 22px;
+    border: 1.5px solid var(--pl-line);
+    border-radius: 28px;
+    background: #fffdf6;
+    box-shadow: 0 18px 36px -24px rgba(23, 48, 31, 0.45);
+    animation: plant-finder-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+@keyframes plant-finder-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+}
+
+.plant-finder-card:hover {
+    border-color: var(--pl-line-strong);
+}
+
+.plant-search-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 50px;
+}
+
+.plant-search-row .plant-search-icon {
+    width: 21px;
+    height: 21px;
+    color: var(--pl-muted);
+}
+
+.plant-search-input {
+    flex: 1 1 220px;
+    min-width: 0;
+    padding: 10px 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--pl-fg);
+    font: 600 clamp(1rem, 1.7vw, 1.18rem) / 1.4 var(--pl-body);
+    text-overflow: ellipsis;
+}
+
+.plant-search-input::placeholder {
+    color: color-mix(in srgb, var(--pl-muted) 72%, transparent);
+    font-weight: 500;
+}
+
+.plant-search-input:focus,
+.plant-search-input:focus-visible {
+    outline: none;
+}
+
+.plant-search-input::-webkit-search-cancel-button,
+.plant-search-input::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.plant-finder-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--pl-line);
+}
+
+.plant-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    flex: 1 1 320px;
+}
+
+.plant-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 13px;
+    border: 1.5px solid rgba(23, 48, 31, 0.14);
+    border-radius: 99px;
+    background: #fff;
+    color: var(--pl-fg);
+    font: 700 0.83rem/1 var(--pl-body);
+    text-decoration: none;
+    white-space: nowrap;
+    animation: plant-chip-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.18s, box-shadow 0.18s;
+}
+
+@keyframes plant-chip-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+}
+
+.plant-chip:nth-child(2) { animation-delay: 0.04s; }
+.plant-chip:nth-child(3) { animation-delay: 0.08s; }
+.plant-chip:nth-child(4) { animation-delay: 0.12s; }
+.plant-chip:nth-child(5) { animation-delay: 0.16s; }
+.plant-chip:nth-child(6) { animation-delay: 0.2s; }
+.plant-chip:nth-child(7) { animation-delay: 0.24s; }
+
+.plant-chip svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.2s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+.plant-chip:hover {
+    border-color: var(--pl-brand-strong);
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px -8px rgba(23, 48, 31, 0.4);
+}
+
+.plant-chip:hover svg {
+    transform: scale(1.12);
+}
+
+.plant-chip:active {
+    transform: scale(0.97);
+}
+
+.plant-chip[data-tone='sun'] svg {
+    color: #dd8512;
+}
+
+.plant-chip[data-tone='care'] svg {
+    color: var(--pl-brand-strong);
+}
+
+.plant-chip[data-tone='place'] svg {
+    color: #1a9ab8;
+}
+
+.plant-chip.is-active[data-tone='sun'] {
+    background: var(--pl-mango);
+    border-color: var(--pl-mango);
+    color: #3b2300;
+}
+
+.plant-chip.is-active[data-tone='care'] {
+    background: var(--pl-brand-strong);
+    border-color: var(--pl-brand-strong);
+    color: #fff;
+}
+
+.plant-chip.is-active[data-tone='place'] {
+    background: var(--pl-sky);
+    border-color: var(--pl-sky);
+    color: #04303b;
+}
+
+.plant-chip.is-active svg {
+    color: currentColor;
+}
+
+.plant-select-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Native select kept for keyboards and mobile, with a chevron that turns
+   when the field has focus. */
+.plant-select-wrap {
+    position: relative;
+    display: inline-flex;
+    min-width: 0;
+}
+
+.plant-select-wrap::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    width: 7px;
+    height: 7px;
+    margin-top: -5px;
+    border-right: 2px solid var(--pl-muted);
+    border-bottom: 2px solid var(--pl-muted);
+    transform: rotate(45deg);
+    pointer-events: none;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.18s;
+}
+
+.plant-select-wrap:hover::after {
+    border-color: var(--pl-brand-strong);
+}
+
+.plant-select-wrap:focus-within::after {
+    transform: rotate(225deg) translateY(-2px);
+    border-color: var(--pl-brand-strong);
+}
+
+.plant-select {
+    appearance: none;
+    min-width: 0;
+    max-width: 220px;
+    padding: 9px 38px 9px 15px;
+    border: 1.5px solid rgba(23, 48, 31, 0.16);
+    border-radius: 99px;
+    background: #fff;
+    color: var(--pl-fg);
+    font: 700 0.83rem/1.2 var(--pl-body);
+    cursor: pointer;
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s, transform 0.18s;
+}
+
+.plant-select:hover {
+    border-color: var(--pl-brand-strong);
+    background: #fff;
+    transform: translateY(-1px);
+}
+
+.plant-select:focus {
+    outline: none;
+    border-color: var(--pl-brand-strong);
+    box-shadow: 0 0 0 4px rgba(47, 191, 92, 0.18);
+}
+
+/* Filter dropdowns mirror Seed Exchange: pill button + rounded menu. */
+.plant-filter {
+    display: inline-flex;
+}
+
+.plant-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 16px;
+    border: 1.5px solid rgba(23, 48, 31, 0.16);
+    border-radius: 99px;
+    background: #fff;
+    color: var(--pl-muted);
+    font: 700 0.83rem/1 var(--pl-body);
+    cursor: pointer;
+    max-width: 100%;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s;
+}
+
+.plant-filter-btn::after {
+    margin-left: 2px;
+}
+
+.plant-filter-btn:hover,
+.plant-filter-btn[aria-expanded='true'] {
+    border-color: var(--pl-brand-strong);
+    color: var(--pl-fg);
+}
+
+.plant-filter-btn:focus-visible {
+    outline: none;
+    border-color: var(--pl-brand-strong);
+    box-shadow: 0 0 0 4px rgba(47, 191, 92, 0.18);
+}
+
+.plant-filter-btn.is-active {
+    border-color: var(--pl-brand-strong);
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+}
+
+.plant-filter-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--pl-brand-strong);
+    flex: none;
+}
+
+/* ---------------------------------------------------------------- Quick asks
+   A small FAQ chat with Petak. Questions sit directly on the page with no
+   container; one warm cream tone keeps every label equally easy to read. */
+.plant-ask {
+    display: grid;
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    align-items: center;
+    gap: 14px 22px;
+    padding: 2px 0;
+}
+
+.plant-ask-pet {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.plant-ask-pet img {
+    width: 52px;
+    height: 52px;
+    flex: none;
+    object-fit: contain;
+}
+
+.plant-ask-bubble {
+    position: relative;
+    margin: 0;
+    padding: 10px 15px;
+    border-radius: 16px 16px 16px 5px;
+    background: var(--pl-brand-soft);
+    color: var(--pl-fg);
+    line-height: 1.35;
+}
+
+.plant-ask-bubble::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--pl-brand-soft);
+    transform: rotate(45deg);
+}
+
+.plant-ask-bubble strong {
+    display: block;
+    font: 800 1rem/1.25 var(--pl-display);
+}
+
+.plant-ask-bubble span {
+    display: block;
+    color: var(--pl-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.plant-ask-questions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.plant-ask-q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 16px 16px 16px 5px;
+    background: #f2e7ca;
+    color: var(--pl-fg);
+    font: 700 0.86rem/1.35 var(--pl-body);
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.18s, color 0.18s, box-shadow 0.18s;
+}
+
+.plant-ask-q svg {
+    width: 15px;
+    height: 15px;
+    flex: none;
+    color: var(--pl-muted);
+    opacity: 0.7;
+    transition: transform 0.18s, opacity 0.18s;
+}
+
+.plant-ask-q:hover {
+    background: #e8d9b5;
+    transform: translateX(4px);
+}
+
+.plant-ask-q:hover svg {
+    opacity: 1;
+    transform: translateX(2px);
+}
+
+.plant-ask-q:active {
+    transform: translateX(4px) scale(0.99);
+}
+
+.plant-ask-q:focus-visible {
+    outline: 2px solid var(--pl-brand-strong);
+    outline-offset: 2px;
+}
+
+.plant-ask-q.is-active {
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+    box-shadow: inset 0 0 0 2px rgba(22, 122, 56, 0.25);
+}
+
+.plant-ask-q.is-active svg {
+    color: var(--pl-brand-strong);
+    opacity: 1;
+    transform: translateX(2px);
+}
+
+/* ---------------------------------------------------------------- Results bar */
+.plant-results-block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.plant-results {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    margin-top: 4px;
+}
+
+.plant-results-count {
+    margin: 0;
+    color: var(--pl-muted);
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.plant-results-count strong {
+    color: var(--pl-fg);
+    font-weight: 800;
+}
+
+.plant-results-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: 1.5px dashed #b8ccb8;
+    border-radius: 99px;
+    color: var(--pl-muted);
+    font: 700 0.82rem/1 var(--pl-body);
+    text-decoration: none;
+    transition: all 0.18s;
+}
+
+.plant-results-reset svg {
+    width: 14px;
+    height: 14px;
+}
+
+.plant-results-reset:hover {
+    border-color: var(--pl-brand-strong);
+    border-style: solid;
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+}
+
+/* ---------------------------------------------------------------- Cards */
+.plant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(242px, 1fr));
+    gap: 18px;
+}
+
+.plant-grid > .plant-card {
+    animation: plant-card-in 0.5s cubic-bezier(0.25, 1.2, 0.45, 1) backwards;
+    animation-delay: calc(var(--plant-i, 0) * 35ms);
+}
+
+@keyframes plant-card-in {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.985);
+    }
+}
+
+.plant-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    overflow: hidden;
+    border: 1.5px solid var(--pl-line);
+    border-radius: 22px;
+    background: #fffdf6;
+    box-shadow: 0 14px 30px -18px rgba(23, 48, 31, 0.35);
+    transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s, border-color 0.25s;
+}
+
+.plant-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--pl-line-strong);
+    box-shadow: 0 24px 44px -22px rgba(23, 48, 31, 0.42);
+}
+
+.plant-card:focus-within {
+    outline: 3px solid var(--pl-mango);
+    outline-offset: 3px;
+}
+
+.plant-card-media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    max-height: 170px;
+    overflow: hidden;
+    border-radius: 14px;
+    background:
+        radial-gradient(120% 90% at 50% 0%, #ffffff 0%, rgba(255, 255, 255, 0) 58%),
+        linear-gradient(150deg, #e6f4e0 0%, #fdf3dd 100%);
+}
+
+.plant-card-media--empty {
+    background:
+        radial-gradient(120% 90% at 50% 0%, #ffffff 0%, rgba(255, 255, 255, 0) 58%),
+        linear-gradient(150deg, #e6f4e0 0%, #fdf3dd 100%);
+}
+
+.plant-card-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+/* Illustrated stand-in for plants without a photo. */
+.plant-card-media .plant-card-ph {
+    width: 70%;
+    height: auto;
+    max-height: 84%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 14px rgba(23, 48, 31, 0.14));
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.plant-card:hover .plant-card-media .plant-card-ph {
+    transform: translateY(-3px) scale(1.03);
+}
+
+/* Recommendation badge sits on the photo so the badge row stays one line. */
+.plant-card-match {
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    border: 1px solid rgba(255, 157, 46, 0.55);
+    border-radius: 99px;
+    background: rgba(255, 253, 246, 0.95);
+    color: var(--pl-mango-ink);
+    font: 800 0.7rem/1.5 var(--pl-body);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(23, 48, 31, 0.18);
+}
+
+.plant-card:hover .plant-card-media img {
+    transform: scale(1.06);
+}
+
+.plant-card-media svg {
+    width: 42px;
+    height: 42px;
+    color: var(--pl-brand-strong);
+    opacity: 0.55;
+}
+
+.plant-card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 13px 6px 4px;
+}
+
+.plant-card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.plant-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.plant-pill--category {
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+}
+
+.plant-pill--easy {
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+}
+
+.plant-pill--medium {
+    background: var(--pl-mango-soft);
+    color: var(--pl-mango-ink);
+}
+
+.plant-pill--hard {
+    background: var(--pl-danger-soft);
+    color: var(--pl-danger);
+}
+
+.plant-pill--type {
+    background: rgba(182, 154, 99, 0.22);
+    color: var(--pl-muted);
+}
+
+.plant-pill--sky {
+    background: var(--pl-sky-soft);
+    color: var(--pl-sky-ink);
+}
+
+.plant-card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0 0 3px;
+    font: 800 1.18rem/1.16 var(--pl-display);
+    letter-spacing: -0.005em;
+}
+
+.plant-card-title a {
+    color: var(--pl-fg);
+    text-decoration: none;
+}
+
+.plant-card-title a:hover {
+    color: var(--pl-brand-strong);
+}
+
+.plant-card-title a:focus-visible {
+    outline: none;
+}
+
+/* Whole card clickable through the title link. */
+.plant-card-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+}
+
+.plant-card-sci {
+    overflow: hidden;
+    margin: 0 0 10px;
+    color: var(--pl-muted);
+    font-size: 0.82rem;
+    font-style: italic;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.plant-card-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 10px;
+    margin: 0 0 10px;
+    padding: 9px 11px;
+    border-radius: 14px;
+    background: rgba(253, 237, 201, 0.55);
+    color: var(--pl-muted);
+    font-size: 0.79rem;
+    font-weight: 600;
+}
+
+.plant-card-specs > div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.plant-card-specs svg {
+    width: 14px;
+    height: 14px;
+    color: var(--pl-brand-strong);
+    stroke-width: 1.9;
+}
+
+.plant-card-specs span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.plant-card-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0 0 10px;
+    color: var(--pl-muted);
+    font-size: 0.87rem;
+    line-height: 1.5;
+}
+
+.plant-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--pl-line);
+}
+
+.plant-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--pl-brand-strong);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.plant-card-cta svg {
+    width: 14px;
+    height: 14px;
+}
+
+.plant-card-go {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+    transition: background 0.2s, transform 0.2s, color 0.2s;
+}
+
+.plant-card-go svg {
+    width: 15px;
+    height: 15px;
+}
+
+.plant-card:hover .plant-card-go {
+    background: var(--pl-brand-strong);
+    color: #fff;
+    transform: translateX(2px);
+}
+
+.plant-card-tools {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.plant-tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--pl-line);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--pl-muted);
+    transition: all 0.18s;
+}
+
+.plant-tool svg {
+    width: 14px;
+    height: 14px;
+}
+
+.plant-tool:hover {
+    border-color: var(--pl-brand-strong);
+    color: var(--pl-brand-strong);
+}
+
+.plant-tool--danger:hover {
+    border-color: var(--pl-danger);
+    background: var(--pl-danger-soft);
+    color: var(--pl-danger);
+}
+
+/* ---------------------------------------------------------------- Empty */
+.plant-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 46px 24px 40px;
+    border: 2px dashed var(--pl-line);
+    border-radius: 26px;
+    background: rgba(255, 253, 246, 0.7);
+    text-align: center;
+}
+
+.plant-empty-mascot {
+    width: 132px;
+    height: auto;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 12px 18px rgba(23, 48, 31, 0.14));
+}
+
+.plant-empty-title {
+    margin: 0;
+    font: 800 1.35rem/1.2 var(--pl-display);
+}
+
+.plant-empty-desc {
+    margin: 0 0 10px;
+    max-width: 44ch;
+    color: var(--pl-muted);
+    font-size: 0.94rem;
+}
+
+/* ---------------------------------------------------------------- Back link */
+.plant-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    padding: 8px 16px;
+    border: 1.5px solid var(--pl-line);
+    border-radius: 99px;
+    background: #fffdf6;
+    color: var(--pl-muted);
+    font-size: 0.86rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.18s;
+}
+
+.plant-back svg {
+    width: 16px;
+    height: 16px;
+}
+
+.plant-back:hover {
+    border-color: var(--pl-line-strong);
+    color: var(--pl-fg);
+    background: #fff;
+}
+
+/* ---------------------------------------------------------------- Detail */
+.plant-detail {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: 26px 30px;
+    padding: 22px;
+    border: 1.5px solid var(--pl-line);
+    border-radius: 28px;
+    background: #fffdf6;
+    box-shadow: 0 20px 44px -30px rgba(23, 48, 31, 0.5);
+}
+
+.plant-detail-side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+}
+
+.plant-detail-media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--pl-line);
+    border-radius: 18px;
+    background: #eef4e6;
+}
+
+.plant-detail-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.plant-detail-media .plant-card-ph {
+    width: 66%;
+    height: auto;
+    max-height: 76%;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 20px rgba(23, 48, 31, 0.16));
+}
+
+/* On wide screens the photo grows so the left column lines up with the details. */
+@media (min-width: 981px) {
+    .plant-detail-media {
+        flex: 1 1 auto;
+        aspect-ratio: auto;
+        min-height: 330px;
+    }
+}
+
+/* One tip under the card, like the note under a Seed Exchange listing. */
+.plant-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0;
+    padding: 12px 16px;
+    border: 1.5px dashed var(--pl-line);
+    border-radius: 16px;
+    background: #fdf7e8;
+    color: var(--pl-muted);
+    font-size: 0.88rem;
+    line-height: 1.55;
+}
+
+.plant-tip svg {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    flex: none;
+    fill: none;
+    stroke: var(--pl-brand-strong);
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.plant-tip b {
+    color: var(--pl-fg);
+}
+
+.plant-detail-body {
+    min-width: 0;
+}
+
+.plant-detail-kicker {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 6px;
+    color: var(--pl-muted);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.plant-detail-kicker svg {
+    width: 15px;
+    height: 15px;
+    color: var(--pl-brand-strong);
+}
+
+.plant-detail-head {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 12px;
+}
+
+.plant-detail-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    font: 800 clamp(1.95rem, 3.4vw, 2.7rem) / 1.03 var(--pl-display);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+}
+
+.plant-detail-head .plant-status {
+    flex: none;
+}
+
+.plant-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.plant-status::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.plant-status--easy {
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+}
+
+.plant-status--medium {
+    background: var(--pl-mango-soft);
+    color: var(--pl-mango-ink);
+}
+
+.plant-status--hard {
+    background: var(--pl-danger-soft);
+    color: var(--pl-danger);
+}
+
+.plant-detail-sci {
+    margin: 4px 0 0;
+    color: var(--pl-muted);
+    font-size: 0.95rem;
+    font-style: italic;
+}
+
+.plant-detail-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 12px 0 0;
+}
+
+.plant-detail-badges .plant-pill svg {
+    width: 13px;
+    height: 13px;
+}
+
+.plant-note {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(253, 237, 201, 0.55);
+    border: 1px solid var(--pl-line);
+}
+
+.plant-note--empty {
+    background: rgba(255, 253, 246, 0.8);
+    border-style: dashed;
+}
+
+.plant-note-kicker {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 6px;
+    color: var(--pl-mango-ink);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.plant-note-kicker svg {
+    width: 15px;
+    height: 15px;
+}
+
+.plant-note-text {
+    margin: 0;
+    color: var(--pl-fg);
+    font-size: 0.95rem;
+    line-height: 1.62;
+}
+
+.plant-note-text p {
+    margin: 0 0 0.6em;
+}
+
+.plant-note-text p:last-child {
+    margin-bottom: 0;
+}
+
+.plant-note-text--empty {
+    color: var(--pl-muted);
+    font-style: italic;
+}
+
+.plant-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 16px 0 0;
+}
+
+.plant-meta {
+    padding: 10px 12px;
+    border: 1px solid var(--pl-line);
+    border-radius: 14px;
+    background: #fff;
+}
+
+.plant-meta dt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    color: var(--pl-muted);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.plant-meta-icon {
+    width: 14px;
+    height: 14px;
+    flex: none;
+}
+
+.plant-meta[data-tone='sun'] .plant-meta-icon {
+    color: var(--pl-mango-ink);
+}
+
+.plant-meta[data-tone='water'] .plant-meta-icon {
+    color: var(--pl-sky-ink);
+}
+
+.plant-meta[data-tone='place'] .plant-meta-icon {
+    color: var(--pl-brand-strong);
+}
+
+.plant-meta[data-tone='space'] .plant-meta-icon {
+    color: var(--pl-line-strong);
+}
+
+.plant-meta dd {
+    margin: 2px 0 0;
+    color: var(--pl-fg);
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.plant-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--pl-line);
+}
+
+.plant-actions form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.plant-owner-note {
+    margin: 12px 0 0;
+    color: var(--pl-muted);
+    font-size: 0.82rem;
+}
+
+/* ---------------------------------------------------------------- Recommend */
+.plant-patch-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.plant-patch-label {
+    flex: none;
+    color: var(--pl-muted);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.plant-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+.plant-field-label {
+    color: var(--pl-muted);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.plant-field .plant-select-wrap {
+    width: 100%;
+}
+
+.plant-field .plant-select {
+    width: 100%;
+    max-width: none;
+    padding: 11px 38px 11px 16px;
+    font-size: 0.92rem;
+}
+
+/* The EcoPatch picker borrows the catalog filter pill and menu, then adds a
+   green dot so it reads as the active garden instead of a form field. */
+.plant-patch-filter {
+    min-width: 0;
+}
+
+.plant-patch-filter .plant-filter-btn {
+    gap: 8px;
+    max-width: 100%;
+    height: 40px;
+    padding: 0 14px;
+    justify-content: flex-start;
+    background: #fff;
+    color: var(--pl-fg);
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.plant-patch-filter .plant-filter-btn::after {
+    margin-left: auto;
+}
+
+.plant-patch-dot {
+    width: 8px;
+    height: 8px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--pl-brand-strong);
+}
+
+.plant-patch-name {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plant-menu.plant-menu--wide {
+    min-width: 268px;
+    width: 100%;
+}
+
+.plant-menu-item--rich {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 9px 12px;
+}
+
+.plant-menu-name {
+    font-weight: 800;
+}
+
+.plant-menu-sub {
+    color: var(--pl-muted);
+    font-size: 0.74rem;
+    font-weight: 600;
+}
+
+.plant-menu-item--rich.active .plant-menu-sub,
+.plant-menu-item--rich:hover .plant-menu-sub,
+.plant-menu-item--rich:focus-visible .plant-menu-sub {
+    color: inherit;
+    opacity: 0.8;
+}
+
+.plant-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    padding: 18px 20px;
+    border: 1px solid rgba(47, 191, 92, 0.26);
+    border-radius: 22px;
+    background: color-mix(in srgb, var(--pl-brand-soft) 62%, #fffdf6);
+}
+
+.plant-banner-name {
+    margin: 0 0 6px;
+    font: 800 1.28rem/1.2 var(--pl-display);
+}
+
+.plant-banner-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.plant-banner-pills .plant-pill {
+    gap: 6px;
+    padding: 4px 11px;
+    font-size: 0.74rem;
+}
+
+.plant-banner-pills svg {
+    width: 13px;
+    height: 13px;
+}
+
+.plant-banner-reason {
+    flex: 1 1 260px;
+    margin: 0;
+    max-width: 52ch;
+    color: var(--pl-muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.plant-banner-reason strong {
+    color: var(--pl-brand-strong);
+}
+
+.plant-pill--match {
+    background: var(--pl-mango-soft);
+    color: var(--pl-mango-ink);
+}
+
+/* ---------------------------------------------------------------- Form */
+.plant-inner--narrow {
+    max-width: calc(820px + var(--pl-offset) + 48px);
+}
+
+.plant-form-card {
+    width: 100%;
+    padding: 26px 30px 28px;
+    border: 1.5px solid var(--pl-line);
+    border-radius: 28px;
+    background: #fffdf6;
+    box-shadow: 0 26px 50px -34px rgba(23, 48, 31, 0.5);
+}
+
+.plant-form-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin: 10px 0 0;
+    color: var(--pl-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.plant-form-legend .plant-required {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.plant-form-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 0 20px;
+    padding: 11px 14px;
+    border-radius: 16px;
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.plant-form-note svg {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.plant-form-section {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 0;
+    color: var(--pl-fg);
+    font: 800 1.08rem/1.1 var(--pl-display);
+    counter-increment: plant-section;
+}
+
+.plant-form-section::before {
+    content: counter(plant-section, decimal-leading-zero);
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 9px;
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+    font: 800 0.66rem/1 var(--pl-body);
+    letter-spacing: 0.06em;
+}
+
+.plant-form-section::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--pl-line-strong);
+    opacity: 0.3;
+}
+
+.plant-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 18px;
+    counter-reset: plant-section;
+}
+
+.plant-field--wide {
+    grid-column: 1 / -1;
+}
+
+.plant-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--pl-fg);
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.plant-required {
+    color: var(--pl-danger);
+}
+
+.plant-optional-tag {
+    color: var(--pl-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.plant-form .form-control,
+.plant-form textarea,
+.plant-select-btn {
+    width: 100%;
+    height: 54px;
+    padding: 0 14px;
+    border: 1.5px solid #9c8e5e;
+    border-radius: 16px;
+    background: #fffdf6;
+    color: var(--pl-fg);
+    font: 500 1rem var(--pl-body);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.plant-form .form-control::placeholder,
+.plant-form textarea::placeholder {
+    color: var(--pl-muted);
+}
+
+.plant-form textarea {
+    height: auto;
+    min-height: 132px;
+    padding: 12px 14px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.plant-form .form-control:focus,
+.plant-form textarea:focus,
+.plant-select-btn:focus {
+    outline: none;
+    border-color: var(--pl-brand-strong);
+    box-shadow: 0 0 0 4px rgba(47, 191, 92, 0.28);
+}
+
+.plant-select-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* the chevron already sits inside the button */
+.plant-select-btn::after {
+    display: none;
+}
+
+.plant-select-btn svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    color: var(--pl-muted);
+    transition: transform 0.2s;
+}
+
+.plant-select-btn[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+}
+
+.plant-placeholder {
+    color: var(--pl-muted);
+    font-weight: 500;
+}
+
+.plant-form .plant-menu {
+    width: 100%;
+}
+
+.plant-menu {
+    min-width: 190px;
+    padding: 8px;
+    border: 1.5px solid var(--pl-line);
+    border-radius: 18px;
+    background: #fffdf6;
+    box-shadow: 0 18px 36px -18px rgba(23, 48, 31, 0.45);
+}
+
+.plant-menu-item {
+    padding: 9px 12px;
+    border-radius: 12px;
+    color: var(--pl-fg);
+    font: 600 0.92rem/1.3 var(--pl-body);
+}
+
+.plant-menu-item:hover,
+.plant-menu-item:focus-visible {
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+}
+
+.plant-menu-item.active {
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+    font-weight: 800;
+}
+
+.plant-form-hint {
+    margin: 0;
+    color: var(--pl-muted);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.plant-form-errors {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: var(--pl-danger-soft);
+    color: var(--pl-danger);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.plant-form-error {
+    margin: 0;
+    color: var(--pl-danger);
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.plant-form-errors strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.plant-form-errors ul {
+    margin: 0;
+    padding-left: 18px;
+    font-weight: 500;
+}
+
+.plant-form-actions {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    padding-top: 18px;
+    border-top: 1px solid var(--pl-line);
+}
+
+/* ---------------------------------------------------------------- Danger card */
+.plant-confirm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 32px 26px 28px;
+    border: 1.5px solid var(--pl-line);
+    border-radius: 26px;
+    background: #fffdf6;
+    box-shadow: 0 20px 44px -30px rgba(23, 48, 31, 0.5);
+    text-align: center;
+}
+
+.plant-confirm-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 4px;
+    border-radius: 50%;
+    background: var(--pl-danger-soft);
+    color: var(--pl-danger);
+}
+
+.plant-confirm-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.plant-confirm-title {
+    margin: 0;
+    font: 800 clamp(1.55rem, 3vw, 2rem) / 1.15 var(--pl-display);
+}
+
+.plant-confirm-lead {
+    margin: 0;
+    color: var(--pl-muted);
+    font-size: 0.95rem;
+}
+
+.plant-confirm-note {
+    margin: 8px 0 0;
+    padding: 12px 16px;
+    max-width: 46ch;
+    border: 1px solid rgba(184, 54, 42, 0.24);
+    border-radius: 14px;
+    background: var(--pl-danger-soft);
+    color: var(--pl-danger);
+    font-size: 0.85rem;
+    line-height: 1.55;
+}
+
+.plant-confirm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+/* ---------------------------------------------------------------- Responsive */
+@media (max-width: 980px) {
+    .plant-detail {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .plant-detail-media {
+        aspect-ratio: 16 / 9;
+    }
+
+    .plant-ask {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .plant-inner {
+        gap: 20px;
+        padding: 24px 16px 44px;
+    }
+
+    .plant-title {
+        font-size: 2.1rem;
+    }
+
+    .plant-sub {
+        font-size: 0.93rem;
+    }
+
+    .plant-finder-pet {
+        right: 10px;
+        bottom: calc(100% - 9px);
+        width: 86px;
+    }
+
+    .plant-finder-card {
+        gap: 10px;
+        padding: 12px 12px 12px 16px;
+        border-radius: 24px;
+    }
+
+    .plant-search-row {
+        gap: 9px;
+        min-height: 44px;
+    }
+
+    .plant-finder-bottom {
+        gap: 9px;
+        padding-top: 10px;
+    }
+
+    .plant-chip-row {
+        flex: 1 1 100%;
+        gap: 6px;
+    }
+
+    .plant-chip {
+        padding: 7px 11px;
+        font-size: 0.78rem;
+    }
+
+    .plant-select-row {
+        width: 100%;
+    }
+
+    .plant-filter {
+        flex: 1 1 140px;
+    }
+
+    .plant-filter-btn {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .plant-select-row .plant-select {
+        flex: 1 1 140px;
+        max-width: none;
+    }
+
+    .plant-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .plant-detail {
+        padding: 16px;
+        border-radius: 24px;
+    }
+
+    .plant-detail-media {
+        aspect-ratio: 4 / 3;
+    }
+
+    .plant-patch-bar {
+        gap: 8px;
+    }
+
+    .plant-patch-label {
+        font-size: 0.72rem;
+    }
+
+    .plant-patch-filter {
+        flex: 0 1 auto;
+    }
+
+    .plant-patch-filter .plant-filter-btn {
+        width: auto;
+    }
+
+    .plant-menu.plant-menu--wide {
+        width: auto;
+        min-width: 240px;
+    }
+
+    .plant-form-card {
+        padding: 20px 18px;
+        border-radius: 22px;
+    }
+
+    .plant-form {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .plant-head-art {
+        display: none;
+    }
+}
+
+@media (max-width: 560px) {
+    .plant-ask-questions {
+        grid-template-columns: 1fr;
+    }
+
+    .plant-ask-q {
+        padding: 10px 13px;
+    }
+}
+
+@media (max-width: 420px) {
+    .plant-chip svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plant-page .plant-btn,
+    .plant-card,
+    .plant-card-media img,
+    .plant-finder-pet,
+    .plant-finder-card,
+    .plant-chip {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .plant-card:hover {
+        transform: none;
+    }
+}
+
+/* ---------------------------------------------------------------- List hero
+   A mint band with a dot pattern, the title with a marker under "Library", a sprig on each side, and the search card
+   riding up over its lower edge so the pet stands in the band. Only the list page uses it. */
+.plant-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(42px, 7vh, 64px) 0 clamp(106px, 13vh, 132px);
+    background:
+        radial-gradient(circle, rgba(47, 191, 92, 0.2) 1.4px, transparent 1.7px) 0 0 / 22px 22px,
+        radial-gradient(60% 120% at 100% 20%, rgba(255, 214, 122, 0.4), transparent 70%),
+        linear-gradient(135deg, #cdeed6 0%, #e3f5dc 52%, #f1f0d3 100%);
+}
+
+
+.plant-hero .plant-eyebrow {
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--pl-brand-strong);
+}
+
+.plant-hero .plant-eyebrow svg {
+    width: 20px;
+    height: 20px;
+}
+
+.plant-hero .plant-title {
+    margin: 0;
+    font: 800 clamp(2.8rem, 5.2vw, 4.3rem) / 0.96 var(--pl-display);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+}
+
+.plant-hero .plant-sub {
+    max-width: 50ch;
+    margin: 12px auto 0;
+    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    line-height: 1.55;
+}
+
+.plant-hero-inner {
+    position: relative;
+    width: 100%;
+    max-width: calc(960px + var(--pl-offset) + 48px);
+    margin: 0 auto;
+    padding: 0 20px 0 calc(var(--pl-offset) + 24px);
+    text-align: center;
+}
+
+.plant-hero-copy {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    padding: 0 clamp(64px, 11vw, 130px);
+}
+
+.plant-hero .plant-sub {
+    max-width: 46ch;
+    margin: 8px auto 0;
+}
+
+.plant-hero .plant-head-actions {
+    justify-content: center;
+}
+
+.plant-title-hl {
+    position: relative;
+    z-index: 0;
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.plant-title-hl::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: -5%;
+    right: -5%;
+    bottom: 6%;
+    height: 36%;
+    border-radius: 99px;
+    background: #ffbd6b;
+    transform: rotate(-1deg);
+}
+
+.plant-sprig {
+    position: absolute;
+    /* level with the title and no taller than the title block, so it never reaches down to the pet on the card's edge */
+    top: 0;
+    width: clamp(40px, 4.6vw, 62px);
+    height: auto;
+    transform-origin: 50% 100%;
+    animation: plant-sprig-sway 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* the sprigs sit in the side room of .plant-hero-copy, next to the title: far from the pet on the right edge of the card */
+.plant-sprig--l { left: 0; }
+.plant-sprig--r { right: 0; transform: scaleX(-1); animation-name: plant-sprig-sway-r; animation-delay: -2.4s; }
+
+@keyframes plant-sprig-sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2.4deg); } }
+@keyframes plant-sprig-sway-r { 0%, 100% { transform: scaleX(-1) rotate(-2deg); } 50% { transform: scaleX(-1) rotate(2.4deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .plant-sprig { animation: none; }
+}
+
+/* the search card rides up over the band */
+.plant-inner--after-hero {
+    position: relative;
+    z-index: 1;
+    margin-top: clamp(-76px, -9vh, -60px);
+    padding-top: 0;
+}
+
+@media (max-width: 767px) {
+    
+.plant-hero .plant-eyebrow {
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--pl-brand-strong);
+}
+
+.plant-hero .plant-eyebrow svg {
+    width: 20px;
+    height: 20px;
+}
+
+.plant-hero .plant-title {
+    margin: 0;
+    font: 800 clamp(2.8rem, 5.2vw, 4.3rem) / 0.96 var(--pl-display);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+}
+
+.plant-hero .plant-sub {
+    max-width: 50ch;
+    margin: 12px auto 0;
+    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    line-height: 1.55;
+}
+
+.plant-hero-inner { padding: 0 20px; }
+}
+
+@media (max-width: 560px) {
+    .plant-hero-copy { padding: 0 8px; }
+    .plant-sprig { display: none; }
+}
+
+/* ---------------------------------------------------------------- Add to an EcoPatch, from the card
+   The round + on the picture opens a small list of the member's EcoPatches (built in the body by quick_add.js, so
+   the card's rounded corners never cut it). Each row says how well the plant fits there. */
+.plant-add {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+}
+
+.plant-add-btn {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: #167a38;
+    color: #fff;
+    box-shadow: 0 4px 0 #0f5a28, 0 10px 18px -8px rgba(23, 48, 31, 0.55);
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.plant-card-media .plant-add-btn svg { width: 18px; height: 18px; color: #fff; opacity: 1; }
+.plant-add-btn:hover { transform: translateY(-1px); background: #0f622b; }
+.plant-add-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #0f5a28; }
+.plant-add-btn[aria-expanded="true"] { background: #0f622b; }
+.plant-add-btn:focus-visible { outline: 3px solid #ff9d2e; outline-offset: 3px; }
+
+.plant-addpop {
+    position: fixed;
+    z-index: 1080;
+    width: min(320px, calc(100vw - 16px));
+    padding: 14px 16px 8px;
+    border: 1px solid rgba(182, 154, 99, 0.45);
+    border-radius: 18px;
+    background: #fffdf6;
+    box-shadow: 0 24px 44px -18px rgba(23, 48, 31, 0.55);
+    color: #17301f;
+    font: 500 0.9rem/1.4 'Plus Jakarta Sans', system-ui, sans-serif;
+    animation: plant-addpop-in 0.16s ease-out;
+}
+
+@keyframes plant-addpop-in { from { opacity: 0; transform: translateY(-6px); } }
+
+.plant-addpop-title {
+    margin: 0 0 6px;
+    color: #4c6853;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.plant-addpop-list { list-style: none; margin: 0; padding: 0; max-height: min(300px, 48vh); overflow-y: auto; overscroll-behavior: contain; }
+.plant-addpop-list form { margin: 0; }
+
+.plant-addpop-opt {
+    display: block;
+    width: 100%;
+    padding: 9px 8px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.plant-addpop-opt:hover, .plant-addpop-opt:focus-visible { background: #e2f4e5; outline: none; }
+.plant-addpop-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.plant-addpop-row strong { font: 800 1.02rem 'Baloo 2', system-ui, sans-serif; overflow-wrap: anywhere; }
+.plant-addpop-row small { flex: none; color: #4c6853; font-size: 0.8rem; }
+.plant-addpop-hint { display: block; font-size: 0.82rem; font-weight: 700; color: #167a38; }
+.plant-addpop-opt--tip .plant-addpop-hint { color: #167a38; }
+.plant-addpop-opt--warn .plant-addpop-hint { color: #a85a10; }
+.plant-addpop-opt--muted .plant-addpop-hint { color: #7a7f6a; font-weight: 600; }
+.plant-addpop-empty { margin: 4px 0 8px; color: #4c6853; }
+
+.plant-addpop-new {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding: 12px 8px 10px;
+    border-top: 1px solid rgba(182, 154, 99, 0.4);
+    color: #167a38;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.plant-addpop-new:hover { color: #0f5a28; }
+.plant-addpop-new span { font-size: 1.2rem; line-height: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+    .plant-addpop { animation: none; }
+    .plant-add-btn { transition: none; }
+}
+
+/* ---------------------------------------------------------------- Plant sheet as a pop-up
+   Opened from a card by detail_modal.js; the sheet inside is the same one the detail page shows. On a phone it rises
+   from the bottom like a sheet. */
+.plant-card { cursor: pointer; }
+
+.plant-modal {
+    padding: 0;
+    border: 0;
+    border-radius: 28px;
+    width: min(900px, calc(100% - 24px));
+    max-height: min(92dvh, 920px);
+    background: #fffdf6;
+    color: var(--pl-fg);
+    box-shadow: 0 30px 80px -20px rgba(23, 48, 31, 0.6);
+    overflow: hidden;
+}
+
+.plant-modal::backdrop {
+    background: rgba(23, 48, 31, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.plant-modal[open] { animation: plant-modal-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+@keyframes plant-modal-in { from { opacity: 0; transform: translateY(14px) scale(0.985); } }
+
+.plant-modal-body {
+    max-height: min(92dvh, 920px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 18px;
+}
+
+.plant-modal .plant-detail {
+    padding: 4px;
+    border: 0;
+    box-shadow: none;
+}
+
+.plant-modal .plant-detail-title:focus { outline: none; }
+
+.plant-modal-x {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 6px 16px -6px rgba(23, 48, 31, 0.5);
+    color: var(--pl-fg);
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.plant-modal-x:hover { background: var(--pl-brand-soft); }
+
+.plant-modal-loading {
+    margin: 0;
+    padding: 70px 0;
+    text-align: center;
+    color: var(--pl-muted);
+    font-weight: 600;
+}
+
+@media (max-width: 700px) {
+    .plant-modal {
+        width: 100%;
+        max-width: 100%;
+        margin: auto 0 0;
+        border-radius: 24px 24px 0 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plant-modal[open] { animation: none; }
+}
+
+/* ---------------------------------------------------------------- Public header
+   A visitor has no sidebar, so the Plant Library header is the landing page's bar:
+   fixed across the top, no box of its own, the sprout wordmark on the left, the
+   links in the middle, "Masuk" as plain text and "Daftar" as the green pill. It
+   hovers over the mint band, and once the page scrolls it condenses into the same
+   cream pill the landing bar becomes. Members keep the floating sidebar as it was. */
+body.plant-body:not(.has-sidebar) .site-navbar {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 1030;
+    margin: 0;
+    padding: 10px max(12px, calc((100vw - 68rem) / 2));
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transition: padding-top 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar.is-scrolled {
+    padding-top: 14px;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar .container {
+    width: 100%;
+    max-width: 100%;
+    padding: 5px 5px 5px 12px;
+    gap: 16px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    transition: max-width 380ms cubic-bezier(0.32, 0.72, 0, 1),
+                background-color 300ms ease-out, border-color 300ms ease-out,
+                box-shadow 300ms ease-out;
+}
+
+/* Scrolled: the cream pill the landing bar condenses into. */
+body.plant-body:not(.has-sidebar) .site-navbar.is-scrolled .container {
+    max-width: 56rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(182, 154, 99, 0.38);
+    box-shadow: 0 18px 50px rgba(23, 48, 31, 0.14);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+}
+
+/* The open mobile menu needs a surface of its own now that the bar has none. */
+body.plant-body:not(.has-sidebar) .site-navbar:has(.navbar-collapse.show) .container,
+body.plant-body:not(.has-sidebar) .site-navbar:has(.navbar-collapse.collapsing) .container {
+    max-width: 100%;
+    border-color: rgba(182, 154, 99, 0.38);
+    border-radius: 22px;
+    background: #fdf7e8;
+    box-shadow: 0 18px 50px rgba(23, 48, 31, 0.14);
+}
+
+/* The landing wordmark: sprout mark, then Baloo 2 at 21px in ink. */
+body.plant-body:not(.has-sidebar) .site-navbar .navbar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    font-size: 21px;
+    font-weight: 800;
+    color: #17301f;
+}
+
+/* No sidebar here, so the logo needs none of the sidebar head's rule, margin or padding. */
+body.plant-body:not(.has-sidebar) .site-navbar .sidebar-head {
+    display: contents;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar .brand-sprout {
+    display: block;
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+}
+
+/* The landing links: 14px, muted green, 22px apart, centred by .mx-auto. */
+body.plant-body:not(.has-sidebar) .site-navbar .navbar-nav {
+    /* Bootstrap's .gap-2 on the list is !important, so this has to be too. */
+    gap: 22px !important;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar .navbar-nav .nav-link {
+    padding: 0;
+    background: none;
+    color: #4c6853;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar .navbar-nav .nav-link:hover,
+body.plant-body:not(.has-sidebar) .site-navbar .navbar-nav .nav-link:focus-visible {
+    color: #17301f;
+}
+
+/* "Masuk" is plain text on the landing page, not a second outlined pill. */
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-outline-success {
+    padding: 8px 6px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #4c6853;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-outline-success:hover,
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-outline-success:focus-visible {
+    background: transparent;
+    color: #17301f;
+}
+
+/* "Daftar" mirrors the landing call to action. */
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-success {
+    padding: 8px 18px;
+    border: 0;
+    border-radius: 999px;
+    background: #1a8a40;
+    box-shadow: none;
+    color: #fff;
+    font-family: 'Baloo 2', 'Trebuchet MS', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-success:hover,
+body.plant-body:not(.has-sidebar) .site-navbar a.btn-success:focus-visible {
+    background: #157a38;
+    color: #fff;
+}
+
+/* The bar floats over the sheet, so the mint band runs under it and only the copy
+   starts below it. Sheets without a band open straight into their column, so they
+   clear the bar themselves. */
+body.plant-body:not(.has-sidebar) .plant-page > .plant-hero {
+    padding-top: calc(clamp(30px, 6vh, 50px) + 70px);
+}
+
+body.plant-body:not(.has-sidebar) .plant-page > .plant-inner:first-child {
+    padding-top: 100px;
+}
+
+@media (max-width: 767.98px) {
+    /* Links inside the dropped-down menu need their padding back. */
+    body.plant-body:not(.has-sidebar) .site-navbar .navbar-nav .nav-link {
+        padding: 8px 4px;
+    }
+}
+
+
+/* ---------------------------------------------------------------- Search suggestions */
+.plant-search-row {
+    position: relative;
+}
+
+.plant-suggest {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 8px;
+    right: 8px;
+    z-index: 100;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 8px;
+    margin: 0;
+    list-style: none;
+    border: 1.5px solid var(--pl-line-strong);
+    border-radius: 18px;
+    background: #fffdf6;
+    box-shadow: 0 16px 32px -12px rgba(23, 48, 31, 0.35);
+}
+
+.plant-suggest-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 14px;
+    border-radius: 12px;
+    font: 600 0.92rem/1.3 var(--pl-body);
+    color: var(--pl-fg);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.plant-suggest-item.is-selected,
+.plant-suggest-item:hover {
+    background: var(--pl-brand-soft);
+    color: var(--pl-brand-strong);
+}
+
+.plant-suggest-main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.plant-suggest-icon {
+    font-size: 1rem;
+    flex: none;
+}
+
+.plant-suggest-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--pl-muted);
+    padding: 2px 7px;
+    border-radius: 99px;
+    background: rgba(23, 48, 31, 0.06);
+    flex: none;
+}
+
+/* ---------------------------------------------------------------- Footer placement */
+body.has-sidebar.plant-body .site-footer {
+    padding-left: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2 + 20px);
+}

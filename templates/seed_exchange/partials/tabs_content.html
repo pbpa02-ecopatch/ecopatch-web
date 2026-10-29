@@ -1,5 +1,4 @@
 {% load static %}
-{% url 'seed_exchange:list' as seed_list_url %}
 {% comment %}
   Seed Exchange list: hidden params + filters + 3 section tabs + panel.
   Swapped as a whole via HTMX (#seed-tabs-content) so the active filter state,
@@ -53,46 +52,58 @@
     </a>
 </form>
 
-{# --- Section Tabs --- #}
+{# --- Section Tabs: three mascots, no container, just the garden crew --- #}
 <nav class="seed-tabs" role="tablist" aria-label="Bagian Seed Exchange">
-    <a role="tab" id="tab-mine" class="seed-tab{% if active_tab == 'mine' %} active{% endif %}"
+    <a role="tab" id="tab-mine" class="seed-tab seed-tab--mine{% if active_tab == 'mine' %} active{% endif %}"
        href="{% url 'seed_exchange:list' %}?tab=mine{% if tab_qs %}&{{ tab_qs }}{% endif %}"
        hx-get="{% url 'seed_exchange:list' %}?tab=mine{% if tab_qs %}&{{ tab_qs }}{% endif %}"
        hx-target="#seed-tabs-content" hx-swap="innerHTML" hx-push-url="true"
        aria-selected="{% if active_tab == 'mine' %}true{% else %}false{% endif %}"
        aria-controls="panel-mine">
-        Listing Saya
-        {% if user.is_authenticated %}
-        <span class="seed-tab-count">{{ my_listings|length }}</span>
-        {% else %}
-        <span class="seed-tab-count seed-tab-count--locked" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span class="seed-tab-plot">
+            <img class="seed-tab-mascot" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" width="96" height="96" loading="lazy" decoding="async">
         </span>
-        {% endif %}
+        <span class="seed-tab-copy">
+            <span class="seed-tab-line">
+                <span class="seed-tab-label">Listing Saya</span>
+                <span class="seed-tab-count">{{ my_listings|length }}</span>
+            </span>
+            <span class="seed-tab-sub">bibit, stek &amp; biji</span>
+        </span>
     </a>
-    <a role="tab" id="tab-bookings" class="seed-tab{% if active_tab == 'bookings' %} active{% endif %}"
+    <a role="tab" id="tab-bookings" class="seed-tab seed-tab--bookings{% if active_tab == 'bookings' %} active{% endif %}"
        href="{% url 'seed_exchange:list' %}?tab=bookings{% if tab_qs %}&{{ tab_qs }}{% endif %}"
        hx-get="{% url 'seed_exchange:list' %}?tab=bookings{% if tab_qs %}&{{ tab_qs }}{% endif %}"
        hx-target="#seed-tabs-content" hx-swap="innerHTML" hx-push-url="true"
        aria-selected="{% if active_tab == 'bookings' %}true{% else %}false{% endif %}"
        aria-controls="panel-bookings">
-        Booking Saya
-        {% if user.is_authenticated %}
-        <span class="seed-tab-count">{{ my_bookings|length }}</span>
-        {% else %}
-        <span class="seed-tab-count seed-tab-count--locked" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span class="seed-tab-plot">
+            <img class="seed-tab-mascot" src="{% static 'img/mascot/petak-mencatat.png' %}" alt="" width="96" height="96" loading="lazy" decoding="async">
         </span>
-        {% endif %}
+        <span class="seed-tab-copy">
+            <span class="seed-tab-line">
+                <span class="seed-tab-label">Booking Saya</span>
+                <span class="seed-tab-count">{{ my_bookings|length }}</span>
+            </span>
+            <span class="seed-tab-sub">status tukarmu</span>
+        </span>
     </a>
-    <a role="tab" id="tab-browse" class="seed-tab{% if active_tab == 'browse' %} active{% endif %}"
+    <a role="tab" id="tab-browse" class="seed-tab seed-tab--browse{% if active_tab == 'browse' %} active{% endif %}"
        href="{% url 'seed_exchange:list' %}?tab=browse{% if tab_qs %}&{{ tab_qs }}{% endif %}"
        hx-get="{% url 'seed_exchange:list' %}?tab=browse{% if tab_qs %}&{{ tab_qs }}{% endif %}"
        hx-target="#seed-tabs-content" hx-swap="innerHTML" hx-push-url="true"
        aria-selected="{% if active_tab == 'browse' %}true{% else %}false{% endif %}"
        aria-controls="panel-browse">
-        Jelajahi
-        <span class="seed-tab-count">{{ listings|length }}</span>
+        <span class="seed-tab-plot">
+            <img class="seed-tab-mascot" src="{% static 'img/mascot/petak-penasaran.png' %}" alt="" width="96" height="96" loading="lazy" decoding="async">
+        </span>
+        <span class="seed-tab-copy">
+            <span class="seed-tab-line">
+                <span class="seed-tab-label">Jelajahi</span>
+                <span class="seed-tab-count">{{ listings|length }}</span>
+            </span>
+            <span class="seed-tab-sub">kebun tetangga</span>
+        </span>
     </a>
 </nav>
 
@@ -101,14 +112,10 @@
 <div id="panel-mine" class="seed-tab-panel active" role="tabpanel" aria-labelledby="tab-mine">
     <header class="seed-section-header">
         <h2 class="seed-section-title">Listing Saya</h2>
-        {% if user.is_authenticated %}
         <span class="seed-count" aria-live="polite">{{ my_listings|length }} listing</span>
-        {% endif %}
     </header>
 
-    {% if not user.is_authenticated %}
-        {% include "seed_exchange/partials/login_callout.html" with title="Masuk untuk melihat listingmu." text="Setelah masuk, kamu bisa membuat dan mengelola listing sendiri di sini." next_url=seed_list_url|add:"?tab=mine" %}
-    {% elif my_listings %}
+    {% if my_listings %}
         <div id="seed-mine" class="seed-grid">
             {% for listing in my_listings %}
                 {% include "seed_exchange/partials/card.html" with listing=listing %}
@@ -126,7 +133,7 @@
                 <img class="seed-empty-mascot" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" aria-hidden="true" width="160" height="160">
                 <p class="seed-empty-title"><strong>Belum ada listing yang cocok.</strong></p>
                 <p class="seed-empty-desc">Bagikan bibit atau tanaman berlebihmu, atau ubah filter di atas.</p>
-                <a href="{% url 'seed_exchange:create' %}" class="btn btn-success btn-sm">+ Buat Listing</a>
+                <a href="{% url 'seed_exchange:create' %}" class="btn-seed-primary btn-seed-sm">+ Buat Listing</a>
             </div>
         </div>
     {% endif %}
@@ -136,14 +143,10 @@
 <div id="panel-bookings" class="seed-tab-panel active" role="tabpanel" aria-labelledby="tab-bookings">
     <header class="seed-section-header">
         <h2 class="seed-section-title">Booking Saya</h2>
-        {% if user.is_authenticated %}
         <span class="seed-count" aria-live="polite">{{ my_bookings|length }} booking</span>
-        {% endif %}
     </header>
 
-    {% if not user.is_authenticated %}
-        {% include "seed_exchange/partials/login_callout.html" with title="Masuk untuk melihat bookingmu." text="Setelah masuk, kamu bisa booking listing dan memantau statusnya di sini." next_url=seed_list_url|add:"?tab=bookings" %}
-    {% elif my_bookings %}
+    {% if my_bookings %}
         <div id="seed-bookings" class="seed-grid">
             {% for listing in my_bookings %}
                 {% include "seed_exchange/partials/card.html" with listing=listing %}
@@ -155,7 +158,7 @@
                 <img class="seed-empty-mascot" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" aria-hidden="true" width="160" height="160">
                 <p class="seed-empty-title"><strong>Belum ada booking yang cocok.</strong></p>
                 <p class="seed-empty-desc">Jelajahi listing orang lain dan booking yang menarik, atau ubah filter di atas.</p>
-                <a href="{% url 'seed_exchange:list' %}?tab=browse{% if tab_qs %}&{{ tab_qs }}{% endif %}" class="btn btn-success btn-sm">Jelajahi Listing</a>
+                <a href="{% url 'seed_exchange:list' %}?tab=browse{% if tab_qs %}&{{ tab_qs }}{% endif %}" class="btn-seed-primary btn-seed-sm">Jelajahi Listing</a>
             </div>
         </div>
     {% endif %}
@@ -168,8 +171,13 @@
         <span class="seed-count" aria-live="polite">{{ listings|length }} listing ditemukan</span>
     </header>
     {% include "seed_exchange/partials/cards.html" with listings=listings grid_id="seed-grid" %}
-    {% if not user.is_authenticated %}
-        {% include "seed_exchange/partials/login_callout.html" with title="Ingin ikut bertukar bibit?" text="Masuk untuk membuat listing atau booking listing orang lain. Belum punya akun? Daftar gratis, kok." next_url=seed_list_url|add:"?tab=browse" %}
-    {% endif %}
+    <p class="seed-tip">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21v-8"/>
+            <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+            <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+        </svg>
+        <span><b>Tip:</b> tulis jumlah bibit dan cara ambil di deskripsi — listing yang jelas biasanya lebih cepat dapat pasangan tukar.</span>
+    </p>
 </div>
 {% endif %}
