@@ -113,7 +113,7 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-module .patch-info{background:transparent;box-shadow:none;border:0;border-top:1px solid #b69a6361;border-bottom:1px solid #b69a6361;border-radius:0;padding:24px 0}
 .mep-module .patch-info dd{overflow-wrap:anywhere}
 /* EcoPatch create/edit form, styled after Seed Exchange. */
-.mep-module .patch-form-shell{max-width:760px;margin:auto}
+.mep-module .patch-form-shell{max-width:960px;margin:auto}
 .mep-module .patch-form-head{margin-bottom:18px}
 .mep-module .patch-form-head .patch-page-title{margin:0 0 8px}
 .mep-module .patch-form-head .patch-page-lead{max-width:50ch;margin:0;color:#4c6853}
@@ -138,7 +138,7 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-module .patch-form-card .patch-form-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:4px;padding-top:18px;border-top:1px solid #b69a6161}
 .mep-module .patch-form-card .patch-city-note{display:block;width:auto;max-width:none;background:#e8f5e6;border:1px solid #cfe3c4;border-radius:16px;padding:11px 14px;margin:0 0 18px;font-size:.88rem;line-height:1.5;color:#2f4a36}
 .mep-module .patch-form-card .patch-alert{grid-column:1/-1;padding:10px 14px;border-radius:14px;background:#fbdcd5;color:#a3301f;font-size:.88rem;font-weight:600}
-.mep-module .patch-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mep-module .patch-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px}
 .mep-module .patch-field{min-width:0}.mep-module .patch-form-actions{gap:12px}
 .mep-module .plant-list{gap:0}
 .mep-module .plant-row{background:transparent;border:0;border-bottom:1px solid #b69a6361;border-radius:0;padding:18px 0;gap:14px}
@@ -163,7 +163,6 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-module .patch-back{display:inline-flex;align-items:center;gap:7px;min-height:36px;color:#4c6853;font-weight:600;text-decoration:none}
 .mep-module .patch-back svg{width:17px;height:17px}
 .mep-module .patch-back:hover{color:#167a38}
-.mep-module .patch-field+.patch-field{margin-top:16px}.mep-module .patch-form-grid .patch-field{margin-top:0}
 @media(min-width:768px) and (max-width:1050px){
   .mep-map{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px}
   .mep-hero h1{font-size:2.8rem}
