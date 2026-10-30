@@ -33,6 +33,12 @@ body.has-sidebar.care-body {
     background: var(--care-sheet-bot);
 }
 
+/* The scene runs under the sidebar, so the footer keeps the content column and stays centred in it,
+   matching the Seed Exchange footer. */
+body.has-sidebar.care-body .site-footer {
+    padding-left: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2 + 20px);
+}
+
 .care-page [hidden] {
     display: none !important;
 }
