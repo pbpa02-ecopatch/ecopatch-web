@@ -1772,6 +1772,14 @@ body.has-sidebar .plant-page {
     display: none;
 }
 
+/* Keep long selected labels inside the same control on narrow columns. */
+.plant-select-btn > [data-plant-label] {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .plant-select-btn svg {
     width: 16px;
     height: 16px;
