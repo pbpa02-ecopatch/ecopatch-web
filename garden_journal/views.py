@@ -628,9 +628,6 @@ def journal_quick_upload_photo(request, pk):
     if hasattr(image_file, "content_type") and image_file.content_type not in valid_content_types:
         return JsonResponse({"success": False, "error": "Format file harus JPG, PNG, atau WebP."}, status=400)
 
-    if image_file.size > 5 * 1024 * 1024:
-        return JsonResponse({"success": False, "error": "Ukuran foto maksimal 5 MB."}, status=400)
-
     try:
         image_file = GardenJournalForm.base_fields["image"].clean(image_file)
     except ValidationError as error:
