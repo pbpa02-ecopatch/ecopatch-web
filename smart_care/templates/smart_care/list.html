@@ -22,10 +22,10 @@
         <div class="care-inner">
             <div class="care-copy">
                 {% language 'id' %}
-                <p class="care-eyebrow"><span class="care-city">{{ city }}</span> &middot; {% if is_today %}Hari ini{% else %}{{ selected_date|date:"l j M" }}{% if in_forecast %} (prakiraan){% endif %}{% endif %}</p>
+                <p class="care-eyebrow"><svg class="care-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span><span class="care-city">{{ city }}</span> &middot; {% if is_today %}Hari ini{% else %}{{ selected_date|date:"l j M" }}{% if in_forecast %} (prakiraan){% endif %}{% endif %}</span></p>
                 {% endlanguage %}
                 <h1 class="care-title">Smart Care</h1>
-                <p class="care-sum"><b id="care-temp">--&deg;</b><span id="care-condition">Memuat cuaca</span></p>
+                <p class="care-sum"><span class="care-wx" id="care-wx" aria-hidden="true"></span><b id="care-temp">--&deg;</b><span id="care-condition">Memuat cuaca</span></p>
                 <p class="care-mini" id="care-mini"></p>
             </div>
         </div>

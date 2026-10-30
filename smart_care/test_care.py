@@ -887,7 +887,7 @@ class CareViewTests(CacheClearingTestCase):
 
     def test_the_eyebrow_names_the_day_and_says_forecast_only_when_there_is_one(self):
         today = timezone.localdate()
-        self.assertContains(self.client.get(reverse("smart_care:list")), "&middot; Hari ini</p>")
+        self.assertContains(self.client.get(reverse("smart_care:list")), "&middot; Hari ini</span></p>")
         soon = self.client.get(reverse("smart_care:list"), {"date": (today + timedelta(days=2)).isoformat()})
         later = self.client.get(reverse("smart_care:list"), {"date": (today + timedelta(days=20)).isoformat()})
         self.assertContains(soon, "(prakiraan)")

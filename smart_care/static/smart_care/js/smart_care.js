@@ -125,11 +125,13 @@
 
     if (weather === null) {
       $('#care-temp').textContent = '--°';
+      $('#care-wx').innerHTML = '';
       $('#care-condition').textContent = 'Tidak tersedia';
       $('#care-mini').textContent = '';
       setBubble('is-soft', 'Cuaca tidak tersedia', 'Saran sesuai cuaca muncul setelah data berhasil dimuat');
     } else if (!day) {
       $('#care-temp').textContent = '--°';
+      $('#care-wx').innerHTML = '';
       $('#care-condition').textContent = 'Tanpa prakiraan';
       $('#care-mini').textContent = '';
       setBubble('is-soft', 'Tanpa prakiraan', 'Prakiraan cuaca hanya tersedia untuk 7 hari ke depan.');
@@ -138,12 +140,13 @@
       pet = sky === 'rain' ? 'curious' : sky === 'soft' ? 'happy' : 'cheer';
       var temperature = isToday ? weather.temperature : day.temperature_max;
       $('#care-temp').textContent = (typeof temperature === 'number' ? Math.round(temperature) : '--') + '°';
+      $('#care-wx').innerHTML = icon(day.outlook.icon);
       $('#care-condition').textContent = isToday ? weather.condition : day.outlook.label;
       var parts = [];
-      if (isToday && typeof weather.humidity === 'number') parts.push('Kelembapan <b>' + Math.round(weather.humidity) + '%</b>');
+      if (isToday && typeof weather.humidity === 'number') parts.push('<small>Kelembapan</small><b>' + Math.round(weather.humidity) + '%</b>');
       // the chance is the highest of the day's hours, which is why it can read 99% on a day with a few drops
-      if (typeof day.rain_probability === 'number') parts.push('Peluang hujan tertinggi <b>' + Math.round(day.rain_probability) + '%</b>');
-      if (typeof day.rain_mm === 'number') parts.push('Curah hujan <b>' + mm(day.rain_mm) + ' mm</b>');
+      if (typeof day.rain_probability === 'number') parts.push('<small>Peluang hujan tertinggi</small><b>' + Math.round(day.rain_probability) + '%</b>');
+      if (typeof day.rain_mm === 'number') parts.push('<small>Curah hujan</small><b>' + mm(day.rain_mm) + ' mm</b>');
       $('#care-mini').innerHTML = parts.map(function (part) { return '<span>' + part + '</span>'; }).join('');
       setBubble(PILL[day.recommendation.tone] || 'is-ok', day.recommendation.pill, day.recommendation.message);
     }

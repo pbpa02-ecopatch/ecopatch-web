@@ -425,10 +425,19 @@ body.has-sidebar.care-body .site-footer {
 }
 
 .care-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin: 0;
     font-size: 0.88rem;
     font-weight: 700;
     color: var(--care-fg);
+}
+
+.care-ico {
+    flex: none;
+    width: 1.05em;
+    height: 1.05em;
 }
 
 .care-title {
@@ -445,6 +454,26 @@ body.has-sidebar.care-body .site-footer {
     margin: 6px 0 0;
 }
 
+.care-wx {
+    flex: none;
+    align-self: center;
+    width: 2rem;
+    height: 2rem;
+    color: var(--care-fg);
+}
+
+/* the icon comes from the script (the same drawings as the week strip), following the weather of the selected day */
+.care-wx svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 .care-sum b {
     font: 800 2.4rem/1 var(--care-display);
 }
@@ -455,20 +484,46 @@ body.has-sidebar.care-body .site-footer {
 
 .care-mini {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2px 16px;
-    margin: 0;
-    font-size: 0.9rem;
-    font-weight: 600;
+    align-items: stretch;
+    margin: 10px 0 0;
     font-variant-numeric: tabular-nums;
 }
 
+/* a small label over a big number, the columns split by a thin line */
 .care-mini span {
-    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 0 16px;
+    border-left: 1px solid color-mix(in srgb, var(--care-fg) 25%, transparent);
+}
+
+.care-mini span:first-child {
+    padding-left: 0;
+    border-left: 0;
+}
+
+.care-mini small {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: color-mix(in srgb, var(--care-fg) 78%, transparent);
 }
 
 .care-mini b {
-    font-weight: 800;
+    font: 800 1.1rem/1.1 var(--care-display);
+    white-space: nowrap;
+}
+
+/* beside the sidebar the words only have the room left of the bubble: the label may take two lines, the number never splits */
+@media (min-width: 768px) and (max-width: 1399.98px) {
+    .care-mini span {
+        padding: 0 12px;
+    }
+
+    .care-mini small {
+        max-width: 11ch;
+    }
 }
 
 .care-bubble {
