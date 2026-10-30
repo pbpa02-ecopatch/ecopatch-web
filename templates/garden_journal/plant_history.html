@@ -9,8 +9,8 @@
 
 {% block content %}
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-    <a href="{% url 'garden_journal:list' %}" class="btn btn-ds-ghost d-inline-flex align-items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    <a href="{% url 'garden_journal:list' %}" class="journal-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Kembali ke Garden Journal
     </a>
     <a href="{% url 'garden_journal:create' %}?plant_name={{ plant_name|urlencode }}" class="btn btn-ds-primary">

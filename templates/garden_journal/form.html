@@ -42,14 +42,15 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M12 5v14M5 12h14"/></svg>
                     Buat EcoPatch Sekarang
                 </a>
-                <a href="{% url 'garden_journal:list' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                <a href="{% url 'garden_journal:list' %}" class="journal-back">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                     Kembali ke Garden Journal
                 </a>
             </div>
         </div>
         {% else %}
 
-        <div class="card border-0 rounded-4" style="border: 1.5px solid #e6cf95 !important; box-shadow: 0 6px 16px rgba(34,48,31,0.08); border-radius: 18px !important;">
+        <div class="card border-0 rounded-4 journal-form-page" style="border: 1.5px solid #e6cf95 !important; box-shadow: 0 6px 16px rgba(34,48,31,0.08); border-radius: 18px !important;">
             <div class="card-body p-4 p-md-5">
                 
                 <!-- Wizard Step Bar Indicator (Hanya saat buat buku tanaman baru dari rak) -->
