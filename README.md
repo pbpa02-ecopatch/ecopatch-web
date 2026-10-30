@@ -9,7 +9,7 @@
 ![Deployed](https://img.shields.io/badge/PWS-live-2fbf5c?style=for-the-badge)
 ![PBP](https://img.shields.io/badge/PBP_Gasal-2026%2F2027-8a6a4a?style=for-the-badge)
 
-**[Coba langsung](https://salwa-alifia-eco-patch.pws.cs.ui.ac.id/)** &nbsp;·&nbsp; **[Desain di Figma](https://www.figma.com/design/oIDtpZy29QWfdudwhSFNb5/Untitled?node-id=0-1&t=LuUIQFP3lihxES26-1)** &nbsp;·&nbsp; **[Jalankan lokal](#-jalankan-di-lokal)** &nbsp;·&nbsp; **[Tim](#-tim)**
+**[Coba langsung](https://salwa-alifia-eco-patch.pws.cs.ui.ac.id/)** &nbsp;·&nbsp; **[Video demo](https://www.youtube.com/watch?v=61f5_0513Ck)** &nbsp;·&nbsp; **[Desain di Figma](https://www.figma.com/design/oIDtpZy29QWfdudwhSFNb5/Untitled?node-id=0-1&t=LuUIQFP3lihxES26-1)** &nbsp;·&nbsp; **[Jalankan lokal](#-jalankan-di-lokal)** &nbsp;·&nbsp; **[Tim](#-tim)**
 
 </div>
 
@@ -30,8 +30,7 @@ Ini adalah website EcoPatch yang dibangun dengan **Django** untuk Proyek Tengah 
   1. Rekam klip pendek (5 sampai 15 detik), lalu seret filenya ke kotak komentar PR atau issue di GitHub.
      GitHub memberi alamat https://github.com/user-attachments/assets/... : salin alamat itu (jangan kirim komentarnya).
   2. Ganti nilai src pada gambar di sel yang sesuai dengan alamat itu.
-  3. Video penuh: unggah ke YouTube (Unlisted), lalu tambahkan di baris tautan paling atas README:
-       &nbsp;·&nbsp; **[Video demo](LINK_YOUTUBE)**
+  3. Video penuh: sudah ada di baris tautan paling atas README (Video demo).
   Pakai akun demo. Jangan sampai terlihat: file .env, token, password, atau nomor kontak asli.
 -->
 
