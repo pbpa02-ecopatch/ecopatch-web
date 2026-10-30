@@ -483,7 +483,8 @@ Test otomatis tidak menggantikan pemeriksaan visual dan pengujian interaksi di b
 
 </details>
 
-### 5. Keterbatasan AI dan perbaikan manual
+<details>
+<summary><b> 5. Keterbatasan AI dan perbaikan manual
 
 Ini bagian yang paling penting: AI tidak selalu benar, dan perbaikannya dikerjakan atau diverifikasi manusia.
 
@@ -502,6 +503,7 @@ Ini bagian yang paling penting: AI tidak selalu benar, dan perbaikannya dikerjak
 | Draf README awal menautkan dokumen yang diabaikan Git (`PRD.md`, `AGENTS.md`, dan lain-lain), sehingga tautannya mati di GitHub (sesi Salwa, Claude Code) | Ditemukan saat README diperiksa di salinan bersih repo. Tautan itu dihapus. |
 
 Pelajaran utamanya: instruksi eksplisit tetap perlu diperiksa pada hasil aktual, perubahan lokal dapat berdampak lintas modul, kecocokan visual membutuhkan penilaian manusia, dan klaim agent tentang keadaan repo atau server harus dicek ulang.
+</details>
 
 <details>
 <summary><b>6. Dokumentasi prompt</b></summary>
