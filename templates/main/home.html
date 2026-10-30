@@ -1,20 +1,23 @@
-{% load static %}<!DOCTYPE html>
+{% load static asset_version %}<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>EcoPatch - Small Spaces, Greener Living</title>
+<link rel="icon" type="image/svg+xml" href="{% static_v 'img/logo.svg' %}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'landing/landing.css' %}">
+<link rel="stylesheet" href="{% static_v 'landing/landing.css' %}">
+{% include "_splash_head.html" %}
 </head>
 <body data-plant-library-url="{{ plant_library_url }}">
+{% include "_splash.html" %}
 
 {% if messages %}<div class="flash" role="status">{% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}</div>{% endif %}
 <header class="nav" id="nav">
   <div class="bar">
-    <a class="logo" href="{% url 'main:home' %}"><svg class="mark" viewBox="0 0 300 300" width="30" height="30" aria-hidden="true"><rect x="0" y="0" width="144" height="144" rx="42" fill="#35c065"/><rect x="156" y="0" width="144" height="144" rx="42" fill="#5ccf82"/><rect x="0" y="156" width="144" height="144" rx="42" fill="#1f9142"/><rect x="156" y="156" width="144" height="144" rx="42" fill="#7ad99b"/><g stroke="#fff" stroke-width="22" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke"><path d="M150 252V136" fill="none" stroke="#fff" stroke-width="36"/><path d="M150 142C120 142 72 126 52 70C100 62 142 90 150 142Z" fill="#4fc874"/><path d="M150 142C180 142 228 122 250 66C200 60 158 90 150 142Z" fill="#4fc874"/><path d="M106 192C98 218 112 246 142 252C150 226 142 196 106 192Z" fill="#ff9d2e"/></g><path d="M150 252V136" fill="none" stroke="#1f9142" stroke-width="14" stroke-linecap="round"/><path d="M150 142C146 112 118 94 84 86M150 142C154 112 182 92 218 82" fill="none" stroke="#1f9142" stroke-width="9" stroke-linecap="round" opacity=".85"/></svg>EcoPatch</a>
+    <a class="logo" href="{% url 'main:home' %}"><img class="mark" src="{% static 'img/logo.svg' %}" alt="" width="30" height="30">EcoPatch</a>
     <nav class="links" aria-label="Navigasi utama">
       <a href="#plant-library">Plant Library</a>
       <a href="#fitur">Fitur</a>
@@ -128,6 +131,13 @@
               <button class="btn btn-primary send" type="submit" aria-label="Cari tanaman" title="Cari tanaman"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5.5 11.5 12 5l6.500 6.500"/></svg></button>
             </div>
           </div>
+        </div>
+        <div class="ask" role="group" aria-label="Contoh pertanyaan">
+          <span class="ask-label"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.200 1.800L12 17l-1.800-5.200L5 10l5.200-1.800Z"/></svg>Coba tanyakan</span>
+          <button type="button" class="ask-chip" data-ask="Tanaman apa yang mudah dirawat di dalam ruangan?">Tanaman apa yang mudah dirawat di dalam ruangan?</button>
+          <button type="button" class="ask-chip" data-ask="Tanaman apa yang cocok di luar ruangan dengan cahaya penuh?">Tanaman apa yang cocok di luar ruangan dengan cahaya penuh?</button>
+          <button type="button" class="ask-chip" data-ask="Tanaman apa yang teduh dan mudah dirawat?">Tanaman apa yang teduh dan mudah dirawat?</button>
+          <button type="button" class="ask-chip" data-ask="Apa tanaman outdoor dengan perawatan sedang?">Apa tanaman outdoor dengan perawatan sedang?</button>
         </div>
         <div class="fres" id="fres" aria-live="polite" hidden></div>
       </form>
@@ -314,67 +324,10 @@
 </main>
 
 <footer class="site-footer">
-  <div class="footer-wave" aria-hidden="true">
-    <svg class="footer-wave-svg" viewBox="0 0 1440 250" preserveAspectRatio="none">
-      <path class="footer-wave-1" d="M0,90 C120,100 180,118 260,116 C420,112 560,95 720,100 C880,105 1000,50 1150,50 C1280,50 1380,70 1440,80 L1440,250 L0,250 Z"/>
-      <path class="footer-wave-2" d="M0,125 C200,125 420,170 720,172 C980,174 1200,140 1440,135 L1440,250 L0,250 Z"/>
-      <path class="footer-wave-3" d="M0,150 C260,150 480,200 740,198 C1000,196 1240,165 1440,160 L1440,250 L0,250 Z"/>
-    </svg>
-    <svg class="footer-leaf footer-leaf-a" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-    <svg class="footer-leaf footer-leaf-b" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-    <svg class="footer-leaf footer-leaf-c" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-    <svg class="footer-leaf footer-leaf-d" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-  </div>
-  <div class="footer-body">
-    <div class="footer-inner">
-      <div class="footer-grid">
-        <div>
-          <a class="footer-brand" href="{% url 'main:home' %}">
-            <svg class="footer-brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-            EcoPatch
-          </a>
-          <p class="footer-tagline">Membantu kamu mengubah balkon, teras, dan rooftop jadi kebun kota yang produktif - ruang kecil, dampak besar.</p>
-          <div class="footer-socials">
-            <a class="footer-social" href="#" aria-label="LinkedIn">IN</a>
-            <a class="footer-social" href="#" aria-label="Twitter">TW</a>
-            <a class="footer-social" href="#" aria-label="Instagram">IG</a>
-          </div>
-        </div>
-        <div>
-          <h3 class="footer-heading">Platform</h3>
-          <ul class="footer-links">
-            <li><a href="#plant-library">Plant Library</a></li>
-            <li><a href="#my-ecopatch">My EcoPatch</a></li>
-            <li><a href="#smart-care">Smart Care</a></li>
-            <li><a href="#garden-journal">Garden Journal</a></li>
-            <li><a href="#seed-exchange">Seed Exchange</a></li>
-          </ul>
-        </div>
-        <div>
-          <h3 class="footer-heading">Bantuan</h3>
-          <ul class="footer-links">
-            <li><a href="#">Tentang Kami</a></li>
-            <li><a href="#">Panduan Memulai</a></li>
-            <li><a href="#">Pusat Bantuan</a></li>
-            <li><a href="#">Hubungi Kami</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <div class="footer-copyright">
-          <svg class="footer-copyright-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-          <span>© 2026 EcoPatch - Small Spaces, Greener Living.</span>
-        </div>
-        <div class="footer-bottom-links">
-          <a href="#">Kebijakan Privasi</a>
-          <a href="#">Syarat Layanan</a>
-        </div>
-      </div>
-    </div>
-  </div>
+  <p class="site-footer-copy">&copy; {% now "Y" %} EcoPatch - Small Spaces, Greener Living.</p>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="{% static 'landing/landing.js' %}"></script>
+<script src="{% static_v 'landing/landing.js' %}"></script>
 </body>
 </html>

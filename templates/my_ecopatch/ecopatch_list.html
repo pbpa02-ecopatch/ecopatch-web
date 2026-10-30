@@ -1,50 +1,163 @@
-{% extends "base.html" %}
+{% extends "my_ecopatch/base.html" %}
+{% load static %}
 {% block title %}My EcoPatch - EcoPatch{% endblock %}
-
-{% block content %}
-<section class="patch-page">
-    <header class="patch-page-head">
-        <div>
-            <h1 class="patch-page-title">My EcoPatch</h1>
-            <p class="patch-page-lead">Kelola semua kebun dan tanamanmu dalam satu tempat.</p>
-        </div>
-        <a href="{% url 'my_ecopatch:create' %}" class="btn btn-success patch-create-btn">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-            Buat EcoPatch Baru
-        </a>
-    </header>
-
-    {% if not patches %}
-        <p class="patch-empty">Kamu belum punya EcoPatch. Mulai dengan membuat kebun pertamamu.</p>
-    {% endif %}
-
-    <div class="patch-grid">
-        {% for patch in patches %}
-            <article class="patch-card">
-                <div class="patch-card-top">
-                    <h2 class="patch-card-title">
-                        <a href="{% url 'my_ecopatch:detail' patch.pk %}" class="patch-card-link stretched-link">{{ patch.name }}</a>
-                    </h2>
-                    <span class="patch-pill patch-pill--space">{{ patch.get_space_type_display }}</span>
-                </div>
-                <p class="patch-card-city">{{ patch.city }}</p>
-                <p class="patch-card-count">{{ patch.plant_total }} tanaman ditanam</p>
-                {% if patch.status_summary %}
-                    <ul class="patch-status-list">
-                        {% for item in patch.status_summary %}
-                            <li class="patch-pill patch-pill--{{ item.key }}">{{ item.count }} {{ item.label }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </article>
-        {% endfor %}
-
-        <a href="{% url 'my_ecopatch:create' %}" class="patch-card patch-card-add">
-            <span class="patch-add-icon" aria-hidden="true">
-                <svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-            </span>
-            <span class="patch-add-label">Buat EcoPatch Baru</span>
-        </a>
+{% block garden_content %}
+{% include "my_ecopatch/_hero.html" %}
+<div class="mep-content">
+  <div class="mep-toolbar">
+    <div><p class="mep-eyebrow">KEBUN PRIBADIMU</p><h2 class="patch-section-title">Setiap ruang bisa tumbuh.</h2></div>
+    <a href="{% url 'my_ecopatch:create' %}" class="btn btn-success">+ Buat EcoPatch Baru</a>
+  </div>
+  <div class="mep-search-bar">
+    <form method="get" action="{% url 'my_ecopatch:list' %}"
+          hx-get="{% url 'my_ecopatch:list' %}"
+          hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+          hx-push-url="true" hx-trigger="submit" hx-include="#mep-active-params">
+      <span class="mep-search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.2-3.2"></path>
+        </svg>
+      </span>
+      <input id="mep-q" class="mep-search-input" type="search" name="q" value="{{ query }}"
+             placeholder="Cari nama kebun atau kota..." aria-label="Cari EcoPatch"
+             hx-get="{% url 'my_ecopatch:list' %}"
+             hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+             hx-push-url="true" hx-trigger="keyup changed delay:400ms, search"
+             hx-include="#mep-active-params">
+      <a id="mep-search-clear" class="mep-search-clear"
+         href="{% url 'my_ecopatch:list' %}{% if selected_space %}?space={{ selected_space }}{% endif %}"
+         aria-label="Hapus pencarian"{% if not query %} hidden{% endif %}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </a>
+    </form>
+  </div>
+  <div id="mep-filter-results">
+    <div id="mep-active-params" hidden>
+      {% if selected_space %}<input type="hidden" name="space" value="{{ selected_space }}">{% endif %}
     </div>
-</section>
+    <form id="mep-filter-form" class="mep-filters" method="get" action="{% url 'my_ecopatch:list' %}"
+          hx-get="{% url 'my_ecopatch:list' %}"
+          hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+          hx-push-url="true" hx-trigger="submit">
+      {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+      <div class="dropdown">
+        <button type="button" class="mep-filter dropdown-toggle{% if selected_space %} mep-filter--active{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+          {% if selected_space %}<span class="mep-filter-dot" aria-hidden="true"></span>{% endif %}
+          {{ selected_space_label|default:"Semua ruang" }}
+        </button>
+        <ul class="dropdown-menu mep-menu">
+          <li>
+            <a class="dropdown-item mep-menu-item{% if not selected_space %} active{% endif %}"
+               href="{% url 'my_ecopatch:list' %}{% if query %}?q={{ query|urlencode }}{% endif %}"
+               hx-get="{% url 'my_ecopatch:list' %}{% if query %}?q={{ query|urlencode }}{% endif %}"
+               hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+               hx-push-url="true">Semua ruang</a>
+          </li>
+          {% for value,label in space_choices %}
+          <li>
+            <a class="dropdown-item mep-menu-item{% if selected_space == value %} active{% endif %}"
+               href="{% url 'my_ecopatch:list' %}?space={{ value }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}"
+               hx-get="{% url 'my_ecopatch:list' %}?space={{ value }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}"
+               hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+               hx-push-url="true">{{ label }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% if query or selected_space %}
+      <a class="mep-filter-reset" href="{% url 'my_ecopatch:list' %}"
+         hx-get="{% url 'my_ecopatch:list' %}"
+         hx-target="#mep-filter-results" hx-select="#mep-filter-results" hx-swap="outerHTML"
+         hx-push-url="true" aria-label="Reset filter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        Reset
+      </a>
+      {% endif %}
+    </form>
+    <div class="mep-map">
+    {% for patch in patches %}
+    <article class="mep-garden">
+    <a class="mep-trash" href="{% url 'my_ecopatch:delete' patch.pk %}" data-confirm-delete data-confirm-title="Hapus EcoPatch?" data-confirm-name="{{ patch.name }}" data-confirm-note="Semua tanaman di dalamnya{% with jcount=patch.journals.count %}{% if jcount %} dan {{ jcount }} catatan jurnal{% endif %}{% endwith %} ikut terhapus. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus EcoPatch"
+       aria-label="Hapus EcoPatch {{ patch.name }}" title="Hapus EcoPatch">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>
+    </a>
+      <a href="{% url 'my_ecopatch:detail' patch.pk %}" class="mep-garden-link">
+        {% include "my_ecopatch/_garden_bed.html" %}
+        <h2>{{ patch.name }}</h2>
+      </a>
+      <p class="mep-location">{{ patch.get_space_type_display }}{% if patch.city %} · {{ patch.city }}{% endif %}</p>
+      <p class="mep-count">{{ patch.plant_quantity }} tanaman</p>
+      <ul class="patch-status-list">{% for item in patch.status_summary %}<li class="patch-pill patch-pill--{{ item.key }}">{{ item.count }} {{ item.label }}</li>{% endfor %}</ul>
+    </article>
+    {% empty %}
+    <div class="mep-empty"><h2>{% if patch_count %}Kebun belum ditemukan{% else %}Ruang kecil, awal yang berarti.{% endif %}</h2><p>{% if patch_count %}Coba nama atau tipe ruang lain, atau reset pencarianmu.{% else %}Balkon, teras, atau sudut kamar — semua bisa jadi tempat tumbuh. Buat EcoPatch untuk mulai mencatat tanamanmu.{% endif %}</p></div>
+    {% endfor %}
+    <a class="mep-add-bed" href="{% url 'my_ecopatch:create' %}"><span aria-hidden="true">+</span><strong>Buat EcoPatch Baru</strong><small>Sediakan ruang untuk tumbuh</small></a>
+  </div>
+  </div>
+  <aside class="mep-seed-tray mep-plant-preview" aria-label="Ide tanaman dari Plant Library">
+    <div class="mep-plant-preview-head">
+      <h2 class="patch-section-title">Selanjutnya, mau menanam apa?</h2>
+      <p>Temukan tanaman yang cocok, lalu tambahkan ke kebun pilihanmu.</p>
+    </div>
+    {% if suggested_plants %}
+    <div class="mep-plant-preview-grid">
+      {% for plant in suggested_plants %}
+      <a class="mep-plant-card" href="{% url 'plant_library:plant_detail' plant.pk %}">
+        <span class="mep-plant-card-media">
+          {% if plant.image_url %}
+            <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy" decoding="async"
+                 data-placeholder="{% static 'plant_library/img/plant-placeholder.svg' %}"
+                 onerror="this.onerror=null; this.src=this.dataset.placeholder;">
+          {% else %}
+            <img src="{% static 'plant_library/img/plant-placeholder.svg' %}" alt="Ilustrasi {{ plant.name }}" loading="lazy" decoding="async">
+          {% endif %}
+        </span>
+        <span class="mep-plant-card-body">
+          <strong>{{ plant.name }}</strong>
+          <small>{{ plant.get_category_display }} · {{ plant.get_difficulty_display }}</small>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <a class="btn btn-outline-success" href="{% url 'plant_library:plant_list' %}">Jelajahi Plant Library ↗</a>
+  </aside>
+</div>
+<script>
+(function () {
+    var input = document.getElementById('mep-q');
+    var clear = document.getElementById('mep-search-clear');
+    if (!input || !clear) return;
+
+    function sync() {
+        clear.hidden = input.value.trim() === '';
+    }
+
+    input.addEventListener('input', sync);
+    input.addEventListener('search', sync);
+
+    clear.addEventListener('click', function (event) {
+        input.value = '';
+        sync();
+        if (window.htmx) {
+            event.preventDefault();
+            input.focus();
+            input.dispatchEvent(new Event('search', { bubbles: true }));
+        }
+    });
+
+    // The reset pill lives inside the swapped results, so clear the visible
+    // search text too; the request itself already goes back to the bare list.
+    document.addEventListener('click', function (event) {
+        if (event.target.closest && event.target.closest('.mep-filter-reset')) {
+            input.value = '';
+            sync();
+        }
+    });
+
+    sync();
+})();
+</script>
 {% endblock %}

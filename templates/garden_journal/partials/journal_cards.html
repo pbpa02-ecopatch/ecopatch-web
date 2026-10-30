@@ -1,13 +1,12 @@
+{% load static %}
 {% if journals %}
     <div class="row g-3">
         {% for journal in journals %}
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm">
+                <div class="card card-ds h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="badge bg-{{ journal.get_condition_display_badge }}-subtle
-                                         text-{{ journal.get_condition_display_badge }}
-                                         border border-{{ journal.get_condition_display_badge }}-subtle">
+                            <span class="badge {{ journal.get_condition_ds_class }} px-3 py-1">
                                 {{ journal.get_plant_condition_display }}
                             </span>
                             <small class="text-muted">{{ journal.date }}</small>
@@ -15,28 +14,30 @@
                         <h6 class="card-title fw-bold mb-1">{{ journal.title }}</h6>
                         {% if journal.ecopatch_name or journal.plant_name %}
                             <p class="small text-muted mb-1">
-                                {% if journal.ecopatch_name %}🪴 {{ journal.ecopatch_name }}{% endif %}
+                                {% if journal.ecopatch_name %}{{ journal.ecopatch_name }}{% endif %}
                                 {% if journal.ecopatch_name and journal.plant_name %} &mdash; {% endif %}
-                                {% if journal.plant_name %}🌱 {{ journal.plant_name }}{% endif %}
+                                {% if journal.plant_name %}{{ journal.plant_name }}{% endif %}
                             </p>
                         {% endif %}
                         <p class="card-text small text-secondary" style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">{{ journal.notes }}</p>
                         {% if journal.plant_height %}
-                            <p class="small mb-1"><span class="text-muted">Tinggi:</span> {{ journal.plant_height }} cm</p>
+                            <p class="small mb-1"><span class="text-muted">Ukuran:</span> {{ journal.plant_height }} cm</p>
                         {% endif %}
                     </div>
                     <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
                         <div class="d-flex gap-2">
-                            <a href="{% url 'garden_journal:detail' journal.pk %}" class="btn btn-sm btn-outline-success flex-grow-1">
+                            <a href="{% url 'garden_journal:detail' journal.pk %}" class="btn btn-sm btn-ds-secondary flex-grow-1">
                                 Lihat Detail
                             </a>
-                            <a href="{% url 'garden_journal:edit' journal.pk %}" class="btn btn-sm btn-outline-secondary">
-                                ✏️
+                            <a href="{% url 'garden_journal:edit' journal.pk %}" class="btn btn-sm btn-ds-ghost px-2" title="Edit">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                             </a>
                             <form method="post" action="{% url 'garden_journal:delete' journal.pk %}"
-                                  onsubmit="return confirm('Hapus catatan ini?')">
+                                  onsubmit="return window.siteConfirmDelete ? true : confirm('Hapus catatan ini?')" data-confirm-delete data-confirm-title="Hapus catatan?" data-confirm-name="{{ journal.title }}" data-confirm-note="Catatan ini dihapus selamanya. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus catatan">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger">🗑️</button>
+                                <button type="submit" class="btn btn-sm btn-ds-danger px-2" title="Hapus">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -46,9 +47,9 @@
     </div>
 {% else %}
     <div class="text-center py-5 text-muted">
-        <div style="font-size: 3rem;">📖</div>
+        <img src="{% static 'img/mascot/petak-mencatat.png' %}" alt="Petak" style="width: 100px; height: auto;" class="mb-3">
         <p class="mt-2">Belum ada catatan jurnal.<br>
-            <a href="{% url 'garden_journal:create' %}">Mulai catat sekarang!</a>
+            <a href="{% url 'garden_journal:create' %}" class="text-success fw-semibold">Mulai catat sekarang!</a>
         </p>
     </div>
 {% endif %}

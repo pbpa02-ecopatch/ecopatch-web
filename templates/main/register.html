@@ -1,9 +1,12 @@
-{% load static socialaccount %}<!doctype html>
+{% load static asset_version socialaccount %}<!doctype html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Daftar · EcoPatch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'auth/register.css' %}">
+<link rel="icon" type="image/svg+xml" href="{% static_v 'img/logo.svg' %}">
+<link rel="stylesheet" href="{% static_v 'auth/register.css' %}">
+{% include "_splash_head.html" %}
 </head><body>
+{% include "_splash.html" %}
 <main class="stage">
   <section class="card" aria-labelledby="h">
     <div class="form-side">
@@ -39,4 +42,4 @@
     {% include "main/_auth_panel.html" %}
   </section>
 </main>
-<script src="{% static 'auth/register.js' %}"></script></body></html>
+<script src="{% static_v 'auth/register.js' %}"></script></body></html>

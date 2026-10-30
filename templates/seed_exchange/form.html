@@ -1,114 +1,175 @@
 {% extends "base.html" %}
+{% load static asset_version %}
 {% block title %}{% if mode == "update" %}Ubah Listing{% else %}Buat Listing{% endif %} - Seed Exchange{% endblock %}
+{% block body_class %} seed-body{% endblock %}
 
 {% block extra_head %}
-<style>
-    .seed-form-card {
-        max-width: 680px;
-        margin: 0 auto;
-        padding: 32px;
-        border: 1px solid var(--border);
-        border-radius: 28px;
-        background: var(--surface-200);
-        box-shadow: 0 6px 16px rgba(34, 48, 31, 0.12);
-    }
-    .seed-form-title { margin: 0 0 6px; font-size: 1.8rem; }
-    .seed-form-lead { margin: 0 0 8px; color: var(--ink-muted); }
-    .seed-form-legend { margin: 0 0 24px; color: var(--ink-muted); font-size: 13.5px; }
-    .seed-field { margin-bottom: 18px; }
-    .seed-label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
-    .seed-required { color: var(--danger); font-weight: 700; }
-    .seed-optional-tag { color: var(--ink-muted); font-weight: 400; font-size: 12.5px; }
-    .seed-input { border-radius: 16px; }
-    .seed-select-btn {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        background: var(--surface-200);
-        text-align: left;
-    }
-    .seed-placeholder { color: var(--ink-muted); font-weight: 400; }
-    .seed-menu {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        background: var(--surface-200);
-        box-shadow: 0 12px 32px rgba(34, 48, 31, 0.18);
-    }
-    .seed-menu-item {
-        border-radius: 10px;
-        color: var(--ink);
-        font-size: 14px;
-        font-weight: 500;
-        padding: 8px 12px;
-        width: 100%;
-        text-align: left;
-        background: transparent;
-        border: none;
-    }
-    .seed-menu-item:hover {
-        background: color-mix(in srgb, var(--brand-300) 45%, var(--surface-200));
-    }
-    .seed-menu-item.active {
-        background: var(--brand-300);
-        color: color-mix(in srgb, var(--brand-600) 65%, var(--ink));
-        font-weight: 700;
-    }
-    .seed-error { margin-top: 6px; font-size: 13px; color: color-mix(in srgb, var(--danger) 75%, var(--ink)); }
-    .seed-form-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
-</style>
+<link rel="stylesheet" href="{% static_v 'seed_exchange/css/seed_exchange.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="seed-form-card">
-    <h1 class="seed-form-title">{% if mode == "update" %}Ubah Listing{% else %}Buat Listing{% endif %}</h1>
-    <p class="seed-form-lead">Bagikan atau tukar bibit, stek, biji, dan tanamanmu.</p>
-    <p class="seed-form-legend"><span class="seed-required">*</span> wajib diisi</p>
+{% block main %}
+<main class="seed-main flex-grow-1">
+<div class="seed-page">
+    <div class="seed-inner">
+        <a class="seed-back" href="{% if mode == 'update' %}{% url 'seed_exchange:detail' listing.pk %}{% else %}{% url 'seed_exchange:list' %}?tab=mine{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5"/>
+                <path d="m12 19-7-7 7-7"/>
+            </svg>
+            {% if mode == 'update' %}Kembali ke listing{% else %}Kembali ke Seed Exchange{% endif %}
+        </a>
 
-    <form method="post">
-        {% csrf_token %}
-        {% if form.non_field_errors %}
-            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-        {% endif %}
-        {% for row in rows %}
-            {% with field=row.field %}
-            <div class="seed-field">
-                <label class="seed-label" for="id_{{ field.name }}">
-                    {{ field.label }}
-                    {% if field.field.required %}<span class="seed-required" aria-hidden="true">*</span>
-                    {% else %}<span class="seed-optional-tag">(opsional)</span>{% endif %}
-                </label>
-                {% if row.select %}
-                <div class="dropdown" data-seed-select>
-                    <input type="hidden" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ row.select.value }}">
-                    <button type="button" class="form-control seed-input seed-select-btn dropdown-toggle"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                        <span data-seed-label>{% if row.select.display %}{{ row.select.display }}{% else %}<span class="seed-placeholder">Pilih {{ field.label|lower }}…</span>{% endif %}</span>
-                    </button>
-                    <ul class="dropdown-menu seed-menu">
-                        {% for opt in row.select.options %}
-                        <li><button type="button" class="dropdown-item seed-menu-item{% if opt.selected %} active{% endif %}"
-                                    data-seed-option data-value="{{ opt.value }}">{{ opt.label }}</button></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% else %}
-                {{ field }}
-                {% endif %}
-                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
-                {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
+        <header class="seed-head seed-head--form">
+            <div class="seed-head-copy">
+                <p class="seed-eyebrow">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 21v-8"/>
+                        <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                        <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                        <path d="M5 21h14"/>
+                    </svg>
+                    Komunitas &middot; {% if mode == 'update' %}ubah listing{% else %}listing baru{% endif %}
+                </p>
+                <h1 class="seed-title">{% if mode == 'update' %}Ubah Listing{% else %}Buat Listing{% endif %}</h1>
+                <p class="seed-sub">{% if mode == 'update' %}Segarkan foto dan detail listingmu, biar makin gampang ketemu tetangga.{% else %}Bagikan atau tukar bibit, stek, biji, dan tanamanmu.{% endif %}</p>
+                <p class="seed-form-legend"><span class="seed-required" aria-hidden="true">*</span> wajib diisi</p>
             </div>
-            {% endwith %}
-        {% endfor %}
-        <div class="seed-form-actions">
-            <button type="submit" class="btn btn-success">{% if mode == "update" %}Simpan perubahan{% else %}Simpan listing{% endif %}</button>
-            <a class="btn btn-outline-success" href="{% if mode == "update" %}{% url 'seed_exchange:detail' listing.pk %}{% else %}{% url 'seed_exchange:list' %}{% endif %}">Batal</a>
+        </header>
+
+        <div class="seed-form-card">
+            <p class="seed-form-note">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 21v-8"/>
+                    <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                    <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                </svg>
+                <span>
+                    Isi sekali di <a href="{% url 'main:profile' %}">profil</a>, semua listingmu langsung memakai kota dan kontak yang sama.
+                </span>
+            </p>
+
+            <form method="post" enctype="multipart/form-data" class="seed-form">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+                {% for row in rows %}
+                    {% with field=row.field %}
+                    {% if forloop.first %}<h2 class="seed-form-section">Detail bibit</h2>{% endif %}
+                    {% if field.name == 'description' %}
+                    <h2 class="seed-form-section">Lokasi &amp; kontak</h2>
+                    <div class="seed-loc{% if not location_ready %} seed-loc--missing{% endif %}">
+                        <div class="seed-loc-body">
+                            {% if location_ready %}
+                            <div class="seed-loc-facts">
+                                <span class="seed-loc-fact">
+                                    <span class="seed-loc-label">Kota</span>
+                                    <strong>{{ location_city }}</strong>
+                                </span>
+                                <span class="seed-loc-fact">
+                                    <span class="seed-loc-label">Kontak</span>
+                                    <strong>{{ location_contact }}</strong>
+                                </span>
+                            </div>
+                            <p class="seed-loc-hint">
+                                Listing baru otomatis memakai data profil.
+                                <a href="{% url 'main:profile' %}">Ubah di profil</a>
+                            </p>
+                            {% else %}
+                            <p class="seed-loc-title">Lengkapi kota &amp; kontak di profil dulu, yuk.</p>
+                            <p class="seed-loc-hint">Sekarang data ini diambil dari profil supaya peminat selalu menghubungi kontak yang benar. Isi sekali saja, semua listing ikut.</p>
+                            <a class="seed-loc-cta" href="{% url 'main:profile' %}">
+                                Lengkapi profil
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M5 12h14"/>
+                                    <path d="m13 6 6 6-6 6"/>
+                                </svg>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <h2 class="seed-form-section">Foto &amp; catatan</h2>
+                    {% endif %}
+                    {% if field.name == 'image' %}
+                    <div class="seed-field seed-field--{{ field.name }}">
+                        <span class="seed-label">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="seed-required" aria-hidden="true">*</span>
+                            {% else %}<span class="seed-optional-tag">(opsional)</span>{% endif %}
+                        </span>
+                        <div class="seed-uploader" data-seed-uploader>
+                            {{ field }}
+                            <input type="file" accept="image/*" capture="environment" class="d-none" data-seed-camera-input>
+                            <input type="file" accept="image/*" capture="user" class="d-none" data-seed-selfie-input>
+                            <label class="seed-upload-zone" for="{{ field.id_for_label }}">
+                                <span class="seed-upload-visual" data-seed-preview>
+                                    {% if listing.image %}
+                                    <img src="{{ listing.image.url }}" alt="Foto listing saat ini" data-seed-preview-img>
+                                    {% else %}
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-seed-placeholder>
+                                        <path d="M12 21v-9.5"/>
+                                        <path d="M12 12.5C12 8.6 9 5.5 4 5.5c0 4.9 3 8 8 7Z"/>
+                                        <path d="M12 14.5c0-3.9 3-7 8-7 0 4.9-3 8-8 7Z"/>
+                                    </svg>
+                                    {% endif %}
+                                </span>
+                                <span class="seed-upload-copy">
+                                    <span class="seed-upload-title" data-seed-filename>{% if listing.image %}Ganti foto listing{% else %}Pilih foto listing{% endif %}</span>
+                                    <span class="seed-upload-hint">JPG/PNG, maks 5 MB. Foto asli bibit/stekmu bikin listing lebih cepat dilirik.</span>
+                                </span>
+                            </label>
+                            <div class="ep-upload-actions">
+                                <button type="button" class="ep-btn ep-btn--ghost ep-btn--sm" data-seed-camera>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                    Kamera belakang
+                                </button>
+                                <button type="button" class="ep-btn ep-btn--ghost ep-btn--sm" data-seed-selfie>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/></svg>
+                                    Selfie
+                                </button>
+                            </div>
+                        </div>
+                        {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="seed-field seed-field--{{ field.name }}{% if mode == 'create' and field.name == 'transaction_type' %} seed-field--wide{% endif %}">
+                        <label class="seed-label" for="id_{{ field.name }}">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="seed-required" aria-hidden="true">*</span>
+                            {% else %}<span class="seed-optional-tag">(opsional)</span>{% endif %}
+                        </label>
+                        {% if row.select %}
+                        <div class="dropdown" data-seed-select>
+                            <input type="hidden" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ row.select.value }}">
+                            <button type="button" class="seed-select-btn dropdown-toggle"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <span data-seed-label>{% if row.select.display %}{{ row.select.display }}{% else %}<span class="seed-placeholder">Pilih {{ field.label|lower }}…</span>{% endif %}</span>
+                            </button>
+                            <ul class="dropdown-menu seed-menu">
+                                {% for opt in row.select.options %}
+                                <li><button type="button" class="dropdown-item seed-menu-item{% if opt.selected %} active{% endif %}"
+                                            data-seed-option data-value="{{ opt.value }}">{{ opt.label }}</button></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% else %}
+                        {{ field }}
+                        {% endif %}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                {% endfor %}
+                <div class="seed-form-actions">
+                    <button type="submit" class="btn-seed-primary">{% if mode == "update" %}Simpan perubahan{% else %}Simpan listing{% endif %}</button>
+                    <a class="btn-seed-secondary" href="{% if mode == 'update' %}{% url 'seed_exchange:detail' listing.pk %}{% else %}{% url 'seed_exchange:list' %}?tab=mine{% endif %}">Batal</a>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
+</main>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -124,6 +185,54 @@ document.querySelectorAll('[data-seed-select]').forEach(function (root) {
             btn.classList.add('active');
         });
     });
+});
+
+document.querySelectorAll('[data-seed-uploader]').forEach(function (root) {
+    var input = root.querySelector('input[type="file"]');
+    if (!input) return;
+    var preview = root.querySelector('[data-seed-preview]');
+    var filename = root.querySelector('[data-seed-filename]');
+    var defaultLabel = filename ? filename.textContent : '';
+    var cameraInput = root.querySelector('[data-seed-camera-input]');
+    var selfieInput = root.querySelector('[data-seed-selfie-input]');
+    var cameraBtn = root.querySelector('[data-seed-camera]');
+    var selfieBtn = root.querySelector('[data-seed-selfie]');
+
+    function renderPreview(file) {
+        if (filename) filename.textContent = file ? file.name : defaultLabel;
+        if (!file || !preview) return;
+        var img = preview.querySelector('img');
+        if (!img) {
+            img = document.createElement('img');
+            img.setAttribute('data-seed-preview-img', '');
+            preview.appendChild(img);
+        }
+        img.src = URL.createObjectURL(file);
+        img.alt = 'Pratinjau foto listing';
+        var placeholder = preview.querySelector('[data-seed-placeholder]');
+        if (placeholder) placeholder.remove();
+    }
+
+    function transfer(source) {
+        if (!source.files || !source.files[0]) return;
+        var dt = new DataTransfer();
+        dt.items.add(source.files[0]);
+        input.files = dt.files;
+        renderPreview(input.files[0]);
+    }
+
+    input.addEventListener('change', function () {
+        renderPreview(input.files && input.files[0]);
+    });
+
+    if (cameraBtn && cameraInput) {
+        cameraBtn.addEventListener('click', function () { cameraInput.click(); });
+        cameraInput.addEventListener('change', function () { transfer(cameraInput); });
+    }
+    if (selfieBtn && selfieInput) {
+        selfieBtn.addEventListener('click', function () { selfieInput.click(); });
+        selfieInput.addEventListener('change', function () { transfer(selfieInput); });
+    }
 });
 </script>
 {% endblock %}

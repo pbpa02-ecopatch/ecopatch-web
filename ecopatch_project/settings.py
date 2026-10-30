@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import parse_qs, unquote, urlsplit
+
+from django.core.exceptions import ImproperlyConfigured
 
 from dotenv import load_dotenv
 
@@ -31,9 +34,23 @@ SECRET_KEY = os.environ.get(
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'True').strip().lower() in {'true', '1', 'yes'}
 
-ALLOWED_HOSTS = ["salwa-alifia-eco-patch.pws.cs.ui.ac.id", "localhost", "127.0.0.1"]
+if not SECRET_KEY and DEBUG:
+    SECRET_KEY = 'django-insecure-local-development-only-change-before-deployment'
+if not DEBUG and (len(SECRET_KEY) < 50 or len(set(SECRET_KEY)) < 5 or SECRET_KEY.startswith('django-insecure-')):
+    raise ImproperlyConfigured('Set a private, strong SECRET_KEY before using DEBUG=False.')
+
+# While preparing a deployment: MAINTENANCE_MODE=True shows everyone but staff a "being prepared" page (503).
+MAINTENANCE_MODE = os.environ.get('MAINTENANCE_MODE', 'False') == 'True'
+
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get(
+    "ALLOWED_HOSTS", "salwa-alifia-eco-patch.pws.cs.ui.ac.id,localhost,127.0.0.1",
+).split(",") if host.strip()]
+
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.environ.get(
+    "CSRF_TRUSTED_ORIGINS", "https://salwa-alifia-eco-patch.pws.cs.ui.ac.id",
+).split(",") if origin.strip()]
 
 
 # Application definition
@@ -64,11 +81,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'main.security.SecurityHeadersMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'main.middleware.MaintenanceModeMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -104,6 +123,28 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Keep SQLite for local work; production can supply its own PostgreSQL service.
+database_url = os.environ.get('DATABASE_URL', '').strip()
+if database_url:
+    try:
+        database = urlsplit(database_url)
+        database_port = database.port or 5432
+        if database.scheme not in {'postgres', 'postgresql'} or not database.path.strip('/'):
+            raise ValueError('Expected a PostgreSQL URL with a database name.')
+        options = parse_qs(database.query)
+        DATABASES['default'] = {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': unquote(database.path.lstrip('/')),
+            'USER': unquote(database.username or ''),
+            'PASSWORD': unquote(database.password or ''),
+            'HOST': database.hostname or '',
+            'PORT': database_port,
+            'CONN_MAX_AGE': 60,
+            'OPTIONS': {'sslmode': options['sslmode'][0]} if options.get('sslmode') else {},
+        }
+    except ValueError as error:
+        raise ImproperlyConfigured('DATABASE_URL must be a valid postgres:// or postgresql:// URL.') from error
 
 
 # Password validation
@@ -154,6 +195,26 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ---- Security -----------------------------------------------------------------------------------------------
+# Cookies. Secure cookies need https, so they stay off while DEBUG is on (local http) and on everywhere else;
+# SECURE_COOKIES can override that in the environment. Neither cookie is read by JavaScript (the CSRF token is put
+# into the page by the template), so both can be HttpOnly. SameSite=Lax is Django's default and stays.
+SECURE_COOKIES = os.environ.get('SECURE_COOKIES', 'False' if DEBUG else 'True').strip().lower() in {'true', '1', 'yes'}
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False' if DEBUG else 'True').strip().lower() in {'true', '1', 'yes'}
+SESSION_COOKIE_SECURE = SECURE_COOKIES
+CSRF_COOKIE_SECURE = SECURE_COOKIES
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+
+# Behind an https reverse proxy (PWS): set BEHIND_HTTPS_PROXY=True in the environment so Django believes the
+# X-Forwarded-Proto header, then HSTS is sent too. Left off by default because trusting that header when no
+# proxy sets it would let a visitor claim "https" for themselves.
+if os.environ.get('BEHIND_HTTPS_PROXY', 'False').strip().lower() in {'true', '1', 'yes'}:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '3600'))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('SECURE_HSTS_INCLUDE_SUBDOMAINS', 'False').lower() == 'true'
+    SECURE_HSTS_PRELOAD = os.environ.get('SECURE_HSTS_PRELOAD', 'False').lower() == 'true'
+
 # Auth redirects
 LOGIN_URL = 'main:login'
 # After signing in people go to their gardens, unless they were sent to the login page from somewhere (?next=)
@@ -165,6 +226,10 @@ LOGOUT_REDIRECT_URL = 'main:home'
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 GOOGLE_AUTH_ENABLED = bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
+
+# Load the starter plants (plant_library/fixtures/initial_plants.json) after `migrate` when the library is empty.
+# For a server where you cannot run `loaddata` yourself (PWS): set SEED_PLANTS_ON_MIGRATE=True in its environment.
+SEED_PLANTS_ON_MIGRATE = os.environ.get('SEED_PLANTS_ON_MIGRATE', 'False') == 'True'
 
 SITE_ID = 1
 AUTHENTICATION_BACKENDS = [

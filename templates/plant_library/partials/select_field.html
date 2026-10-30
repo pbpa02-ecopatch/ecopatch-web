@@ -1,0 +1,42 @@
+{% load plant_extras %}
+<div class="plant-field{% if wide %} plant-field--wide{% endif %}">
+    <label class="plant-label" for="id_{{ field.name }}_btn">
+        {{ field.label }}
+        {% if field.field.required %}
+            <span class="plant-required" aria-hidden="true">*</span>
+        {% else %}
+            <span class="plant-optional-tag">(opsional)</span>
+        {% endif %}
+    </label>
+
+    <div class="dropdown" data-plant-select>
+        <input type="hidden" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ field.value|default:'' }}">
+        <button type="button" id="id_{{ field.name }}_btn" class="plant-select-btn dropdown-toggle"
+                data-bs-toggle="dropdown" aria-expanded="false">
+            <span data-plant-label>
+                {% with picked=field|selected_label %}
+                    {% if picked %}
+                        {{ picked }}
+                    {% else %}
+                        <span class="plant-placeholder">Pilih {{ field.label|lower }}&hellip;</span>
+                    {% endif %}
+                {% endwith %}
+            </span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6"/>
+            </svg>
+        </button>
+        <ul class="dropdown-menu plant-menu">
+            {% for value, label in field|select_options %}
+                <li>
+                    <button type="button" class="dropdown-item plant-menu-item{% if field.value|stringformat:'s' == value|stringformat:'s' %} active{% endif %}"
+                            data-plant-option data-value="{{ value }}">{{ label }}</button>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% for error in field.errors %}
+        <p class="plant-form-error">{{ error }}</p>
+    {% endfor %}
+</div>

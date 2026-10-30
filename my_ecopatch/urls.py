@@ -12,6 +12,7 @@ urlpatterns = [
     path('<int:pk>/edit/', views.ecopatch_update, name='update'),
     path('<int:pk>/delete/', views.ecopatch_delete, name='delete'),
     path('<int:pk>/plants/add/', views.patchplant_add, name='plant_add'),
+    path('<int:pk>/plants/quick-add/', views.patchplant_quick_add, name='plant_quick_add'),
     path('plants/<int:pk>/status/', views.patchplant_set_status, name='plant_status'),
     path('plants/<int:pk>/delete/', views.patchplant_delete, name='plant_delete'),
 ]

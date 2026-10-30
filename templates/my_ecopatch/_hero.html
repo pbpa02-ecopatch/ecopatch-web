@@ -1,0 +1,128 @@
+{% load static %}
+{% comment %}
+Illustrated morning garden for the top of My EcoPatch: a sun rising behind the hills, drifting clouds, a picket
+fence, shrubs, flowers, butterflies, and Petak watering a row of wooden plots. There is one plot per EcoPatch (up to
+five, newest on the right) and each shows how far that garden has grown. Purely decorative, so the art is aria-hidden.
+{% endcomment %}
+<header class="mep-hero">
+    <div class="mep-hero-art" aria-hidden="true">
+        <span class="mep-sun"></span>
+
+        <svg class="mep-clouds" viewBox="0 0 1200 200" preserveAspectRatio="xMidYMin slice" focusable="false">
+            <g class="mep-cloud mep-cloud--a"><path d="M90 96c0-17 14-31 31-31 5-19 22-33 42-33 23 0 42 17 45 39 16 2 28 15 28 32H90Z"/></g>
+            <g class="mep-cloud mep-cloud--b"><path d="M610 70c0-13 10-24 23-24 4-15 17-26 33-26 19 0 34 13 36 30 13 2 23 12 23 25H610Z"/></g>
+            <g class="mep-cloud mep-cloud--c"><path d="M930 112c0-11 9-20 20-20 3-13 14-22 28-22 15 0 28 11 30 25 11 2 19 10 19 20H930Z"/></g>
+        </svg>
+
+        <svg class="mep-birds" viewBox="0 0 120 40" focusable="false">
+            <path d="M6 22q8-14 16 0q8-14 16 0" fill="none" stroke="#6b8f77" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M62 12q6-10 12 0q6-10 12 0" fill="none" stroke="#6b8f77" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+        </svg>
+
+        <svg class="mep-hills mep-hills--back" viewBox="0 0 1440 260" preserveAspectRatio="none" focusable="false">
+            <path d="M0 120C170 54 350 52 530 98c190 48 340 54 530 6 150-38 290-30 380 14v142H0Z" fill="#cfe8c2"/>
+        </svg>
+
+        <svg class="mep-fence" viewBox="0 0 1440 100" preserveAspectRatio="xMidYMax slice" focusable="false">
+            <defs>
+                <pattern id="mep-picket" width="30" height="76" patternUnits="userSpaceOnUse">
+                    <path d="M4 76V18l9-11 9 11v58Z" fill="#fbf1d6" stroke="#d9c28f" stroke-width="2" stroke-linejoin="round"/>
+                </pattern>
+            </defs>
+            <rect x="0" y="22" width="1440" height="78" fill="url(#mep-picket)"/>
+            <rect x="0" y="42" width="1440" height="7" rx="3.5" fill="#e8d3a0"/>
+            <rect x="0" y="70" width="1440" height="7" rx="3.5" fill="#e8d3a0"/>
+        </svg>
+
+        <svg class="mep-shrubs" viewBox="0 0 1440 120" preserveAspectRatio="xMidYMax slice" focusable="false">
+            <g fill="#a9d49a">
+                <circle cx="120" cy="88" r="24"/><circle cx="150" cy="72" r="32"/><circle cx="184" cy="90" r="22"/>
+                <circle cx="610" cy="96" r="20"/><circle cx="634" cy="82" r="28"/><circle cx="662" cy="96" r="18"/>
+                <circle cx="960" cy="94" r="22"/><circle cx="986" cy="78" r="28"/><circle cx="1016" cy="94" r="18"/>
+            </g>
+            <g fill="#8fc780"><circle cx="150" cy="64" r="8"/><circle cx="634" cy="74" r="7"/><circle cx="986" cy="70" r="7"/></g>
+        </svg>
+
+        <svg class="mep-hills mep-hills--front" viewBox="0 0 1440 220" preserveAspectRatio="none" focusable="false">
+            <path d="M0 150c200-52 380-58 560-14 200 48 360 52 540 4 120-32 240-24 340 10v70H0Z" fill="#b7dda7"/>
+        </svg>
+
+        <svg class="mep-flowers" viewBox="0 0 1440 100" preserveAspectRatio="xMidYMax slice" focusable="false">
+            <g fill="none" stroke="#4a9f5d" stroke-width="2" stroke-linecap="round">
+                <path d="M96 84v14"/><path d="M300 82v16"/><path d="M520 86v12"/><path d="M760 82v16"/><path d="M1180 84v14"/>
+            </g>
+            <g fill="#fffdf6">
+                <g transform="translate(96 80)"><circle cy="-7" r="5"/><circle cx="7" r="5"/><circle cy="7" r="5"/><circle cx="-7" r="5"/></g>
+                <g transform="translate(520 82)"><circle cy="-7" r="5"/><circle cx="7" r="5"/><circle cy="7" r="5"/><circle cx="-7" r="5"/></g>
+                <g transform="translate(1180 80)"><circle cy="-7" r="5"/><circle cx="7" r="5"/><circle cy="7" r="5"/><circle cx="-7" r="5"/></g>
+            </g>
+            <g fill="#ffc9d6">
+                <g transform="translate(300 78)"><circle cy="-7" r="5"/><circle cx="7" r="5"/><circle cy="7" r="5"/><circle cx="-7" r="5"/></g>
+                <g transform="translate(760 78)"><circle cy="-7" r="5"/><circle cx="7" r="5"/><circle cy="7" r="5"/><circle cx="-7" r="5"/></g>
+            </g>
+            <g fill="#ffc857">
+                <circle cx="96" cy="80" r="3.5"/><circle cx="300" cy="78" r="3.5"/><circle cx="520" cy="82" r="3.5"/><circle cx="760" cy="78" r="3.5"/><circle cx="1180" cy="80" r="3.5"/>
+            </g>
+        </svg>
+
+        <svg class="mep-butterfly mep-butterfly--a" viewBox="0 0 40 32" focusable="false">
+            <g class="mep-wings"><path d="M20 16C12 2 2 6 4 16c2 8 10 8 16 0Z" fill="#ff9d2e"/><path d="M20 16c8-14 18-10 16 0-2 8-10 8-16 0Z" fill="#ffb85c"/></g>
+            <path d="M20 8v16" stroke="#5b3a24" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+        <svg class="mep-butterfly mep-butterfly--b" viewBox="0 0 40 32" focusable="false">
+            <g class="mep-wings"><path d="M20 16C12 2 2 6 4 16c2 8 10 8 16 0Z" fill="#f4a7b9"/><path d="M20 16c8-14 18-10 16 0-2 8-10 8-16 0Z" fill="#f8c4d0"/></g>
+            <path d="M20 8v16" stroke="#5b3a24" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <div class="mep-hero-inner">
+        <div class="mep-hero-copy">
+            <h1>My EcoPatch</h1>
+            <p>Kelola semua kebun dan tanamanmu dalam satu tempat.</p>
+            <div class="journal-stats-pills" aria-label="Ringkasan semua kebun">
+                <span class="stat-pill-chip">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f9142"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        class="stat-pill-icon">
+                        <path d="M7 20h10" />
+                        <path d="M10 20c5.5-2.5.8-6.4 3-10" />
+                        <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" />
+                    </svg>
+                    <strong>{{ patch_count }}</strong> EcoPatch
+                </span>
+                <span class="stat-pill-chip">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f9142"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        class="stat-pill-icon">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                    </svg>
+                    <strong>{{ plant_count }}</strong> tanaman
+                </span>
+                <span class="stat-pill-chip">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f9142"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        class="stat-pill-icon">
+                        <path d="M7 20h10" />
+                        <path d="M10 20c5.5-2.5.8-6.4 3-10" />
+                        <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" />
+                    </svg>
+                    <strong>{{ growing_count }}</strong> sedang tumbuh
+                </span>
+            </div>
+        </div>
+
+        <div class="mep-hero-stage" aria-hidden="true">
+            <p class="mep-speech">
+                {% if not patch_count %}Kebun pertamamu dimulai dari satu langkah kecil. Ayo buat EcoPatch!{% elif growing_count %}{{ growing_count }} tanamanmu sedang tumbuh. Jangan lupa disiram ya!{% else %}Ruang kecilmu punya banyak cerita. Yuk, lihat yang tumbuh hari ini!{% endif %}
+            </p>
+            <div class="mep-ground">
+                <div class="mep-plots">
+                    {% for plot in scene_plots %}{% include "my_ecopatch/_hero_plot.html" %}{% endfor %}
+                    {% if scene_more %}<span class="mep-plots-more">+{{ scene_more }}</span>{% endif %}
+                </div>
+                <img class="mep-petak" src="{% static 'my_ecopatch/petak-siram.svg' %}" alt="" width="540" height="430" loading="eager" decoding="async">
+            </div>
+        </div>
+    </div>
+</header>

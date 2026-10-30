@@ -1,17 +1,17 @@
-{% extends "base.html" %}
+{% extends "my_ecopatch/base.html" %}
 {% block title %}Hapus EcoPatch - EcoPatch{% endblock %}
 
-{% block content %}
+{% block garden_content %}<div class="mep-content">
 <section class="patch-form-shell">
     <h1 class="patch-page-title">Hapus EcoPatch?</h1>
     <p class="patch-page-lead">
-        Kamu akan menghapus <strong>{{ patch.name }}</strong>{% if patch.plant_total %} beserta {{ patch.plant_total }} tanaman di dalamnya{% endif %}.
+        Kamu akan menghapus <strong>{{ patch.name }}</strong>{% if patch.plant_total %} beserta {{ patch.plant_quantity }} tanaman ({{ patch.plant_total }} entri) di dalamnya{% endif %}{% with jcount=patch.journals.count %}{% if jcount %} dan {{ jcount }} catatan jurnal ikut terhapus{% endif %}{% endwith %}.
         Tindakan ini tidak bisa dibatalkan.
     </p>
     <form method="post" class="patch-form-actions">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success patch-btn-danger">Ya, hapus</button>
-        <a class="btn btn-outline-success" href="{% url 'my_ecopatch:detail' patch.pk %}">Batal</a>
+        <button type="submit" class="ep-btn ep-btn--danger">Ya, hapus</button>
+        <a class="ep-btn ep-btn--ghost" href="{% url 'my_ecopatch:detail' patch.pk %}">Batal</a>
     </form>
 </section>
-{% endblock %}
+</div>{% endblock %}

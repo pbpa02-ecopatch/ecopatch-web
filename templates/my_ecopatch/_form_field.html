@@ -1,6 +1,9 @@
-<div class="patch-field{% if field.errors %} has-error{% endif %}">
-    <label class="patch-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+<div class="patch-field ep-field{% if field.errors %} has-error{% endif %}{% if field.widget_type == 'textarea' %} patch-field--wide ep-field--wide{% endif %}">
+    <label class="patch-label ep-label" for="{{ field.id_for_label }}">
+        {{ field.label }}
+        {% if field.field.required %}<span class="patch-required ep-required" aria-hidden="true">*</span>{% else %}<span class="patch-optional ep-optional">(opsional)</span>{% endif %}
+    </label>
     {{ field }}
-    {% if field.help_text %}<p class="patch-help">{{ field.help_text }}</p>{% endif %}
-    {% for error in field.errors %}<p class="patch-error">{{ error }}</p>{% endfor %}
+    {% if field.help_text and field.help_text != 'Opsional.' %}<p class="patch-help ep-help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>{% endif %}
+    {% if field.errors %}<ul class="patch-error ep-error" id="{{ field.auto_id }}_error" role="alert">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
 </div>

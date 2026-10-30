@@ -99,5 +99,5 @@ class Command(BaseCommand):
             created += 1
 
         self.stdout.write(
-            self.style.SUCCESS(f"✅ Berhasil membuat {created} entri Garden Journal.")
+            self.style.SUCCESS(f"Berhasil membuat {created} entri Garden Journal.")
         )

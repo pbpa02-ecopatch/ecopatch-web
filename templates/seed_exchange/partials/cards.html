@@ -1,10 +1,17 @@
+{% load static %}
 <div id="{{ grid_id|default:'seed-grid' }}" class="seed-grid">
     {% for listing in listings %}
         {% include "seed_exchange/partials/card.html" with listing=listing %}
     {% empty %}
         <div class="seed-empty">
-            <p><strong>Belum ada listing yang cocok.</strong></p>
-            <p>Coba ubah filter atau buat listing baru.</p>
+            <img class="seed-empty-mascot" src="{% static 'seed_exchange/tukar-bibit.svg' %}" alt="" aria-hidden="true" width="160" height="160">
+            <p class="seed-empty-title"><strong>Belum ada listing yang cocok.</strong></p>
+            <p class="seed-empty-desc">Coba ubah filter di atas, atau jadilah yang pertama berbagi bibit.</p>
+            {% if own_listing_total and not tab_qs %}
+                <p class="seed-empty-desc seed-empty-hint">Di sini hanya ada listing orang lain. Listing buatanmu ada di tab
+                    <a href="{% url 'seed_exchange:list' %}?tab=mine"
+                       hx-get="{% url 'seed_exchange:list' %}?tab=mine" hx-target="#seed-tabs-content" hx-swap="innerHTML" hx-push-url="true"><strong>Listing Saya</strong></a>.</p>
+            {% endif %}
         </div>
     {% endfor %}
     {% if show_add_card %}

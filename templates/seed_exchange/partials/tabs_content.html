@@ -1,0 +1,175 @@
+{% load static %}
+{% comment %}
+  Seed Exchange list: hidden params + filters + 3 section tabs + panel.
+  Swapped as a whole via HTMX (#seed-tabs-content) so the active filter state,
+  the tab state and the content always stay in sync.
+{% endcomment %}
+
+{# Hidden params: let the search box keep the current tab and filters. #}
+<div id="seed-active-params" hidden>
+    <input type="hidden" name="tab" value="{{ active_tab }}">
+    {% for k, v in active.items %}{% if v and k != 'tab' and k != 'q' %}
+    <input type="hidden" name="{{ k }}" value="{{ v }}">
+    {% endif %}{% endfor %}
+</div>
+
+{# --- Filter Dropdowns (above the sections, below the search bar) --- #}
+<form id="seed-filter-form" class="seed-filters" method="get" action="{% url 'seed_exchange:list' %}"
+      hx-get="{% url 'seed_exchange:list' %}" hx-target="#seed-tabs-content" hx-swap="innerHTML"
+      hx-push-url="true" hx-trigger="submit">
+    {% for dd in dropdowns %}
+    <div class="dropdown">
+        <button type="button" class="seed-filter dropdown-toggle{% if dd.is_active %} seed-filter--active{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ dd.current_label }}
+            {% if dd.is_active %}
+            <span class="seed-filter-dot" aria-hidden="true"></span>
+            {% endif %}
+        </button>
+        <ul class="dropdown-menu seed-menu">
+            {% for item in dd.items %}
+            <li>
+                <a class="dropdown-item seed-menu-item{% if item.selected %} active{% endif %}"
+                   href="{{ item.url }}"
+                   hx-get="{{ item.url }}"
+                   hx-target="#seed-tabs-content"
+                   hx-swap="innerHTML"
+                   hx-push-url="true"
+                   hx-trigger="click">
+                    {{ item.label }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+
+    <a class="seed-filter-reset" href="{% url 'seed_exchange:list' %}?tab={{ active_tab }}"
+       hx-get="{% url 'seed_exchange:list' %}?tab={{ active_tab }}"
+       hx-target="#seed-tabs-content" hx-swap="innerHTML" hx-push-url="true"
+       aria-label="Reset filter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        Reset
+    </a>
+</form>
+
+{# --- Section Tabs: three mascots, no container, just the garden crew --- #}
+<nav class="seed-tabs" role="tablist" aria-label="Bagian Seed Exchange">
+    <a role="tab" id="tab-mine" class="seed-tab seed-tab--mine{% if active_tab == 'mine' %} active{% endif %}"
+       href="{% url 'seed_exchange:list' %}?tab=mine{% if tab_qs %}&{{ tab_qs }}{% endif %}"
+       hx-get="{% url 'seed_exchange:list' %}?tab=mine{% if tab_qs %}&{{ tab_qs }}{% endif %}"
+       hx-target="#seed-tabs-content" hx-swap="innerHTML" hx-push-url="true"
+       aria-selected="{% if active_tab == 'mine' %}true{% else %}false{% endif %}"
+       aria-controls="panel-mine">
+        <span class="seed-tab-plot">
+            <img class="seed-tab-mascot" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" width="96" height="96" loading="lazy" decoding="async">
+        </span>
+        <span class="seed-tab-copy">
+            <span class="seed-tab-line">
+                <span class="seed-tab-label">Listing Saya</span>
+                <span class="seed-tab-count">{{ my_listings|length }}</span>
+            </span>
+            <span class="seed-tab-sub">bibit, stek &amp; biji</span>
+        </span>
+    </a>
+    <a role="tab" id="tab-bookings" class="seed-tab seed-tab--bookings{% if active_tab == 'bookings' %} active{% endif %}"
+       href="{% url 'seed_exchange:list' %}?tab=bookings{% if tab_qs %}&{{ tab_qs }}{% endif %}"
+       hx-get="{% url 'seed_exchange:list' %}?tab=bookings{% if tab_qs %}&{{ tab_qs }}{% endif %}"
+       hx-target="#seed-tabs-content" hx-swap="innerHTML" hx-push-url="true"
+       aria-selected="{% if active_tab == 'bookings' %}true{% else %}false{% endif %}"
+       aria-controls="panel-bookings">
+        <span class="seed-tab-plot">
+            <img class="seed-tab-mascot" src="{% static 'img/mascot/petak-mencatat.png' %}" alt="" width="96" height="96" loading="lazy" decoding="async">
+        </span>
+        <span class="seed-tab-copy">
+            <span class="seed-tab-line">
+                <span class="seed-tab-label">Booking Saya</span>
+                <span class="seed-tab-count">{{ my_bookings|length }}</span>
+            </span>
+            <span class="seed-tab-sub">status tukarmu</span>
+        </span>
+    </a>
+    <a role="tab" id="tab-browse" class="seed-tab seed-tab--browse{% if active_tab == 'browse' %} active{% endif %}"
+       href="{% url 'seed_exchange:list' %}?tab=browse{% if tab_qs %}&{{ tab_qs }}{% endif %}"
+       hx-get="{% url 'seed_exchange:list' %}?tab=browse{% if tab_qs %}&{{ tab_qs }}{% endif %}"
+       hx-target="#seed-tabs-content" hx-swap="innerHTML" hx-push-url="true"
+       aria-selected="{% if active_tab == 'browse' %}true{% else %}false{% endif %}"
+       aria-controls="panel-browse">
+        <span class="seed-tab-plot">
+            <img class="seed-tab-mascot" src="{% static 'img/mascot/petak-penasaran.png' %}" alt="" width="96" height="96" loading="lazy" decoding="async">
+        </span>
+        <span class="seed-tab-copy">
+            <span class="seed-tab-line">
+                <span class="seed-tab-label">Jelajahi</span>
+                <span class="seed-tab-count">{{ listings|length }}</span>
+            </span>
+            <span class="seed-tab-sub">kebun tetangga</span>
+        </span>
+    </a>
+</nav>
+
+{# --- Section Panels --- #}
+{% if active_tab == 'mine' %}
+<div id="panel-mine" class="seed-tab-panel active" role="tabpanel" aria-labelledby="tab-mine">
+    <header class="seed-section-header">
+        <h2 class="seed-section-title">Listing Saya</h2>
+        <span class="seed-count" aria-live="polite">{{ my_listings|length }} listing</span>
+    </header>
+
+    {% if my_listings %}
+        <div id="seed-mine" class="seed-grid">
+            {% for listing in my_listings %}
+                {% include "seed_exchange/partials/card.html" with listing=listing %}
+            {% endfor %}
+            <a href="{% url 'seed_exchange:create' %}" class="seed-card seed-card-add">
+                <span class="seed-add-icon" aria-hidden="true">
+                    <svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                </span>
+                <span class="seed-add-label">Buat Listing Baru</span>
+            </a>
+        </div>
+    {% else %}
+        <div class="seed-grid">
+            <div class="seed-empty">
+                <img class="seed-empty-mascot" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" aria-hidden="true" width="160" height="160">
+                <p class="seed-empty-title"><strong>Belum ada listing yang cocok.</strong></p>
+                <p class="seed-empty-desc">Bagikan bibit atau tanaman berlebihmu, atau ubah filter di atas.</p>
+                <a href="{% url 'seed_exchange:create' %}" class="btn-seed-primary btn-seed-sm">+ Buat Listing</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% elif active_tab == 'bookings' %}
+<div id="panel-bookings" class="seed-tab-panel active" role="tabpanel" aria-labelledby="tab-bookings">
+    <header class="seed-section-header">
+        <h2 class="seed-section-title">Booking Saya</h2>
+        <span class="seed-count" aria-live="polite">{{ my_bookings|length }} booking</span>
+    </header>
+
+    {% if my_bookings %}
+        <div id="seed-bookings" class="seed-grid">
+            {% for listing in my_bookings %}
+                {% include "seed_exchange/partials/card.html" with listing=listing %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="seed-grid">
+            <div class="seed-empty">
+                <img class="seed-empty-mascot" src="{% static 'img/mascot/tukar-bibit.png' %}" alt="" aria-hidden="true" width="160" height="160">
+                <p class="seed-empty-title"><strong>Belum ada booking yang cocok.</strong></p>
+                <p class="seed-empty-desc">Jelajahi listing orang lain dan booking yang menarik, atau ubah filter di atas.</p>
+                <a href="{% url 'seed_exchange:list' %}?tab=browse{% if tab_qs %}&{{ tab_qs }}{% endif %}" class="btn-seed-primary btn-seed-sm">Jelajahi Listing</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% else %}
+<div id="panel-browse" class="seed-tab-panel active" role="tabpanel" aria-labelledby="tab-browse">
+    <header class="seed-section-header">
+        <h2 class="seed-section-title">Jelajahi Listing</h2>
+        <span class="seed-count" aria-live="polite">{{ listings|length }} listing ditemukan</span>
+    </header>
+    {% include "seed_exchange/partials/cards.html" with listings=listings grid_id="seed-grid" %}
+</div>
+{% endif %}

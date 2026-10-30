@@ -1,0 +1,16 @@
+<div class="modal-header">
+    <h2 class="modal-title" id="care-modal-title">{% if is_edit %}Edit Care Task{% else %}Tambah Care Task{% endif %}</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+</div>
+<form method="post" class="care-form"
+      hx-post="{% if is_edit %}{% url 'smart_care:update' task.pk %}{% else %}{% url 'smart_care:create' %}{% endif %}"
+      hx-target="#care-modal-content" hx-swap="innerHTML" novalidate>
+    <div class="modal-body">
+        {% csrf_token %}
+        {% include "smart_care/_task_fields.html" %}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="care-btn care-btn-ghost ep-btn ep-btn--ghost" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" class="care-btn care-btn-primary ep-btn ep-btn--primary">{% if is_edit %}Simpan Perubahan{% else %}Tambah Task{% endif %}</button>
+    </div>
+</form>

@@ -12,6 +12,15 @@ staticfiles/
 # Ignore all markdown docs except README
 *.md
 !README.md
+# ...and the GitHub templates
+!.github/*.md
 
 # Media uploads
 media/
+
+# Local QA artifacts
+.coverage*
+!.coveragerc
+qa/artifacts/
+
+node_modules/

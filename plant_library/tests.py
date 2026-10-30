@@ -6,6 +6,7 @@ from django.test import TestCase, override_settings
 from django.urls import include, path, reverse
 from my_ecopatch.models import EcoPatch
 from plant_library.forms import PlantForm
+from plant_library.apps import seed_initial_plants
 from plant_library.models import Plant
 from plant_library.views import parse_query_keywords
 
@@ -13,6 +14,7 @@ from plant_library.views import parse_query_keywords
 test_urlpatterns = [
     path('', include('main.urls')),
     path('plants/', include('plant_library.urls')),
+    path('smart-care/', include('smart_care.urls')),
     path('my-ecopatch/', include('my_ecopatch.urls')),
     path('journal/', include('garden_journal.urls')),
     path('seed-exchange/', include('seed_exchange.urls')),
@@ -83,6 +85,18 @@ class PlantCRUDTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Kemangi')
         self.assertContains(response, 'Ocimum basilicum')
+
+    def test_plant_detail_shows_the_matching_ecopatch_name(self):
+        patch = EcoPatch.objects.create(
+            owner=self.regular_user,
+            name='Balkon Kosan',
+            space_type=EcoPatch.SpaceType.BALCONY,
+            sunlight=EcoPatch.Sunlight.FULL,
+            city='Depok',
+        )
+        self.client.login(username='regular_user', password='password123')
+        response = self.client.get(reverse('plant_library:plant_detail', args=[self.plant.pk]))
+        self.assertContains(response, f'Cocok untuk {patch.name}')
 
     def test_create_access_control(self):
         create_url = reverse('plant_library:plant_create')
@@ -259,6 +273,46 @@ class ParseQueryKeywordsTests(TestCase):
         self.assertEqual(filters.get("difficulty"), "easy")
         self.assertEqual(remaining, "")
 
+    def test_keyword_trailing_punctuation_is_ignored(self):
+        """'mudah/' tetap terbaca sebagai filter mudah, bukan nama tanaman."""
+        filters, remaining = parse_query_keywords("mudah/")
+        self.assertEqual(filters.get("difficulty"), "easy")
+        self.assertEqual(remaining, "")
+
+    def test_a_question_leaves_only_the_filters(self):
+        """Kata tanya bukan nama tanaman: kalimat saran dari landing page hanya menghasilkan filter."""
+        cases = {
+            "Tanaman apa yang mudah dirawat di dalam ruangan?": {"difficulty": "easy", "indoor_outdoor": "indoor"},
+            "Tanaman apa yang cocok di luar ruangan dengan cahaya penuh?": {"indoor_outdoor": "outdoor", "sunlight": "full"},
+            "Tanaman apa yang teduh dan mudah dirawat?": {"sunlight": "shade", "difficulty": "easy"},
+            "Apa tanaman outdoor dengan perawatan sedang?": {"indoor_outdoor": "outdoor", "difficulty": "medium"},
+        }
+        for question, expected in cases.items():
+            with self.subTest(question=question):
+                filters, remaining = parse_query_keywords(question)
+                self.assertEqual(filters, expected)
+                self.assertEqual(remaining, "")
+
+    def test_a_real_plant_name_in_a_question_is_still_searched(self):
+        filters, remaining = parse_query_keywords("Apa bayam cocok di luar ruangan?")
+        self.assertEqual(filters, {"indoor_outdoor": "outdoor"})
+        self.assertEqual(remaining, "bayam")
+
+    def test_keyword_watering_phrases(self):
+        """Uji berbagai kata kunci watering dipetakan ke level penyiraman yang benar."""
+        cases = {
+            "tanaman yang jarang disiram": {"watering": "low"},
+            "tahan lupa disiram": {"watering": "low"},
+            "sering disiram": {"watering": "high"},
+            "penyiraman sedang": {"watering": "moderate"},
+            "siram sedang": {"watering": "moderate"},
+        }
+        for phrase, expected in cases.items():
+            with self.subTest(phrase=phrase):
+                filters, remaining = parse_query_keywords(phrase)
+                self.assertEqual(filters, expected)
+                self.assertEqual(remaining, "")
+
 
 @override_settings(ROOT_URLCONF=__name__)
 class KeywordSearchIntegrationTests(TestCase):
@@ -300,6 +354,14 @@ class KeywordSearchIntegrationTests(TestCase):
         self.assertContains(res, "Bayam Merah")
         self.assertNotContains(res, "Pakis Haji")
 
+    def test_view_keyword_with_trailing_slash_still_filters(self):
+        """'mudah/' tidak boleh dianggap nama tanaman; filter mudah tetap jalan."""
+        url = reverse("plant_library:plant_list") + "?q=mudah%2F"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertNotContains(res, "Bayam Merah")
+
     def test_view_mixed_easy_bayam(self):
         """'mudah bayam' → filter difficulty=easy DAN nama mengandung 'bayam'.
         Bayam Merah adalah hard, jadi tidak muncul; Pakis Haji ada nama 'bayam'? Tidak.
@@ -310,3 +372,121 @@ class KeywordSearchIntegrationTests(TestCase):
         # Pakis Haji lolos easy tapi namanya tidak mengandung 'bayam',
         # Bayam Merah mengandung 'bayam' tapi difficulty=hard → 0 hasil
         self.assertContains(res, "Tidak ada tanaman ditemukan")
+
+    def test_view_watering_filter_param(self):
+        """GET ?watering=low menyaring tanaman watering=low."""
+        url = reverse("plant_library:plant_list") + "?watering=low"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertNotContains(res, "Bayam Merah")
+
+    def test_view_watering_filter_invalid_param_is_ignored(self):
+        """GET ?watering=invalid_value diabaikan dan tidak menyebabkan error 500."""
+        url = reverse("plant_library:plant_list") + "?watering=banjir"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertContains(res, "Bayam Merah")
+
+    def test_view_watering_via_search_keyword(self):
+        """Pencarian teks 'jarang disiram' otomatis memicu filter watering=low."""
+        url = reverse("plant_library:plant_list") + "?q=jarang+disiram"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertNotContains(res, "Bayam Merah")
+
+    def test_view_watering_and_sunlight_combined(self):
+        """Filter kombinasi watering dan sunlight keduanya dipertahankan."""
+        url = reverse("plant_library:plant_list") + "?watering=low&sunlight=shade"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Pakis Haji")
+        self.assertNotContains(res, "Bayam Merah")
+
+
+class WateringIntervalTests(TestCase):
+    """Plant.watering_interval_days: the days between two waterings that Smart Care schedules by."""
+
+    def plant(self, watering, **kwargs):
+        values = dict(
+            name='Uji', category=Plant.Category.VEGETABLES, sunlight=Plant.Sunlight.FULL, watering=watering,
+            difficulty=Plant.Difficulty.EASY, indoor_outdoor=Plant.Placement.OUTDOOR,
+            space_requirement=Plant.SpaceRequirement.BALCONY,
+        )
+        values.update(kwargs)
+        return Plant(**values)
+
+    def test_base_days_follow_how_often_the_plant_wants_water(self):
+        self.assertEqual(self.plant(Plant.Watering.HIGH).watering_interval_days, 1)
+        self.assertEqual(self.plant(Plant.Watering.MODERATE).watering_interval_days, 2)
+        self.assertEqual(self.plant(Plant.Watering.LOW).watering_interval_days, 4)
+
+    def test_an_indoor_plant_dries_slower(self):
+        indoor = self.plant(Plant.Watering.MODERATE, indoor_outdoor=Plant.Placement.INDOOR)
+        self.assertEqual(indoor.watering_interval_days, 3)
+
+    def test_an_indoor_low_light_plant_dries_slower_even_when_placement_is_both(self):
+        plant = self.plant(Plant.Watering.MODERATE, category=Plant.Category.INDOOR_LOW_LIGHT,
+                           indoor_outdoor=Plant.Placement.BOTH)
+        self.assertEqual(plant.watering_interval_days, 3)
+
+    def test_indoor_and_low_light_count_once_together(self):
+        plant = self.plant(Plant.Watering.MODERATE, category=Plant.Category.INDOOR_LOW_LIGHT,
+                           indoor_outdoor=Plant.Placement.INDOOR)
+        self.assertEqual(plant.watering_interval_days, 3)
+
+    def test_shade_adds_a_day(self):
+        shade = self.plant(Plant.Watering.LOW, sunlight=Plant.Sunlight.SHADE)
+        self.assertEqual(shade.watering_interval_days, 5)
+
+    def test_never_longer_than_six_days(self):
+        plant = self.plant(Plant.Watering.LOW, sunlight=Plant.Sunlight.SHADE,
+                           indoor_outdoor=Plant.Placement.INDOOR)
+        self.assertEqual(plant.watering_interval_days, 6)
+
+    def test_the_seed_plants_spread_from_daily_to_every_six_days(self):
+        from django.core.management import call_command
+        call_command('loaddata', 'initial_plants', verbosity=0)
+        days = {plant.name: plant.watering_interval_days for plant in Plant.objects.all()}
+        self.assertEqual(days['Bayam Hijau'], 1)
+        self.assertEqual(days['Cabai Rawit Merah'], 2)
+        self.assertEqual(days['Rosemary'], 4)
+        self.assertEqual(days['Lidah Mertua (Sansevieria)'], 6)
+        self.assertTrue(all(1 <= value <= 6 for value in days.values()))
+
+
+class SeedOnMigrateTests(TestCase):
+    """The starter plants load after `migrate` only when asked for, and only into an empty library."""
+
+    def test_off_by_default_so_nothing_is_added(self):
+        seed_initial_plants()
+        self.assertEqual(Plant.objects.count(), 0)
+
+    @override_settings(SEED_PLANTS_ON_MIGRATE=True)
+    def test_an_empty_library_gets_the_starter_plants(self):
+        seed_initial_plants()
+        self.assertEqual(Plant.objects.count(), 60)
+
+    @override_settings(SEED_PLANTS_ON_MIGRATE=True)
+    def test_running_it_again_adds_nothing(self):
+        seed_initial_plants()
+        seed_initial_plants()
+        self.assertEqual(Plant.objects.count(), 60)
+
+    @override_settings(SEED_PLANTS_ON_MIGRATE=True)
+    def test_a_library_that_already_has_plants_is_left_alone(self):
+        Plant.objects.create(
+            name='Tanamanku', category=Plant.Category.HERBS, sunlight=Plant.Sunlight.FULL,
+            watering=Plant.Watering.MODERATE, difficulty=Plant.Difficulty.EASY,
+            indoor_outdoor=Plant.Placement.BOTH, space_requirement=Plant.SpaceRequirement.ANY,
+        )
+        seed_initial_plants()
+        self.assertEqual(list(Plant.objects.values_list('name', flat=True)), ['Tanamanku'])
+
+    @override_settings(SEED_PLANTS_ON_MIGRATE=True)
+    def test_it_runs_after_migrate_itself(self):
+        from django.core.management import call_command
+        call_command('migrate', verbosity=0)
+        self.assertEqual(Plant.objects.count(), 60)

@@ -75,6 +75,12 @@ class SeedExchange(models.Model):
         default=Status.AVAILABLE,
     )
     description = models.TextField(blank=True, default='')
+    image = models.ImageField(
+        upload_to='seed_exchange/',
+        blank=False,
+        null=True,
+        help_text='Foto bibit/tanaman (wajib, JPG/PNG, maks 5 MB)',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -83,3 +89,13 @@ class SeedExchange(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def owner_contact(self):
+        """The owner's contact as it is on their profile right now.
+
+        The contact saved with the listing is only a copy (kept in step with the profile), so it
+        is the fallback for an owner whose profile no longer has one.
+        """
+        profile = getattr(self.user, 'profile', None)
+        return (profile.contact_text() if profile else '') or self.contact

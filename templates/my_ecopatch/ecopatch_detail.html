@@ -1,28 +1,39 @@
-{% extends "base.html" %}
+{% extends "my_ecopatch/base.html" %}
 {% block title %}{{ patch.name }} - EcoPatch{% endblock %}
 
-{% block content %}
-<section class="patch-page">
-    <a class="patch-back" href="{% url 'my_ecopatch:list' %}">&larr; Semua EcoPatch</a>
-
-    <header class="patch-page-head">
-        <div>
+{% block garden_content %}
+<header class="mep-band">
+    <div class="mep-band-inner">
+        <div class="mep-band-copy">
+            <a class="patch-back" href="{% url 'my_ecopatch:list' %}">&larr; Semua EcoPatch</a>
             <h1 class="patch-page-title">{{ patch.name }}</h1>
-            <p class="patch-page-lead">{{ patch.city }}</p>
+            <ul class="mep-facts" aria-label="Tentang ruang ini">
+                <li>{{ patch.get_space_type_display }}</li>
+                {% if patch.size_m2 %}<li>{{ patch.size_m2 }} m²</li>{% endif %}
+                {% if patch.sunlight %}<li>{{ patch.get_sunlight_display }}</li>{% endif %}
+                {% if patch.city %}<li>{{ patch.city }}</li>{% endif %}
+            </ul>
+            {% if patch.goal %}<p class="mep-goal"><strong>Tujuan:</strong> {{ patch.goal }}</p>{% endif %}
+            <div class="mep-band-actions">
+                <a href="#add-plant" class="btn btn-success">+ Tambah tanaman</a>
+                <a href="{% url 'plant_library:plant_recommend' %}?patch={{ patch.pk }}" class="btn btn-outline-success">Rekomendasi tanaman</a>
+            </div>
         </div>
-        <div class="patch-head-actions">
-            <a href="{% url 'my_ecopatch:update' patch.pk %}" class="btn btn-outline-success">Ubah</a>
-            <a href="{% url 'my_ecopatch:delete' patch.pk %}" class="btn btn-outline-success patch-btn-danger">Hapus</a>
+        <div class="mep-band-side">
+            {% include "my_ecopatch/_garden_bed.html" %}
+            <p class="mep-band-links">
+                <a href="{% url 'my_ecopatch:update' patch.pk %}">Ubah</a>
+                <span aria-hidden="true">&middot;</span>
+                <a href="{% url 'my_ecopatch:delete' patch.pk %}" class="mep-link-danger" data-confirm-delete data-confirm-title="Hapus EcoPatch?" data-confirm-name="{{ patch.name }}" data-confirm-note="Semua tanaman di dalamnya{% with jcount=patch.journals.count %}{% if jcount %} dan {{ jcount }} catatan jurnal{% endif %}{% endwith %} ikut terhapus. Tindakan ini tidak bisa dibatalkan." data-confirm-yes="Ya, hapus EcoPatch">Hapus</a>
+            </p>
         </div>
-    </header>
+    </div>
+</header>
 
-    <dl class="patch-info">
-        <div><dt>Tipe ruang</dt><dd>{{ patch.get_space_type_display }}</dd></div>
-        <div><dt>Ukuran</dt><dd>{% if patch.size_m2 %}{{ patch.size_m2 }} m²{% else %}-{% endif %}</dd></div>
-        <div><dt>Sinar matahari</dt><dd>{% if patch.sunlight %}{{ patch.get_sunlight_display }}{% else %}-{% endif %}</dd></div>
-        <div class="patch-info-wide"><dt>Tujuan berkebun</dt><dd>{% if patch.goal %}{{ patch.goal }}{% else %}-{% endif %}</dd></div>
-    </dl>
-
+<div class="mep-content">
+<section class="patch-page">
+    <p id="mep-network" role="alert" class="patch-error" tabindex="-1"></p>
     {% include "my_ecopatch/_plants_panel.html" %}
 </section>
+</div>
 {% endblock %}

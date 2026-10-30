@@ -1,9 +1,12 @@
-{% load static socialaccount %}<!doctype html>
+{% load static asset_version socialaccount %}<!doctype html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Masuk · EcoPatch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'auth/login.css' %}">
+<link rel="icon" type="image/svg+xml" href="{% static_v 'img/logo.svg' %}">
+<link rel="stylesheet" href="{% static_v 'auth/login.css' %}">
+{% include "_splash_head.html" %}
 </head><body>
+{% include "_splash.html" %}
 <main class="stage">
   <section class="card" aria-labelledby="h">
     <div class="form-side">
@@ -12,7 +15,7 @@
       <div class="hello">        {% include "main/_auth_mascot.html" %}
         <div><h1 id="h">Halo lagi!</h1><p class="sub">Masuk untuk melanjutkan merawat kebunmu.</p></div></div>
       {% for message in messages %}<div class="alert{% if message.tags == 'success' or message.tags == 'info' %} ok{% endif %}" role="status"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/></svg><span>{{ message }}</span></div>{% endfor %}
-      <div class="alert" id="alert" role="alert"{% if form.errors %} data-server="1"{% else %} hidden{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/></svg><span id="alerttxt">{% if form.errors %}Username atau password salah. Coba lagi.{% endif %}</span></div>
+      <div class="alert" id="alert" role="alert"{% if form.errors %} data-server="1"{% else %} hidden{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/></svg><span id="alerttxt">{% if locked %}Terlalu banyak percobaan masuk. Tunggu beberapa menit, lalu coba lagi.{% elif form.errors %}Username atau password salah. Coba lagi.{% endif %}</span></div>
       <form id="f" novalidate method="post" action="">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
@@ -37,4 +40,4 @@
     {% include "main/_auth_panel.html" %}
   </section>
 </main>
-<script src="{% static 'auth/login.js' %}"></script></body></html>
+<script src="{% static_v 'auth/login.js' %}"></script></body></html>

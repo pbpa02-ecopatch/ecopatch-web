@@ -1,12 +1,39 @@
-<article class="seed-card" id="seed-card-{{ listing.pk }}">
-    <h3 class="seed-card-title">
-        <a href="{% url 'seed_exchange:detail' listing.pk %}">{{ listing.title }}</a>
-    </h3>
-    <div class="seed-badges">
-        <span class="seed-pill seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
-        <span class="seed-pill seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
+{% load static %}
+<article class="seed-card" id="seed-card-{{ listing.pk }}" style="--seed-i: {{ forloop.counter0|default:0 }}">
+    {% if listing.image %}
+    <div class="seed-card-media">
+        <img src="{{ listing.image.url }}" alt="" loading="lazy" decoding="async"
+             data-placeholder="{% static 'plant_library/img/plant-placeholder.svg' %}"
+             onerror="this.onerror=null; this.src=this.dataset.placeholder; this.classList.add('seed-card-ph');">
     </div>
-    <p class="seed-card-city">{{ listing.city }}{% if listing.plant_name %} &middot; {{ listing.plant_name }}{% endif %}</p>
-    <p class="seed-card-desc">{{ listing.description|default:"Belum ada deskripsi."|truncatewords:20 }}</p>
-    <p class="seed-card-meta">oleh {{ listing.user.username }} &middot; {{ listing.get_item_type_display }}{% if user.is_authenticated and listing.reserved_by_id == user.id and listing.status == 'requested' %} &middot; <strong>menunggu konfirmasi</strong>{% elif user.is_authenticated and listing.reserved_by_id == user.id and listing.status == 'reserved' %} &middot; <strong>sudah diterima</strong>{% endif %}</p>
+    {% else %}
+    <div class="seed-card-media seed-card-media--empty">
+        <img class="seed-card-ph" src="{% static 'plant_library/img/plant-placeholder.svg' %}"
+             alt="Ilustrasi {{ listing.title }}" loading="lazy" decoding="async">
+    </div>
+    {% endif %}
+    <div class="seed-card-body">
+        <h3 class="seed-card-title">
+            <a href="{% url 'seed_exchange:detail' listing.pk %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}">{{ listing.title }}</a>
+        </h3>
+        <p class="seed-card-location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z"/>
+                <circle cx="12" cy="10" r="2.4"/>
+            </svg>
+            <span>{{ listing.city }}{% if listing.plant_name %} &middot; {{ listing.plant_name }}{% endif %}</span>
+        </p>
+        <div class="seed-badges">
+            <span class="seed-pill seed-pill--type">{{ listing.get_item_type_display }}</span>
+            <span class="seed-pill seed-pill--{{ listing.transaction_type }}">{{ listing.get_transaction_type_display }}</span>
+        </div>
+        <p class="seed-card-desc">{{ listing.description|default:"Belum ada deskripsi."|truncatewords:20 }}</p>
+        <div class="seed-card-foot">
+            <span class="seed-card-owner">
+                <span class="seed-avatar" aria-hidden="true">{{ listing.user.username|first|upper }}</span>
+                <span>@{{ listing.user.username }}</span>
+            </span>
+            <span class="seed-status seed-pill--{{ listing.status }}">{{ listing.get_status_display }}</span>
+        </div>
+    </div>
 </article>
