@@ -155,7 +155,7 @@ body.has-sidebar:has(.seed-page) .site-footer {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    min-height: clamp(390px, 44vh, 460px);
+    min-height: var(--hero-band-min);
     border-bottom: 3px solid #d8c48d;
     background:
         radial-gradient(70% 90% at 84% 4%, rgba(255, 216, 120, 0.62) 0%, rgba(255, 216, 120, 0) 64%),
