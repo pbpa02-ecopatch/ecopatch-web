@@ -30,8 +30,8 @@
                 {% include "my_ecopatch/_form_field.html" %}
             {% endfor %}
             <div class="patch-form-actions">
-                <a class="btn btn-outline-success" href="{% if patch %}{% url 'my_ecopatch:detail' patch.pk %}{% else %}{% url 'my_ecopatch:list' %}{% endif %}">Batal</a>
                 <button type="submit" class="btn btn-success">{% if patch %}Simpan perubahan{% else %}Buat EcoPatch{% endif %}</button>
+                <a class="btn btn-outline-success" href="{% if patch %}{% url 'my_ecopatch:detail' patch.pk %}{% else %}{% url 'my_ecopatch:list' %}{% endif %}">Batal</a>
             </div>
         </form>
     </div>
