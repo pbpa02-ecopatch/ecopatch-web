@@ -137,11 +137,15 @@ body.has-sidebar.care-body .site-footer {
 /* ---------------------------------------------------------------- Scene: the sky, the city, the balcony */
 .care-scene {
     --fh: clamp(190px, 32vh, 260px);
+    /* The drawing is scaled to the scene's width (viewBox 1200x280, "slice"), so on a wide, short screen it is taller than
+       --fh and its top rail (212 of the 280 units above the floor) climbs into the words. --rail is the room the drawing
+       really takes: 212/1200 of the width, or --fh when that is more. The pets, the bubble and the sky still use --fh. */
+    --rail: max(var(--fh), 17.7vw);
     position: relative;
     overflow: hidden;
     min-height: clamp(430px, 56vh, 520px);
-    /* the balcony owns the bottom --fh of the scene: the words stay above the railing, however short the screen is */
-    padding-bottom: calc(var(--fh) + 24px);
+    /* the balcony owns the bottom --rail of the scene: the words stay above the railing, however short the screen is */
+    padding-bottom: calc(var(--rail) + 24px);
     isolation: isolate;
 }
 
@@ -1932,7 +1936,7 @@ body.has-sidebar.care-body .site-footer {
         display: flex;
         flex-direction: column;
         min-height: 0;
-        padding-bottom: calc(var(--fh) + 12px);
+        padding-bottom: calc(var(--rail) + 12px);
     }
 
     .care-bubble {
