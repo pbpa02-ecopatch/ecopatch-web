@@ -6,6 +6,12 @@
   'use strict';
   var pop = null, opener = null;
 
+  // A <dialog> opened with showModal() sits in the top layer, above everything on <body>: from inside the plant
+  // pop-up the list and the toast have to be put in the dialog itself to be seen.
+  function host(from) {
+    return (from && from.closest('dialog[open]')) || document.body;
+  }
+
   function close(refocus) {
     if (pop) { pop.remove(); pop = null; }
     if (opener) {
@@ -32,7 +38,7 @@
     pop.setAttribute('role', 'dialog');
     pop.setAttribute('aria-label', 'Tambah ke EcoPatch');
     pop.appendChild(tpl.content.cloneNode(true));
-    document.body.appendChild(pop);
+    host(button).appendChild(pop);
     opener = button;
     button.setAttribute('aria-expanded', 'true');
     place(button);
@@ -40,7 +46,7 @@
     if (first) first.focus({ preventScroll: true });
   }
 
-  function toast(message, url) {
+  function toast(message, url, where) {
     var box = document.createElement('div');
     box.className = 'site-toasts';
     box.setAttribute('role', 'status');
@@ -58,7 +64,7 @@
       item.appendChild(link);
     }
     box.appendChild(item);
-    document.body.appendChild(box);
+    (where || document.body).appendChild(box);
     setTimeout(function () { box.remove(); }, 5200);
   }
 
@@ -83,6 +89,7 @@
     var form = event.target;
     if (!pop || !pop.contains(form)) return;
     event.preventDefault();
+    var where = host(pop);
     fetch(form.action, {
       method: 'POST',
       body: new FormData(form),
@@ -93,10 +100,10 @@
       return response.json();
     }).then(function (data) {
       close(true);
-      toast(data.message, data.url);
+      toast(data.message, data.url, where);
     }).catch(function () {
       close(true);
-      toast('Belum tersimpan. Coba lagi, atau buka halaman EcoPatch-nya.', '');
+      toast('Belum tersimpan. Coba lagi, atau buka halaman EcoPatch-nya.', '', where);
     });
   });
 }());
