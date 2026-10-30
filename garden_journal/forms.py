@@ -45,22 +45,22 @@ class GardenJournalForm(ModelForm):
         }
         widgets = {
             "plant_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "cth: Monstera Deliciosa", "required": "required"}
+                attrs={"class": "form-control ep-input", "placeholder": "cth: Monstera Deliciosa", "required": "required"}
             ),
             "ecopatch_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "cth: Balkon Timur"}
+                attrs={"class": "form-control ep-input", "placeholder": "cth: Balkon Timur"}
             ),
-            "date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
-            "title": forms.TextInput(attrs={"class": "form-control", "placeholder": "cth: Daun baru mulai merekah"}),
+            "date": forms.DateInput(attrs={"type": "date", "class": "form-control ep-input"}),
+            "title": forms.TextInput(attrs={"class": "form-control ep-input", "placeholder": "cth: Daun baru mulai merekah"}),
             "plant_condition": forms.Select(attrs={"class": "form-select"}),
             "plant_height": forms.NumberInput(
-                attrs={"class": "form-control", "step": "0.1", "min": "0", "placeholder": "cm"}
+                attrs={"class": "form-control ep-input", "step": "0.1", "min": "0", "placeholder": "cm"}
             ),
             "image": forms.FileInput(attrs={"class": "form-control", "accept": "image/*"}),
             "cover_pattern": forms.RadioSelect(attrs={"class": "cover-radio-input"}),
             "cover_color": forms.HiddenInput(attrs={"id": "id_cover_color"}),
             "notes": forms.Textarea(
-                attrs={"rows": 4, "class": "form-control", "placeholder": "Ada daun baru? Perlu disiram? Tulis apa yang kamu lihat hari ini."}
+                attrs={"rows": 4, "class": "form-control ep-input", "placeholder": "Ada daun baru? Perlu disiram? Tulis apa yang kamu lihat hari ini."}
             ),
         }
 

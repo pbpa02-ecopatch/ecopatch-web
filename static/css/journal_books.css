@@ -4339,6 +4339,20 @@ body.has-sidebar.journal-body {
     box-shadow: 0 26px 50px -34px rgba(23, 48, 31, 0.5) !important;
 }
 
+/* The entry form uses the same 960px shell as the rest of the app. */
+.journal-form-shell {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.journal-form-shell > .col-12 {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .journal-form-page .card-body {
     padding: 26px 30px 28px !important;
 }
