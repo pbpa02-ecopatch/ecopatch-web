@@ -32,6 +32,12 @@ class UserForm(forms.ModelForm):
         self.fields['email'].error_messages['required'] = 'Email wajib diisi.'
         self.fields['email'].error_messages['invalid'] = 'Format email belum benar. Contoh: nama@gmail.com'
 
+    def clean_email(self):
+        email = self.cleaned_data['email'].strip()
+        if get_user_model().objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('Email ini sudah dipakai akun lain.')
+        return email
+
 
 class AvatarForm(forms.ModelForm):
     """Foto profil: unggahan atau salah satu wajah Petak, tidak keduanya."""

@@ -1,0 +1,21 @@
+[run]
+branch = True
+source = main,my_ecopatch,plant_library,smart_care,garden_journal,seed_exchange,ecopatch_project
+omit =
+    */migrations/*
+    */tests.py
+    */test_*.py
+    */asgi.py
+    */wsgi.py
+
+[report]
+show_missing = True
+skip_empty = True
+precision = 2
+fail_under = 91
+
+[html]
+directory = qa/artifacts/htmlcov
+
+[json]
+output = qa/artifacts/coverage.json

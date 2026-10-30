@@ -636,7 +636,14 @@ body.has-sidebar.pf-body {
     color: var(--pf-muted);
 }
 
+.pf-pwrow > span {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .pf-eye {
+    flex-shrink: 0;
     height: 40px;
     padding: 0 16px;
     border: 1.5px solid var(--pf-brand-strong);

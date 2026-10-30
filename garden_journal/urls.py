@@ -6,7 +6,7 @@ app_name = "garden_journal"
 
 urlpatterns = [
     path("", views.journal_list, name="list"),
-    path("plant/<str:plant_name>/", views.plant_journal_history, name="plant_history"),
+    path("plant/<path:plant_name>/", views.plant_journal_history, name="plant_history"),
     path("create/", views.journal_create, name="create"),
     path("<int:pk>/", views.journal_detail, name="detail"),
     path("<int:pk>/edit/", views.journal_edit, name="edit"),

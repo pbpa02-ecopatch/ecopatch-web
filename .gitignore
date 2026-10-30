@@ -17,3 +17,10 @@ staticfiles/
 
 # Media uploads
 media/
+
+# Local QA artifacts
+.coverage*
+!.coveragerc
+qa/artifacts/
+
+node_modules/

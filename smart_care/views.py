@@ -55,7 +55,10 @@ def _parse_date(value):
     # Nilai ?date= berasal dari URL, jadi bisa berisi apa saja. fromisoformat menolak format yang salah dengan
     # ValueError; hasilnya None dan pemanggil jatuh ke hari ini, bukan error 500.
     try:
-        return date.fromisoformat(value) if value else None
+        selected = date.fromisoformat(value) if value else None
+        if selected and date.min + timedelta(days=7) <= selected <= date.max - timedelta(days=7):
+            return selected
+        return None
     except ValueError:
         return None
 

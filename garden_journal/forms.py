@@ -5,7 +5,26 @@ from my_ecopatch.models import EcoPatch
 from .models import GardenJournal
 
 
+MAX_JOURNAL_IMAGE_BYTES = 5 * 1024 * 1024
+
+
+class JournalImageField(forms.ImageField):
+    """Apply the same size and image-byte validation to both upload paths."""
+
+    def clean(self, data, initial=None):
+        if data and getattr(data, 'size', 0) > MAX_JOURNAL_IMAGE_BYTES:
+            raise forms.ValidationError('Ukuran foto maksimal 5 MB.')
+        return super().clean(data, initial)
+
+
 class GardenJournalForm(ModelForm):
+    image = JournalImageField(
+        required=False,
+        label="Foto Tanaman (Opsional)",
+        help_text="Upload foto perkembangan tanaman hari ini (JPG/PNG).",
+        widget=forms.FileInput(attrs={"class": "form-control", "accept": "image/*"}),
+    )
+
     ecopatch = forms.ModelChoiceField(
         queryset=EcoPatch.objects.all(),
         required=False,
@@ -69,6 +88,7 @@ class GardenJournalForm(ModelForm):
         self.user = user
         if user is not None:
             self.fields["ecopatch"].queryset = EcoPatch.objects.filter(owner=user)
+        self.fields["plant_name"].required = True
         self.fields["ecopatch"].required = False
         self.fields["ecopatch_name"].required = False
 

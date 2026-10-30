@@ -416,7 +416,7 @@ def plant_recommend(request):
 
     patch_id = request.GET.get('patch')
     selected_patch = None
-    if patch_id:
+    if patch_id and patch_id.isdecimal() and len(patch_id) <= 19:
         selected_patch = user_patches.filter(pk=patch_id).first()
 
     if not selected_patch:
