@@ -9,8 +9,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static_v 'landing/landing.css' %}">
+{% include "_splash_head.html" %}
 </head>
 <body data-plant-library-url="{{ plant_library_url }}">
+{% include "_splash.html" %}
 
 {% if messages %}<div class="flash" role="status">{% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}</div>{% endif %}
 <header class="nav" id="nav">

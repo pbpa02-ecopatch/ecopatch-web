@@ -1639,38 +1639,13 @@ body.has-sidebar.care-body {
     }
 }
 
-/* ---------------------------------------------------------------- Footer: a tip and the small print */
+/* ---------------------------------------------------------------- Footer: the small print */
 .care-foot {
     display: flex;
     flex-direction: column;
     gap: 14px;
     margin-top: auto;
     padding: 36px 0 28px;
-}
-
-.care-tip {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    max-width: 60ch;
-    margin: 0;
-    font-weight: 600;
-}
-
-.care-tip svg {
-    width: 1.25em;
-    height: 1.25em;
-    margin-top: 3px;
-    fill: none;
-    stroke: var(--care-brand-strong);
-    stroke-width: 1.9;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.care-tip b {
-    font-family: var(--care-display);
-    font-weight: 800;
 }
 
 .care-foot-row {
@@ -2057,5 +2032,29 @@ body.has-sidebar.care-body {
 
     .care-floor .care-pg {
         transform: none;
+    }
+}
+
+/* While the forecast is on its way the scene text gets the same hopping dots as the welcome screen */
+.care-scene.is-loading #care-condition::after,
+.care-scene.is-loading #care-bubble-text::after {
+    content: "...";
+    display: inline-block;
+    width: 1.2em;
+    overflow: hidden;
+    vertical-align: bottom;
+    animation: care-ellipsis 1.2s steps(4, end) infinite;
+}
+
+@keyframes care-ellipsis {
+    from { width: 0; }
+    to { width: 1.2em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .care-scene.is-loading #care-condition::after,
+    .care-scene.is-loading #care-bubble-text::after {
+        animation: none;
+        width: 1.2em;
     }
 }
