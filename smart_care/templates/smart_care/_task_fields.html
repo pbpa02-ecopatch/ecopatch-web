@@ -13,6 +13,38 @@
             {% if field.help_text %}<small class="care-help ep-help">{{ field.help_text }}</small>{% endif %}
             {% if field.errors %}<div class="care-field-error ep-error">{{ field.errors|join:" " }}</div>{% endif %}
         </div>
+    {% elif field.name == "patch_plant" or field.name == "task_type" %}
+        <div class="care-field ep-field ep-select{% if field.errors %} has-error{% endif %}"
+             data-ep-select
+             data-placeholder="{% if field.name == 'patch_plant' %}Pilih tanaman…{% else %}Pilih jenis tugas…{% endif %}">
+            <label class="ep-label" for="{{ field.id_for_label }}">
+                {{ field.label }}
+                {% if field.field.required %}<span class="ep-required" aria-hidden="true">*</span>{% else %}<span class="ep-optional">(opsional)</span>{% endif %}
+            </label>
+            <input type="hidden" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}">
+            <div class="ep-select-control">
+                <button type="button" class="ep-select-btn" data-ep-toggle aria-expanded="false" aria-haspopup="listbox">
+                    <span class="ep-select-value ep-placeholder" data-ep-label>{% if field.name == 'patch_plant' %}Pilih tanaman…{% else %}Pilih jenis tugas…{% endif %}</span>
+                    <svg class="ep-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <ul class="ep-menu ep-select-menu" data-ep-menu hidden role="listbox">
+                    {% if field.name == "patch_plant" %}
+                        {% for plant, label in field.field.choices %}
+                            {% if plant %}<li><button type="button" class="ep-menu-item" role="option" data-ep-value="{{ plant }}">{{ label }}</button></li>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% for value, label in field.field.choices %}
+                            {% if value %}<li><button type="button" class="ep-menu-item" role="option" data-ep-value="{{ value }}">{{ label }}</button></li>{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+            {% if field.errors %}
+                <div class="care-field-error ep-error">{{ field.errors|join:" " }}</div>
+            {% elif field.help_text %}
+                <small class="care-help ep-help">{{ field.help_text }}</small>
+            {% endif %}
+        </div>
     {% else %}
         <div class="care-field ep-field{% if field.errors %} has-error{% endif %}">
             <label class="ep-label" for="{{ field.id_for_label }}">
