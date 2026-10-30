@@ -48,7 +48,7 @@ empty,_=EcoPatch.objects.get_or_create(owner=u,name='Teras Rumah',defaults={'spa
 foreign,_=EcoPatch.objects.get_or_create(owner=other,name='Kebun Pengguna Lain',defaults={'space_type':'small_yard','city':'Bogor'})
 buf=io.BytesIO();Image.new('RGB',(320,240),'#73a965').save(buf,'PNG');image=buf.getvalue()
 j,_=GardenJournal.objects.get_or_create(user=u,plant_name='Bayam',title='Daun baru mulai tumbuh',defaults={'ecopatch':patch,'ecopatch_name':patch.name,'date':timezone.localdate(),'notes':'Ada daun baru. Penyiraman dilakukan pagi hari.','plant_height':12,'plant_condition':'healthy'})
-if not j.image:j.image.save('audit-plant.png',ContentFile(image))
+j.image.save('audit-plant.png',ContentFile(image))
 GardenJournal.objects.get_or_create(user=u,plant_name='Bayam',title='Hari pertama menanam',defaults={'ecopatch':patch,'date':timezone.localdate()-timedelta(days=2),'notes':'Mulai menanam di balkon.','plant_height':7,'plant_condition':'healthy'})
 pp=patch.plants.get(plant=plants[0])
 task,_=CareTask.objects.get_or_create(user=u,patch_plant=pp,task_type='watering',due_date=timezone.localdate(),defaults={'plant_name':'Bayam','notes':'Periksa kelembapan tanah.'})
@@ -62,5 +62,6 @@ manifest={'cookie':c.cookies['sessionid'].value,'patch':patch.pk,'empty_patch':e
 # Keep browser tests deterministic and avoid real network calls to the weather provider.
 import smart_care.views as careviews
 careviews.weather_payload=lambda *args,**kwargs:{'available':False,'city':'Depok','message':'Cuaca tidak tersedia untuk audit lokal.'}
-print('AUDIT_READY http://127.0.0.1:8765',flush=True)
-call_command('runserver','127.0.0.1:8765',use_reloader=False,verbosity=0)
+port=os.environ.get('AUDIT_PORT','8765')
+print('AUDIT_READY http://127.0.0.1:'+port,flush=True)
+call_command('runserver','127.0.0.1:'+port,use_reloader=False,verbosity=0)

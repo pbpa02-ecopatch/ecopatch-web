@@ -54,4 +54,5 @@ const guests=[['home','/'],['login','/login/'],['register','/register/'],['reset
  await browser.close();
  const bad=results.filter(r=>r.overflow||r.error||r.errors?.length||r.status>=400);
  console.log(JSON.stringify({phase,checks:results.length,failures:bad.length,output:path.join(out,phase+'-layout.json')}));
+ if(bad.length)process.exitCode=1;
 })().catch(e=>{console.error(e);process.exit(1)});
