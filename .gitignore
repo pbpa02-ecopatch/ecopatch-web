@@ -20,3 +20,5 @@ media/
 .coverage*
 !.coveragerc
 qa/artifacts/
+
+node_modules/

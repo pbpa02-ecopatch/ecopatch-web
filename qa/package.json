@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Browser regression checks for EcoPatch",
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
