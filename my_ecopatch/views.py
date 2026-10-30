@@ -167,10 +167,18 @@ def ecopatch_list(request):
         plants=Sum('quantity'), growing=Sum('quantity', filter=Q(status=PatchPlant.Status.GROWING)),
     )
     patch_count = owned.count()
+    # A few real Plant Library plants to preview under the patch grid.
+    suggested_plants = list(Plant.objects.filter(difficulty=Plant.Difficulty.EASY)[:3])
+    if len(suggested_plants) < 3:
+        chosen = [plant.pk for plant in suggested_plants]
+        suggested_plants += list(
+            Plant.objects.exclude(pk__in=chosen)[:3 - len(suggested_plants)]
+        )
     return render(request, 'my_ecopatch/ecopatch_list.html', {
         'patches': patches, 'patch_count': patch_count,
         'scene_plots': _scene_plots(owned), 'scene_more': max(patch_count - SCENE_PLOT_LIMIT, 0),
         'plant_count': totals['plants'] or 0, 'growing_count': totals['growing'] or 0,
+        'suggested_plants': suggested_plants,
         'query': query, 'selected_space': space, 'space_choices': EcoPatch.SpaceType.choices,
         'selected_space_label': dict(EcoPatch.SpaceType.choices).get(space, ''),
     })

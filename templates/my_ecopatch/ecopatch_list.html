@@ -97,7 +97,35 @@
     <a class="mep-add-bed" href="{% url 'my_ecopatch:create' %}"><span aria-hidden="true">+</span><strong>Buat EcoPatch Baru</strong><small>Sediakan ruang untuk tumbuh</small></a>
   </div>
   </div>
-  <aside class="mep-seed-tray"><div><p class="mep-eyebrow">BIBIT IDE</p><h2 class="patch-section-title">Selanjutnya, mau menanam apa?</h2><p>Temukan tanaman yang cocok, lalu tambahkan ke kebun pilihanmu.</p></div><a class="btn btn-outline-success" href="{% url 'plant_library:plant_list' %}">Jelajahi Plant Library ↗</a></aside>
+  <aside class="mep-seed-tray mep-plant-preview" aria-label="Ide tanaman dari Plant Library">
+    <div class="mep-plant-preview-head">
+      <p class="mep-eyebrow">IDE TANAMAN</p>
+      <h2 class="patch-section-title">Selanjutnya, mau menanam apa?</h2>
+      <p>Temukan tanaman yang cocok, lalu tambahkan ke kebun pilihanmu.</p>
+    </div>
+    {% if suggested_plants %}
+    <div class="mep-plant-preview-grid">
+      {% for plant in suggested_plants %}
+      <a class="mep-plant-card" href="{% url 'plant_library:plant_detail' plant.pk %}">
+        <span class="mep-plant-card-media">
+          {% if plant.image_url %}
+            <img src="{{ plant.image_url }}" alt="{{ plant.name }}" loading="lazy" decoding="async"
+                 data-placeholder="{% static 'plant_library/img/plant-placeholder.svg' %}"
+                 onerror="this.onerror=null; this.src=this.dataset.placeholder;">
+          {% else %}
+            <img src="{% static 'plant_library/img/plant-placeholder.svg' %}" alt="Ilustrasi {{ plant.name }}" loading="lazy" decoding="async">
+          {% endif %}
+        </span>
+        <span class="mep-plant-card-body">
+          <strong>{{ plant.name }}</strong>
+          <small>{{ plant.get_category_display }} · {{ plant.get_difficulty_display }}</small>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <a class="btn btn-outline-success" href="{% url 'plant_library:plant_list' %}">Jelajahi Plant Library ↗</a>
+  </aside>
   <p class="patch-help">Jumlah tanaman menjumlahkan kuantitas. Entri dan label status menghitung catatan tanaman, termasuk Planned dan Removed.</p>
 </div>
 <script>
