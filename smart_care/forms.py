@@ -13,6 +13,7 @@ class CareTaskForm(forms.ModelForm):
         queryset=PatchPlant.objects.none(),
         label="Tanaman",
         empty_label="Pilih tanaman",
+        widget=forms.Select(attrs={"class": "ep-input"}),
         error_messages={
             "required": "Pilih tanamannya dulu.",
             "invalid_choice": "Tanaman ini tidak tersedia. Pilih dari daftar.",
@@ -32,8 +33,9 @@ class CareTaskForm(forms.ModelForm):
             "due_date": {"required": "Isi tanggalnya dulu.", "invalid": "Tanggalnya belum benar."},
         }
         widgets = {
-            "due_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
-            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": "Opsional, misalnya: pakai pupuk kompos cair"}),
+            "task_type": forms.Select(attrs={"class": "ep-input"}),
+            "due_date": forms.DateInput(attrs={"type": "date", "class": "ep-input"}, format="%Y-%m-%d"),
+            "notes": forms.Textarea(attrs={"rows": 3, "class": "ep-input", "placeholder": "Opsional, misalnya: pakai pupuk kompos cair"}),
         }
 
     def __init__(self, *args, user, **kwargs):
