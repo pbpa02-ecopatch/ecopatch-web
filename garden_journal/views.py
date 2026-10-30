@@ -610,7 +610,7 @@ def journal_delete(request, pk):
     plant_name = journal.plant_name
     journal.delete()
     messages.success(request, f"Catatan '{title}' berhasil dihapus.")
-    if GardenJournal.objects.filter(user=request.user, plant_name=plant_name).exists():
+    if plant_name and GardenJournal.objects.filter(user=request.user, plant_name=plant_name).exists():
         return redirect("garden_journal:plant_history", plant_name=plant_name)
     return redirect("garden_journal:list")
 
