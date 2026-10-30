@@ -27,7 +27,6 @@ from .plant_source import (
 )
 from .suggestions import INTERVALS, HistoryEntry, build_suggestions, plant_status
 from .tests import API_RESPONSE, fake_response
-from .views import GENERAL_TIPS, TIPS
 from .weather import WeatherUnavailable
 
 FAST_HASHER = override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
@@ -860,7 +859,7 @@ class CareViewTests(CacheClearingTestCase):
 
     def test_smart_care_has_its_own_light_footer_and_the_other_modules_keep_the_shared_one(self):
         own = self.client.get(reverse("smart_care:list"))
-        self.assertContains(own, "Tip Petak")
+        self.assertNotContains(own, "Tip Petak")
         self.assertNotContains(own, "site-footer")
         self.assertNotContains(own, '<main class="container')  # the scene needs the full width
         other = self.client.get(reverse("my_ecopatch:list"))
@@ -869,20 +868,13 @@ class CareViewTests(CacheClearingTestCase):
         self.assertNotContains(other, "Tip Petak")
         self.assertNotContains(other, "care-foot")
 
-    def test_the_footer_is_just_the_tip_and_the_copyright_with_no_placeholder_links(self):
+    def test_the_footer_is_just_the_copyright_with_no_placeholder_links(self):
         html = self.client.get(reverse("smart_care:list")).content.decode()
         foot = html.split('<footer class="care-foot">', 1)[1].split("</footer>", 1)[0]
         self.assertIn("EcoPatch", foot)
         self.assertIn("Small Spaces, Greener Living.", foot)
         self.assertNotIn("<a ", foot)
         self.assertNotIn('href="#"', foot)
-
-    def test_the_tip_follows_the_day(self):
-        make_patch_plant(self.user, "Cabai")  # with plants the whole list is in play (without them, only the general tips)
-        for day in (date(2026, 11, 2), date(2026, 11, 3)):
-            tip = self.client.get(reverse("smart_care:list"), {"date": day.isoformat()}).context["tip"]
-            self.assertEqual(tip, TIPS[day.day % len(TIPS)])
-        self.assertNotEqual(TIPS[2], TIPS[3])
 
     def test_only_the_coming_week_counts_as_a_forecast(self):
         today = timezone.localdate()
@@ -1315,16 +1307,6 @@ class SuggestionViewTests(CacheClearingTestCase):
         make_patch_plant(newbie, "Bayam", status="planned")
         response = self.client.get(reverse("smart_care:list"))
         self.assertFalse(response.context["has_plants"])
-
-    def test_without_plants_the_tip_is_a_general_one_on_every_day(self):
-        self._login_without_plants()
-        for offset in range(7):
-            day = (timezone.localdate() + timedelta(days=offset)).isoformat()
-            tip = self.client.get(reverse("smart_care:list"), {"date": day}).context["tip"]
-            self.assertIn(tip, GENERAL_TIPS)
-        self.assertEqual(len(GENERAL_TIPS), 3)
-        for tip in GENERAL_TIPS:
-            self.assertNotRegex(tip.lower(), r"basil|pot|tunas|daun")
 
     def test_a_suggestion_row_knows_its_date_so_the_forecast_advice_can_find_it(self):
         response = self.client.get(reverse("smart_care:list"))
