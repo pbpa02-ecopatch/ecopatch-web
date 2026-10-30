@@ -416,7 +416,8 @@ ecopatch-web/
 
 Pengembangan EcoPatch melibatkan beberapa tools berbasis AI untuk implementasi, debugging, perancangan antarmuka, dan dokumentasi. **Seluruh anggota tim menggunakan AI**, tetapi pola dan tingkat pemakaiannya berbeda antaranggota dan antarmodul. Keputusan tentang perilaku fitur, aturan akses, desain, dan perubahan yang dipertahankan tetap dibuat anggota tim.
 
-### 1. Tools AI dan perannya
+<details>
+<summary><b>1. Tools AI dan perannya</b></summary>
 
 | Tool | Digunakan oleh | Peran umum |
 | --- | --- | --- |
@@ -428,6 +429,7 @@ Pengembangan EcoPatch melibatkan beberapa tools berbasis AI untuk implementasi, 
 | ChatGPT / GPT | Percakapan proyek | Penjelasan konsep Django, pembacaan kode, debugging, pengujian, dan penyusunan dokumentasi |
 
 Pemetaan tools per anggota berasal dari laporan tim. Rincian tugas per anggota untuk Claude Code, Codex, Antigravity, dan Figma Agent belum terdokumentasi.
+</details>
 
 <details>
 <summary><b>2. Area yang dibantu AI</b></summary>
