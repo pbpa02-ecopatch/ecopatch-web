@@ -9,7 +9,7 @@
 ![Deployed](https://img.shields.io/badge/PWS-live-2fbf5c?style=for-the-badge)
 ![PBP](https://img.shields.io/badge/PBP_Gasal-2026%2F2027-8a6a4a?style=for-the-badge)
 
-**[Coba langsung](https://salwa-alifia-eco-patch.pws.cs.ui.ac.id/)** &nbsp;·&nbsp; **[Desain di Figma](https://www.figma.com/design/oIDtpZy29QWfdudwhSFNb5/Untitled?node-id=0-1&t=LuUIQFP3lihxES26-1)** &nbsp;·&nbsp; **[Jalankan lokal](#-jalankan-di-lokal)** &nbsp;·&nbsp; **[Tim](#-tim)**
+**[Coba langsung](https://salwa-alifia-eco-patch.pws.cs.ui.ac.id/)** &nbsp;·&nbsp; **[Video demo](https://www.youtube.com/watch?v=61f5_0513Ck)** &nbsp;·&nbsp; **[Desain di Figma](https://www.figma.com/design/oIDtpZy29QWfdudwhSFNb5/Untitled?node-id=0-1&t=LuUIQFP3lihxES26-1)** &nbsp;·&nbsp; **[Jalankan lokal](#-jalankan-di-lokal)** &nbsp;·&nbsp; **[Tim](#-tim)**
 
 </div>
 
@@ -18,6 +18,57 @@
 Balkon dua meter, kamar kos dengan satu jendela, atau rooftop yang kepanasan: semuanya bisa jadi kebun. **EcoPatch** membantu kamu tahu tanaman apa yang cocok, kapan harus menyiram, sudah sejauh apa tumbuhnya, dan ke mana bibit sisa bisa pergi. Semuanya ada di satu tempat.
 
 Ini adalah website EcoPatch yang dibangun dengan **Django** untuk Proyek Tengah Semester mata kuliah Pemrograman Berbasis Platform (PBP) Gasal 2026/2027. Subtema kami adalah **Sustainable Living › Urban Farming**: ruang sempit tetap bisa dihijaukan, dan bibit tidak terbuang karena bisa dipakai orang lain lewat Seed Exchange.
+
+---
+
+## Demo
+
+> **Lihat langsung.** Satu alur dari memilih tanaman sampai membagikan bibit, satu klip per fitur, direkam dari aplikasi yang berjalan dengan data contoh. Video lengkapnya ada di [YouTube](https://www.youtube.com/watch?v=61f5_0513Ck).
+
+<!--
+  Klip di bawah adalah GIF di docs/readme/demo-*.gif, direkam dari aplikasi lokal dengan akun dan database demo terpisah.
+  Untuk menggantinya, simpan GIF baru dengan nama yang sama (usahakan di bawah 1,5 MB per file).
+  Pakai akun demo. Jangan sampai terlihat: file .env, token, password, atau nomor kontak asli.
+-->
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/readme/demo-1-cari.gif" alt="Plant Library: pencarian dan filter tanaman" width="100%"/>
+      <b>① Cari tanaman</b><br/>
+      <sub>Cari berdasarkan nama, saring dengan cahaya, ruang, dan tingkat kesulitan. Klik kartu untuk membuka detailnya dalam pop-up.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/readme/demo-2-tambah.gif" alt="Detail tanaman dengan tombol Tambah ke EcoPatch" width="100%"/>
+      <b>② Tambah ke EcoPatch</b><br/>
+      <sub>Dari kartu atau pop-up tanaman, tekan tambah dan pilih kebunmu. Tiap kebun menunjukkan seberapa cocok tanamannya, tanpa pindah halaman.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/readme/demo-3-kebun.gif" alt="My EcoPatch: detail kebun dan tahap tumbuh tanaman" width="100%"/>
+      <b>③ Kelola kebun</b><br/>
+      <sub>Buat EcoPatch dengan jenis ruang, cahaya, dan kota. Atur tanamannya dari bibit sampai tumbuh.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/readme/demo-4-rawat.gif" alt="Smart Care: cuaca hari ini dan saran perawatan" width="100%"/>
+      <b>④ Rawat sesuai cuaca</b><br/>
+      <sub>Smart Care membaca prakiraan Open-Meteo untuk kotamu dan memberi saran per tanaman. Centang tugas yang sudah selesai.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/readme/demo-5-jurnal.gif" alt="Garden Journal: buku catatan per tanaman" width="100%"/>
+      <b>⑤ Catat perkembangan</b><br/>
+      <sub>Garden Journal menyimpan catatan dan foto tiap tanaman dalam satu timeline.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/readme/demo-6-bibit.gif" alt="Seed Exchange: jelajahi listing bibit dan stek" width="100%"/>
+      <b>⑥ Bagikan bibit</b><br/>
+      <sub>Pasang bibit atau stek berlebih di Seed Exchange, lalu orang lain memesannya. Statusnya tersedia, diminta, dipesan, sampai selesai.</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -358,6 +409,114 @@ ecopatch-web/
 **Branch utama:** `main`, `dev`
 
 **Branch modul:** `feature/plant-library` · `feature/my-ecopatch` · `feature/smart-care` · `feature/garden-journal` · `feature/seed-exchange`
+
+---
+
+## Pengungkapan Penggunaan AI
+
+Pengembangan EcoPatch melibatkan beberapa tools berbasis AI untuk implementasi, debugging, perancangan antarmuka, dan dokumentasi. **Seluruh anggota tim menggunakan AI**, tetapi pola dan tingkat pemakaiannya berbeda antaranggota dan antarmodul. Keputusan tentang perilaku fitur, aturan akses, desain, dan perubahan yang dipertahankan tetap dibuat anggota tim.
+
+### 1. Tools AI dan perannya
+
+| Tool | Digunakan oleh | Peran umum |
+| --- | --- | --- |
+| Claude Code | Nurul Fikryati Bena, Salwa Alifia Putri | Asisten coding berbasis agent |
+| Codex | Haikal Rafka A Rahman | Asisten coding berbasis agent |
+| Google Antigravity | Nur Azizah | Asisten coding berbasis agent |
+| Figma Agent | Salwa Alifia Putri, Nur Azizah | Dukungan perancangan antarmuka |
+| DeepSeek | Rheina Uliana | Asisten coding berbasis agent |
+| ChatGPT / GPT | Percakapan proyek | Penjelasan konsep Django, pembacaan kode, debugging, pengujian, dan penyusunan dokumentasi |
+
+Pemetaan tools per anggota berasal dari laporan tim. Rincian tugas per anggota untuk Claude Code, Codex, Antigravity, dan Figma Agent belum terdokumentasi.
+
+<details>
+<summary><b>2. Area yang dibantu AI</b></summary>
+
+<br>
+
+Tabel ini memetakan aktivitas yang tercatat. Bukan berarti seluruh kode pada area tersebut ditulis AI.
+
+| Area | Contoh aktivitas |
+| --- | --- |
+| Django backend | Model, view, form, routing, query, dan validasi. Pada Seed Exchange: pemisahan listing milik pengguna, booking, dan listing yang dapat dijelajahi, serta alur status listing. |
+| Authentication & authorization | Pembatasan aksi berdasarkan login, kepemilikan listing, dan status transaksi (misalnya edit atau hapus hanya untuk pemilik). |
+| Templates & HTMX | Partial, kartu, form, halaman detail, empty state, konfirmasi hapus, serta perpindahan tab, filter, dan pencarian yang mempertahankan parameter URL. |
+| CSS, responsive UI & aset visual | Tombol, spacing, dropdown, tampilan mobile, ilustrasi dan maskot SVG beranimasi, serta sistem form bersama lintas modul. |
+| Testing & debugging | Menelusuri error, menjalankan Django checks dan test, iterasi setelah perilaku diperiksa di browser. |
+| Git, integrasi & CI/CD | Branch, commit, merge, push, dan pull sesuai instruksi anggota. Workflow GitHub Actions untuk tes dan deploy ke PWS. |
+| Pembelajaran & dokumentasi | Penjelasan konsep Django, HTMX, permission, dan testing, serta penyusunan dokumentasi proyek. |
+
+</details>
+
+<details>
+<summary><b>3. Strategi prompt dan alur kerja</b></summary>
+
+<br>
+
+| Strategi | Contoh |
+| --- | --- |
+| Konteks proyek lebih dulu | Agent diminta membaca README dan struktur proyek sebelum mengubah modul yang ditugaskan. Repo ini punya `AGENTS.md` yang memuat pembagian modul dan larangan (jangan ubah modul orang lain, jangan push ke `main`, jangan menaruh rahasia di kode). |
+| Instruksi perilaku spesifik | Memisahkan "Listing Saya", "Booking Saya", dan "Jelajahi". Kontak pemilik baru tampil setelah booking diterima. |
+| Screenshot dan referensi visual | Melampirkan screenshot, lalu menunjuk elemen yang ukurannya, posisinya, atau spacing-nya belum sesuai. |
+| Iterasi dari hasil pengujian | Melaporkan gejala (tab berpindah sendiri, filter hilang), lalu meminta revisi terarah setelah dicek ulang di browser. |
+| Rencana dulu, baru eksekusi | Untuk perubahan besar, agent diminta menyusun rencana yang disetujui anggota sebelum mengubah kode. |
+| Batasan ruang lingkup | Menetapkan branch kerja (memakai branch lama, bukan membuat yang baru), melarang mengubah file bersama, dan menetapkan format pesan commit. Commit dan push hanya dilakukan setelah diminta. |
+| Meminta opsi dan penjelasan | Meminta pilihan refactor atau fitur kecil, penjelasan potongan kode, dan verifikasi temuan code review sebelum memutuskan apa yang diterapkan. |
+
+Strategi di atas didukung oleh sesi Rheina (DeepSeek) dan sesi Salwa (Claude Code), dan tidak otomatis berlaku untuk semua anggota.
+
+</details>
+
+<details>
+<summary><b>4. Review manusia, implementasi, dan verifikasi</b></summary>
+
+<br>
+
+- **Pemeriksaan di browser:** anggota membandingkan halaman dengan perilaku dan referensi yang diharapkan, lalu melaporkan perbedaannya.
+- **Koreksi lanjutan:** ketika tab, filter, layout, atau ilustrasi belum sesuai, anggota menyampaikan gejala spesifik dan mengarahkan revisi berikutnya.
+- **Keputusan ruang lingkup:** anggota menentukan branch, file yang boleh diubah, dan perubahan yang dipertahankan atau dikembalikan. Contohnya, hardening terhadap injection yang sempat ditambahkan dibatalkan dan hanya penanganan edge case yang dipertahankan.
+- **Pencocokan dengan proyek:** hasil perubahan dicocokkan dengan model, nama field, URL, dan konvensi aplikasi.
+- **Pengujian otomatis:** suite penuh repo (565 test, dijalankan pada branch deploy pada 30 Oktober 2026) lulus, dan `makemigrations --check` bersih. Keduanya juga dijalankan otomatis oleh GitHub Actions di setiap pull request. Sesi Rheina sebelumnya melaporkan 315 test lulus dan `manage.py check` tanpa masalah. Angka itu berasal dari laporan sesi dan tidak dijalankan ulang secara independen.
+- **Review sebelum merge:** perubahan masuk lewat pull request dengan template yang memuat daftar centang tes, tampilan di ponsel, dan review oleh anggota lain.
+
+Test otomatis tidak menggantikan pemeriksaan visual dan pengujian interaksi di browser. Riwayat commit juga tidak membuktikan apakah suatu baris ditulis manusia atau AI, karena sebagian commit dijalankan agent atas instruksi anggota.
+
+</details>
+
+### 5. Keterbatasan AI dan perbaikan manual
+
+Ini bagian yang paling penting: AI tidak selalu benar, dan perbaikannya dikerjakan atau diverifikasi manusia.
+
+| Temuan | Cara diketahui dan tindakan korektif |
+| --- | --- |
+| Agent membuat branch baru padahal diminta memakai branch fitur yang ada (sesi Rheina) | Anggota memeriksa branch aktif dan mengoreksi instruksi. Pekerjaan dilanjutkan di branch yang dimaksud. |
+| Tab dan filter tidak konsisten: pilihan filter hilang atau tab berpindah sendiri (sesi Rheina) | Ditemukan lewat pengujian di browser. Agent menelusuri parameter request dan HTMX. Akar masalahnya adalah parameter `tab` duplikat dan `hx-include` yang membawa nilai lama. |
+| Agent mengubah file bersama (`base.html`, `custom.css`) di luar modul yang diminta (sesi Rheina) | Anggota menemukannya dan meminta perubahan dikembalikan. Di-revert dengan `git checkout`. |
+| Perubahan tidak tampil di browser (sesi Rheina) | Ternyata proses `runserver` lama masih berjalan. Server dimulai ulang. Masalahnya ada di lingkungan, bukan kode. |
+| Maskot dan layout belum sesuai referensi (sesi Rheina) | Dibandingkan dengan screenshot dan direvisi beberapa kali, termasuk dibuat ulang sebagai SVG beranimasi. |
+| Nested quotes pada atribut template menimbulkan error (sesi Rheina) | Handler diubah memakai atribut `data-` dan kutip tunggal. |
+| Agent menyatakan working tree "bersih" padahal ada perubahan yang belum di-commit (sesi Salwa, Claude Code) | Terlihat dari keluaran `git status` pada langkah berikutnya. Klaimnya dikoreksi, dan perubahan itu diperiksa satu per satu sebelum di-commit. Pelajarannya: status Git dibaca dari keluaran perintah, bukan dari ingatan agent. |
+| Agent menyarankan memuat 60 tanaman lewat Terminal PWS (`loaddata`), padahal terminal itu tidak bisa dipakai untuk itu (sesi Salwa, Claude Code) | Anggota menunjukkan bahwa langkah itu tidak berjalan di PWS. Solusinya diganti: seed otomatis setelah `migrate` yang diaktifkan variabel lingkungan `SEED_PLANTS_ON_MIGRATE`, lengkap dengan tes. |
+| Pada header Smart Care, ikon cuaca digambar ulang sebagai SVG baru padahal fungsi `icon()` yang sama sudah ada, dan jarak ganda muncul di baris lokasi (sesi Salwa, Claude Code) | Ditemukan lewat review kode dan screenshot hasil render. Ikon diganti dengan memakai ulang `icon()`, jarak diperbaiki, dan tesnya disesuaikan. |
+| Workflow CI yang dipakai ulang oleh workflow deploy dapat membatalkan CI dari push yang sama, sehingga deploy bisa terlewat (sesi Salwa, Claude Code) | Ditemukan saat meninjau ulang file sebelum dijalankan. Nama grup concurrency diubah memakai nama workflow. Perilaku akhirnya dibuktikan di GitHub: tes lalu deploy ke PWS berhasil. |
+| Draf README awal menautkan dokumen yang diabaikan Git (`PRD.md`, `AGENTS.md`, dan lain-lain), sehingga tautannya mati di GitHub (sesi Salwa, Claude Code) | Ditemukan saat README diperiksa di salinan bersih repo. Tautan itu dihapus. |
+
+Pelajaran utamanya: instruksi eksplisit tetap perlu diperiksa pada hasil aktual, perubahan lokal dapat berdampak lintas modul, kecocokan visual membutuhkan penilaian manusia, dan klaim agent tentang keadaan repo atau server harus dicek ulang.
+
+<details>
+<summary><b>6. Log percakapan dan dokumentasi prompt</b></summary>
+
+<br>
+
+| Materi | Status |
+| --- | --- |
+| Percakapan teknis ChatGPT | Dirujuk sebagai dasar klaim pembelajaran dan dokumentasi. Tidak ada tautan yang dibagikan |
+| Log Claude Code, Codex, Antigravity, DeepSeek, Figma Agent | Tidak tersedia |
+| Riwayat Git repository | Tersedia, menunjukkan waktu perubahan |
+
+</details>
+
+> AI digunakan sebagai alat bantu untuk eksplorasi, implementasi, debugging, dan dokumentasi. Kesesuaian dengan requirement, keputusan desain dan arsitektur, pemeriksaan hasil, serta tanggung jawab atas kualitas akhir tetap berada pada anggota tim.
 
 ---
 
