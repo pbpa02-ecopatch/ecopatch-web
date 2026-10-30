@@ -879,13 +879,13 @@
 
 .open-book {
     display: flex;
-    background: #fbf6ec;
+    background: #ffffff;
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md), 0 15px 35px rgba(34, 48, 31, 0.1);
+    box-shadow: 0 14px 34px rgba(60, 45, 20, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
     position: relative;
     overflow: hidden;
     min-height: clamp(340px, 30vw, 400px);
-    border: 1.5px solid var(--border);
+    border: 1.5px solid #e2d4b2;
     align-items: stretch;
 }
 
@@ -894,13 +894,13 @@
 .book-page-left {
     flex: 1 1 50%;
     width: 50%;
-    background: #faf5ea;
+    background: #fffdf9;
     padding: 2.5rem 2.8rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
-    box-shadow: inset -15px 0 25px -15px rgba(0, 0, 0, 0.08);
+    box-shadow: inset -15px 0 25px -15px rgba(0, 0, 0, 0.06);
     border-right: 1px solid #e8dbbe;
     box-sizing: border-box;
 }
@@ -2389,12 +2389,19 @@
    ========================================================= */
 
 .summary-mini-card {
-    background: #ffffff;
-    border: 1.5px solid #efe4cb;
+    background: #fbf7ee;
+    border: 1.5px solid #eadcb9;
     border-radius: 10px;
     padding: 8px 6px;
     text-align: center;
     box-shadow: 0 1px 3px rgba(34, 48, 31, 0.04);
+}
+
+.book-page-left #left-ecopatch-badge,
+.book-page-left #left-total {
+    background: #fbf7ee !important;
+    border-color: #eadcb9 !important;
+    color: #4a5c48 !important;
 }
 
 .summary-mini-card .stat-num {
@@ -2434,7 +2441,7 @@
 }
 
 .book-toc-item {
-    border: 1.5px solid transparent;
+    border: 1.5px solid #eadcb9;
     border-radius: 8px;
     padding: 6px 10px;
     transition: all 0.15s ease;
@@ -2443,12 +2450,12 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 4px;
-    background: rgba(255, 255, 255, 0.65);
+    background: #fbf7ee;
 }
 
 .book-toc-item:hover {
-    background: rgba(70, 104, 66, 0.06);
-    border-color: rgba(70, 104, 66, 0.25);
+    background: #f3ecd9;
+    border-color: #387638;
 }
 
 .book-toc-item.active {
