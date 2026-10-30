@@ -10,7 +10,9 @@
     dialog = document.createElement('dialog');
     dialog.className = 'plant-modal';
     dialog.setAttribute('aria-labelledby', 'plant-modal-title');
-    dialog.innerHTML = '<button type="button" class="plant-modal-x" data-plant-close aria-label="Tutup">&times;</button><div class="plant-modal-body"></div>';
+    dialog.innerHTML = '<button type="button" class="plant-modal-x" data-plant-close aria-label="Tutup">'
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'
+      + '</button><div class="plant-modal-body"></div>';
     // inside .plant-page so the page's colour variables reach the sheet
     (document.querySelector('.plant-page') || document.body).appendChild(dialog);
     dialog.addEventListener('click', function (event) {

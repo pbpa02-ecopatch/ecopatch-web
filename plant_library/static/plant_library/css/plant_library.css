@@ -2077,6 +2077,7 @@ body.has-sidebar .plant-page {
     position: relative;
     isolation: isolate;
     overflow: hidden;
+    min-height: var(--hero-band-min);
     padding: clamp(42px, 7vh, 64px) 0 clamp(106px, 13vh, 132px);
     background:
         radial-gradient(circle, rgba(47, 191, 92, 0.2) 1.4px, transparent 1.7px) 0 0 / 22px 22px,
@@ -2370,24 +2371,38 @@ body.has-sidebar .plant-page {
 
 .plant-modal-x {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 3;
+    top: 14px;
+    right: 14px;
+    z-index: 5;
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 40px;
-    border: 0;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1.5px solid rgba(23, 48, 31, 0.16);
     border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 6px 16px -6px rgba(23, 48, 31, 0.5);
+    background: #fffdf6;
+    box-shadow: 0 10px 22px -8px rgba(23, 48, 31, 0.55);
     color: var(--pl-fg);
-    font-size: 1.6rem;
-    line-height: 1;
     cursor: pointer;
+    pointer-events: auto;
 }
 
-.plant-modal-x:hover { background: var(--pl-brand-soft); }
+.plant-modal-x svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+.plant-modal-x:hover {
+    background: var(--pl-brand-soft);
+    border-color: var(--pl-brand-strong);
+}
+
+.plant-modal-x:focus-visible {
+    outline: 3px solid rgba(47, 191, 92, 0.4);
+    outline-offset: 2px;
+}
 
 .plant-modal-loading {
     margin: 0;
@@ -2403,6 +2418,13 @@ body.has-sidebar .plant-page {
         max-width: 100%;
         margin: auto 0 0;
         border-radius: 24px 24px 0 0;
+    }
+
+    .plant-modal-x {
+        top: 10px;
+        right: 10px;
+        width: 42px;
+        height: 42px;
     }
 }
 
