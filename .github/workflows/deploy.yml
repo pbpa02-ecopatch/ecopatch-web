@@ -1,0 +1,46 @@
+# Deploys to PWS after a merge to dev, but only when the same checks as CI pass.
+# PWS builds from its git remote: a push to its `master` branch is a deploy, and the container runs `migrate` on start.
+# It can also be run by hand (Actions > Deploy to PWS > Run workflow), from the branch chosen there.
+#
+# Needs two repository secrets (Settings > Secrets and variables > Actions):
+#   PWS_GIT_USER   the username you use for `git push pws`
+#   PWS_GIT_TOKEN  its password or access token
+name: Deploy to PWS
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+# one deploy at a time; a newer one waits for the running one instead of cancelling it half way
+concurrency:
+  group: deploy-pws
+  cancel-in-progress: false
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the whole history, so the push to PWS can be a fast-forward
+
+      - name: Push to PWS
+        env:
+          PWS_GIT_USER: ${{ secrets.PWS_GIT_USER }}
+          PWS_GIT_TOKEN: ${{ secrets.PWS_GIT_TOKEN }}
+        run: |
+          if [ -z "$PWS_GIT_USER" ] || [ -z "$PWS_GIT_TOKEN" ]; then
+            echo "::error::Set the PWS_GIT_USER and PWS_GIT_TOKEN repository secrets first."
+            exit 1
+          fi
+          AUTH=$(printf '%s:%s' "$PWS_GIT_USER" "$PWS_GIT_TOKEN" | base64 -w0)
+          echo "::add-mask::$AUTH"
+          # a plain push, never forced: if PWS has commits this branch lacks, the deploy fails instead of overwriting them
+          git -c "http.extraHeader=Authorization: Basic $AUTH" \
+            push https://pws.cs.ui.ac.id/salwa.alifia/eco-patch HEAD:master

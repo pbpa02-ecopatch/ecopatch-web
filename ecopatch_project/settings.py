@@ -41,6 +41,9 @@ if not SECRET_KEY and DEBUG:
 if not DEBUG and (len(SECRET_KEY) < 50 or len(set(SECRET_KEY)) < 5 or SECRET_KEY.startswith('django-insecure-')):
     raise ImproperlyConfigured('Set a private, strong SECRET_KEY before using DEBUG=False.')
 
+# While preparing a deployment: MAINTENANCE_MODE=True shows everyone but staff a "being prepared" page (503).
+MAINTENANCE_MODE = os.environ.get('MAINTENANCE_MODE', 'False') == 'True'
+
 ALLOWED_HOSTS = [host.strip() for host in os.environ.get(
     "ALLOWED_HOSTS", "salwa-alifia-eco-patch.pws.cs.ui.ac.id,localhost,127.0.0.1",
 ).split(",") if host.strip()]
@@ -84,6 +87,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'main.middleware.MaintenanceModeMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
