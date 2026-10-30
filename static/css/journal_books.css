@@ -879,13 +879,13 @@
 
 .open-book {
     display: flex;
-    background: #fbf6ec;
+    background: #ffffff;
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md), 0 15px 35px rgba(34, 48, 31, 0.1);
+    box-shadow: 0 14px 34px rgba(60, 45, 20, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
     position: relative;
     overflow: hidden;
     min-height: clamp(340px, 30vw, 400px);
-    border: 1.5px solid var(--border);
+    border: 1.5px solid #e2d4b2;
     align-items: stretch;
 }
 
@@ -894,13 +894,13 @@
 .book-page-left {
     flex: 1 1 50%;
     width: 50%;
-    background: #faf5ea;
+    background: #fffdf9;
     padding: 2.5rem 2.8rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
-    box-shadow: inset -15px 0 25px -15px rgba(0, 0, 0, 0.08);
+    box-shadow: inset -15px 0 25px -15px rgba(0, 0, 0, 0.06);
     border-right: 1px solid #e8dbbe;
     box-sizing: border-box;
 }
@@ -2389,12 +2389,19 @@
    ========================================================= */
 
 .summary-mini-card {
-    background: #ffffff;
-    border: 1.5px solid #efe4cb;
+    background: #fbf7ee;
+    border: 1.5px solid #eadcb9;
     border-radius: 10px;
     padding: 8px 6px;
     text-align: center;
     box-shadow: 0 1px 3px rgba(34, 48, 31, 0.04);
+}
+
+.book-page-left #left-ecopatch-badge,
+.book-page-left #left-total {
+    background: #fbf7ee !important;
+    border-color: #eadcb9 !important;
+    color: #4a5c48 !important;
 }
 
 .summary-mini-card .stat-num {
@@ -2434,7 +2441,7 @@
 }
 
 .book-toc-item {
-    border: 1.5px solid transparent;
+    border: 1.5px solid #eadcb9;
     border-radius: 8px;
     padding: 6px 10px;
     transition: all 0.15s ease;
@@ -2443,12 +2450,12 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 4px;
-    background: rgba(255, 255, 255, 0.65);
+    background: #fbf7ee;
 }
 
 .book-toc-item:hover {
-    background: rgba(70, 104, 66, 0.06);
-    border-color: rgba(70, 104, 66, 0.25);
+    background: #f3ecd9;
+    border-color: #387638;
 }
 
 .book-toc-item.active {
@@ -2889,9 +2896,14 @@
     --journal-offset: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2);
 }
 
+body.journal-body,
 body.has-sidebar.journal-body {
+    background: #fdf7e8 !important;
+    background-color: #fdf7e8 !important;
+}
+
+body.has-sidebar.journal-body:has(.journal-main) {
     padding-left: 0 !important;
-    background: #faefd5;
 }
 
 /* The journal sheet runs full width, so the footer line keeps the same column as the content
@@ -2913,7 +2925,7 @@ body.has-sidebar.journal-body .site-footer {
     position: relative;
     background: radial-gradient(70% 90% at 76% 78%, rgba(255, 240, 200, 0.65) 0%, transparent 62%), linear-gradient(180deg, #fff4dc 0%, #eef8e2 46%, #dff2d4 100%);
     border-bottom: 3px solid #d8c48d;
-    padding: clamp(20px, 3vh, 30px) 20px 0 calc(var(--journal-offset, 0px) + 20px);
+    padding: clamp(20px, 3vh, 30px) 0 0 0;
     overflow: hidden;
     isolation: isolate;
     box-sizing: border-box;
@@ -3066,18 +3078,34 @@ body.has-sidebar.journal-body .site-footer {
 .journal-desk-props {
     position: absolute;
     bottom: 28px;
-    left: 57%;
+    left: calc(52% + var(--journal-offset, 0px) / 2);
     transform: translateX(-50%);
     width: 196px;
     height: 74px;
     z-index: 2;
-    display: block;
+    display: block !important;
     pointer-events: none;
 }
 
 @media (max-width: 991.98px) {
     .journal-desk-props {
-        display: none;
+        display: block !important;
+        left: calc(var(--journal-offset, 0px) + 24px);
+        transform: none;
+        width: clamp(110px, 25vw, 155px);
+        height: auto;
+        bottom: 28px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .journal-desk-props {
+        display: block !important;
+        left: 10px;
+        transform: none;
+        width: clamp(92px, 25vw, 125px);
+        height: auto;
+        bottom: 28px;
     }
 }
 
@@ -3217,11 +3245,7 @@ body.has-sidebar.journal-body .site-footer {
     }
 }
 
-@media (max-width: 991.98px) {
-    .journal-hero-banner-full {
-        padding: 24px 20px 0 20px;
-    }
-}
+
 
 /* Left content container */
 
@@ -3245,31 +3269,31 @@ body.has-sidebar.journal-body .site-footer {
 }
 
 .journal-hero-inner {
-    max-width: 1008px;
     width: 100%;
+    max-width: calc(1008px + var(--journal-offset, 0px) + 48px);
     margin: 0 auto;
     position: relative;
     z-index: 3;
-    padding: 0 24px 18px;
-}
-
-.journal-sheet-body > .container {
-    max-width: 1008px;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 0 24px 18px calc(var(--journal-offset, 0px) + 24px);
+    box-sizing: border-box;
 }
 
 .journal-sheet-body {
-    background: linear-gradient(180deg, #fdf7e8 0%, #faefd5 100%);
-    padding-left: var(--journal-offset);
+    background: #fdf7e8 !important;
+    width: 100%;
     flex: 1 0 auto;
 }
 
-@media (max-width: 991.98px) {
-    .journal-sheet-body {
-        padding-left: 0;
-    }
+.journal-sheet-body > .container {
+    width: 100%;
+    max-width: calc(1008px + var(--journal-offset, 0px) + 48px);
+    margin: 0 auto;
+    padding-left: calc(var(--journal-offset, 0px) + 24px);
+    padding-right: 24px;
+    box-sizing: border-box;
 }
+
+
 
 /* Minimal Clean Footer (Matching Reference) */
 
@@ -3502,8 +3526,11 @@ body.has-sidebar.journal-body .site-footer {
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    height: 48px !important;
-    padding: 0 28px !important;
+    min-height: 48px !important;
+    height: auto !important;
+    padding: 0 24px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
     background: #0d6832 !important;
     color: #ffffff !important;
     border: 2px solid transparent !important;
@@ -3516,6 +3543,20 @@ body.has-sidebar.journal-body .site-footer {
     cursor: pointer !important;
     transition: transform 0.15s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.15s ease, background 0.15s ease !important;
     white-space: nowrap !important;
+}
+
+@media (max-width: 575.98px) {
+    .btn-listing-style,
+    .journal-main-cta,
+    .btn-ds-primary.journal-main-cta {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 11px 16px !important;
+        font-size: clamp(0.82rem, 3.4vw, 0.95rem) !important;
+        white-space: normal !important;
+        text-align: center !important;
+        line-height: 1.3 !important;
+    }
 }
 
 .btn-listing-style:hover,
@@ -4402,4 +4443,116 @@ body.has-sidebar.journal-body .site-footer {
 
 .journal-form-page .form-control::placeholder {
     color: #4c6853;
+}
+
+
+/* ===== GARDEN JOURNAL MOBILE & RESPONSIVE FIXES ===== */
+
+/* Issue 4: Date input left-alignment across iOS & mobile browsers */
+input[type="date"].ep-input,
+.ep-input[type="date"],
+input#id_date {
+    text-align: start !important;
+    text-align: left !important;
+    -webkit-appearance: none;
+    appearance: none;
+    padding-left: 14px !important;
+}
+
+input[type="date"].ep-input::-webkit-date-and-time-value,
+.ep-input[type="date"]::-webkit-date-and-time-value,
+input#id_date::-webkit-date-and-time-value {
+    text-align: start !important;
+    text-align: left !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: normal;
+    min-height: 1.5em;
+}
+
+/* Issue 2: Responsive Open Book Spread for Mobile & Tablet */
+@media (max-width: 820px) {
+    .open-book-wrapper {
+        margin: 0.75rem auto 2rem auto;
+        perspective: none;
+    }
+
+    .open-book {
+        flex-direction: column;
+        border-radius: var(--radius-md);
+        min-height: auto;
+        overflow: visible;
+        align-items: stretch;
+    }
+
+    .book-page-left {
+        width: 100% !important;
+        flex: 0 0 auto !important;
+        padding: 1.25rem 1rem !important;
+        border-right: none !important;
+        border-bottom: 2px dashed #e8dbbe !important;
+        box-shadow: none !important;
+    }
+
+    .book-spine-center {
+        display: none !important;
+    }
+
+    .book-page-right {
+        width: 100% !important;
+        flex: 1 1 auto !important;
+        padding: 1.25rem 1rem !important;
+        box-shadow: none !important;
+    }
+
+    #page-content > div {
+        min-height: auto !important;
+    }
+
+    .summary-mini-card {
+        padding: 6px 4px;
+        min-width: 0;
+    }
+
+    .summary-mini-card .stat-num {
+        font-size: clamp(1.15rem, 4.2vw, 1.45rem);
+    }
+
+    .summary-mini-card .stat-desc {
+        font-size: 0.7rem;
+    }
+
+    .plant-left-title {
+        font-size: clamp(1.25rem, 5vw, 1.55rem);
+    }
+
+    .left-chart-container {
+        height: 95px !important;
+    }
+
+    .book-toc-list {
+        max-height: 110px;
+    }
+
+    .journal-hero-inner {
+        padding: 0 16px 16px;
+    }
+}
+
+
+@media (max-width: 767.98px) {
+    .journal-hero-banner-full {
+        padding: clamp(32px, 5vh, 44px) 0 0 0 !important;
+    }
+
+    .journal-hero-inner {
+        max-width: 100% !important;
+        padding: 0 16px 16px 16px !important;
+    }
+
+    .journal-sheet-body > .container {
+        max-width: 100% !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
 }
