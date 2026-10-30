@@ -296,7 +296,7 @@ def patchplant_quick_add(request, pk):
     """
     patch = _get_patch(request, pk)
     plant_id = request.POST.get('plant', '')
-    if not plant_id.isdigit():
+    if not plant_id.isdecimal() or len(plant_id) > 19:
         return HttpResponseBadRequest('Tanaman tidak dikenal.')
     plant = get_object_or_404(Plant, pk=int(plant_id))
 

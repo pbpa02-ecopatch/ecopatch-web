@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.http import JsonResponse
@@ -14,6 +15,14 @@ from django.views.decorators.http import require_POST
 
 from .forms import GardenJournalForm
 from .models import GardenJournal
+
+
+def _filter_date(value):
+    """Ignore malformed query dates before they reach ORM date conversion."""
+    try:
+        return date.fromisoformat(value) if value else None
+    except (TypeError, ValueError):
+        return None
 
 
 def _journal_filter_url(active, **changes):
@@ -92,11 +101,13 @@ def _get_filtered_journals(request):
     ecopatch_param = request.GET.get("ecopatch", "").strip() or request.GET.get("ecopatch_name", "").strip()
     plant_name = request.GET.get("plant_name", "").strip()
     condition = request.GET.get("condition", "").strip()
-    date_from = request.GET.get("date_from", "").strip()
-    date_to = request.GET.get("date_to", "").strip()
+    date_from = _filter_date(request.GET.get("date_from", "").strip())
+    date_to = _filter_date(request.GET.get("date_to", "").strip())
 
     if ecopatch_param:
-        if ecopatch_param.isdigit():
+        if ecopatch_param.isdecimal():
+            if len(ecopatch_param) > 19:
+                return journals.none()
             journals = journals.filter(ecopatch_id=int(ecopatch_param))
         else:
             journals = journals.filter(
@@ -332,9 +343,10 @@ def plant_journal_history(request, plant_name):
     if condition_filter:
         journals_query = journals_query.filter(plant_condition=condition_filter)
 
-    date_filter = request.GET.get("date", "").strip()
-    if date_filter:
-        journals_query = journals_query.filter(date=date_filter)
+    parsed_date = _filter_date(request.GET.get("date", "").strip())
+    date_filter = parsed_date.isoformat() if parsed_date else ""
+    if parsed_date:
+        journals_query = journals_query.filter(date=parsed_date)
 
     total_entries = journals_query.count()
 
@@ -487,7 +499,7 @@ def journal_create(request):
             has_step1_errors = any(f in form.errors for f in step1_fields)
             start_at_step_2 = not has_step1_errors or is_adding_to_existing_book
     else:
-        initial_data = {"date": date.today()}
+        initial_data = {"date": timezone.localdate()}
         if initial_plant:
             initial_data["plant_name"] = initial_plant
             if prev_journal:
@@ -618,6 +630,11 @@ def journal_quick_upload_photo(request, pk):
 
     if image_file.size > 5 * 1024 * 1024:
         return JsonResponse({"success": False, "error": "Ukuran foto maksimal 5 MB."}, status=400)
+
+    try:
+        image_file = GardenJournalForm.base_fields["image"].clean(image_file)
+    except ValidationError as error:
+        return JsonResponse({"success": False, "error": " ".join(error.messages)}, status=400)
 
     journal.image = image_file
     journal.save(update_fields=["image", "updated_at"])

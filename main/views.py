@@ -13,6 +13,7 @@ from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils import translation
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.views.static import serve
+from django.views.decorators.http import require_POST
 
 from .auth_forms import EcoPasswordResetForm, RegisterForm
 
@@ -162,6 +163,7 @@ def _profile(request):
     })
 
 
+@require_POST
 def logout_view(request):
     logout(request)
     return redirect('main:home')
