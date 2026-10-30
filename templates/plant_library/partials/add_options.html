@@ -1,0 +1,21 @@
+{# What the + opens: the member's EcoPatches for this plant (needs plant.patch_options). Used inside a <template> by the card and by the plant sheet. #}
+<p class="plant-addpop-title">Tambah {{ plant.name }} ke</p>
+{% if plant.patch_options %}
+<ul class="plant-addpop-list">
+    {% for opt in plant.patch_options %}
+    <li>
+        <form method="post" action="{% url 'my_ecopatch:plant_quick_add' opt.patch.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="plant" value="{{ plant.pk }}">
+            <button type="submit" class="plant-addpop-opt plant-addpop-opt--{{ opt.tone }}">
+                <span class="plant-addpop-row"><strong>{{ opt.patch.name }}</strong><small>{{ opt.place }}</small></span>
+                <span class="plant-addpop-hint">{{ opt.hint }}</span>
+            </button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p class="plant-addpop-empty">Kamu belum punya EcoPatch.</p>
+{% endif %}
+<a class="plant-addpop-new" href="{% url 'my_ecopatch:create' %}"><span aria-hidden="true">+</span> EcoPatch baru</a>

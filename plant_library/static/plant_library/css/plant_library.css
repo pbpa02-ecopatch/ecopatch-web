@@ -1412,6 +1412,21 @@ body.has-sidebar .plant-page {
     margin: 0;
 }
 
+/* "Tambah ke EcoPatch" on the plant sheet: a normal button that opens the same list as the + on a card */
+.plant-add-inline {
+    display: inline-flex;
+}
+
+.plant-add-inline .plant-btn svg {
+    width: 17px;
+    height: 17px;
+}
+
+/* in the pop-up the round close button sits in the top right corner: keep the difficulty tag clear of it */
+.plant-modal .plant-detail-head {
+    padding-right: 52px;
+}
+
 .plant-owner-note {
     margin: 12px 0 0;
     color: var(--pl-muted);
