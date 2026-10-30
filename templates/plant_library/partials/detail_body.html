@@ -15,15 +15,6 @@
     </div>
 
     <div class="plant-detail-body">
-        <p class="plant-detail-kicker">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 21v-8"/>
-                <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
-                <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
-            </svg>
-            Katalog tanaman
-        </p>
-
         <div class="plant-detail-head">
             {% if in_modal %}<h2 class="plant-detail-title" id="plant-modal-title">{{ plant.name }}</h2>{% else %}<h1 class="plant-detail-title">{{ plant.name }}</h1>{% endif %}
             <span class="plant-status plant-status--{{ plant.difficulty }}">{{ plant.get_difficulty_display }}</span>
@@ -46,13 +37,6 @@
         </div>
 
         <section class="plant-note{% if not plant.description %} plant-note--empty{% endif %}" aria-label="Tentang tanaman">
-            <p class="plant-note-kicker">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M16.5 4.5 19 7l-9.5 9.5L6 18l1.5-3.5L17 5Z"/>
-                    <path d="m14.5 6.5 3 3"/>
-                </svg>
-                Tentang tanaman ini
-            </p>
             {% if plant.description %}
                 <div class="plant-note-text">{{ plant.description|linebreaks }}</div>
             {% else %}
@@ -133,15 +117,3 @@
         {% endif %}
     </div>
 </article>
-
-<p class="plant-tip">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M12 21v-8"/>
-        <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
-        <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
-    </svg>
-    <span>
-        Smart Care menyarankan menyiram sekitar tiap {{ plant.watering_interval_days }} hari.
-        Cek dulu kelembapan tanah sebelum menyiram, lalu sesuaikan jadwalnya di Smart Care.
-    </span>
-</p>

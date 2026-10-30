@@ -18,6 +18,8 @@
     </script>
     {% include "_splash_head.html" %}
     {% block extra_head %}{% endblock %}
+    {# Shared form system: loaded last so every module gets identical fields and dropdowns #}
+    <link rel="stylesheet" href="{% static_v 'css/forms.css' %}">
 </head>
 <body class="d-flex flex-column min-vh-100{% if user.is_authenticated %} has-sidebar{% endif %}{% block body_class %}{% endblock %}">
     {% include "_splash.html" %}

@@ -8,24 +8,13 @@
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none">Garden Journal</a>
-                </li>
-                {% if journal %}
-                    <li class="breadcrumb-item">
-                        <a href="{% url 'garden_journal:plant_history' journal.plant_name %}" class="text-success text-decoration-none">
-                            {{ journal.plant_name }}
-                        </a>
-                    </li>
-                {% endif %}
-                <li class="breadcrumb-item active">{{ action }} Catatan</li>
-            </ol>
-        </nav>
+<div class="journal-form-shell">
+    <div class="col-12">
+        <!-- Back link -->
+        <a class="journal-back mb-3" href="{% if journal %}{% url 'garden_journal:plant_history' journal.plant_name %}{% else %}{% url 'garden_journal:list' %}{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            {% if journal %}Kembali ke {{ journal.plant_name }}{% else %}Kembali ke Garden Journal{% endif %}
+        </a>
 
         {% if not has_ecopatch and action == "Tambah" %}
         <!-- Empty State Jika Belum Punya EcoPatch -->
@@ -42,14 +31,15 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M12 5v14M5 12h14"/></svg>
                     Buat EcoPatch Sekarang
                 </a>
-                <a href="{% url 'garden_journal:list' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                <a href="{% url 'garden_journal:list' %}" class="journal-back">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                     Kembali ke Garden Journal
                 </a>
             </div>
         </div>
         {% else %}
 
-        <div class="card border-0 rounded-4" style="border: 1.5px solid #e6cf95 !important; box-shadow: 0 6px 16px rgba(34,48,31,0.08); border-radius: 18px !important;">
+        <div class="card rounded-4 journal-form-page">
             <div class="card-body p-4 p-md-5">
                 
                 <!-- Wizard Step Bar Indicator (Hanya saat buat buku tanaman baru dari rak) -->
@@ -102,7 +92,7 @@
                     <div id="sectionSetup" class="{% if start_at_step_2 %}d-none{% endif %}">
                         <!-- Pilihan Sampul Buku (Compact Card & Modal) -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold mb-1 text-dark">
+                            <label class="ep-label mb-1">
                                 Sampul Buku Jurnal
                             </label>
                             <p class="text-muted small mb-2">Pilih motif atau warna sampul favoritmu untuk tanaman ini:</p>
@@ -356,90 +346,87 @@
                             </div>
                         </div>
 
-                        <div class="row g-3">
+                        <div class="ep-form">
                             <!-- Pilihan EcoPatch (Scrollable Custom Dropdown) -->
-                            <div class="col-12 col-md-6">
-                                <label for="ecopatchSelectBtn" class="form-label fw-semibold">
-                                    EcoPatch <span class="text-danger">*</span>
+                            <div class="ep-field">
+                                <label for="ecopatchSelectBtn" class="ep-label">
+                                    EcoPatch <span class="ep-required">*</span>
                                 </label>
                                 {% if user_patches %}
                                     <div class="dropdown journal-select-wrapper" id="ecopatchSelectWrapper">
                                         <input type="hidden" name="ecopatch" id="id_ecopatch" value="{{ form.ecopatch.value|default:'' }}">
                                         <input type="hidden" name="ecopatch_name" id="id_ecopatch_name" value="{{ form.ecopatch_name.value|default:'' }}">
-                                        <button type="button" class="journal-select-btn dropdown-toggle w-100{% if form.ecopatch_name.value %} journal-select-btn--active{% endif %}" id="ecopatchSelectBtn"
+                                        <button type="button" class="journal-select-btn ep-select-btn dropdown-toggle w-100" id="ecopatchSelectBtn"
                                                 data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
-                                            <span class="journal-select-dot" id="ecopatchSelectDot" aria-hidden="true"{% if not form.ecopatch_name.value %} hidden{% endif %}></span>
-                                            <span id="ecopatchSelectLabel" class="journal-select-label {% if not form.ecopatch_name.value %}text-muted{% endif %}">
+                                            <span id="ecopatchSelectLabel" class="journal-select-label{% if not form.ecopatch_name.value %} ep-placeholder{% endif %}">
                                                 {% if form.ecopatch_name.value %}
                                                     {{ form.ecopatch_name.value }}
                                                 {% else %}
-                                                    -- Pilih EcoPatch Kamu --
+                                                    Pilih EcoPatch&hellip;
                                                 {% endif %}
                                             </span>
-                                            <svg class="journal-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                            <svg class="journal-select-chevron ep-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
                                         </button>
-                                        <ul class="dropdown-menu journal-select-menu w-100" id="ecopatchDropdownMenu" aria-labelledby="ecopatchSelectBtn">
+                                        <ul class="dropdown-menu journal-select-menu ep-menu w-100" id="ecopatchDropdownMenu" aria-labelledby="ecopatchSelectBtn">
                                             {% for patch in user_patches %}
                                                 <li>
-                                                    <button type="button" class="dropdown-item journal-select-item {% if form.ecopatch_name.value == patch.name %}active{% endif %}"
+                                                    <button type="button" class="dropdown-item journal-select-item ep-menu-item {% if form.ecopatch_name.value == patch.name %}active{% endif %}"
                                                             data-ecopatch-val="{{ patch.name }}" data-ecopatch-id="{{ patch.pk }}">
-                                                        <span class="fw-semibold">{{ patch.name }}</span>
-                                                        <span class="badge rounded-pill bg-light text-muted border px-2 py-1" style="font-size: 11px;">{{ patch.get_space_type_display }}</span>
+                                                        {{ patch.name }}
                                                     </button>
                                                 </li>
                                             {% endfor %}
                                         </ul>
                                     </div>
                                 {% else %}
-                                    <input type="text" name="ecopatch_name" id="id_ecopatch_name" class="form-control" placeholder="Contoh: Balkon Depan" value="{{ form.ecopatch_name.value|default:'' }}" required>
+                                    <input type="text" name="ecopatch_name" id="id_ecopatch_name" class="form-control ep-input" placeholder="Contoh: Balkon Depan" value="{{ form.ecopatch_name.value|default:'' }}" required>
                                 {% endif %}
-                                <div class="form-text small">Pilih lokasi EcoPatch tempat tanamanmu tumbuh.</div>
+                                <p class="ep-help">Pilih lokasi EcoPatch tempat tanamanmu tumbuh.</p>
                                 {% if form.ecopatch_name.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.ecopatch_name.errors.as_text }}</div>
+                                    <p class="ep-error">{{ form.ecopatch_name.errors.as_text }}</p>
                                 {% endif %}
                             </div>
 
                             <!-- Nama Tanaman: Scrollable Custom Dropdown -->
-                            <div class="col-12 col-md-6">
-                                <label for="plantSelectBtn" class="form-label fw-semibold">
-                                    Nama Tanaman <span class="text-danger">*</span>
+                            <div class="ep-field">
+                                <label for="plantSelectBtn" class="ep-label">
+                                    Nama Tanaman <span class="ep-required">*</span>
                                 </label>
 
                                 <div class="dropdown journal-select-wrapper" id="plantSelectWrapper">
                                     <!-- Hidden actual form field for POST & validation -->
                                     <input type="hidden" name="plant_name" id="id_plant_name" value="{{ form.plant_name.value|default:'' }}">
-                                    
-                                    <button type="button" class="journal-select-btn dropdown-toggle w-100{% if form.plant_name.value %} journal-select-btn--active{% endif %}" id="plantSelectBtn"
+
+                                    <button type="button" class="journal-select-btn ep-select-btn dropdown-toggle w-100" id="plantSelectBtn"
                                             data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
-                                        <span class="journal-select-dot" id="plantSelectDot" aria-hidden="true"{% if not form.plant_name.value %} hidden{% endif %}></span>
-                                        <span id="plantSelectLabel" class="journal-select-label {% if not form.plant_name.value %}text-muted{% endif %}">
+                                        <span id="plantSelectLabel" class="journal-select-label{% if not form.plant_name.value %} ep-placeholder{% endif %}">
                                             {% if form.plant_name.value %}
                                                 {{ form.plant_name.value }}
                                             {% else %}
-                                                -- Pilih tanaman --
+                                                Pilih tanaman&hellip;
                                             {% endif %}
                                         </span>
-                                        <svg class="journal-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                        <svg class="journal-select-chevron ep-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
                                     </button>
-                                    <ul class="dropdown-menu journal-select-menu w-100" id="plantDropdownMenu" aria-labelledby="plantSelectBtn">
+                                    <ul class="dropdown-menu journal-select-menu ep-menu w-100" id="plantDropdownMenu" aria-labelledby="plantSelectBtn">
                                         <!-- Diisi secara dinamis oleh JS berdasarkan EcoPatch yang dipilih -->
                                     </ul>
                                 </div>
 
-                                <div class="form-text small text-muted mt-1">Pilih tanaman yang terdaftar di EcoPatch kamu.</div>
+                                <p class="ep-help">Pilih tanaman yang terdaftar di EcoPatch kamu.</p>
                                 {% if form.plant_name.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.plant_name.errors.as_text }}</div>
+                                    <p class="ep-error">{{ form.plant_name.errors.as_text }}</p>
                                 {% endif %}
                             </div>
                         </div>
 
                         <!-- Tombol Lanjut ke Step 2 -->
-                        <div class="d-flex align-items-center gap-3 mt-4 pt-3 border-top">
-                            <button type="button" class="btn btn-ds-primary" id="btnNextToStep2">
+                        <div class="ep-actions">
+                            <button type="button" class="ep-btn ep-btn--primary" id="btnNextToStep2">
                                 Lanjut ke Catatan
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="ms-2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                             </button>
-                            <a href="{% if initial_plant %}{% url 'garden_journal:plant_history' initial_plant %}{% else %}{% url 'garden_journal:list' %}{% endif %}" class="btn btn-ds-ghost">
+                            <a href="{% if initial_plant %}{% url 'garden_journal:plant_history' initial_plant %}{% else %}{% url 'garden_journal:list' %}{% endif %}" class="ep-btn ep-btn--ghost">
                                 Batal
                             </a>
                         </div>
@@ -480,48 +467,48 @@
                             {% endif %}
                         </div>
 
-                        <div class="row g-3">
+                        <div class="ep-form">
                             <!-- Judul Catatan -->
-                            <div class="col-12">
-                                <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
-                                    Judul Catatan <span class="text-danger">*</span>
+                            <div class="ep-field ep-field--wide">
+                                <label for="{{ form.title.id_for_label }}" class="ep-label">
+                                    Judul Catatan <span class="ep-required">*</span>
                                 </label>
                                 {{ form.title }}
                                 {% if form.title.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.title.errors.as_text }}</div>
+                                    <p class="ep-error">{{ form.title.errors.as_text }}</p>
                                 {% endif %}
                             </div>
 
                             <!-- Tanggal -->
-                            <div class="col-12 col-md-6">
-                                <label for="{{ form.date.id_for_label }}" class="form-label fw-semibold">
-                                    Tanggal <span class="text-danger">*</span>
+                            <div class="ep-field">
+                                <label for="{{ form.date.id_for_label }}" class="ep-label">
+                                    Tanggal <span class="ep-required">*</span>
                                 </label>
                                 {{ form.date }}
                                 {% if form.date.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.date.errors.as_text }}</div>
+                                    <p class="ep-error">{{ form.date.errors.as_text }}</p>
                                 {% endif %}
                             </div>
 
                             <!-- Ukuran / Tinggi Tanaman -->
-                            <div class="col-12 col-md-6">
-                                <label for="{{ form.plant_height.id_for_label }}" class="form-label fw-semibold">
-                                    Ukuran / Tinggi Tanaman <span class="text-muted small fw-normal">(opsional)</span>
+                            <div class="ep-field">
+                                <label for="{{ form.plant_height.id_for_label }}" class="ep-label">
+                                    Ukuran / Tinggi Tanaman <span class="ep-optional">(opsional)</span>
                                 </label>
-                                <div class="input-group">
+                                <div class="ep-input-group">
                                     {{ form.plant_height }}
-                                    <span class="input-group-text bg-white text-muted">cm</span>
+                                    <span class="ep-suffix">cm</span>
                                 </div>
-                                <div class="form-text small">Tinggi batang, panjang sulur, atau bentang tanaman dalam cm.</div>
+                                <p class="ep-help">Tinggi batang, panjang sulur, atau bentang tanaman dalam cm.</p>
                                 {% if form.plant_height.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.plant_height.errors.as_text }}</div>
+                                    <p class="ep-error">{{ form.plant_height.errors.as_text }}</p>
                                 {% endif %}
                             </div>
 
                             <!-- Kondisi Tanaman (Card Grid Mascot Petak) -->
-                            <div class="col-12">
-                                <label class="form-label fw-semibold mb-2">
-                                    Kondisi tanaman <span class="text-danger">*</span>
+                            <div class="ep-field ep-field--wide">
+                                <label class="ep-label mb-2">
+                                    Kondisi tanaman <span class="ep-required">*</span>
                                 </label>
                                 <input type="hidden" name="plant_condition" id="id_plant_condition" value="{{ form.plant_condition.value|default:'healthy' }}">
                                 
@@ -564,88 +551,87 @@
                                     </div>
                                 </div>
                                 {% if form.plant_condition.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.plant_condition.errors.as_text }}</div>
+                                    <p class="ep-error">{{ form.plant_condition.errors.as_text }}</p>
                                 {% endif %}
                             </div>
 
                             <!-- Catatan Jurnal -->
-                            <div class="col-12">
-                                <label for="{{ form.notes.id_for_label }}" class="form-label fw-semibold">
-                                    Catatan jurnal <span class="text-danger">*</span>
+                            <div class="ep-field ep-field--wide">
+                                <label for="{{ form.notes.id_for_label }}" class="ep-label">
+                                    Catatan jurnal <span class="ep-required">*</span>
                                 </label>
                                 {{ form.notes }}
                                 {% if form.notes.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.notes.errors.as_text }}</div>
+                                    <p class="ep-error">{{ form.notes.errors.as_text }}</p>
                                 {% endif %}
                             </div>
 
                             <!-- Foto Tanaman (Upload Galeri + Kamera Langsung) -->
-                            <div class="col-12">
-                                <label class="form-label fw-semibold mb-2">
-                                    Foto tanaman <span class="text-muted small fw-normal">(opsional)</span>
-                                </label>
+                            <div class="ep-field ep-field--wide">
+                                <span class="ep-label">
+                                    Foto tanaman <span class="ep-optional">(opsional)</span>
+                                </span>
 
-                                <!-- Input galeri -->
-                                <input type="file" name="image" id="id_image" accept="image/*" class="d-none">
-                                <!-- Input kamera belakang -->
-                                <input type="file" id="id_image_camera" accept="image/*" capture="environment" class="d-none">
-                                <!-- Input kamera depan (selfie) -->
-                                <input type="file" id="id_image_selfie" accept="image/*" capture="user" class="d-none">
-                                <input type="checkbox" name="image-clear" id="image-clear_id" class="d-none">
+                                <div class="ep-uploader" id="photoDropArea"
+                                     data-existing-image="{% if journal and journal.image %}{{ journal.image.url }}{% endif %}">
+                                    <!-- Input galeri -->
+                                    <input type="file" name="image" id="id_image" accept="image/*" class="ep-file">
+                                    <!-- Input kamera belakang -->
+                                    <input type="file" id="id_image_camera" accept="image/*" capture="environment" class="d-none">
+                                    <!-- Input kamera depan (selfie) -->
+                                    <input type="file" id="id_image_selfie" accept="image/*" capture="user" class="d-none">
+                                    <input type="checkbox" name="image-clear" id="image-clear_id" class="d-none">
 
-                                <!-- Preview box -->
-                                <div class="photo-upload-box p-4" id="photoDropArea"
-                                     data-existing-image="{% if journal and journal.image %}{{ journal.image.url }}{% endif %}" style="cursor: default;">
-                                    <div id="photoPlaceholder" class="photo-placeholder py-3">
-                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#607659" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                                        <div class="fw-bold text-dark mb-1">Belum ada foto</div>
-                                        <div class="text-muted small">JPG atau PNG, maks. 5 MB</div>
-                                    </div>
-                                    <div id="photoPreviewContainer" class="d-none text-center">
-                                        <div class="photo-preview-wrap">
-                                            <img id="photoPreviewImg" src="" alt="Preview Foto Tanaman" class="photo-preview-img mb-1">
-                                        </div>
-                                    </div>
+                                    <label class="ep-upload-zone" for="id_image">
+                                        <span class="ep-upload-visual">
+                                            <span id="photoPlaceholder">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                            </span>
+                                            <span id="photoPreviewContainer" class="d-none">
+                                                <img id="photoPreviewImg" src="" alt="Pratinjau foto tanaman">
+                                            </span>
+                                        </span>
+                                        <span class="ep-upload-copy">
+                                            <span class="ep-upload-title" id="photoTitle">{% if journal and journal.image %}Ganti foto tanaman{% else %}Pilih foto tanaman{% endif %}</span>
+                                            <span class="ep-upload-hint">JPG/PNG, maks 5 MB. Foto tanaman bikin jurnalmu lebih hidup.</span>
+                                        </span>
+                                    </label>
                                 </div>
 
-                                <!-- Tombol aksi foto -->
-                                <div class="d-flex flex-wrap gap-2 mt-2">
-                                    <button type="button" class="btn btn-ds-secondary btn-sm d-inline-flex align-items-center" id="btnPickFromGallery">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                                        Galeri / File
+                                <!-- Tombol kamera langsung -->
+                                <div class="ep-upload-actions">
+                                    <button type="button" class="ep-btn ep-btn--ghost ep-btn--sm" id="btnOpenCamera">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                        Kamera belakang
                                     </button>
-                                    <button type="button" class="btn btn-ds-secondary btn-sm d-inline-flex align-items-center" id="btnOpenCamera">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                                        Kamera Belakang
-                                    </button>
-                                    <button type="button" class="btn btn-ds-secondary btn-sm d-inline-flex align-items-center" id="btnOpenSelfie">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="12" r="3"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/></svg>
+                                    <button type="button" class="ep-btn ep-btn--ghost ep-btn--sm" id="btnOpenSelfie">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/></svg>
                                         Selfie
                                     </button>
-                                    <button type="button" class="btn btn-link text-danger text-decoration-none p-0 small fw-semibold d-none align-items-center" id="btnRemovePhoto">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                    <button type="button" class="ep-btn ep-btn--danger ep-btn--sm d-none" id="btnRemovePhoto">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                                         Hapus foto
                                     </button>
                                 </div>
                                 {% if form.image.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.image.errors.as_text }}</div>
+                                    <p class="ep-error">{{ form.image.errors.as_text }}</p>
                                 {% endif %}
                             </div>
                         </div>
 
                         <!-- Tombol Aksi Step 2 -->
-                        <div class="d-flex flex-wrap align-items-center gap-3 mt-4 pt-3 border-top">
+                        <div class="ep-actions">
                             {% if action == "Tambah" and not is_adding_to_existing_book %}
-                            <button type="button" class="btn btn-ds-ghost d-inline-flex align-items-center" id="btnBackToStep1">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                            <button type="button" class="ep-btn ep-btn--ghost" id="btnBackToStep1">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                                 Kembali ke Setup
                             </button>
                             {% endif %}
-                            <a href="{% if journal %}{% url 'garden_journal:plant_history' journal.plant_name %}{% elif initial_plant %}{% url 'garden_journal:plant_history' initial_plant %}{% else %}{% url 'garden_journal:list' %}{% endif %}" class="btn btn-ds-ghost">
+                            <a href="{% if journal %}{% url 'garden_journal:plant_history' journal.plant_name %}{% elif initial_plant %}{% url 'garden_journal:plant_history' initial_plant %}{% else %}{% url 'garden_journal:list' %}{% endif %}" class="ep-btn ep-btn--ghost">
                                 Batal
                             </a>
-                            <button type="submit" class="btn btn-ds-primary">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            <button type="submit" class="ep-btn ep-btn--primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                                 {% if action == "Tambah" %}Simpan ke Buku{% else %}Update Catatan{% endif %}
                             </button>
                         </div>
@@ -788,8 +774,8 @@
             plantDropdownMenu.appendChild(emptyLi);
 
             if (plantSelectLabel) {
-                plantSelectLabel.textContent = '-- Belum ada tanaman --';
-                plantSelectLabel.classList.add('text-muted');
+                plantSelectLabel.textContent = 'Belum ada tanaman…';
+                plantSelectLabel.classList.add('ep-placeholder');
             }
             if (plantInput) plantInput.value = '';
             setSelectPillState(plantSelectBtn, plantSelectDot, false);
@@ -813,7 +799,7 @@
 
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = 'dropdown-item journal-select-item ' + (isSel ? 'active' : '');
+            btn.className = 'dropdown-item journal-select-item ep-menu-item ' + (isSel ? 'active' : '');
             btn.setAttribute('data-plant-val', p);
             btn.innerHTML = `
                 <span class="d-flex align-items-center gap-2">
@@ -828,20 +814,20 @@
         if (foundCurrent && currentVal) {
             if (plantSelectLabel) {
                 setBoldLabel(plantSelectLabel, currentVal);
-                plantSelectLabel.classList.remove('text-muted');
+                plantSelectLabel.classList.remove('ep-placeholder');
             }
             setSelectPillState(plantSelectBtn, plantSelectDot, true);
         } else {
             if (currentVal && !plants.includes(currentVal)) {
                 if (plantInput) plantInput.value = '';
                 if (plantSelectLabel) {
-                    plantSelectLabel.textContent = '-- Pilih tanaman --';
-                    plantSelectLabel.classList.add('text-muted');
+                    plantSelectLabel.textContent = 'Pilih tanaman…';
+                    plantSelectLabel.classList.add('ep-placeholder');
                 }
             } else if (!currentVal) {
                 if (plantSelectLabel) {
-                    plantSelectLabel.textContent = '-- Pilih tanaman --';
-                    plantSelectLabel.classList.add('text-muted');
+                    plantSelectLabel.textContent = 'Pilih tanaman…';
+                    plantSelectLabel.classList.add('ep-placeholder');
                 }
             }
             setSelectPillState(plantSelectBtn, plantSelectDot, false);
@@ -856,8 +842,8 @@
 
             if (ecopatchInput) ecopatchInput.value = patchName;
             if (ecopatchSelectLabel) {
-                setBoldLabel(ecopatchSelectLabel, patchName || '-- Pilih EcoPatch Kamu --');
-                ecopatchSelectLabel.classList.remove('text-muted');
+                setBoldLabel(ecopatchSelectLabel, patchName || 'Pilih EcoPatch…');
+                ecopatchSelectLabel.classList.remove('ep-placeholder');
             }
             setSelectPillState(ecopatchSelectBtn, ecopatchSelectDot, !!patchName);
 
@@ -879,7 +865,7 @@
             if (plantInput) plantInput.value = plantVal;
             if (plantSelectLabel) {
                 setBoldLabel(plantSelectLabel, plantVal);
-                plantSelectLabel.classList.remove('text-muted');
+                plantSelectLabel.classList.remove('ep-placeholder');
             }
             setSelectPillState(plantSelectBtn, plantSelectDot, !!plantVal);
 
@@ -1268,6 +1254,7 @@
     const placeholder      = document.getElementById('photoPlaceholder');
     const previewContainer = document.getElementById('photoPreviewContainer');
     const previewImg       = document.getElementById('photoPreviewImg');
+    const photoTitle       = document.getElementById('photoTitle');
     const btnRemovePhoto   = document.getElementById('btnRemovePhoto');
     const btnPickGallery   = document.getElementById('btnPickFromGallery');
     const btnOpenCamera    = document.getElementById('btnOpenCamera');
@@ -1278,6 +1265,7 @@
         const reader = new FileReader();
         reader.onload = (e) => {
             previewImg.src = e.target.result;
+            if (photoTitle) photoTitle.textContent = file.name;
             if (placeholder) placeholder.classList.add('d-none');
             if (previewContainer) previewContainer.classList.remove('d-none');
             if (btnRemovePhoto) btnRemovePhoto.classList.remove('d-none');
@@ -1325,6 +1313,7 @@
             if (previewImg) previewImg.src = '';
             if (previewContainer) previewContainer.classList.add('d-none');
             if (placeholder) placeholder.classList.remove('d-none');
+            if (photoTitle) photoTitle.textContent = 'Pilih foto tanaman';
             btnRemovePhoto.classList.add('d-none');
             btnRemovePhoto.classList.remove('d-inline-flex');
             if (clearCheckbox) clearCheckbox.checked = true;
@@ -1334,6 +1323,7 @@
     const existingImageUrl = photoDropArea ? photoDropArea.dataset.existingImage : '';
     if (existingImageUrl && previewImg) {
         previewImg.src = existingImageUrl;
+        if (photoTitle) photoTitle.textContent = 'Ganti foto tanaman';
         if (placeholder) placeholder.classList.add('d-none');
         if (previewContainer) previewContainer.classList.remove('d-none');
         if (btnRemovePhoto) { btnRemovePhoto.classList.remove('d-none'); btnRemovePhoto.classList.add('d-inline-flex'); }

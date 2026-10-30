@@ -84,8 +84,6 @@ class PlantCRUDTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Kemangi')
         self.assertContains(response, 'Ocimum basilicum')
-        # moderate watering and outdoor: the Smart Care interval is shown
-        self.assertContains(response, 'Smart Care menyarankan menyiram sekitar tiap 2 hari')
 
     def test_plant_detail_shows_the_matching_ecopatch_name(self):
         patch = EcoPatch.objects.create(

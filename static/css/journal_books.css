@@ -2894,6 +2894,12 @@ body.has-sidebar.journal-body {
     background: #faefd5;
 }
 
+/* The journal sheet runs full width, so the footer line keeps the same column as the content
+   (and stays centred in it), the way the Seed Exchange footer does. */
+body.has-sidebar.journal-body .site-footer {
+    padding-left: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2 + 20px);
+}
+
 .journal-main {
     display: flex;
     flex-direction: column;
@@ -2907,11 +2913,11 @@ body.has-sidebar.journal-body {
     position: relative;
     background: radial-gradient(70% 90% at 76% 78%, rgba(255, 240, 200, 0.65) 0%, transparent 62%), linear-gradient(180deg, #fff4dc 0%, #eef8e2 46%, #dff2d4 100%);
     border-bottom: 3px solid #d8c48d;
-    padding: clamp(28px, 4vh, 40px) 20px 0 calc(var(--journal-offset, 0px) + 20px);
+    padding: clamp(20px, 3vh, 30px) 20px 0 calc(var(--journal-offset, 0px) + 20px);
     overflow: hidden;
     isolation: isolate;
     box-sizing: border-box;
-    min-height: clamp(340px, 30vw, 400px);
+    min-height: var(--hero-band-min);
 }
 
 /* Background Art Layer Container */
@@ -3239,12 +3245,18 @@ body.has-sidebar.journal-body {
 }
 
 .journal-hero-inner {
-    max-width: 1360px;
+    max-width: 1008px;
     width: 100%;
     margin: 0 auto;
     position: relative;
     z-index: 3;
-    padding: 0 20px 24px;
+    padding: 0 24px 18px;
+}
+
+.journal-sheet-body > .container {
+    max-width: 1008px;
+    padding-left: 24px;
+    padding-right: 24px;
 }
 
 .journal-sheet-body {
@@ -3293,12 +3305,12 @@ body.has-sidebar.journal-body {
 
 .journal-hero-title {
     font-family: var(--font-display, 'Baloo 2', sans-serif);
-    font-size: clamp(3rem, 5.2vw, 4.8rem);
+    font-size: clamp(2.4rem, 4.2vw, 3.6rem);
     font-weight: 800;
     color: #22301f;
     line-height: 1;
     letter-spacing: -0.03em;
-    margin: 0 0 14px;
+    margin: 0 0 12px;
 }
 
 .journal-hero-lead {
@@ -4292,59 +4304,6 @@ body.has-sidebar.journal-body {
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    .journal-hero-banner-full {
-        background: linear-gradient(180deg, #1c140a 0%, #2b1f11 55%, #3a2612 100%);
-        border-bottom-color: #4a3622;
-    }
-
-    .journal-hero-title {
-        font-family: var(--font-display, 'Baloo 2', sans-serif);
-        font-size: clamp(3rem, 5.2vw, 4.8rem);
-        font-weight: 800;
-        color: #22301f;
-        line-height: 1;
-        letter-spacing: -0.03em;
-        margin: 0 0 14px;
-    }
-
-    .journal-hero-lead {
-        color: #d1c2a5;
-    }
-
-    .stat-pill-chip {
-        background: #251e14;
-        border-color: #52402a;
-        color: #f7edd7;
-    }
-
-    .stat-pill-chip strong {
-        color: #6ef0a0;
-    }
-
-    .stat-pill-icon {
-        color: #6ef0a0;
-    }
-
-    .journal-bubble {
-        background: #203022;
-        border-color: #3b533d;
-        color: #f0faf1;
-    }
-
-    .journal-bubble-text {
-        color: #daf0d8;
-    }
-
-    .journal-day-name {
-        color: #d1c2a5;
-    }
-
-    .legend-chip {
-        color: #d1c2a5;
-    }
-}
-
 .journal-hero-eyebrow {
     font-size: 0.72rem;
     font-weight: 800;
@@ -4357,4 +4316,90 @@ body.has-sidebar.journal-body {
 
 .journal-hero-cta-wrap {
     margin-top: 10px;
+}
+/* Plain back link, matching Seed Exchange and Plant Library (no chip). */
+.journal-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--ink-muted, #4c6853);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.18s;
+}
+
+.journal-back svg {
+    width: 17px;
+    height: 17px;
+}
+
+.journal-back:hover {
+    color: #167a38;
+}
+
+/* Journal entry form, aligned with the Seed Exchange form card. */
+.journal-form-page {
+    border: 1.5px solid #b69a6161 !important;
+    border-radius: 28px !important;
+    background: #fffdf6 !important;
+    box-shadow: 0 26px 50px -34px rgba(23, 48, 31, 0.5) !important;
+}
+
+/* The entry form uses the same 960px shell as the rest of the app. */
+.journal-form-shell {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.journal-form-shell > .col-12 {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.journal-form-page .card-body {
+    padding: 26px 30px 28px !important;
+}
+
+.journal-form-page .form-label {
+    color: #17301f;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.journal-form-page .form-control,
+.journal-form-page .form-select {
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1.5px solid #9c8e5e;
+    border-radius: 16px;
+    background: #fffdf6;
+    color: #17301f;
+    font: 500 1rem 'Plus Jakarta Sans', sans-serif;
+}
+
+.journal-form-page .form-select {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 44px;
+    background: #fffdf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2317301f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 14px center;
+}
+
+.journal-form-page textarea.form-control {
+    min-height: 132px;
+    padding: 12px 14px;
+    line-height: 1.6;
+}
+
+.journal-form-page .form-control:focus,
+.journal-form-page .form-select:focus {
+    outline: 3px solid rgba(47, 191, 92, 0.35);
+    border-color: #167a38;
+    box-shadow: none;
+}
+
+.journal-form-page .form-control::placeholder {
+    color: #4c6853;
 }

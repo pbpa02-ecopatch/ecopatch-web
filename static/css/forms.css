@@ -1,0 +1,803 @@
+/* EcoPatch shared form system.
+   Loaded after every module stylesheet (see base.html) so that every form,
+   field and dropdown in the app looks like the profile page:
+   52px fields, 16px radius, #9c8e5e border, soft cream surface and a green
+   focus ring. Module classes are normalised here as well, so older markup
+   keeps the same look while pages migrate to the ep-* classes. */
+
+:root {
+    --ep-fg: #17301f;
+    --ep-muted: #4c6853;
+    --ep-line: rgba(182, 154, 99, 0.38);
+    --ep-line-strong: #b69a63;
+    --ep-field: #9c8e5e;
+    --ep-brand: #167a38;
+    --ep-brand-strong: #167a38;
+    --ep-brand-edge: #0f5a28;
+    --ep-brand-soft: #e2f4e5;
+    --ep-late: #a3301f;
+    --ep-late-bg: #fbdcd5;
+    --ep-mango: #ff9d2e;
+    --ep-display: 'Baloo 2', sans-serif;
+    --ep-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ---------------------------------------------------------------- Card + layout */
+.ep-form-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 26px 30px 28px;
+    border: 1.5px solid var(--ep-line);
+    border-radius: 28px;
+    background: #fffdf6;
+    box-shadow: 0 26px 50px -34px rgba(23, 48, 31, 0.5);
+}
+
+.ep-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 18px;
+    counter-reset: ep-section;
+}
+
+.ep-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.ep-field--wide {
+    grid-column: 1 / -1;
+}
+
+.ep-label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    color: var(--ep-fg);
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.ep-required {
+    color: var(--ep-late);
+}
+
+.ep-optional {
+    color: var(--ep-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* ---------------------------------------------------------------- Inputs */
+.ep-input,
+.ep-select-btn {
+    width: 100%;
+    height: 52px;
+    padding: 0 14px;
+    border: 1.5px solid var(--ep-field);
+    border-radius: 16px;
+    background: #fffdf6;
+    color: var(--ep-fg);
+    font: 500 1rem var(--ep-body);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ep-input::placeholder {
+    color: var(--ep-muted);
+    opacity: 1;
+}
+
+textarea.ep-input {
+    height: auto;
+    min-height: 132px;
+    padding: 12px 14px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+select.ep-input {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 44px;
+    background: #fffdf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2317301f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 14px center;
+}
+
+.ep-input:focus,
+.ep-select-btn:focus,
+.ep-input:focus-visible,
+.ep-select-btn:focus-visible {
+    outline: 3px solid rgba(47, 191, 92, 0.35);
+    border-color: var(--ep-brand-strong);
+    box-shadow: none;
+}
+
+/* A unit that sits inside the field, like the "cm" in Garden Journal. */
+.ep-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ep-input-group .ep-input {
+    padding-right: 54px;
+}
+
+.ep-suffix {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ep-muted);
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.ep-field.has-error .ep-input,
+.ep-field.has-error .ep-select-btn {
+    border-color: var(--ep-late);
+}
+
+/* ---------------------------------------------------------------- Dropdowns */
+.ep-select-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ep-select-btn::after {
+    display: none;
+}
+
+.ep-select-btn > svg,
+.ep-select-btn .ep-chevron {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    color: var(--ep-muted);
+    opacity: 1;
+    transition: transform 0.2s;
+}
+
+.ep-select-btn[aria-expanded='true'] > svg,
+.ep-select-btn[aria-expanded='true'] .ep-chevron {
+    transform: rotate(180deg);
+}
+
+.ep-select-btn:hover {
+    border-color: var(--ep-brand-strong);
+    color: var(--ep-fg);
+}
+
+/* The Smart Care modal has its own zero-gap flex form; give its fields air. */
+.care-modal .ep-field {
+    margin-bottom: 14px;
+}
+
+.care-modal .ep-field:last-of-type {
+    margin-bottom: 0;
+}
+
+.ep-placeholder {
+    color: var(--ep-muted);
+    font-weight: 500;
+}
+
+.ep-menu {
+    min-width: 190px;
+    margin: 0;
+    padding: 8px;
+    list-style: none;
+    border: 1.5px solid var(--ep-line);
+    border-radius: 18px;
+    background: #fffdf6;
+    box-shadow: 0 18px 36px -18px rgba(23, 48, 31, 0.45);
+}
+
+.ep-menu > li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* A dropdown that lives inline in a form (Smart Care). The menu floats under
+   the trigger so the form never reflows while it is open. */
+.ep-select {
+    position: relative;
+}
+
+.ep-select-control {
+    position: relative;
+}
+
+.ep-select-value {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ep-select-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 1080;
+    min-width: 0;
+    max-height: 264px;
+    overflow-y: auto;
+}
+
+.ep-select.is-open .ep-select-btn {
+    border-color: var(--ep-brand-strong);
+}
+
+/* Let the dropdown escape the modal body instead of being clipped by it. */
+.care-modal .modal-body {
+    overflow: visible;
+}
+
+.ep-menu-item {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--ep-fg);
+    font: 600 0.92rem/1.3 var(--ep-body);
+    text-align: left;
+    white-space: normal;
+    cursor: pointer;
+}
+
+.ep-menu-item:hover,
+.ep-menu-item:focus-visible {
+    background: var(--ep-brand-soft);
+    color: var(--ep-brand-strong);
+}
+
+.ep-menu-item.active {
+    background: var(--ep-brand-soft);
+    color: var(--ep-brand-strong);
+    font-weight: 800;
+}
+
+/* ---------------------------------------------------------------- Copy */
+.ep-help {
+    margin: 0;
+    color: var(--ep-muted);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.ep-error {
+    margin: 0;
+    color: var(--ep-late);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.ep-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 0 18px;
+    padding: 11px 14px;
+    border-radius: 16px;
+    background: var(--ep-brand-soft);
+    color: var(--ep-brand-strong);
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.ep-note a {
+    color: inherit;
+    font-weight: 800;
+    text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------- Sections */
+.ep-section {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0 0;
+    color: var(--ep-fg);
+    font: 800 1.08rem/1.1 var(--ep-display);
+    counter-increment: ep-section;
+}
+
+.ep-section:first-of-type {
+    margin-top: 0;
+}
+
+.ep-section::before {
+    content: counter(ep-section, decimal-leading-zero);
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 9px;
+    background: var(--ep-brand-soft);
+    color: var(--ep-brand-strong);
+    font: 800 0.66rem/1 var(--ep-body);
+    letter-spacing: 0.06em;
+}
+
+.ep-section::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--ep-line-strong);
+    opacity: 0.3;
+}
+
+/* ---------------------------------------------------------------- Actions */
+.ep-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+    padding-top: 18px;
+    border-top: 1px solid var(--ep-line);
+}
+
+.ep-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 48px;
+    padding: 0 24px;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    font: 700 0.95rem/1 var(--ep-body);
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.ep-btn--primary {
+    background: var(--ep-brand-strong);
+    color: #fff;
+    box-shadow: 0 5px 0 var(--ep-brand-edge);
+}
+
+.ep-btn--primary:hover {
+    background: var(--ep-brand-strong);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 var(--ep-brand-edge);
+}
+
+.ep-btn--primary:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 var(--ep-brand-edge);
+}
+
+.ep-btn--ghost {
+    background: #fff;
+    border-color: var(--ep-line-strong);
+    color: var(--ep-fg);
+}
+
+.ep-btn--ghost:hover {
+    border-color: var(--ep-fg);
+    background: #fff;
+    color: var(--ep-fg);
+    transform: translateY(-1px);
+}
+
+.ep-btn--sm {
+    height: 38px;
+    padding: 0 16px;
+    font-size: 0.82rem;
+}
+
+.ep-btn--danger {
+    background: transparent;
+    border-color: transparent;
+    color: var(--ep-late);
+    box-shadow: none;
+}
+
+.ep-btn--danger:hover {
+    background: var(--ep-late-bg);
+    color: var(--ep-late);
+    transform: none;
+}
+
+.ep-upload-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* ---------------------------------------------------------------- Uploader */
+.ep-uploader {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ep-file {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.ep-upload-zone {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    border: 1.5px dashed var(--ep-line-strong);
+    border-radius: 18px;
+    background: #fffdf6;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.ep-upload-zone:hover {
+    border-color: var(--ep-brand-strong);
+    background: rgba(226, 244, 229, 0.5);
+}
+
+.ep-file:focus-visible + .ep-upload-zone {
+    outline: 3px solid var(--ep-mango);
+    outline-offset: 3px;
+}
+
+.ep-upload-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 96px;
+    height: 96px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--ep-brand-soft);
+    color: var(--ep-brand-strong);
+}
+
+.ep-upload-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ep-upload-visual svg {
+    width: 38px;
+    height: 38px;
+}
+
+.ep-upload-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.ep-upload-title {
+    color: var(--ep-fg);
+    font: 800 0.98rem var(--ep-display);
+    overflow-wrap: anywhere;
+}
+
+.ep-upload-hint {
+    color: var(--ep-muted);
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
+/* The preview and the placeholder share the square visual box. */
+.ep-upload-visual > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.ep-upload-visual > span.d-none {
+    display: none !important;
+}
+
+/* ---------------------------------------------------------------- Legacy aliases
+   Keep existing module markup visually identical without touching every page. */
+.seed-form .seed-input,
+.seed-form .seed-select-btn,
+.seed-form select.seed-input,
+.plant-form .form-control,
+.plant-form textarea,
+.plant-select-btn,
+.patch-form input:not([type="hidden"]),
+.patch-form select,
+.patch-form textarea,
+.care-field input:not([type="checkbox"]),
+.care-field select,
+.care-field textarea,
+.journal-form-page .form-control,
+.journal-form-page .form-select,
+.journal-select-btn {
+    height: 52px;
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1.5px solid var(--ep-field);
+    border-radius: 16px;
+    background-color: #fffdf6;
+    color: var(--ep-fg);
+    font: 500 1rem var(--ep-body);
+}
+
+.plant-form textarea,
+.patch-form textarea,
+.care-field textarea,
+.seed-form textarea.seed-input,
+.journal-form-page textarea.form-control {
+    height: auto;
+    min-height: 132px;
+    padding: 12px 14px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.seed-form select.seed-input,
+.patch-form select,
+.care-field select,
+.journal-form-page .form-select {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 44px;
+    background: #fffdf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2317301f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 14px center;
+}
+
+.seed-form .seed-input:focus,
+.seed-form .seed-select-btn:focus,
+.plant-form .form-control:focus,
+.plant-form textarea:focus,
+.plant-select-btn:focus,
+.patch-form input:not([type="hidden"]):focus,
+.patch-form select:focus,
+.patch-form textarea:focus,
+.care-field input:not([type="checkbox"]):focus,
+.care-field select:focus,
+.care-field textarea:focus,
+.journal-form-page .form-control:focus,
+.journal-form-page .form-select:focus,
+.journal-select-btn:focus {
+    outline: 3px solid rgba(47, 191, 92, 0.35);
+    border-color: var(--ep-brand-strong);
+    box-shadow: none;
+}
+
+.seed-form .seed-menu,
+.plant-form .plant-menu,
+.patch-menu,
+.journal-select-menu {
+    min-width: 190px;
+    padding: 8px;
+    border: 1.5px solid var(--ep-line);
+    border-radius: 18px;
+    background: #fffdf6;
+    box-shadow: 0 18px 36px -18px rgba(23, 48, 31, 0.45);
+}
+
+.seed-form .seed-menu-item,
+.plant-form .plant-menu-item,
+.patch-menu-item,
+.journal-select-item {
+    padding: 9px 12px;
+    border-radius: 12px;
+    color: var(--ep-fg);
+    font: 600 0.92rem/1.3 var(--ep-body);
+    white-space: normal;
+}
+
+.seed-form .seed-menu-item:hover,
+.seed-form .seed-menu-item:focus-visible,
+.plant-form .plant-menu-item:hover,
+.plant-form .plant-menu-item:focus-visible,
+.patch-menu-item:hover,
+.patch-menu-item:focus-visible,
+.journal-select-item:hover,
+.journal-select-item:focus-visible {
+    background: var(--ep-brand-soft);
+    color: var(--ep-brand-strong);
+}
+
+.seed-form .seed-menu-item.active,
+.plant-form .plant-menu-item.active,
+.patch-menu-item.active,
+.journal-select-item.active {
+    background: var(--ep-brand-soft);
+    color: var(--ep-brand-strong);
+    font-weight: 800;
+}
+
+.seed-uploader,
+.ep-uploader {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.seed-upload-zone,
+.ep-upload-zone {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    border: 1.5px dashed var(--ep-line-strong);
+    border-radius: 18px;
+    background: #fffdf6;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.seed-upload-zone:hover,
+.ep-upload-zone:hover {
+    border-color: var(--ep-brand-strong);
+    background: rgba(226, 244, 229, 0.5);
+}
+
+.seed-upload-visual,
+.ep-upload-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 96px;
+    height: 96px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--ep-brand-soft);
+    color: var(--ep-brand-strong);
+}
+
+.seed-upload-visual img,
+.ep-upload-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.seed-upload-visual svg,
+.ep-upload-visual svg {
+    width: 38px;
+    height: 38px;
+}
+
+.seed-upload-copy,
+.ep-upload-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.seed-upload-title,
+.ep-upload-title {
+    color: var(--ep-fg);
+    font: 800 0.98rem var(--ep-display);
+    overflow-wrap: anywhere;
+}
+
+.seed-upload-hint,
+.ep-upload-hint {
+    color: var(--ep-muted);
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
+/* Auth pages render bare Django inputs; bring them onto the same field system. */
+.auth-form input:not([type="hidden"]) {
+    height: 52px;
+    padding: 0 14px;
+    border: 1.5px solid var(--ep-field);
+    border-radius: 16px;
+    background: #fffdf6;
+    color: var(--ep-fg);
+    font: 500 1rem var(--ep-body);
+}
+
+.auth-form input::placeholder {
+    color: var(--ep-muted);
+    opacity: 1;
+}
+
+.auth-form input:focus {
+    outline: 3px solid rgba(47, 191, 92, 0.35);
+    border-color: var(--ep-brand-strong);
+    background: #fffdf6;
+    box-shadow: none;
+}
+
+.auth-label {
+    color: var(--ep-fg);
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- Responsive */
+@media (max-width: 720px) {
+    .ep-form-card {
+        padding: 20px 18px 22px;
+        border-radius: 22px;
+    }
+
+    .journal-form-page .card-body {
+        padding: 20px 18px 22px !important;
+    }
+
+    .ep-form {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .ep-field {
+        grid-column: 1 / -1;
+    }
+
+    .ep-actions {
+        justify-content: stretch;
+    }
+
+    .ep-actions > * {
+        flex: 1 1 100%;
+    }
+
+    .ep-upload-zone,
+    .seed-upload-zone {
+        align-items: flex-start;
+    }
+
+    .ep-upload-visual,
+    .seed-upload-visual {
+        width: 72px;
+        height: 72px;
+    }
+
+    .ep-menu,
+    .seed-menu,
+    .plant-menu,
+    .patch-menu,
+    .journal-select-menu {
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .ep-upload-zone,
+    .seed-upload-zone {
+        flex-direction: column;
+    }
+
+    .ep-upload-visual,
+    .seed-upload-visual {
+        width: 100%;
+        height: 120px;
+    }
+}

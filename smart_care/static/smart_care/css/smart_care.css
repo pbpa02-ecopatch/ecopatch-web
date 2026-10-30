@@ -33,6 +33,12 @@ body.has-sidebar.care-body {
     background: var(--care-sheet-bot);
 }
 
+/* The scene runs under the sidebar, so the footer keeps the content column and stays centred in it,
+   matching the Seed Exchange footer. */
+body.has-sidebar.care-body .site-footer {
+    padding-left: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2 + 20px);
+}
+
 .care-page [hidden] {
     display: none !important;
 }
@@ -586,7 +592,7 @@ body.has-sidebar.care-body {
     --care-section-gap: 30px;
     gap: var(--care-section-gap);
     width: 100%;
-    max-width: calc(920px + var(--care-offset) + 48px);
+    max-width: calc(960px + var(--care-offset) + 48px);
     margin: 0 auto;
     padding: 30px 20px 0 calc(var(--care-offset) + 24px);
 }
@@ -1803,6 +1809,13 @@ body.has-sidebar.care-body {
 .care-field input:not([type="checkbox"]),
 .care-field select {
     height: 52px;
+}
+
+.care-field select {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 44px;
+    background: #fffdf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2317301f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 14px center;
 }
 
 .care-field textarea {

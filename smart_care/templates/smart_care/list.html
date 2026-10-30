@@ -212,13 +212,6 @@
                     </ul>
                 </section>
             </div>
-
-            {# ---------- Footer: the small print (Smart Care has its own, lighter footer) ---------- #}
-            <footer class="care-foot">
-                <div class="care-foot-row">
-                    <span>&copy; {% now "Y" %} EcoPatch &middot; Small Spaces, Greener Living.</span>
-                </div>
-            </footer>
         </div>
     </div>
 
@@ -262,8 +255,7 @@
 </main>
 {% endblock %}
 
-{% block footer %}{% endblock %}
-
 {% block extra_scripts %}
 <script src="{% static_v 'smart_care/js/smart_care.js' %}" defer></script>
+<script src="{% static_v 'smart_care/js/care_selects.js' %}" defer></script>
 {% endblock %}

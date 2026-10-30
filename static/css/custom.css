@@ -95,6 +95,11 @@
     --accent-mango: #ff9d2e;
     --accent-sky: #29b6d8;
     --danger: #ef5350;
+
+    /* The module banners (Plant Library, Seed Exchange, My EcoPatch, Garden Journal) share one
+       minimum height so every page opens on the same rhythm. It follows the Plant Library hero:
+       its copy height plus the same vertical breathing room. */
+    --hero-band-min: calc(170px + clamp(42px, 7vh, 64px) + clamp(106px, 13vh, 132px));
 }
 
 /* Global */

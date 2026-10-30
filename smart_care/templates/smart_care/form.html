@@ -12,11 +12,14 @@
         <form method="post" class="care-form" novalidate>
             {% csrf_token %}
             {% include "smart_care/_task_fields.html" %}
-            <div class="care-form-actions">
-                <a href="{% url 'smart_care:list' %}" class="care-btn care-btn-ghost">Batal</a>
-                <button type="submit" class="care-btn care-btn-primary">{% if is_edit %}Simpan Perubahan{% else %}Tambah Task{% endif %}</button>
+            <div class="care-form-actions ep-actions">
+                <a href="{% url 'smart_care:list' %}" class="care-btn care-btn-ghost ep-btn ep-btn--ghost">Batal</a>
+                <button type="submit" class="care-btn care-btn-primary ep-btn ep-btn--primary">{% if is_edit %}Simpan Perubahan{% else %}Tambah Task{% endif %}</button>
             </div>
         </form>
     </section>
 </div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{% static_v 'smart_care/js/care_selects.js' %}" defer></script>
 {% endblock %}

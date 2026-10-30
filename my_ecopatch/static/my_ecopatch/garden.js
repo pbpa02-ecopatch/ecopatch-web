@@ -66,6 +66,7 @@
     });
   }
   enhanceSelects();
+  document.body.addEventListener('htmx:afterSwap', enhanceSelects);
   document.body.classList.add('mep-js');
 
   // The add form is folded away once there are plants; every "add a plant" link opens it and moves there.
@@ -90,7 +91,7 @@
   dialog.className = 'mep-delete-dialog';
   dialog.setAttribute('aria-labelledby', 'mep-delete-title');
   dialog.setAttribute('aria-describedby', 'mep-delete-copy');
-  dialog.innerHTML = '<form method="dialog"><span class="mep-delete-icon" aria-hidden="true">×</span><h2 id="mep-delete-title">Hapus tanaman?</h2><p id="mep-delete-copy"></p><p class="patch-help">Tindakan ini tidak bisa dibatalkan.</p><div class="mep-dialog-actions"><button class="btn btn-outline-success" value="cancel" autofocus>Batal</button><button class="btn btn-success patch-btn-danger" value="delete">Ya, hapus tanaman</button></div></form>';
+  dialog.innerHTML = '<form method="dialog"><span class="mep-delete-icon" aria-hidden="true">×</span><h2 id="mep-delete-title">Hapus tanaman?</h2><p id="mep-delete-copy"></p><p class="patch-help">Tindakan ini tidak bisa dibatalkan.</p><div class="mep-dialog-actions"><button class="ep-btn ep-btn--ghost" value="cancel" autofocus>Batal</button><button class="ep-btn ep-btn--danger" value="delete">Ya, hapus tanaman</button></div></form>';
   document.body.append(dialog);
   let pendingDelete = null;
   let deleteTrigger = null;

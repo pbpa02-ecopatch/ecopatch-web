@@ -310,9 +310,8 @@
         <div class="journal-hero-inner">
             <div class="row align-items-center g-3">
                 <!-- Left Column: Branding, Copy, Stats, Week Calendar & Primary Action -->
-                <div class="col-lg-6 col-md-6 d-flex flex-column justify-content-center">
+                <div class="col-lg-7 col-md-6 d-flex flex-column justify-content-center">
                     <div class="journal-hero-content-left">
-                        <p class="journal-hero-eyebrow">JURNAL PERKEMBANGAN KEBUN</p>
 
                         <!-- Judul Halaman -->
                         <h1 class="journal-hero-title">
@@ -430,7 +429,7 @@
                 </div>
 
                 <!-- Right Column: Speech Bubble Dialog & Mascot Petak -->
-                <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                <div class="col-lg-5 col-md-6 d-flex flex-column align-items-center justify-content-center">
                     <div class="journal-dialog-scene">
                         <!-- Dialogue / Speech Bubble Pop-Up (Matches Smart Care & Seed Exchange) -->
                         <div class="journal-bubble" role="status" aria-live="polite">
@@ -565,19 +564,10 @@
                     {% include "garden_journal/partials/book_grid.html" %}
                 </div>
             </div>
-
-            <!-- Minimal Bottom Footer (Matching Example) -->
-            <footer class="journal-foot">
-                <div class="journal-foot-row">
-                    <span>&copy; {% now "Y" %} EcoPatch &middot; Small Spaces, Greener Living.</span>
-                </div>
-            </footer>
         </div>
     </div>
 </main>
 {% endblock %}
-
-{% block footer %}{% endblock %}
 
 {% block extra_scripts %}
 <script>
