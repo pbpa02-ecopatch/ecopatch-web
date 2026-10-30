@@ -1,4 +1,4 @@
-# Deploys to PWS after a merge to dev, but only when the same checks as CI pass.
+# Deploys to PWS after a merge to main, but only when the same checks as CI pass.
 # PWS builds from its git remote: a push to its `master` branch is a deploy, and the container runs `migrate` on start.
 # It can also be run by hand (Actions > Deploy to PWS > Run workflow), from the branch chosen there.
 #
@@ -9,7 +9,7 @@ name: Deploy to PWS
 
 on:
   push:
-    branches: [dev]
+    branches: [main]
   workflow_dispatch:
 
 # one deploy at a time; a newer one waits for the running one instead of cancelling it half way
