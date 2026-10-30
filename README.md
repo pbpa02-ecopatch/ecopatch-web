@@ -6,7 +6,7 @@
 
 ![Django](https://img.shields.io/badge/Django-5.2-167a38?style=for-the-badge&logo=django&logoColor=white)
 ![Open-Meteo](https://img.shields.io/badge/Public_API-Open--Meteo-ff9d2e?style=for-the-badge)
-![Deployed](https://img.shields.io/badge/PWS-live-2fbf5c?style=for-the-badge)
+[![Deployed](https://img.shields.io/badge/PWS-live-2fbf5c?style=for-the-badge)](https://salwa-alifia-eco-patch.pws.cs.ui.ac.id/)
 ![PBP](https://img.shields.io/badge/PBP_Gasal-2026%2F2027-8a6a4a?style=for-the-badge)
 
 **[Coba langsung](https://salwa-alifia-eco-patch.pws.cs.ui.ac.id/)** &nbsp;·&nbsp; **[Video demo](https://www.youtube.com/watch?v=61f5_0513Ck)** &nbsp;·&nbsp; **[Desain di Figma](https://www.figma.com/design/oIDtpZy29QWfdudwhSFNb5/Untitled?node-id=0-1&t=LuUIQFP3lihxES26-1)** &nbsp;·&nbsp; **[Jalankan lokal](#-jalankan-di-lokal)** &nbsp;·&nbsp; **[Tim](#-tim)**
