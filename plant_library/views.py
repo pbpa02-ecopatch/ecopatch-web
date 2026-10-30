@@ -371,6 +371,10 @@ def plant_detail(request, pk):
             if matching_plants(patch).filter(pk=plant.pk).exists():
                 matching_patches.append(patch)
 
+    # Anyone logged in can add the plant to one of their EcoPatches from the sheet (the same list the card's + opens).
+    if request.user.is_authenticated:
+        attach_patch_options([plant], request.user)
+
     context = {'plant': plant, 'matching_patches': matching_patches}
     # A card opens the same sheet in a pop-up: that asks for only the sheet (and the link still works as a page).
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

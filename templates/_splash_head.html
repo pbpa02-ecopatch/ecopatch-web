@@ -1,0 +1,10 @@
+{% load asset_version %}<link rel="stylesheet" href="{% static_v 'css/splash.css' %}">
+<script>
+    // The welcome screen shows once per browser tab: the first page opened, not every click after it
+    try {
+        if (!sessionStorage.getItem('ecopatch-splash')) {
+            document.documentElement.classList.add('show-splash');
+            sessionStorage.setItem('ecopatch-splash', '1');
+        }
+    } catch (e) {}
+</script>

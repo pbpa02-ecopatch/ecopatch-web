@@ -10,7 +10,7 @@ from .plant_source import link_task, patch_plant_name, user_patch_plants
 
 # A task may be dated up to this many days before or after today. The limit keeps absurd dates (year 1 or 9999) out of
 # the database: the list page does date arithmetic around the chosen day and cannot go past the calendar's ends.
-DATE_WINDOW_DAYS = 365
+DATE_WINDOW_DAYS = 30
 NOTES_MAX_LENGTH = 500
 
 
@@ -21,6 +21,7 @@ class CareTaskForm(forms.ModelForm):
         queryset=PatchPlant.objects.none(),
         label="Tanaman",
         empty_label="Pilih tanaman",
+        widget=forms.Select(attrs={"class": "ep-input"}),
         error_messages={
             "required": "Pilih tanamannya dulu.",
             "invalid_choice": "Tanaman ini tidak tersedia. Pilih dari daftar.",
@@ -43,10 +44,9 @@ class CareTaskForm(forms.ModelForm):
             "due_date": {"required": "Isi tanggalnya dulu.", "invalid": "Tanggalnya belum benar."},
         }
         widgets = {
-            "due_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
-            "notes": forms.Textarea(attrs={
-                "rows": 3, "maxlength": NOTES_MAX_LENGTH, "placeholder": "Opsional, misalnya: pakai pupuk kompos cair",
-            }),
+            "task_type": forms.Select(attrs={"class": "ep-input"}),
+            "due_date": forms.DateInput(attrs={"type": "date", "class": "ep-input"}, format="%Y-%m-%d"),
+            "notes": forms.Textarea(attrs={"rows": 3, "class": "ep-input", "placeholder": "Opsional, misalnya: pakai pupuk kompos cair"}),
         }
 
     def __init__(self, *args, user, **kwargs):
@@ -65,14 +65,14 @@ class CareTaskForm(forms.ModelForm):
 
     def clean_due_date(self):
         # Django memanggil clean_<nama field> setelah validasi bawaan field itu lolos. Tanggal hanya boleh dalam
-        # rentang setahun dari hari ini. Tugas lama yang tanggalnya tidak diubah tetap boleh diedit, jadi
+        # rentang 30 hari dari hari ini. Tugas lama yang tanggalnya tidak diubah tetap boleh diedit, jadi
         # catatan atau jenisnya bisa dibetulkan tanpa dipaksa mengganti tanggal.
         due = self.cleaned_data["due_date"]
         if self.instance.pk and due == self.instance.due_date:
             return due
         today = timezone.localdate()
         if not today - timedelta(days=DATE_WINDOW_DAYS) <= due <= today + timedelta(days=DATE_WINDOW_DAYS):
-            raise forms.ValidationError("Tanggal harus dalam rentang 1 tahun dari hari ini.")
+            raise forms.ValidationError("Tanggal harus dalam rentang 30 hari dari hari ini.")
         return due
 
     def clean_notes(self):

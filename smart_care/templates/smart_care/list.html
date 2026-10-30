@@ -22,10 +22,10 @@
         <div class="care-inner">
             <div class="care-copy">
                 {% language 'id' %}
-                <p class="care-eyebrow"><span class="care-city">{{ city }}</span> &middot; {% if is_today %}Hari ini{% else %}{{ selected_date|date:"l j M" }}{% if in_forecast %} (prakiraan){% endif %}{% endif %}</p>
+                <p class="care-eyebrow"><svg class="care-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span><span class="care-city">{{ city }}</span> &middot; {% if is_today %}Hari ini{% else %}{{ selected_date|date:"l j M" }}{% if in_forecast %} (prakiraan){% endif %}{% endif %}</span></p>
                 {% endlanguage %}
                 <h1 class="care-title">Smart Care</h1>
-                <p class="care-sum"><b id="care-temp">--&deg;</b><span id="care-condition">Memuat cuaca</span></p>
+                <p class="care-sum"><span class="care-wx" id="care-wx" aria-hidden="true"></span><b id="care-temp">--&deg;</b><span id="care-condition">Memuat cuaca</span></p>
                 <p class="care-mini" id="care-mini"></p>
             </div>
         </div>
@@ -212,17 +212,6 @@
                     </ul>
                 </section>
             </div>
-
-            {# ---------- Footer: a tip and the small print (Smart Care has its own, lighter footer) ---------- #}
-            <footer class="care-foot">
-                <p class="care-tip">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-9"/><path d="M12 12c0-3.6-2.6-5.6-6.4-5.6 0 3.6 2.6 5.6 6.4 5.6z"/><path d="M12 10c0-3.2 2.3-5.2 6-5.2 0 3.2-2.3 5.2-6 5.2z"/></svg>
-                    <span><b>Tip Petak</b> &middot; {{ tip }}</span>
-                </p>
-                <div class="care-foot-row">
-                    <span>&copy; {% now "Y" %} EcoPatch &middot; Small Spaces, Greener Living.</span>
-                </div>
-            </footer>
         </div>
     </div>
 
@@ -266,8 +255,7 @@
 </main>
 {% endblock %}
 
-{% block footer %}{% endblock %}
-
 {% block extra_scripts %}
 <script src="{% static_v 'smart_care/js/smart_care.js' %}" defer></script>
+<script src="{% static_v 'smart_care/js/care_selects.js' %}" defer></script>
 {% endblock %}

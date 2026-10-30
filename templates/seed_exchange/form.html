@@ -34,9 +34,6 @@
                 <p class="seed-sub">{% if mode == 'update' %}Segarkan foto dan detail listingmu, biar makin gampang ketemu tetangga.{% else %}Bagikan atau tukar bibit, stek, biji, dan tanamanmu.{% endif %}</p>
                 <p class="seed-form-legend"><span class="seed-required" aria-hidden="true">*</span> wajib diisi</p>
             </div>
-            <div class="seed-head-art" aria-hidden="true">
-                <img src="{% static 'seed_exchange/tukar-bibit.svg' %}" alt="" width="150" height="150" loading="lazy" decoding="async">
-            </div>
         </header>
 
         <div class="seed-form-card">
@@ -102,6 +99,8 @@
                         </span>
                         <div class="seed-uploader" data-seed-uploader>
                             {{ field }}
+                            <input type="file" accept="image/*" capture="environment" class="d-none" data-seed-camera-input>
+                            <input type="file" accept="image/*" capture="user" class="d-none" data-seed-selfie-input>
                             <label class="seed-upload-zone" for="{{ field.id_for_label }}">
                                 <span class="seed-upload-visual" data-seed-preview>
                                     {% if listing.image %}
@@ -119,6 +118,16 @@
                                     <span class="seed-upload-hint">JPG/PNG, maks 5 MB. Foto asli bibit/stekmu bikin listing lebih cepat dilirik.</span>
                                 </span>
                             </label>
+                            <div class="ep-upload-actions">
+                                <button type="button" class="ep-btn ep-btn--ghost ep-btn--sm" data-seed-camera>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                    Kamera belakang
+                                </button>
+                                <button type="button" class="ep-btn ep-btn--ghost ep-btn--sm" data-seed-selfie>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/></svg>
+                                    Selfie
+                                </button>
+                            </div>
                         </div>
                         {% for error in field.errors %}<div class="seed-error">{{ error }}</div>{% endfor %}
                     </div>
@@ -184,15 +193,14 @@ document.querySelectorAll('[data-seed-uploader]').forEach(function (root) {
     var preview = root.querySelector('[data-seed-preview]');
     var filename = root.querySelector('[data-seed-filename]');
     var defaultLabel = filename ? filename.textContent : '';
+    var cameraInput = root.querySelector('[data-seed-camera-input]');
+    var selfieInput = root.querySelector('[data-seed-selfie-input]');
+    var cameraBtn = root.querySelector('[data-seed-camera]');
+    var selfieBtn = root.querySelector('[data-seed-selfie]');
 
-    input.addEventListener('change', function () {
-        var file = input.files && input.files[0];
-        if (!file) {
-            if (filename) filename.textContent = defaultLabel;
-            return;
-        }
-        if (filename) filename.textContent = file.name;
-        if (!preview) return;
+    function renderPreview(file) {
+        if (filename) filename.textContent = file ? file.name : defaultLabel;
+        if (!file || !preview) return;
         var img = preview.querySelector('img');
         if (!img) {
             img = document.createElement('img');
@@ -203,7 +211,28 @@ document.querySelectorAll('[data-seed-uploader]').forEach(function (root) {
         img.alt = 'Pratinjau foto listing';
         var placeholder = preview.querySelector('[data-seed-placeholder]');
         if (placeholder) placeholder.remove();
+    }
+
+    function transfer(source) {
+        if (!source.files || !source.files[0]) return;
+        var dt = new DataTransfer();
+        dt.items.add(source.files[0]);
+        input.files = dt.files;
+        renderPreview(input.files[0]);
+    }
+
+    input.addEventListener('change', function () {
+        renderPreview(input.files && input.files[0]);
     });
+
+    if (cameraBtn && cameraInput) {
+        cameraBtn.addEventListener('click', function () { cameraInput.click(); });
+        cameraInput.addEventListener('change', function () { transfer(cameraInput); });
+    }
+    if (selfieBtn && selfieInput) {
+        selfieBtn.addEventListener('click', function () { selfieInput.click(); });
+        selfieInput.addEventListener('change', function () { transfer(selfieInput); });
+    }
 });
 </script>
 {% endblock %}

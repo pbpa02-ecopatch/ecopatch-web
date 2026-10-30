@@ -35,21 +35,6 @@ from .weather import CITIES, DEFAULT_CITY, FORECAST_DAYS, WeatherUnavailable, we
 STRIP_DOTS = 3  # a day of the week strip shows up to this many dots, then "+N"
 Status = CareTask.Status
 
-# One tip under the page, picked by the day of the month of the selected date
-TIPS = (
-    "Siram di pagi hari, bukan siang bolong. Air lebih sempat diserap sebelum panas.",
-    "Cek tanah dengan jari: kalau 2 cm teratas masih lembap, tunda menyiram.",
-    "Pupuk cair paling baik diberikan saat tanah sudah sedikit lembap, bukan kering kerontang.",
-    "Putar pot indoor seperempat putaran tiap minggu supaya daunnya tumbuh seimbang.",
-    "Daun menguning bisa tanda kelebihan air. Cek lubang drainase potmu.",
-    "Pangkas ujung tunas basil supaya ia tumbuh bercabang dan makin rimbun.",
-    "Hujan deras bisa mencuci pupuk dari tanah. Tunda pemupukan outdoor setelah hujan.",
-)
-
-# Before there is any plant the tip stays general: nothing that talks about a particular plant or pot
-GENERAL_TIPS = TIPS[:3]
-
-
 def _profile_city(user):
     """City saved on the user's profile, if the profile feature exists and has one."""
     try:
@@ -204,7 +189,6 @@ def care_task_list(request):
     selected = _parse_date(request.GET.get("date")) or today
     plants = get_user_plants(request.user)
     watering_days = get_user_watering_days(request.user)
-    tips = TIPS if plants else GENERAL_TIPS
     tasks, suggestions = _day_state(request.user, selected, today, plants, watering_days)
     for suggestion in suggestions:
         suggestion["label"] = CareTask.TaskType(suggestion["task_type"]).label
@@ -229,7 +213,6 @@ def care_task_list(request):
         "prev_week_url": _list_url(selected - timedelta(days=7)),
         "next_week_url": _list_url(selected + timedelta(days=7)),
         "today_url": _list_url(),
-        "tip": tips[selected.day % len(tips)],
         "city": _current_city(request.user),
     }
     return render(request, "smart_care/list.html", context)

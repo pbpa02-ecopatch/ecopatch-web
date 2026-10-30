@@ -125,3 +125,54 @@ class PlantPopupTests(TestCase):
         self.client.force_login(staff)
         html = self.client.get(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode()
         self.assertIn(reverse('plant_library:plant_update', args=[self.plant.pk]), html)
+
+
+class SheetAddButtonTests(TestCase):
+    """"Tambah ke EcoPatch" on the plant sheet (pop-up and full page): the same list the + on a card opens."""
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('petak', password='pw12345678')
+        self.plant = make_plant()
+        self.patch = EcoPatch.objects.create(owner=self.user, name=IMG, space_type='terrace', city='Malang')
+        self.url = reverse('plant_library:plant_detail', args=[self.plant.pk])
+        self.ajax = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+
+    def test_a_guest_gets_no_add_button_in_the_popup_or_on_the_page(self):
+        for extra in (self.ajax, {}):
+            html = self.client.get(self.url, **extra).content.decode()
+            self.assertNotIn('data-plant-add', html)
+            self.assertNotIn('Tambah ke EcoPatch', html)
+
+    def test_a_member_gets_the_button_with_a_row_per_ecopatch_in_the_popup(self):
+        self.client.force_login(self.user)
+        html = self.client.get(self.url, **self.ajax).content.decode()
+        self.assertIn('data-plant-add', html)
+        self.assertIn('Tambah ke EcoPatch', html)
+        self.assertIn(reverse('my_ecopatch:plant_quick_add', args=[self.patch.pk]), html)
+        self.assertIn('Teras · Malang', html)
+        self.assertNotIn(IMG, html)  # the EcoPatch name is escaped
+        self.assertIn('&lt;img src=x onerror=alert(1)&gt;', html)
+
+    def test_the_full_page_has_the_button_and_loads_the_script_that_opens_it(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, 'Tambah ke EcoPatch')
+        self.assertContains(response, 'plant_library/js/quick_add.js')
+
+    def test_a_plant_already_in_an_ecopatch_is_marked_on_the_sheet(self):
+        PatchPlant.objects.create(patch=self.patch, plant=self.plant, quantity=1, status='planned')
+        self.client.force_login(self.user)
+        self.assertContains(self.client.get(self.url, **self.ajax), 'Sudah ada di sini')
+
+    def test_without_an_ecopatch_the_sheet_points_to_making_one(self):
+        self.patch.delete()
+        self.client.force_login(self.user)
+        html = self.client.get(self.url, **self.ajax).content.decode()
+        self.assertIn('Kamu belum punya EcoPatch.', html)
+        self.assertIn(reverse('my_ecopatch:create'), html)
+
+    def test_the_card_still_renders_the_same_list_after_it_moved_into_a_shared_partial(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('plant_library:plant_list'))
+        self.assertContains(response, reverse('my_ecopatch:plant_quick_add', args=[self.patch.pk]))
+        self.assertContains(response, 'Tambah Basil ke')

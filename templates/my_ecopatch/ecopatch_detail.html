@@ -6,7 +6,6 @@
     <div class="mep-band-inner">
         <div class="mep-band-copy">
             <a class="patch-back" href="{% url 'my_ecopatch:list' %}">&larr; Semua EcoPatch</a>
-            <p class="mep-eyebrow">EcoPatch kamu</p>
             <h1 class="patch-page-title">{{ patch.name }}</h1>
             <ul class="mep-facts" aria-label="Tentang ruang ini">
                 <li>{{ patch.get_space_type_display }}</li>

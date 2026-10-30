@@ -3,24 +3,36 @@
 
 {% block garden_content %}<div class="mep-content">
 <section class="patch-form-shell">
-    <a class="patch-back" href="{% if patch %}{% url 'my_ecopatch:detail' patch.pk %}{% else %}{% url 'my_ecopatch:list' %}{% endif %}">&larr; Kembali</a>
-    <h1 class="patch-page-title">{% if patch %}Ubah EcoPatch{% else %}Buat EcoPatch Baru{% endif %}</h1>
-    <p class="patch-page-lead">Ceritakan sedikit tentang ruang berkebunmu supaya rekomendasi tanaman bisa lebih pas.</p>
+    <a class="patch-back" href="{% if patch %}{% url 'my_ecopatch:detail' patch.pk %}{% else %}{% url 'my_ecopatch:list' %}{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        Kembali
+    </a>
 
-    <p class="patch-help">Kolom bertanda * wajib diisi. Data lainnya boleh dilengkapi nanti.</p>
-    <p class="patch-help patch-city-note">{% if profile_city %}Kota ikut profilmu: <strong>{{ profile_city }}</strong> (dipakai Smart Care untuk cuaca). <a href="{% url 'main:profile' %}">Ubah di profil</a>{% else %}Kotamu belum diisi di profil, jadi Smart Care memakai Depok. <a href="{% url 'main:profile' %}">Isi di profil</a>{% endif %}</p>
-    <form method="post" class="patch-form" novalidate>
-        {% csrf_token %}
-        {% if form.non_field_errors %}
-            <div class="patch-alert" role="alert">{% for error in form.non_field_errors %}{{ error }}{% endfor %}</div>
-        {% endif %}
-        {% for field in form %}
-            {% include "my_ecopatch/_form_field.html" %}
-        {% endfor %}
-        <div class="patch-form-actions">
-            <button type="submit" class="btn btn-success">{% if patch %}Simpan perubahan{% else %}Buat EcoPatch{% endif %}</button>
-            <a class="btn btn-outline-success" href="{% if patch %}{% url 'my_ecopatch:detail' patch.pk %}{% else %}{% url 'my_ecopatch:list' %}{% endif %}">Batal</a>
-        </div>
-    </form>
+    <header class="patch-form-head">
+        <h1 class="patch-page-title">{% if patch %}Ubah EcoPatch{% else %}Buat EcoPatch Baru{% endif %}</h1>
+        <p class="patch-page-lead">Ceritakan sedikit tentang ruang berkebunmu supaya rekomendasi tanaman bisa lebih pas.</p>
+        <p class="patch-form-legend"><span class="patch-required ep-required" aria-hidden="true">*</span> wajib diisi</p>
+    </header>
+
+    <div class="patch-form-card ep-form-card">
+        <p class="patch-city-note ep-note">{% if profile_city %}Kota ikut profilmu: <strong>{{ profile_city }}</strong> (dipakai Smart Care untuk cuaca). <a href="{% url 'main:profile' %}">Ubah di profil</a>{% else %}Kotamu belum diisi di profil, jadi Smart Care memakai Depok. <a href="{% url 'main:profile' %}">Isi di profil</a>{% endif %}</p>
+
+        <form method="post" class="patch-form ep-form" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="patch-alert ep-error" role="alert">{% for error in form.non_field_errors %}{{ error }}{% endfor %}</div>
+            {% endif %}
+            {% for field in form %}
+                {% if field.name == 'name' %}<h2 class="patch-form-section ep-section">Tentang EcoPatch</h2>{% endif %}
+                {% if field.name == 'size_m2' %}<h2 class="patch-form-section ep-section">Kondisi ruang</h2>{% endif %}
+                {% if field.name == 'goal' %}<h2 class="patch-form-section ep-section">Tujuan berkebun</h2>{% endif %}
+                {% include "my_ecopatch/_form_field.html" %}
+            {% endfor %}
+            <div class="patch-form-actions ep-actions">
+                <button type="submit" class="ep-btn ep-btn--primary">{% if patch %}Simpan perubahan{% else %}Buat EcoPatch{% endif %}</button>
+                <a class="ep-btn ep-btn--ghost" href="{% if patch %}{% url 'my_ecopatch:detail' patch.pk %}{% else %}{% url 'my_ecopatch:list' %}{% endif %}">Batal</a>
+            </div>
+        </form>
+    </div>
 </section>
 </div>{% endblock %}

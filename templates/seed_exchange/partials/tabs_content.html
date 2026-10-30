@@ -171,13 +171,5 @@
         <span class="seed-count" aria-live="polite">{{ listings|length }} listing ditemukan</span>
     </header>
     {% include "seed_exchange/partials/cards.html" with listings=listings grid_id="seed-grid" %}
-    <p class="seed-tip">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 21v-8"/>
-            <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
-            <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
-        </svg>
-        <span><b>Tip:</b> tulis jumlah bibit dan cara ambil di deskripsi — listing yang jelas biasanya lebih cepat dapat pasangan tukar.</span>
-    </p>
 </div>
 {% endif %}

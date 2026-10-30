@@ -30,7 +30,7 @@ class UserForm(forms.ModelForm):
         # Email dipakai untuk reset password, jadi tidak boleh dikosongkan dari profil
         self.fields['email'].required = True
         self.fields['email'].error_messages['required'] = 'Email wajib diisi.'
-        self.fields['email'].error_messages['invalid'] = 'Format email belum benar. Contoh: nama@email.com'
+        self.fields['email'].error_messages['invalid'] = 'Format email belum benar. Contoh: nama@gmail.com'
 
 
 class AvatarForm(forms.ModelForm):

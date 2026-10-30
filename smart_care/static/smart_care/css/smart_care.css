@@ -33,6 +33,12 @@ body.has-sidebar.care-body {
     background: var(--care-sheet-bot);
 }
 
+/* The scene runs under the sidebar, so the footer keeps the content column and stays centred in it,
+   matching the Seed Exchange footer. */
+body.has-sidebar.care-body .site-footer {
+    padding-left: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2 + 20px);
+}
+
 .care-page [hidden] {
     display: none !important;
 }
@@ -419,10 +425,19 @@ body.has-sidebar.care-body {
 }
 
 .care-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin: 0;
     font-size: 0.88rem;
     font-weight: 700;
     color: var(--care-fg);
+}
+
+.care-ico {
+    flex: none;
+    width: 1.05em;
+    height: 1.05em;
 }
 
 .care-title {
@@ -439,6 +454,26 @@ body.has-sidebar.care-body {
     margin: 6px 0 0;
 }
 
+.care-wx {
+    flex: none;
+    align-self: center;
+    width: 2rem;
+    height: 2rem;
+    color: var(--care-fg);
+}
+
+/* the icon comes from the script (the same drawings as the week strip), following the weather of the selected day */
+.care-wx svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 .care-sum b {
     font: 800 2.4rem/1 var(--care-display);
 }
@@ -449,20 +484,46 @@ body.has-sidebar.care-body {
 
 .care-mini {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2px 16px;
-    margin: 0;
-    font-size: 0.9rem;
-    font-weight: 600;
+    align-items: stretch;
+    margin: 10px 0 0;
     font-variant-numeric: tabular-nums;
 }
 
+/* a small label over a big number, the columns split by a thin line */
 .care-mini span {
-    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 0 16px;
+    border-left: 1px solid color-mix(in srgb, var(--care-fg) 25%, transparent);
+}
+
+.care-mini span:first-child {
+    padding-left: 0;
+    border-left: 0;
+}
+
+.care-mini small {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: color-mix(in srgb, var(--care-fg) 78%, transparent);
 }
 
 .care-mini b {
-    font-weight: 800;
+    font: 800 1.1rem/1.1 var(--care-display);
+    white-space: nowrap;
+}
+
+/* beside the sidebar the words only have the room left of the bubble: the label may take two lines, the number never splits */
+@media (min-width: 768px) and (max-width: 1399.98px) {
+    .care-mini span {
+        padding: 0 12px;
+    }
+
+    .care-mini small {
+        max-width: 11ch;
+    }
 }
 
 .care-bubble {
@@ -586,7 +647,7 @@ body.has-sidebar.care-body {
     --care-section-gap: 30px;
     gap: var(--care-section-gap);
     width: 100%;
-    max-width: calc(920px + var(--care-offset) + 48px);
+    max-width: calc(960px + var(--care-offset) + 48px);
     margin: 0 auto;
     padding: 30px 20px 0 calc(var(--care-offset) + 24px);
 }
@@ -1639,38 +1700,13 @@ body.has-sidebar.care-body {
     }
 }
 
-/* ---------------------------------------------------------------- Footer: a tip and the small print */
+/* ---------------------------------------------------------------- Footer: the small print */
 .care-foot {
     display: flex;
     flex-direction: column;
     gap: 14px;
     margin-top: auto;
     padding: 36px 0 28px;
-}
-
-.care-tip {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    max-width: 60ch;
-    margin: 0;
-    font-weight: 600;
-}
-
-.care-tip svg {
-    width: 1.25em;
-    height: 1.25em;
-    margin-top: 3px;
-    fill: none;
-    stroke: var(--care-brand-strong);
-    stroke-width: 1.9;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.care-tip b {
-    font-family: var(--care-display);
-    font-weight: 800;
 }
 
 .care-foot-row {
@@ -1828,6 +1864,13 @@ body.has-sidebar.care-body {
 .care-field input:not([type="checkbox"]),
 .care-field select {
     height: 52px;
+}
+
+.care-field select {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 44px;
+    background: #fffdf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2317301f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 14px center;
 }
 
 .care-field textarea {
@@ -2057,5 +2100,29 @@ body.has-sidebar.care-body {
 
     .care-floor .care-pg {
         transform: none;
+    }
+}
+
+/* While the forecast is on its way the scene text gets the same hopping dots as the welcome screen */
+.care-scene.is-loading #care-condition::after,
+.care-scene.is-loading #care-bubble-text::after {
+    content: "...";
+    display: inline-block;
+    width: 1.2em;
+    overflow: hidden;
+    vertical-align: bottom;
+    animation: care-ellipsis 1.2s steps(4, end) infinite;
+}
+
+@keyframes care-ellipsis {
+    from { width: 0; }
+    to { width: 1.2em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .care-scene.is-loading #care-condition::after,
+    .care-scene.is-loading #care-bubble-text::after {
+        animation: none;
+        width: 1.2em;
     }
 }

@@ -879,7 +879,7 @@ class ProfileViewTests(TestCase):
     # ---- tampilan: footer ringan dan halaman yang berdiri di bawah sidebar
     def test_the_footer_is_light_with_no_placeholder_links(self):
         html = self.client.get(self.url).content.decode()
-        foot = html.split('<footer class="pf-foot">', 1)[1].split('</footer>', 1)[0]
+        foot = html.split('<footer class="site-footer mt-auto">', 1)[1].split('</footer>', 1)[0]
         self.assertIn('Small Spaces, Greener Living.', foot)
         self.assertNotIn('href="#"', foot)
         self.assertNotIn('<a ', foot)

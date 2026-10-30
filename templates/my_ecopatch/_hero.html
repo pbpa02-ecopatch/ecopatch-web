@@ -77,14 +77,39 @@ five, newest on the right) and each shows how far that garden has grown. Purely 
 
     <div class="mep-hero-inner">
         <div class="mep-hero-copy">
-            <p class="mep-eyebrow">RUANG KECIL, CERITA HIJAU BESAR</p>
             <h1>My EcoPatch</h1>
             <p>Kelola semua kebun dan tanamanmu dalam satu tempat.</p>
-            <ul class="mep-stats" aria-label="Ringkasan semua kebun">
-                <li><strong>{{ patch_count }}</strong> EcoPatch</li>
-                <li><strong>{{ plant_count }}</strong> tanaman</li>
-                <li><strong>{{ growing_count }}</strong> sedang tumbuh</li>
-            </ul>
+            <div class="journal-stats-pills" aria-label="Ringkasan semua kebun">
+                <span class="stat-pill-chip">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f9142"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        class="stat-pill-icon">
+                        <path d="M7 20h10" />
+                        <path d="M10 20c5.5-2.5.8-6.4 3-10" />
+                        <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" />
+                    </svg>
+                    <strong>{{ patch_count }}</strong> EcoPatch
+                </span>
+                <span class="stat-pill-chip">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f9142"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        class="stat-pill-icon">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                    </svg>
+                    <strong>{{ plant_count }}</strong> tanaman
+                </span>
+                <span class="stat-pill-chip">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f9142"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        class="stat-pill-icon">
+                        <path d="M7 20h10" />
+                        <path d="M10 20c5.5-2.5.8-6.4 3-10" />
+                        <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" />
+                    </svg>
+                    <strong>{{ growing_count }}</strong> sedang tumbuh
+                </span>
+            </div>
         </div>
 
         <div class="mep-hero-stage" aria-hidden="true">

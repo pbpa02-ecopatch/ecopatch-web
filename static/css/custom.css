@@ -95,6 +95,11 @@
     --accent-mango: #ff9d2e;
     --accent-sky: #29b6d8;
     --danger: #ef5350;
+
+    /* The module banners (Plant Library, Seed Exchange, My EcoPatch, Garden Journal) share one
+       minimum height so every page opens on the same rhythm. It follows the Plant Library hero:
+       its copy height plus the same vertical breathing room. */
+    --hero-band-min: calc(170px + clamp(42px, 7vh, 64px) + clamp(106px, 13vh, 132px));
 }
 
 /* Global */
@@ -2640,4 +2645,87 @@ form.patch-form-actions {
 
 @media (prefers-reduced-motion: reduce) {
     .confirm-dialog { animation: none; }
+}
+
+/* ================= Top bar on phones and small tablets (below md) =================
+   Logo + name on the left; the profile avatar (or Masuk/Daftar) and the menu button grouped on the right,
+   so nothing floats in the middle of the pill. The menu button is a round green-tinted chip with our own three
+   bars (they turn into a cross while the menu is open) instead of Bootstrap's grey box. */
+@media (max-width: 767.98px) {
+    .site-navbar .container {
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .site-navbar .brand-sprout {
+        display: block;
+        flex: 0 0 auto;
+        width: 30px;
+        height: 30px;
+    }
+
+    .site-navbar .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 auto 0 0;
+        padding: 0;
+    }
+
+    .site-navbar .container > .d-flex {
+        margin-left: auto;
+    }
+
+    .site-navbar .navbar-toggler {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 44px;
+        height: 44px;
+        margin-left: 8px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--brand-300) 55%, var(--surface-200));
+        transition: background-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .site-navbar .navbar-toggler:hover {
+        background: var(--brand-300);
+    }
+
+    .site-navbar .navbar-toggler:focus {
+        box-shadow: none;
+    }
+
+    .site-navbar .navbar-toggler:focus-visible {
+        outline: 3px solid var(--brand-300);
+        outline-offset: 3px;
+    }
+
+    .site-navbar .navbar-toggler:active {
+        transform: scale(0.94);
+    }
+
+    .site-navbar .navbar-toggler-icon {
+        width: 22px;
+        height: 22px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f9142' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M5 7h14M5 12h14M5 17h14'/%3E%3C/svg%3E");
+    }
+
+    .site-navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f9142' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E");
+    }
+
+    .site-navbar .navbar-collapse {
+        flex-basis: 100%;
+        padding-top: 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-navbar .navbar-toggler {
+        transition: none;
+    }
 }

@@ -27,7 +27,6 @@ from .plant_source import (
 )
 from .suggestions import INTERVALS, HistoryEntry, build_suggestions, plant_status
 from .tests import API_RESPONSE, fake_response
-from .views import GENERAL_TIPS, TIPS
 from .weather import WeatherUnavailable
 
 FAST_HASHER = override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
@@ -533,16 +532,16 @@ class CareViewTests(CacheClearingTestCase):
 
     def test_a_date_far_from_today_is_rejected_by_the_form(self):
         plant = make_patch_plant(self.user, "Cabai")
-        too_far = (timezone.localdate() + timedelta(days=366)).isoformat()
+        too_far = (timezone.localdate() + timedelta(days=31)).isoformat()
         for value in ("9999-12-31", "0001-01-01", "1990-01-01", too_far):
             response = self.post_new_task(plant, value)
             self.assertEqual(response.status_code, 200, value)  # the form is shown again with its error
-            self.assertContains(response, "dalam rentang 1 tahun")
+            self.assertContains(response, "dalam rentang 30 hari")
         self.assertFalse(CareTask.objects.exists())
 
-    def test_dates_up_to_a_year_either_side_of_today_are_accepted(self):
+    def test_dates_up_to_thirty_days_either_side_of_today_are_accepted(self):
         plant = make_patch_plant(self.user, "Cabai")
-        for offset in (-365, 0, 365):
+        for offset in (-30, 0, 30):
             day = (timezone.localdate() + timedelta(days=offset)).isoformat()
             self.assertEqual(self.post_new_task(plant, day).status_code, 302, day)
         self.assertEqual(CareTask.objects.count(), 3)
@@ -858,10 +857,11 @@ class CareViewTests(CacheClearingTestCase):
         self.assertLess(controls.index("Minggu lalu"), controls.index("Hari ini"))
         self.assertLess(controls.index("Hari ini"), controls.index("Minggu depan"))
 
-    def test_smart_care_has_its_own_light_footer_and_the_other_modules_keep_the_shared_one(self):
+    def test_smart_care_uses_the_shared_footer(self):
         own = self.client.get(reverse("smart_care:list"))
-        self.assertContains(own, "Tip Petak")
-        self.assertNotContains(own, "site-footer")
+        self.assertContains(own, "site-footer")
+        self.assertNotContains(own, "Tip Petak")
+        self.assertNotContains(own, "care-foot")
         self.assertNotContains(own, '<main class="container')  # the scene needs the full width
         other = self.client.get(reverse("my_ecopatch:list"))
         # (what another module puts inside its main area is its own business, so only the shared footer is checked)
@@ -869,20 +869,13 @@ class CareViewTests(CacheClearingTestCase):
         self.assertNotContains(other, "Tip Petak")
         self.assertNotContains(other, "care-foot")
 
-    def test_the_footer_is_just_the_tip_and_the_copyright_with_no_placeholder_links(self):
+    def test_the_footer_is_just_the_copyright_with_no_placeholder_links(self):
         html = self.client.get(reverse("smart_care:list")).content.decode()
-        foot = html.split('<footer class="care-foot">', 1)[1].split("</footer>", 1)[0]
+        foot = html.split('<footer class="site-footer mt-auto">', 1)[1].split("</footer>", 1)[0]
         self.assertIn("EcoPatch", foot)
         self.assertIn("Small Spaces, Greener Living.", foot)
         self.assertNotIn("<a ", foot)
         self.assertNotIn('href="#"', foot)
-
-    def test_the_tip_follows_the_day(self):
-        make_patch_plant(self.user, "Cabai")  # with plants the whole list is in play (without them, only the general tips)
-        for day in (date(2026, 11, 2), date(2026, 11, 3)):
-            tip = self.client.get(reverse("smart_care:list"), {"date": day.isoformat()}).context["tip"]
-            self.assertEqual(tip, TIPS[day.day % len(TIPS)])
-        self.assertNotEqual(TIPS[2], TIPS[3])
 
     def test_only_the_coming_week_counts_as_a_forecast(self):
         today = timezone.localdate()
@@ -894,7 +887,7 @@ class CareViewTests(CacheClearingTestCase):
 
     def test_the_eyebrow_names_the_day_and_says_forecast_only_when_there_is_one(self):
         today = timezone.localdate()
-        self.assertContains(self.client.get(reverse("smart_care:list")), "&middot; Hari ini</p>")
+        self.assertContains(self.client.get(reverse("smart_care:list")), "&middot; Hari ini</span></p>")
         soon = self.client.get(reverse("smart_care:list"), {"date": (today + timedelta(days=2)).isoformat()})
         later = self.client.get(reverse("smart_care:list"), {"date": (today + timedelta(days=20)).isoformat()})
         self.assertContains(soon, "(prakiraan)")
@@ -1315,16 +1308,6 @@ class SuggestionViewTests(CacheClearingTestCase):
         make_patch_plant(newbie, "Bayam", status="planned")
         response = self.client.get(reverse("smart_care:list"))
         self.assertFalse(response.context["has_plants"])
-
-    def test_without_plants_the_tip_is_a_general_one_on_every_day(self):
-        self._login_without_plants()
-        for offset in range(7):
-            day = (timezone.localdate() + timedelta(days=offset)).isoformat()
-            tip = self.client.get(reverse("smart_care:list"), {"date": day}).context["tip"]
-            self.assertIn(tip, GENERAL_TIPS)
-        self.assertEqual(len(GENERAL_TIPS), 3)
-        for tip in GENERAL_TIPS:
-            self.assertNotRegex(tip.lower(), r"basil|pot|tunas|daun")
 
     def test_a_suggestion_row_knows_its_date_so_the_forecast_advice_can_find_it(self):
         response = self.client.get(reverse("smart_care:list"))
