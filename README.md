@@ -23,50 +23,47 @@ Ini adalah website EcoPatch yang dibangun dengan **Django** untuk Proyek Tengah 
 
 ## Demo
 
-> **Lihat langsung.** Satu alur dari memilih tanaman sampai membagikan bibit, satu gambar per fitur (screenshot dari aplikasi yang berjalan dengan data contoh).
+> **Lihat langsung.** Satu alur dari memilih tanaman sampai membagikan bibit, satu klip per fitur, direkam dari aplikasi yang berjalan dengan data contoh. Video lengkapnya ada di [YouTube](https://www.youtube.com/watch?v=61f5_0513Ck).
 
 <!--
-  Gambar di bawah masih screenshot statis (docs/readme/demo-*.jpg). Untuk menggantinya dengan GIF/MP4 dari aplikasi yang berjalan:
-  1. Rekam klip pendek (5 sampai 15 detik), lalu seret filenya ke kotak komentar PR atau issue di GitHub.
-     GitHub memberi alamat https://github.com/user-attachments/assets/... : salin alamat itu (jangan kirim komentarnya).
-  2. Ganti nilai src pada gambar di sel yang sesuai dengan alamat itu.
-  3. Video penuh: sudah ada di baris tautan paling atas README (Video demo).
+  Klip di bawah adalah GIF di docs/readme/demo-*.gif, direkam dari aplikasi lokal dengan akun dan database demo terpisah.
+  Untuk menggantinya, simpan GIF baru dengan nama yang sama (usahakan di bawah 1,5 MB per file).
   Pakai akun demo. Jangan sampai terlihat: file .env, token, password, atau nomor kontak asli.
 -->
 
 <table>
   <tr>
     <td width="50%" valign="top">
-      <img src="docs/readme/demo-1-cari.jpg" alt="Plant Library: pencarian dan filter tanaman" width="100%"/>
+      <img src="docs/readme/demo-1-cari.gif" alt="Plant Library: pencarian dan filter tanaman" width="100%"/>
       <b>① Cari tanaman</b><br/>
       <sub>Cari berdasarkan nama, saring dengan cahaya, ruang, dan tingkat kesulitan. Klik kartu untuk membuka detailnya dalam pop-up.</sub>
     </td>
     <td width="50%" valign="top">
-      <img src="docs/readme/demo-2-tambah.jpg" alt="Detail tanaman dengan tombol Tambah ke EcoPatch" width="100%"/>
+      <img src="docs/readme/demo-2-tambah.gif" alt="Detail tanaman dengan tombol Tambah ke EcoPatch" width="100%"/>
       <b>② Tambah ke EcoPatch</b><br/>
       <sub>Dari kartu atau pop-up tanaman, tekan tambah dan pilih kebunmu. Tiap kebun menunjukkan seberapa cocok tanamannya, tanpa pindah halaman.</sub>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <img src="docs/readme/demo-3-kebun.jpg" alt="My EcoPatch: detail kebun dan tahap tumbuh tanaman" width="100%"/>
+      <img src="docs/readme/demo-3-kebun.gif" alt="My EcoPatch: detail kebun dan tahap tumbuh tanaman" width="100%"/>
       <b>③ Kelola kebun</b><br/>
       <sub>Buat EcoPatch dengan jenis ruang, cahaya, dan kota. Atur tanamannya dari bibit sampai tumbuh.</sub>
     </td>
     <td width="50%" valign="top">
-      <img src="docs/readme/demo-4-rawat.jpg" alt="Smart Care: cuaca hari ini dan saran perawatan" width="100%"/>
+      <img src="docs/readme/demo-4-rawat.gif" alt="Smart Care: cuaca hari ini dan saran perawatan" width="100%"/>
       <b>④ Rawat sesuai cuaca</b><br/>
       <sub>Smart Care membaca prakiraan Open-Meteo untuk kotamu dan memberi saran per tanaman. Centang tugas yang sudah selesai.</sub>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <img src="docs/readme/demo-5-jurnal.jpg" alt="Garden Journal: buku catatan per tanaman" width="100%"/>
+      <img src="docs/readme/demo-5-jurnal.gif" alt="Garden Journal: buku catatan per tanaman" width="100%"/>
       <b>⑤ Catat perkembangan</b><br/>
       <sub>Garden Journal menyimpan catatan dan foto tiap tanaman dalam satu timeline.</sub>
     </td>
     <td width="50%" valign="top">
-      <img src="docs/readme/demo-6-bibit.jpg" alt="Seed Exchange: jelajahi listing bibit dan stek" width="100%"/>
+      <img src="docs/readme/demo-6-bibit.gif" alt="Seed Exchange: jelajahi listing bibit dan stek" width="100%"/>
       <b>⑥ Bagikan bibit</b><br/>
       <sub>Pasang bibit atau stek berlebih di Seed Exchange, lalu orang lain memesannya. Statusnya tersedia, diminta, dipesan, sampai selesai.</sub>
     </td>
