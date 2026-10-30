@@ -10,7 +10,7 @@ from .plant_source import link_task, patch_plant_name, user_patch_plants
 
 # A task may be dated up to this many days before or after today. The limit keeps absurd dates (year 1 or 9999) out of
 # the database: the list page does date arithmetic around the chosen day and cannot go past the calendar's ends.
-DATE_WINDOW_DAYS = 365
+DATE_WINDOW_DAYS = 30
 NOTES_MAX_LENGTH = 500
 
 
@@ -65,14 +65,14 @@ class CareTaskForm(forms.ModelForm):
 
     def clean_due_date(self):
         # Django memanggil clean_<nama field> setelah validasi bawaan field itu lolos. Tanggal hanya boleh dalam
-        # rentang setahun dari hari ini. Tugas lama yang tanggalnya tidak diubah tetap boleh diedit, jadi
+        # rentang 30 hari dari hari ini. Tugas lama yang tanggalnya tidak diubah tetap boleh diedit, jadi
         # catatan atau jenisnya bisa dibetulkan tanpa dipaksa mengganti tanggal.
         due = self.cleaned_data["due_date"]
         if self.instance.pk and due == self.instance.due_date:
             return due
         today = timezone.localdate()
         if not today - timedelta(days=DATE_WINDOW_DAYS) <= due <= today + timedelta(days=DATE_WINDOW_DAYS):
-            raise forms.ValidationError("Tanggal harus dalam rentang 1 tahun dari hari ini.")
+            raise forms.ValidationError("Tanggal harus dalam rentang 30 hari dari hari ini.")
         return due
 
     def clean_notes(self):

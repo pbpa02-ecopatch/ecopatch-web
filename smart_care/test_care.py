@@ -532,16 +532,16 @@ class CareViewTests(CacheClearingTestCase):
 
     def test_a_date_far_from_today_is_rejected_by_the_form(self):
         plant = make_patch_plant(self.user, "Cabai")
-        too_far = (timezone.localdate() + timedelta(days=366)).isoformat()
+        too_far = (timezone.localdate() + timedelta(days=31)).isoformat()
         for value in ("9999-12-31", "0001-01-01", "1990-01-01", too_far):
             response = self.post_new_task(plant, value)
             self.assertEqual(response.status_code, 200, value)  # the form is shown again with its error
-            self.assertContains(response, "dalam rentang 1 tahun")
+            self.assertContains(response, "dalam rentang 30 hari")
         self.assertFalse(CareTask.objects.exists())
 
-    def test_dates_up_to_a_year_either_side_of_today_are_accepted(self):
+    def test_dates_up_to_thirty_days_either_side_of_today_are_accepted(self):
         plant = make_patch_plant(self.user, "Cabai")
-        for offset in (-365, 0, 365):
+        for offset in (-30, 0, 30):
             day = (timezone.localdate() + timedelta(days=offset)).isoformat()
             self.assertEqual(self.post_new_task(plant, day).status_code, 302, day)
         self.assertEqual(CareTask.objects.count(), 3)
