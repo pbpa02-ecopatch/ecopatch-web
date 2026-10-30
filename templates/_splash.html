@@ -1,0 +1,26 @@
+{% load static %}{# Welcome screen: only drawn when _splash_head.html flagged the first visit (html.show-splash) #}
+<div class="site-splash" id="site-splash" aria-hidden="true">
+    <div class="site-splash-art">
+        <span class="site-splash-ring"></span>
+        <span class="site-splash-ring site-splash-ring--2"></span>
+        <img src="{% static 'img/mascot/petak-semangat.png' %}" alt="" width="190" height="186">
+    </div>
+    <p class="site-splash-text">Menyiapkan <b>EcoPatch</b><span class="loading-dots"><i></i><i></i><i></i></span></p>
+</div>
+<script>
+    // Take the welcome screen away once the page has loaded (but let it be seen for a moment), and never keep it longer than 4 seconds
+    (function () {
+        var splash = document.getElementById('site-splash');
+        if (!splash || !document.documentElement.classList.contains('show-splash')) return;
+        var done = false;
+        function hide() {
+            if (done) return;
+            done = true;
+            splash.classList.add('is-leaving');
+            setTimeout(function () { document.documentElement.classList.remove('show-splash'); }, 450);
+        }
+        function whenReady() { setTimeout(hide, Math.max(0, 900 - performance.now())); }
+        if (document.readyState === 'complete') whenReady(); else window.addEventListener('load', whenReady);
+        setTimeout(hide, 4000);
+    })();
+</script>
