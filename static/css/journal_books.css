@@ -2894,6 +2894,12 @@ body.has-sidebar.journal-body {
     background: #faefd5;
 }
 
+/* The journal sheet runs full width, so the footer line keeps the same column as the content
+   (and stays centred in it), the way the Seed Exchange footer does. */
+body.has-sidebar.journal-body .site-footer {
+    padding-left: calc(var(--side-width, 0px) + var(--side-gap, 0px) * 2 + 20px);
+}
+
 .journal-main {
     display: flex;
     flex-direction: column;
@@ -2907,11 +2913,11 @@ body.has-sidebar.journal-body {
     position: relative;
     background: radial-gradient(70% 90% at 76% 78%, rgba(255, 240, 200, 0.65) 0%, transparent 62%), linear-gradient(180deg, #fff4dc 0%, #eef8e2 46%, #dff2d4 100%);
     border-bottom: 3px solid #d8c48d;
-    padding: clamp(28px, 4vh, 40px) 20px 0 calc(var(--journal-offset, 0px) + 20px);
+    padding: clamp(20px, 3vh, 30px) 20px 0 calc(var(--journal-offset, 0px) + 20px);
     overflow: hidden;
     isolation: isolate;
     box-sizing: border-box;
-    min-height: clamp(340px, 30vw, 400px);
+    min-height: var(--hero-band-min);
 }
 
 /* Background Art Layer Container */
@@ -3244,7 +3250,7 @@ body.has-sidebar.journal-body {
     margin: 0 auto;
     position: relative;
     z-index: 3;
-    padding: 0 24px 24px;
+    padding: 0 24px 18px;
 }
 
 .journal-sheet-body > .container {
@@ -3299,12 +3305,12 @@ body.has-sidebar.journal-body {
 
 .journal-hero-title {
     font-family: var(--font-display, 'Baloo 2', sans-serif);
-    font-size: clamp(3rem, 5.2vw, 4.8rem);
+    font-size: clamp(2.4rem, 4.2vw, 3.6rem);
     font-weight: 800;
     color: #22301f;
     line-height: 1;
     letter-spacing: -0.03em;
-    margin: 0 0 14px;
+    margin: 0 0 12px;
 }
 
 .journal-hero-lead {
