@@ -99,6 +99,26 @@ textarea.ep-input {
     resize: vertical;
 }
 
+/* Date input alignment fix (ensures left-aligned date text across iOS Safari & mobile browsers) */
+input[type="date"].ep-input,
+.ep-input[type="date"] {
+    text-align: start !important;
+    text-align: left !important;
+    -webkit-appearance: none;
+    appearance: none;
+    padding-left: 14px !important;
+}
+
+input[type="date"].ep-input::-webkit-date-and-time-value,
+.ep-input[type="date"]::-webkit-date-and-time-value {
+    text-align: start !important;
+    text-align: left !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: normal;
+    min-height: 1.5em;
+}
+
 select.ep-input {
     -webkit-appearance: none;
     appearance: none;

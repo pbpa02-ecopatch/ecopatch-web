@@ -54,7 +54,7 @@ class GardenJournalForm(ModelForm):
             "title": forms.TextInput(attrs={"class": "form-control ep-input", "placeholder": "cth: Daun baru mulai merekah"}),
             "plant_condition": forms.Select(attrs={"class": "form-select"}),
             "plant_height": forms.NumberInput(
-                attrs={"class": "form-control ep-input", "step": "0.1", "min": "0", "placeholder": "cm"}
+                attrs={"class": "form-control ep-input", "step": "0.1", "min": "0", "placeholder": "cth: 15"}
             ),
             "image": forms.FileInput(attrs={"class": "form-control", "accept": "image/*"}),
             "cover_pattern": forms.RadioSelect(attrs={"class": "cover-radio-input"}),
