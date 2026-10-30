@@ -71,7 +71,7 @@
                         </select>
                         <button class="mep-status-save" type="submit" id="save-{{ plant.pk }}" aria-label="Simpan status {% firstof plant.plant.name plant.plant_name %}">Simpan</button>
                     </form>
-                    <a class="plant-remove" href="{% url 'my_ecopatch:plant_delete' plant.pk %}"
+                    <a class="plant-remove ep-btn ep-btn--danger ep-btn--sm" href="{% url 'my_ecopatch:plant_delete' plant.pk %}"
                        hx-post="{% url 'my_ecopatch:plant_delete' plant.pk %}"
                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                        hx-confirm="Hapus {% firstof plant.plant.name plant.plant_name %} dari EcoPatch ini?"

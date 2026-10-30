@@ -107,7 +107,7 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-add-bed>span{font-size:3rem;line-height:1.4;color:#167a38}.mep-add-bed small{margin-top:7px}.mep-add-bed:hover{background:#e7efda;color:#175e30}
 .mep-empty{grid-column:1/-1;background:#fff9ed;border-radius:24px;padding:30px;border:1px dashed #b6a174}
 .mep-empty h2{font-family:'Baloo 2',sans-serif}.mep-empty p{max-width:65ch;margin:0}
-.mep-seed-tray{margin:44px 0 24px;padding:26px 0;border-top:2px solid #8a6a4a66;border-bottom:1px solid #b69a6361}
+.mep-seed-tray{margin:44px 0 24px;padding:26px 0;border-top:2px solid #8a6a4a66}
 .mep-seed-tray p:last-child{font-size:.9rem;margin-bottom:0;max-width:52ch;color:#4c6853}
 .mep-module .patch-page-title{font-family:'Baloo 2',sans-serif;font-size:clamp(2rem,4vw,3rem);overflow-wrap:anywhere}
 .mep-module .patch-info{background:transparent;box-shadow:none;border:0;border-top:1px solid #b69a6361;border-bottom:1px solid #b69a6361;border-radius:0;padding:24px 0}
@@ -144,7 +144,7 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-module .plant-row{background:transparent;border:0;border-bottom:1px solid #b69a6361;border-radius:0;padding:18px 0;gap:14px}
 .mep-module .plant-name{font:700 1.3rem 'Baloo 2',sans-serif;overflow-wrap:anywhere}
 .mep-module .plant-main{min-width:140px}
-.mep-module .plant-remove{min-height:44px;text-decoration:underline}
+.mep-module .plant-remove{min-height:0;text-decoration:none}
 .mep-module .patch-pill{font-size:.72rem}
 .mep-module .patch-btn-danger{color:#a3301f;border-color:#c88e70}
 .mep-module .btn-success.patch-btn-danger{background:#a3301f;color:white;box-shadow:0 4px 0 #712417}
@@ -180,22 +180,29 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-module .patch-plant-form { margin: 0 0 36px; scroll-margin-top: 96px; }
 .mep-module .mep-select { min-width: 0; width: 100%; }
 .mep-module .mep-select .patch-select-btn {
-  width: 100%; min-height: 48px; padding: 12px 16px;
+  width: 100%; height: 52px; min-height: 52px; padding: 0 40px 0 14px;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  background: #fffef9; border: 1.5px solid #aa9a70; border-radius: 14px;
-  color: #17301f; font: inherit; text-align: left; white-space: normal;
+  background-color: #fffdf6; border: 1.5px solid #9c8e5e; border-radius: 16px;
+  color: #17301f; font: 500 1rem 'Plus Jakarta Sans', sans-serif; text-align: left; white-space: normal;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234c6853' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 16px;
 }
-.mep-module .mep-select .patch-select-btn::after { flex-shrink: 0; }
+.mep-module .mep-select .patch-select-btn::after { display: none; }
+.mep-module .mep-select .patch-select-btn:focus-visible,
+.mep-module .mep-select .patch-select-btn.show { background-color: #fffdf6; }
 .mep-module .mep-select .patch-menu {
-  max-height: 260px; overflow-y: auto; overscroll-behavior: contain;
-  background: #fffdf6; border-color: #d8c7a3; border-radius: 16px;
+  max-height: 264px; overflow-y: auto; overscroll-behavior: contain;
+  padding: 8px; background: #fffdf6; border: 1.5px solid #9c8e5e; border-radius: 18px;
+  box-shadow: 0 18px 36px -18px rgba(23, 48, 31, 0.45);
 }
-.mep-module .mep-select .patch-menu-item { min-height: 44px; white-space: normal; }
-.mep-module .mep-select .patch-menu-item.active { background: #bdeec7; color: #175e30; }
+.mep-module .mep-select .patch-menu-item { min-height: 44px; padding: 9px 12px; border-radius: 12px; white-space: normal; font: 600 .92rem/1.3 'Plus Jakarta Sans', sans-serif; }
+.mep-module .mep-select .patch-menu-item.active { background: #e2f4e5; color: #175e30; font-weight: 800; }
 .mep-module .mep-select .patch-menu-item:hover,
 .mep-module .mep-select .patch-menu-item:focus-visible { background: #e2f4e5; color: #17301f; }
 .mep-module .mep-select-status { width: 150px; }
-.mep-module .mep-select-status .patch-select-btn { border-radius: 999px; background: #e2f4e5; font-weight: 700; font-size: .85rem; }
+.mep-module .mep-select-status .patch-select-btn { border-radius: 999px; background-color: #e2f4e5; font-weight: 700; font-size: .85rem; }
+.mep-module .mep-select-status .patch-select-btn:focus-visible,
+.mep-module .mep-select-status .patch-select-btn.show { background-color: #e2f4e5; }
 .mep-module .mep-select [aria-invalid="true"] { border-color: #a3301f; }
 .mep-module .mep-select select[hidden] { display: none !important; }
 .mep-delete-dialog {
@@ -346,13 +353,14 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-empty-plants{background:#fff9ed;border:1px dashed #b6a174;border-radius:20px;padding:22px 24px;margin:0 0 20px}
 .mep-empty-plants p{margin:0 0 6px}
 
-.mep-add{margin-top:26px;background:#fffaf0;border:1px solid #d8c7a3;border-radius:24px;overflow:hidden}
-.mep-add>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:16px 22px;font:800 1.15rem 'Baloo 2',sans-serif;color:#17301f}
+.mep-add{margin-top:26px;background:#fffdf6;border:1.5px solid #b69a6161;border-radius:28px;overflow:visible}
+.mep-add>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:18px 24px;font:800 1.15rem 'Baloo 2',sans-serif;color:#17301f}
 .mep-add>summary::-webkit-details-marker{display:none}
 .mep-add-plus{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#167a38;color:#fff;font-size:1.3rem;line-height:1;transition:transform .2s}
 .mep-add[open]>summary .mep-add-plus{transform:rotate(45deg)}
-.mep-add .patch-plant-form{border:0;border-top:1px solid #e0d3b3;border-radius:0;box-shadow:none;margin:0;padding:20px 22px 24px;background:transparent}
+.mep-add .patch-plant-form{border:0;border-top:1px solid #b69a6161;border-radius:0;box-shadow:none;margin:0;padding:26px 30px 28px;background:transparent}
 .mep-add>summary:focus-visible{outline-offset:-3px}
+@media(max-width:600px){.mep-add>summary{padding:15px 18px}.mep-add .patch-plant-form{padding:20px 18px 22px}}
 
 @media(max-width:900px){
   .mep-flow{grid-template-columns:1fr}

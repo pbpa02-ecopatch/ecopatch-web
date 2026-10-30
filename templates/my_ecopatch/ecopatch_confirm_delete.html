@@ -10,8 +10,8 @@
     </p>
     <form method="post" class="patch-form-actions">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success patch-btn-danger">Ya, hapus</button>
-        <a class="btn btn-outline-success" href="{% url 'my_ecopatch:detail' patch.pk %}">Batal</a>
+        <button type="submit" class="ep-btn ep-btn--danger">Ya, hapus</button>
+        <a class="ep-btn ep-btn--ghost" href="{% url 'my_ecopatch:detail' patch.pk %}">Batal</a>
     </form>
 </section>
 </div>{% endblock %}
