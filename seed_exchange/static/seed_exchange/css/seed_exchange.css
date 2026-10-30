@@ -177,7 +177,7 @@ body.has-sidebar:has(.seed-page) .site-footer {
     align-items: center;
     gap: clamp(18px, 3vw, 36px);
     width: 100%;
-    max-width: calc(1080px + var(--seed-offset) + 48px);
+    max-width: calc(960px + var(--seed-offset) + 48px);
     min-height: inherit;
     margin: 0 auto;
     padding: clamp(34px, 5vh, 54px) 24px 28px calc(var(--seed-offset) + 24px);
