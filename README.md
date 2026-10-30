@@ -484,7 +484,7 @@ Test otomatis tidak menggantikan pemeriksaan visual dan pengujian interaksi di b
 </details>
 
 <details>
-<summary><b> 5. Keterbatasan AI dan perbaikan manual
+<summary><b>5. Keterbatasan AI dan perbaikan manual</b></summary>
 
 Ini bagian yang paling penting: AI tidak selalu benar, dan perbaikannya dikerjakan atau diverifikasi manusia.
 
