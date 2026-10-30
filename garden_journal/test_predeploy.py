@@ -89,3 +89,9 @@ class JournalRegressionTests(TestCase):
         with patch('garden_journal.views.timezone.localdate', return_value=local_date):
             response = self.client.get(reverse('garden_journal:create'))
         self.assertEqual(response.context['form'].initial['date'], local_date)
+
+    def test_deleting_a_legacy_entry_without_plant_name_returns_to_list(self):
+        first = GardenJournal.objects.create(user=self.user, date=date(2026,10,30), title='Legacy 1', notes='Lama')
+        GardenJournal.objects.create(user=self.user, date=date(2026,10,30), title='Legacy 2', notes='Lama')
+        response = self.client.post(reverse('garden_journal:delete', args=[first.pk]))
+        self.assertRedirects(response, reverse('garden_journal:list'))
