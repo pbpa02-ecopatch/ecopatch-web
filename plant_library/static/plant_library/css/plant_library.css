@@ -1704,7 +1704,7 @@ body.has-sidebar .plant-page {
 .plant-form textarea,
 .plant-select-btn {
     width: 100%;
-    height: 54px;
+    height: 52px;
     padding: 0 14px;
     border: 1.5px solid #9c8e5e;
     border-radius: 16px;
@@ -1712,6 +1712,14 @@ body.has-sidebar .plant-page {
     color: var(--pl-fg);
     font: 500 1rem var(--pl-body);
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Same chevron as the profile page for any native select left in a form. */
+.plant-form select.form-control {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 44px;
+    background: #fffdf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2317301f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 14px center;
 }
 
 .plant-form .form-control::placeholder,
@@ -1730,9 +1738,9 @@ body.has-sidebar .plant-page {
 .plant-form .form-control:focus,
 .plant-form textarea:focus,
 .plant-select-btn:focus {
-    outline: none;
+    outline: 3px solid rgba(47, 191, 92, 0.35);
     border-color: var(--pl-brand-strong);
-    box-shadow: 0 0 0 4px rgba(47, 191, 92, 0.28);
+    box-shadow: none;
 }
 
 .plant-select-btn {

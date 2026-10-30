@@ -130,10 +130,11 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-module .patch-form-section::after{content:'';flex:1;height:2px;border-radius:2px;background:#8a6a4a;opacity:.25}
 .mep-module .patch-label{display:flex;align-items:center;gap:5px;color:#17301f;font-size:.92rem;font-weight:700}
 .mep-module .patch-required{color:#a3301f}
-.mep-module .patch-form-card .patch-form input:not([type=hidden]),.mep-module .patch-form-card .patch-form select,.mep-module .patch-form-card .patch-form textarea{width:100%;height:54px;min-height:54px;padding:0 14px;border:1.5px solid #9c8e5e;border-radius:16px;background:#fffdf6;color:#17301f;font:500 1rem 'Plus Jakarta Sans',sans-serif;transition:border-color .18s,box-shadow .18s}
-.mep-module .patch-form-card .patch-form textarea{height:auto;min-height:132px;padding:12px 14px;line-height:1.6}
-.mep-module .patch-form-card .patch-form input:focus,.mep-module .patch-form-card .patch-form select:focus,.mep-module .patch-form-card .patch-form textarea:focus{outline:none;border-color:#167a38;box-shadow:0 0 0 4px rgba(47,191,92,.28)}
-.mep-module .patch-form-card .patch-form .patch-help{margin:0;color:#4c6853;font-size:.82rem;line-height:1.5}
+.mep-module .patch-form input:not([type=hidden]),.mep-module .patch-form select,.mep-module .patch-form textarea{width:100%;height:52px;min-height:52px;padding:0 14px;border:1.5px solid #9c8e5e;border-radius:16px;background:#fffdf6;color:#17301f;font:500 1rem 'Plus Jakarta Sans',sans-serif;transition:border-color .18s,box-shadow .18s}
+.mep-module .patch-form textarea{height:auto;min-height:132px;padding:12px 14px;line-height:1.6}
+.mep-module .patch-form select{-webkit-appearance:none;appearance:none;padding-right:44px;background:#fffdf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2317301f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 14px center}
+.mep-module .patch-form input:focus,.mep-module .patch-form select:focus,.mep-module .patch-form textarea:focus{outline:3px solid rgba(47,191,92,.35);border-color:#167a38;box-shadow:none}
+.mep-module .patch-form .patch-help{margin:0;color:#4c6853;font-size:.82rem;line-height:1.5}
 .mep-module .patch-form-card .patch-form-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:4px;padding-top:18px;border-top:1px solid #b69a6161}
 .mep-module .patch-form-card .patch-city-note{display:block;width:auto;max-width:none;background:#e8f5e6;border:1px solid #cfe3c4;border-radius:16px;padding:11px 14px;margin:0 0 18px;font-size:.88rem;line-height:1.5;color:#2f4a36}
 .mep-module .patch-form-card .patch-alert{grid-column:1/-1;padding:10px 14px;border-radius:14px;background:#fbdcd5;color:#a3301f;font-size:.88rem;font-weight:600}
