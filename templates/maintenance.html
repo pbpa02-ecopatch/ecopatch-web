@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EcoPatch sedang disiapkan</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--fg:#17301f;--muted:#4c6853;--brand:#167a38;--font-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;--font-body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:32px 20px;text-align:center;color:var(--fg);font:400 1rem/1.55 var(--font-body);background:linear-gradient(180deg,#fde9c0 0%,#fdd9a0 55%,#fcc885 100%)}
+.brand{position:absolute;top:24px;left:50%;transform:translateX(-50%);font:800 1.2rem var(--font-display);letter-spacing:-.01em}
+.pet{width:min(190px,48vw)}
+.pet svg{display:block;width:100%;height:auto;overflow:visible;animation:breathe 3.8s ease-in-out infinite}
+h1{margin:6px 0 0;font:800 clamp(2rem,7vw,3.4rem)/1.05 var(--font-display);letter-spacing:-.015em}
+p{margin:0;max-width:34ch;font-weight:600;color:var(--muted)}
+.hint{font-size:.9rem;font-weight:400}
+@keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.p-sprout{transform-box:fill-box;transform-origin:50% 100%;animation:sway 3.2s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-2.6deg)}50%{transform:rotate(2.6deg)}}
+@media (prefers-reduced-motion:reduce){.pet svg,.p-sprout{animation:none}}
+</style>
+</head>
+<body>
+<span class="brand">EcoPatch</span>
+<div class="pet" aria-hidden="true">{% include "smart_care/_petak_faces.html" with only="happy" %}</div>
+<h1>EcoPatch lagi disiapkan</h1>
+<p>Petak sedang merapikan kebun. Coba lagi sebentar lagi ya.</p>
+<p class="hint">Terima kasih sudah mampir.</p>
+</body>
+</html>
