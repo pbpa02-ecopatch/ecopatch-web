@@ -10,22 +10,11 @@
 {% block content %}
 <div class="journal-form-shell">
     <div class="col-12">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="{% url 'garden_journal:list' %}" class="text-success text-decoration-none">Garden Journal</a>
-                </li>
-                {% if journal %}
-                    <li class="breadcrumb-item">
-                        <a href="{% url 'garden_journal:plant_history' journal.plant_name %}" class="text-success text-decoration-none">
-                            {{ journal.plant_name }}
-                        </a>
-                    </li>
-                {% endif %}
-                <li class="breadcrumb-item active">{{ action }} Catatan</li>
-            </ol>
-        </nav>
+        <!-- Back link -->
+        <a class="journal-back mb-3" href="{% if journal %}{% url 'garden_journal:plant_history' journal.plant_name %}{% else %}{% url 'garden_journal:list' %}{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            {% if journal %}Kembali ke {{ journal.plant_name }}{% else %}Kembali ke Garden Journal{% endif %}
+        </a>
 
         {% if not has_ecopatch and action == "Tambah" %}
         <!-- Empty State Jika Belum Punya EcoPatch -->
