@@ -504,17 +504,7 @@ Ini bagian yang paling penting: AI tidak selalu benar, dan perbaikannya dikerjak
 Pelajaran utamanya: instruksi eksplisit tetap perlu diperiksa pada hasil aktual, perubahan lokal dapat berdampak lintas modul, kecocokan visual membutuhkan penilaian manusia, dan klaim agent tentang keadaan repo atau server harus dicek ulang.
 
 <details>
-<summary><b>6. Log percakapan dan dokumentasi prompt</b></summary>
-
-<br>
-
-| Materi | Status |
-| --- | --- |
-| Percakapan teknis ChatGPT | Dirujuk sebagai dasar klaim pembelajaran dan dokumentasi. Tidak ada tautan yang dibagikan |
-| Log Claude Code, Codex, Antigravity, DeepSeek, Figma Agent | Tidak tersedia |
-| Riwayat Git repository | Tersedia, menunjukkan waktu perubahan |
-
-</details>
+<summary><b>6. Dokumentasi prompt</b></summary>
 
 > AI digunakan sebagai alat bantu untuk eksplorasi, implementasi, debugging, dan dokumentasi. Kesesuaian dengan requirement, keputusan desain dan arsitektur, pemeriksaan hasil, serta tanggung jawab atas kualitas akhir tetap berada pada anggota tim.
 
