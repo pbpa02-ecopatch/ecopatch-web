@@ -706,10 +706,11 @@ class CareViewTests(CacheClearingTestCase):
         self.assertLess(controls.index("Minggu lalu"), controls.index("Hari ini"))
         self.assertLess(controls.index("Hari ini"), controls.index("Minggu depan"))
 
-    def test_smart_care_has_its_own_light_footer_and_the_other_modules_keep_the_shared_one(self):
+    def test_smart_care_uses_the_shared_footer(self):
         own = self.client.get(reverse("smart_care:list"))
-        self.assertContains(own, "Tip Petak")
-        self.assertNotContains(own, "site-footer")
+        self.assertContains(own, "site-footer")
+        self.assertNotContains(own, "Tip Petak")
+        self.assertNotContains(own, "care-foot")
         self.assertNotContains(own, '<main class="container')  # the scene needs the full width
         other = self.client.get(reverse("my_ecopatch:list"))
         # (what another module puts inside its main area is its own business, so only the shared footer is checked)
@@ -717,9 +718,9 @@ class CareViewTests(CacheClearingTestCase):
         self.assertNotContains(other, "Tip Petak")
         self.assertNotContains(other, "care-foot")
 
-    def test_the_footer_is_just_the_tip_and_the_copyright_with_no_placeholder_links(self):
+    def test_the_footer_is_just_the_copyright_with_no_placeholder_links(self):
         html = self.client.get(reverse("smart_care:list")).content.decode()
-        foot = html.split('<footer class="care-foot">', 1)[1].split("</footer>", 1)[0]
+        foot = html.split('<footer class="site-footer mt-auto">', 1)[1].split("</footer>", 1)[0]
         self.assertIn("EcoPatch", foot)
         self.assertIn("Small Spaces, Greener Living.", foot)
         self.assertNotIn("<a ", foot)
