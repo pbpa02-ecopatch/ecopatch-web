@@ -6,6 +6,7 @@ from django.test import TestCase, override_settings
 from django.urls import include, path, reverse
 from my_ecopatch.models import EcoPatch
 from plant_library.forms import PlantForm
+from plant_library.apps import seed_initial_plants
 from plant_library.models import Plant
 from plant_library.views import parse_query_keywords
 
@@ -454,3 +455,38 @@ class WateringIntervalTests(TestCase):
         self.assertEqual(days['Rosemary'], 4)
         self.assertEqual(days['Lidah Mertua (Sansevieria)'], 6)
         self.assertTrue(all(1 <= value <= 6 for value in days.values()))
+
+
+class SeedOnMigrateTests(TestCase):
+    """The starter plants load after `migrate` only when asked for, and only into an empty library."""
+
+    def test_off_by_default_so_nothing_is_added(self):
+        seed_initial_plants()
+        self.assertEqual(Plant.objects.count(), 0)
+
+    @override_settings(SEED_PLANTS_ON_MIGRATE=True)
+    def test_an_empty_library_gets_the_starter_plants(self):
+        seed_initial_plants()
+        self.assertEqual(Plant.objects.count(), 60)
+
+    @override_settings(SEED_PLANTS_ON_MIGRATE=True)
+    def test_running_it_again_adds_nothing(self):
+        seed_initial_plants()
+        seed_initial_plants()
+        self.assertEqual(Plant.objects.count(), 60)
+
+    @override_settings(SEED_PLANTS_ON_MIGRATE=True)
+    def test_a_library_that_already_has_plants_is_left_alone(self):
+        Plant.objects.create(
+            name='Tanamanku', category=Plant.Category.HERBS, sunlight=Plant.Sunlight.FULL,
+            watering=Plant.Watering.MODERATE, difficulty=Plant.Difficulty.EASY,
+            indoor_outdoor=Plant.Placement.BOTH, space_requirement=Plant.SpaceRequirement.ANY,
+        )
+        seed_initial_plants()
+        self.assertEqual(list(Plant.objects.values_list('name', flat=True)), ['Tanamanku'])
+
+    @override_settings(SEED_PLANTS_ON_MIGRATE=True)
+    def test_it_runs_after_migrate_itself(self):
+        from django.core.management import call_command
+        call_command('migrate', verbosity=0)
+        self.assertEqual(Plant.objects.count(), 60)

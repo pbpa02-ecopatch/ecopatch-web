@@ -33,6 +33,9 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
+# While preparing a deployment: MAINTENANCE_MODE=True shows everyone but staff a "being prepared" page (503).
+MAINTENANCE_MODE = os.environ.get('MAINTENANCE_MODE', 'False') == 'True'
+
 ALLOWED_HOSTS = ["salwa-alifia-eco-patch.pws.cs.ui.ac.id", "localhost", "127.0.0.1"]
 
 CSRF_TRUSTED_ORIGINS = ["https://salwa-alifia-eco-patch.pws.cs.ui.ac.id"]
@@ -72,6 +75,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'main.middleware.MaintenanceModeMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -185,6 +189,10 @@ LOGOUT_REDIRECT_URL = 'main:home'
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 GOOGLE_AUTH_ENABLED = bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
+
+# Load the starter plants (plant_library/fixtures/initial_plants.json) after `migrate` when the library is empty.
+# For a server where you cannot run `loaddata` yourself (PWS): set SEED_PLANTS_ON_MIGRATE=True in its environment.
+SEED_PLANTS_ON_MIGRATE = os.environ.get('SEED_PLANTS_ON_MIGRATE', 'False') == 'True'
 
 SITE_ID = 1
 AUTHENTICATION_BACKENDS = [
