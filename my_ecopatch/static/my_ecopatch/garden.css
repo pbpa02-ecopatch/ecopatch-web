@@ -226,10 +226,10 @@ body.mep-module{background:#fdf7e8;color:#17301f}
   .mep-module{--mep-offset:calc(var(--side-width) + var(--side-gap) * 2)}
 }
 /* The footer continues the page: same colour as where the page gradient ends, and the line sits in the same column as the content */
-.mep-module .site-footer{padding:0;background:#faefd5;text-align:left}
+.mep-module .site-footer{padding:0;background:#faefd5;text-align:center}
 .mep-module .site-footer-copy{max-width:calc(1120px + var(--mep-offset,0px));margin:0 auto;
   padding:18px clamp(20px,4vw,56px) 28px calc(var(--mep-offset,0px) + clamp(20px,4vw,56px))}
-.mep-hero{position:relative;isolation:isolate;overflow:hidden;min-height:clamp(390px,46vh,480px);border-bottom:3px solid #d8c48d;
+.mep-hero{position:relative;isolation:isolate;overflow:hidden;min-height:var(--hero-band-min);border-bottom:3px solid #d8c48d;
   background:radial-gradient(70% 90% at 76% 78%,#fff0c8a6 0%,transparent 62%),linear-gradient(180deg,#fff4dc 0%,#eef8e2 46%,#dff2d4 100%)}
 .mep-hero-art{position:absolute;inset:0;z-index:0;pointer-events:none}
 .mep-sun{position:absolute;right:25%;bottom:33%;width:clamp(110px,13vw,170px);aspect-ratio:1;border-radius:50%;
@@ -337,6 +337,9 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 
 .mep-module .patch-plants-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 20px;margin-bottom:6px}
 .mep-module .patch-plants-head .patch-card-count{margin:2px 0 0}
+.mep-module .patch-plants-head-main{display:flex;align-items:center;gap:14px;min-width:0}
+.mep-module .patch-plants-icon{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:16px;background:#eaf5ea;border:1px solid #c9e3c9;color:#167a38}
+.mep-module .patch-plants-icon svg{width:22px;height:22px}
 .mep-module .plant-row{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(0,1.5fr) auto auto;gap:10px 18px;align-items:center}
 .mep-module .plant-main{min-width:0}
 .mep-track{display:flex;list-style:none;margin:0;padding:0;gap:4px}
@@ -360,6 +363,16 @@ body.mep-module{background:#fdf7e8;color:#17301f}
 .mep-add[open]>summary .mep-add-plus{transform:rotate(45deg)}
 .mep-add .patch-plant-form{border:0;border-top:1px solid #b69a6161;border-radius:0;box-shadow:none;margin:0;padding:26px 30px 28px;background:transparent}
 .mep-add>summary:focus-visible{outline-offset:-3px}
+
+/* The two opening notes of the add-plant form: one quiet card for the rules, one for the nudge to Plant Library. */
+.mep-form-intro{display:flex;flex-direction:column;gap:10px;margin:0 0 22px}
+.mep-form-note,.mep-form-hint{display:flex;align-items:flex-start;gap:10px;margin:0;padding:12px 16px;border:1px solid #e6cf95;border-radius:16px;background:#fff8e7;color:#4c6853;font-size:.86rem;line-height:1.55}
+.mep-form-note svg,.mep-form-hint svg{flex:none;width:19px;height:19px;margin-top:2px;color:#167a38}
+.mep-form-note .ep-required{color:#a3301f;font-weight:800}
+.mep-form-hint{background:#f2f8ea;border-color:#cfe3c1}
+.mep-form-hint a{color:#167a38;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.mep-form-hint a:hover{color:#0f5c2b}
+@media(max-width:600px){.mep-form-note,.mep-form-hint{padding:11px 13px;font-size:.82rem}}
 @media(max-width:600px){.mep-add>summary{padding:15px 18px}.mep-add .patch-plant-form{padding:20px 18px 22px}}
 
 @media(max-width:900px){

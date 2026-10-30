@@ -22,9 +22,18 @@
     </ol>
 
     <div class="patch-plants-head">
-        <div>
-            <h2 class="patch-section-title">Tanaman di EcoPatch ini</h2>
-            <p class="patch-card-count">{{ patch.plant_quantity }} tanaman &middot; {{ patch.plant_total }} entri</p>
+        <div class="patch-plants-head-main">
+            <span class="patch-plants-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 21v-8"/>
+                    <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                    <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                </svg>
+            </span>
+            <div>
+                <h2 class="patch-section-title">Tanaman di EcoPatch ini</h2>
+                <p class="patch-card-count">{{ patch.plant_quantity }} tanaman</p>
+            </div>
         </div>
         {% if patch.status_summary %}
             <ul class="patch-status-list">
@@ -95,12 +104,26 @@
               hx-post="{% url 'my_ecopatch:plant_add' patch.pk %}"
               hx-target="#patch-plants" hx-swap="outerHTML">
             {% csrf_token %}
-            <p class="patch-help">Kolom bertanda * wajib diisi. Pilih tanaman dari katalog, lalu catat jumlah dan tahap pertumbuhannya.</p>
-            <p class="patch-help patch-help-lead">
-                Belum tahu mau menanam apa?
-                <a href="{% url 'plant_library:plant_recommend' %}?patch={{ patch.pk }}">Lihat rekomendasi untuk EcoPatch ini</a>
-                atau <a href="{% url 'plant_library:plant_list' %}">jelajahi Plant Library</a>.
-            </p>
+            <div class="mep-form-intro">
+                <p class="mep-form-note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M12 11v5"/>
+                        <path d="M12 7.6h.01"/>
+                    </svg>
+                    <span>Kolom bertanda <span class="ep-required" aria-hidden="true">*</span> wajib diisi. Pilih tanaman dari katalog, lalu catat jumlah dan tahap pertumbuhannya.</span>
+                </p>
+                <p class="mep-form-hint">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 21v-8"/>
+                        <path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7Z"/>
+                        <path d="M12 15c0-3-2.2-5-5-5 0 3 2.2 5 5 5Z"/>
+                    </svg>
+                    <span>Belum tahu mau menanam apa?
+                        <a href="{% url 'plant_library:plant_recommend' %}?patch={{ patch.pk }}">Lihat rekomendasi untuk EcoPatch ini</a>
+                        atau <a href="{% url 'plant_library:plant_list' %}">jelajahi Plant Library</a>.</span>
+                </p>
+            </div>
             {% if plant_form.non_field_errors %}
                 <div class="patch-alert" role="alert">{% for error in plant_form.non_field_errors %}{{ error }}{% endfor %}</div>
             {% endif %}

@@ -75,7 +75,6 @@
       </a>
       {% endif %}
     </form>
-    <p class="patch-help">{{ patches|length }} EcoPatch ditampilkan · Pilih petak untuk mengelola tanaman.</p>
     <div class="mep-map">
     {% for patch in patches %}
     <article class="mep-garden">
@@ -88,7 +87,7 @@
         <h2>{{ patch.name }}</h2>
       </a>
       <p class="mep-location">{{ patch.get_space_type_display }}{% if patch.city %} · {{ patch.city }}{% endif %}</p>
-      <p class="mep-count">{{ patch.plant_quantity }} tanaman · {{ patch.plant_total }} entri</p>
+      <p class="mep-count">{{ patch.plant_quantity }} tanaman</p>
       <ul class="patch-status-list">{% for item in patch.status_summary %}<li class="patch-pill patch-pill--{{ item.key }}">{{ item.count }} {{ item.label }}</li>{% endfor %}</ul>
     </article>
     {% empty %}
