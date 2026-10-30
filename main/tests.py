@@ -1006,6 +1006,12 @@ class NotFoundPageTests(TestCase):
         self.client.force_login(get_user_model().objects.create_user('tanam', 't@example.com', 'pass12345'))
         self.assertIsOurNotFoundPage(self.client.get(reverse('plant_library:plant_detail', args=[99999])))
 
+    def test_a_phone_can_leave_and_play_by_tapping(self):
+        body = self.client.get('/tidak-ada/').content.decode()
+        self.assertIn('Ketuk atau seret', body)  # a tap places a piece: dragging a small piece onto its hole is hard on a phone
+        cta_rule = next(line for line in body.splitlines() if line.startswith('.cta{'))
+        self.assertNotIn('visibility:hidden', cta_rule)  # the way out is there from the start, not only after the puzzle is solved
+
     def test_the_page_is_self_contained(self):
         body = self.client.get('/tidak-ada/').content.decode()
         self.assertNotIn('site-navbar', body)  # it does not extend base.html
