@@ -211,17 +211,6 @@
                     </ul>
                 </section>
             </div>
-
-            {# ---------- Footer: a tip and the small print (Smart Care has its own, lighter footer) ---------- #}
-            <footer class="care-foot">
-                <p class="care-tip">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-9"/><path d="M12 12c0-3.6-2.6-5.6-6.4-5.6 0 3.6 2.6 5.6 6.4 5.6z"/><path d="M12 10c0-3.2 2.3-5.2 6-5.2 0 3.2-2.3 5.2-6 5.2z"/></svg>
-                    <span><b>Tip Petak</b> &middot; {{ tip }}</span>
-                </p>
-                <div class="care-foot-row">
-                    <span>&copy; {% now "Y" %} EcoPatch &middot; Small Spaces, Greener Living.</span>
-                </div>
-            </footer>
         </div>
     </div>
 
@@ -264,8 +253,6 @@
 </div>
 </main>
 {% endblock %}
-
-{% block footer %}{% endblock %}
 
 {% block extra_scripts %}
 <script src="{% static_v 'smart_care/js/smart_care.js' %}" defer></script>
